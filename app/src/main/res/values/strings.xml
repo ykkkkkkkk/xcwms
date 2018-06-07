@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">xcwms</string>
+    <string name="action_settings"></string>
+    <string name="public_back">关闭</string>
+    <!-- 本地保存的文件名字 -->
+    <string name="saveOther">saveOther</string>
+    <!-- 保存操作员信息 -->
+    <string name="saveUser">saveUserInfo</string>
+    <!-- 保存服务器配置信息 -->
+    <string name="saveConfig">saveConfig</string>
+
+
+    <!-- 自定义listView -->
+    <string name="xrecyclerview_header_hint_normal">下拉刷新</string>
+    <string name="xlrecyclerview_header_hint_ready">释放立即刷新</string>
+    <string name="xrecyclerview_header_hint_loading">正在刷新...</string>
+    <string name="xrecyclerview_header_hint_refresh_success">刷新成功</string>
+    <string name="xrecyclerview_header_hint_refresh_failure">刷新失败</string>
+    <string name="refresh_done">刷新完成</string>
+    <string name="click_to_loadmore">点击加载更多数据</string>
+    <string name="xrecyclerview_header_last_time">最近更新：</string>
+    <string name="xrecyclerview_footer_loadmore">加载更多...</string>
+    <string name="xrecyclerview_footer_loading">正在加载...</string>
+    <string name="xrecyclerview_footer_hint_normal">加载更多</string>
+    <string name="xrecyclerview_footer_hint_ready">释放立即加载</string>
+    <string name="xrecyclerview_footer_never_hasdata">没有更多的数据了</string>
+    <string name="loading_done">加载完成</string>
+    <string name="not_updated_yet">暂未更新过</string>
+    <string name="updated_at">上次更新于%1$s前</string>
+    <string name="updated_just_now">刚刚更新</string>
+    <string name="time_error">时间有问题</string>
+    <string name="layout_loading_text">正在加载...</string>
+    <string name="load_fail_message">数据加载失败，请点击重试</string>
+
+</resources>
