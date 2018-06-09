@@ -49,7 +49,7 @@ import ykk.xc.com.xcwms.model.Mtl;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
-import ykk.xc.com.xcwms.model.SeOrder;
+import ykk.xc.com.xcwms.model.pur.SeOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockArea;
 import ykk.xc.com.xcwms.model.StockPosition;

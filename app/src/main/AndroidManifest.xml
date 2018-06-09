@@ -95,7 +95,10 @@
             android:name=".purchase.Pur_InActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Pur_OrderActivity"
+            android:name=".purchase.Sel_PurOrderActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Pur_OrderSearchActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 销售模块 -->

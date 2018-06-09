@@ -8,16 +8,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.PoList;
+import ykk.xc.com.xcwms.model.pur.PoList;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_OrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
+public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
     private List<PoList> datas;
 
-    public Pur_OrderAdapter(Activity context, List<PoList> datas) {
+    public Sel_PurOrderAdapter(Activity context, List<PoList> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -25,7 +25,7 @@ public class Pur_OrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_order_item;
+        return R.layout.sel_pur_order_item;
     }
 
     @Override

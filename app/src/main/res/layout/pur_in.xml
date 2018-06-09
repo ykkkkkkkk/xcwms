@@ -17,7 +17,6 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:gravity="center"
             android:text="外购入库"
@@ -26,7 +25,7 @@
 
         <Button
             android:id="@+id/btn_maker_code"
-            android:layout_width="52dp"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@drawable/btn_blue2_selector"
             android:ems="2"

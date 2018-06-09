@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.SeOrder;
+import ykk.xc.com.xcwms.model.pur.SeOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 public class Sal_OrderAdapter extends BaseArrayRecyclerAdapter<SeOrder> {

@@ -7,7 +7,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.PoList;
+import ykk.xc.com.xcwms.model.pur.PoList;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**

@@ -46,7 +46,7 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.Mtl;
-import ykk.xc.com.xcwms.model.PoList;
+import ykk.xc.com.xcwms.model.pur.PoList;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.Stock;
@@ -300,7 +300,7 @@ public class Pur_InActivity extends BaseActivity {
                 }
                 bundle = new Bundle();
                 bundle.putParcelable("supplier", supplier);
-                showForResult(Pur_OrderActivity.class, SEL_ORDER, bundle);
+                showForResult(Sel_PurOrderActivity.class, SEL_ORDER, bundle);
 
                 break;
             case R.id.tv_custSel: // 选择供应商

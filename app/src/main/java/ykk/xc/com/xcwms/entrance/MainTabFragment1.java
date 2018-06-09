@@ -17,6 +17,7 @@ import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Pur_InActivity;
+import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
 public class MainTabFragment1 extends BaseFragment {
@@ -64,12 +65,12 @@ public class MainTabFragment1 extends BaseFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.relative1:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                show(Pur_OrderSearchActivity.class, null);
+
                 break;
             case R.id.relative2:
-//                show(getActivity(), Ware_Pur_InActivity.class, null);
-                Intent intent = new Intent(getContext(), Pur_InActivity.class);
-                startActivity(intent);
+                show(Pur_InActivity.class, null);
+
                 break;
             case R.id.relative3:
                 mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);

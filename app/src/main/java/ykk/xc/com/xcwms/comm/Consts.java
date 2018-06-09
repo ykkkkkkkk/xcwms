@@ -29,9 +29,9 @@ public class Consts {
 	 * 服务器的地址
 	 */
 	public static final String getURL(String param) {
-		return "http://"+mIp+":"+mPort+"/mdwms/"+param;
+		return "http://"+mIp+":"+mPort+"/xcwms/"+param;
 	}
-	public static final String getApkURL() {	return "http://"+mIp+":"+mPort+"/apks/wms.apk"; }
+	public static final String getApkURL() {	return "http://"+mIp+":"+mPort+"/apks/xcwms.apk"; }
 
 	public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 

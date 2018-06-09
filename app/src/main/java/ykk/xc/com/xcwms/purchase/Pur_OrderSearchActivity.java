@@ -10,18 +10,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -32,60 +29,68 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.MeasureUnit;
-import ykk.xc.com.xcwms.model.PoList;
+import ykk.xc.com.xcwms.model.pur.PurPoOrder;
 import ykk.xc.com.xcwms.model.Supplier;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_OrderAdapter;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_OrderSearchAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
-public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
+public class Pur_OrderSearchActivity extends BaseActivity implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.btn_close)
     Button btnClose;
-    @BindView(R.id.tv_custInfo)
-    TextView tvCustInfo;
-    @BindView(R.id.cbAll)
-    CheckBox cbAll;
-    @BindView(R.id.btn_confirm)
-    Button btnConfirm;
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
+    @BindView(R.id.tv_strDate)
+    TextView tvStrDate;
+    @BindView(R.id.tv_begDate)
+    TextView tvBegDate;
+    @BindView(R.id.tv_endDate)
+    TextView tvEndDate;
+    @BindView(R.id.et_fbillno)
+    EditText etFbillno;
+    @BindView(R.id.et_supplierName)
+    EditText etSupplierName;
+    @BindView(R.id.et_mtlFnumber)
+    EditText etMtlFnumber;
+    @BindView(R.id.et_mtlFname)
+    EditText etMtlFname;
 
-    private Pur_OrderActivity context = this;
+    private Pur_OrderSearchActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
-    private Supplier supplier; // 供应商
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private FormBody formBody = null;
-    private Pur_OrderAdapter mAdapter;
-    private List<PoList> listDatas;
-    private MeasureUnit unit;
+    private Pur_OrderSearchAdapter mAdapter;
+    private List<PurPoOrder> listDatas = new ArrayList<>();
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_OrderActivity> mActivity;
+        private final WeakReference<Pur_OrderSearchActivity> mActivity;
 
-        public MyHandler(Pur_OrderActivity activity) {
-            mActivity = new WeakReference<Pur_OrderActivity>(activity);
+        public MyHandler(Pur_OrderSearchActivity activity) {
+            mActivity = new WeakReference<Pur_OrderSearchActivity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_OrderActivity m = mActivity.get();
+            Pur_OrderSearchActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.listDatas = JsonUtil.strToList2((String) msg.obj, PoList.class);
-//                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<PO_list>>(){}.getType());
-
-                        m.updateUI();
+                        List<PurPoOrder> list = JsonUtil.strToList2((String) msg.obj, PurPoOrder.class);
+                        m.listDatas.addAll(list);
+                        m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.mAdapter.notifyDataSetChanged();
                         m.toasts("抱歉，没有加载到数据！");
 
                         break;
@@ -97,25 +102,34 @@ public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.Loa
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_order;
+        return R.layout.pur_order_search;
+    }
+
+    @Override
+    public void initView() {
+        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Pur_OrderSearchAdapter(context, listDatas);
+        xRecyclerView.setAdapter(mAdapter);
+        xRecyclerView.setLoadingListener(context);
+
+        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
     }
 
     @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+//        run_okhttpDatas();
     }
 
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
-            supplier = bundle.getParcelable("supplier");
-            tvCustInfo.setText("供应商：" + supplier.getFname());
         }
     }
 
-
-    @OnClick({R.id.btn_close, R.id.btn_confirm})
+    @OnClick({R.id.btn_close, R.id.btn_search, R.id.tv_strDate, R.id.tv_begDate, R.id.tv_endDate})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -124,48 +138,27 @@ public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.Loa
                 context.finish();
 
                 break;
-            case R.id.btn_confirm: // 确认
-                if(listDatas == null || listDatas.size() == 0) {
-                    toasts("请选择数据在确认！");
-                    return;
-                }
-                List<PoList> list = new ArrayList<PoList>();
-                for(int i = 0, size = listDatas.size(); i<size; i++) {
-                    PoList p = listDatas.get(i);
-                    if(p.getIsCheck() == 1) {
-                        list.add(p);
-                    }
-                }
-                if(list.size() == 0) {
-                    toasts("请勾选数据行！");
-                    return;
-                }
-                bundle = new Bundle();
-                bundle.putSerializable("checkDatas", (Serializable)list);
-                setResults(context, bundle);
-                context.finish();
+            case R.id.btn_search: // 查询
+                hideKeyboard(getCurrentFocus());
+                listDatas.clear();
+                run_okhttpDatas();
+
+                break;
+            case R.id.tv_strDate: // 选择日期段
+                hideKeyboard(getCurrentFocus());
+
+                break;
+            case R.id.tv_begDate: // 选择开始日期
+                hideKeyboard(getCurrentFocus());
+                Comm.showDateDialog(context, view, 0);
+
+                break;
+            case R.id.tv_endDate: // 选择结束日期
+                hideKeyboard(getCurrentFocus());
+                Comm.showDateDialog(context, view, 0);
 
                 break;
         }
-    }
-
-    @OnCheckedChanged(R.id.cbAll)
-    public void onViewChecked(CompoundButton buttonView, boolean isChecked) {
-        if (listDatas == null) {
-            return;
-        }
-        if (isChecked) {
-            for (int i = 0, size = listDatas.size(); i < size; i++) {
-                PoList p = listDatas.get(i);
-                p.setIsCheck(1);
-            }
-        } else {
-            for (int i = 0, size = listDatas.size(); i < size; i++) {
-                PoList p = listDatas.get(i);
-                p.setIsCheck(0);
-            }
-        }
-        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -173,9 +166,15 @@ public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.Loa
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findPoListListByParam");
+        String mUrl = Consts.getURL("findPurPoOrderList");
         FormBody formBody = new FormBody.Builder()
-                .add("supplierId", String.valueOf(supplier.getFitemID()))
+
+                .add("fbillno", getValues(etFbillno).trim())
+                .add("supplierName", getValues(etSupplierName).trim())
+                .add("mtlFnumber", getValues(etMtlFnumber).trim())
+                .add("mtlFname", getValues(etMtlFname).trim())
+                .add("poFdateBeg", getValues(tvBegDate))
+                .add("poFdateEnd", getValues(tvEndDate))
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -197,7 +196,7 @@ public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.Loa
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                if(!JsonUtil.isSuccess(result)) {
+                if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
@@ -207,24 +206,6 @@ public class Pur_OrderActivity extends BaseActivity implements XRecyclerView.Loa
             }
         });
     }
-
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-//        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        xRecyclerView.setLayoutManager(layoutManager);
-        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Pur_OrderAdapter(context, listDatas);
-        xRecyclerView.setAdapter(mAdapter);
-        xRecyclerView.setLoadingListener(context);
-
-        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
-    }
-
 
     @Override
     public void onRefresh() {
