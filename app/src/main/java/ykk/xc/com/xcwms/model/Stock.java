@@ -7,53 +7,201 @@ import android.os.Parcelable;
  * 仓库表 t_stock
  */
 public class Stock implements Parcelable {
-//    [id] [int] IDENTITY(1,1) NOT NULL,
-//	[fitemID] [int] NOT NULL, 'K3 仓库ID
-//    [FNumber] [nvarchar](50) NOT NULL, 仓库代码
-//	[fname] [nvarchar](50) NOT NULL, 仓库名称
-//	[is_reservoir_area] [bit] NULL, 是否启用库区管理
-//	[is_storage_location] [bit] NULL, 是否启用库位管理
-//	[barcode] [varchar](20) NULL, 条码号
-    private int id;
-    private int fitemID;
-    private String fnumber;
-    private String fname;
-    private boolean reservoirArea; // 启用库区管理
-    private boolean storageLocation; // 启用库位管理
+    /*id*/
+    private Integer id;
+    /*仓库id*/
+    private Integer fStockid ;
+    /*仓库编码*/
+    private String fNumber;
+    /*仓库名称*/
+    private String fName;
+    /*仓库负责人编码*/
+    private String staffFnumber;
+    /*联系电话*/
+    private String fTel;
+    /*仓位*/
+    private String fLocationid;
+    /*仓位属性*/
+    private String stockProperty;
+    /*仓库地址*/
+    private String fAddress;
+    /*库存状态类型*/
+    private String fStockStatusType;
+    /*库存默认状态编码*/
+    private String stockStatusFnumber;
+    /*默认收料状态*/
+    private String rechargeStatusFnumber;
+    /*供应商编码*/
+    private String supFnumber;
+    /*客户编码*/
+    private String cusFnumber;
+    /*创建组织编码*/
+    private String corgFnumber;
+    /*使用组织编码*/
+    private String uorgFnumber;
+    /*K3数据状态*/
+    private String dataStatus;
+    /*wms非物理删除标识*/
+    private String isDelete;
+    /*k3是否禁用*/
+    private String enabled;
+    /*  启用库区管理 */
+    private boolean reservoirArea;
+    /* 启用库位管理 */
+    private boolean storageLocation;
+    /* 条码 */
     private String barcode;
 
-
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getFitemId() {
-        return fitemID;
+    public Integer getfStockid() {
+        return fStockid;
     }
 
-    public void setFitemId(int fitemId) {
-        this.fitemID = fitemId;
+    public void setfStockid(Integer fStockid) {
+        this.fStockid = fStockid;
     }
 
-    public String getFnumber() {
-        return fnumber;
+    public String getfNumber() {
+        return fNumber;
     }
 
-    public void setFnumber(String FNumber) {
-        this.fnumber = FNumber;
+    public void setfNumber(String fNumber) {
+        this.fNumber = fNumber;
     }
 
-    public String getFname() {
-        return fname;
+    public String getfName() {
+        return fName;
     }
 
-    public void setFname(String fname) {
-        this.fname = fname;
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+
+    public String getStaffFnumber() {
+        return staffFnumber;
+    }
+
+    public void setStaffFnumber(String staffFnumber) {
+        this.staffFnumber = staffFnumber;
+    }
+
+    public String getfTel() {
+        return fTel;
+    }
+
+    public void setfTel(String fTel) {
+        this.fTel = fTel;
+    }
+
+    public String getfLocationid() {
+        return fLocationid;
+    }
+
+    public void setfLocationid(String fLocationid) {
+        this.fLocationid = fLocationid;
+    }
+
+    public String getStockProperty() {
+        return stockProperty;
+    }
+
+    public void setStockProperty(String stockProperty) {
+        this.stockProperty = stockProperty;
+    }
+
+    public String getfAddress() {
+        return fAddress;
+    }
+
+    public void setfAddress(String fAddress) {
+        this.fAddress = fAddress;
+    }
+
+    public String getfStockStatusType() {
+        return fStockStatusType;
+    }
+
+    public void setfStockStatusType(String fStockStatusType) {
+        this.fStockStatusType = fStockStatusType;
+    }
+
+    public String getStockStatusFnumber() {
+        return stockStatusFnumber;
+    }
+
+    public void setStockStatusFnumber(String stockStatusFnumber) {
+        this.stockStatusFnumber = stockStatusFnumber;
+    }
+
+    public String getRechargeStatusFnumber() {
+        return rechargeStatusFnumber;
+    }
+
+    public void setRechargeStatusFnumber(String rechargeStatusFnumber) {
+        this.rechargeStatusFnumber = rechargeStatusFnumber;
+    }
+
+    public String getSupFnumber() {
+        return supFnumber;
+    }
+
+    public void setSupFnumber(String supFnumber) {
+        this.supFnumber = supFnumber;
+    }
+
+    public String getCusFnumber() {
+        return cusFnumber;
+    }
+
+    public void setCusFnumber(String cusFnumber) {
+        this.cusFnumber = cusFnumber;
+    }
+
+    public String getCorgFnumber() {
+        return corgFnumber;
+    }
+
+    public void setCorgFnumber(String corgFnumber) {
+        this.corgFnumber = corgFnumber;
+    }
+
+    public String getUorgFnumber() {
+        return uorgFnumber;
+    }
+
+    public void setUorgFnumber(String uorgFnumber) {
+        this.uorgFnumber = uorgFnumber;
+    }
+
+    public String getDataStatus() {
+        return dataStatus;
+    }
+
+    public void setDataStatus(String dataStatus) {
+        this.dataStatus = dataStatus;
+    }
+
+    public String getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    public String getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
     }
 
     public boolean isReservoirArea() {
@@ -84,7 +232,6 @@ public class Stock implements Parcelable {
         super();
     }
 
-
     /**
      * 这里的读的顺序必须与writeToParcel(Parcel dest, int flags)方法中
      * 写的顺序一致，否则数据会有差错，比如你的读取顺序如果是：
@@ -98,13 +245,28 @@ public class Stock implements Parcelable {
      */
     public Stock(Parcel p) {
         id = p.readInt();
-        fitemID = p.readInt();
-        fnumber = p.readString();
-        fname = p.readString();
-        int reservoirArea = p.readInt();
-        this.reservoirArea = reservoirArea > 0 ? true : false;
-        int storageLocation = p.readInt();
-        this.storageLocation = storageLocation > 0 ? true : false;
+        fStockid = p.readInt();
+        fNumber = p.readString();
+        fName = p.readString();
+        staffFnumber = p.readString();
+        fTel = p.readString();
+        fLocationid = p.readString();
+        stockProperty = p.readString();
+        fAddress = p.readString();
+        fStockStatusType = p.readString();
+        stockStatusFnumber = p.readString();
+        rechargeStatusFnumber = p.readString();
+        supFnumber = p.readString();
+        cusFnumber = p.readString();
+        corgFnumber = p.readString();
+        uorgFnumber = p.readString();
+        dataStatus = p.readString();
+        isDelete = p.readString();
+        enabled = p.readString();
+        int reservoir_area = p.readInt();
+        reservoirArea = reservoir_area > 0 ? true : false;
+        int storage_location = p.readInt();
+        storageLocation = storage_location > 0 ? true : false;
         barcode = p.readString();
     }
 
@@ -116,9 +278,24 @@ public class Stock implements Parcelable {
     @Override
     public void writeToParcel(Parcel p, int flags) {
         p.writeInt(id);
-        p.writeInt(fitemID);
-        p.writeString(fnumber);
-        p.writeString(fname);
+        p.writeInt(fStockid);
+        p.writeString(fNumber);
+        p.writeString(fName);
+        p.writeString(staffFnumber);
+        p.writeString(fTel);
+        p.writeString(fLocationid);
+        p.writeString(stockProperty);
+        p.writeString(fAddress);
+        p.writeString(fStockStatusType);
+        p.writeString(stockStatusFnumber);
+        p.writeString(rechargeStatusFnumber);
+        p.writeString(supFnumber);
+        p.writeString(cusFnumber);
+        p.writeString(corgFnumber);
+        p.writeString(uorgFnumber);
+        p.writeString(dataStatus);
+        p.writeString(isDelete);
+        p.writeString(enabled);
         p.writeInt(reservoirArea ? 1 : 0);
         p.writeInt(storageLocation ? 1 : 0);
         p.writeString(barcode);

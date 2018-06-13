@@ -7,52 +7,59 @@ import android.os.Parcelable;
  * 库位表stock_position
  */
 public class StockPosition implements Parcelable {
-    //    [id] [int] IDENTITY(1,1) NOT NULL,
-//	[area_id] [int] NOT NULL,
-//	[fnumber] [nvarchar](50) NOT NULL,
-//	[fname] [nvarchar](50) NOT NULL,
+    // [ID] [int] IDENTITY(1,1) NOT NULL,
+    // [area_id] [int] NOT NULL,
+    // [fnumber] [nvarchar](50) NOT NULL,
+    // [fname] [nvarchar](50) NOT NULL,
     private int id;
+    private int stock_id;
     private int area_id;
     private String fnumber;
     private String fname;
-
-
     private String barcode;
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getStock_id() {
+        return stock_id;
     }
 
     public int getArea_id() {
         return area_id;
     }
 
-    public void setArea_id(int area_id) {
-        this.area_id = area_id;
-    }
-
     public String getFnumber() {
         return fnumber;
-    }
-
-    public void setFnumber(String fnumber) {
-        this.fnumber = fnumber;
     }
 
     public String getFname() {
         return fname;
     }
 
-    public void setFname(String fname) {
-        this.fname = fname;
-    }
-
     public String getBarcode() {
         return barcode;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setStock_id(int stock_id) {
+        this.stock_id = stock_id;
+    }
+
+    public void setArea_id(int area_id) {
+        this.area_id = area_id;
+    }
+
+    public void setFnumber(String fnumber) {
+        this.fnumber = fnumber;
+    }
+
+    public void setFname(String fname) {
+        this.fname = fname;
     }
 
     public void setBarcode(String barcode) {
@@ -76,6 +83,7 @@ public class StockPosition implements Parcelable {
      */
     public StockPosition(Parcel p) {
         id = p.readInt();
+        stock_id = p.readInt();
         area_id = p.readInt();
         fnumber = p.readString();
         fname = p.readString();
@@ -90,6 +98,7 @@ public class StockPosition implements Parcelable {
     @Override
     public void writeToParcel(Parcel p, int flags) {
         p.writeInt(id);
+        p.writeInt(stock_id);
         p.writeInt(area_id);
         p.writeString(fnumber);
         p.writeString(fname);

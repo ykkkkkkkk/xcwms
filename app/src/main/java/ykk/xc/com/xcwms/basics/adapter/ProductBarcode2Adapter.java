@@ -37,8 +37,8 @@ public class ProductBarcode2Adapter extends BaseArrayRecyclerAdapter<Stock> {
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getFnumber());
-            tv_fname.setText(entity.getFname());
+            tv_fnumber.setText(entity.getfNumber());
+            tv_fname.setText(entity.getfName());
 
             View.OnClickListener click = new View.OnClickListener() {
                 @Override

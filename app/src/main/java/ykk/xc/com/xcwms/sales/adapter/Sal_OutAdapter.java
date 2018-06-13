@@ -63,7 +63,7 @@ public class Sal_OutAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         tv_batch_seqNo.setText(batchNo+"\n"+seqNo);
         double stockqty = entity.getStockqty();
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
-        tv_stockAP.setText(entity.getStock().getFname()+"\n"+Comm.isNULLS(entity.getStockAName())+"\n"+Comm.isNULLS(entity.getStockPName()));
+        tv_stockAP.setText(entity.getStock().getfName()+"\n"+Comm.isNULLS(entity.getStockAName())+"\n"+Comm.isNULLS(entity.getStockPName()));
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override

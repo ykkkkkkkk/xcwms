@@ -66,7 +66,7 @@ public class StockArea_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.list = JsonUtil.strToList2((String) msg.obj, StockArea.class);
+                        m.list = JsonUtil.strToList((String) msg.obj, StockArea.class);
                         m.updateUI();
 
                         break;

@@ -110,7 +110,7 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
             supplier = bundle.getParcelable("supplier");
-            tvCustInfo.setText("供应商：" + supplier.getFname());
+            tvCustInfo.setText("供应商：" + supplier.getfName());
         }
     }
 
@@ -175,7 +175,7 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("findPoListListByParam");
         FormBody formBody = new FormBody.Builder()
-                .add("supplierId", String.valueOf(supplier.getFitemID()))
+                .add("supplierId", String.valueOf(supplier.getFsupplierid()))
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();

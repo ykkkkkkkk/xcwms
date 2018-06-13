@@ -568,7 +568,7 @@ public class PrintBarcodeActivity extends BaseActivity implements XRecyclerView.
                 mAdapter2.setCallBack(new ProductBarcode2Adapter.MyCallBack() {
                     @Override
                     public void onPrint(Stock e, int pos) {
-                        Log.e("setListener-222", e.getFname());
+                        Log.e("setListener-222", e.getfName());
                         setAdapterListenerSon(e.getBarcode(), "stock", pos, e.getId());
                     }
                 });
@@ -595,7 +595,7 @@ public class PrintBarcodeActivity extends BaseActivity implements XRecyclerView.
                 mAdapter5.setCallBack(new ProductBarcode5Adapter.MyCallBack() {
                     @Override
                     public void onPrint(Department e, int pos) {
-                        Log.e("setListener-555", e.getFname());
+                        Log.e("setListener-555", e.getDepartmentName());
                         setAdapterListenerSon(e.getBarcode(), "department", pos, e.getId());
                     }
                 });

@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -43,7 +44,7 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
     RecyclerView recyclerView;
     private Supplier_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
-    private List<Supplier> list;
+    private List<Supplier> listDatas = new ArrayList<>();
     private Supplier_DialogAdapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -63,7 +64,8 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.list = JsonUtil.strToList2((String) msg.obj, Supplier.class);
+                        List<Supplier> list = JsonUtil.strToList((String) msg.obj, Supplier.class);
+                        m.listDatas.addAll(list);
                         m.updateUI();
 
                         break;
@@ -138,13 +140,13 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
     private void updateUI() {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Supplier_DialogAdapter(context, list);
+        mAdapter = new Supplier_DialogAdapter(context, listDatas);
         recyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(new OnItemClickListener2() {
             @Override
             public void onItemClick(View view, int pos) {
-                Supplier supplier = list.get(pos);
+                Supplier supplier = listDatas.get(pos);
                 Intent intent = new Intent();
                 intent.putExtra("obj", supplier);
                 context.setResult(RESULT_OK, intent);

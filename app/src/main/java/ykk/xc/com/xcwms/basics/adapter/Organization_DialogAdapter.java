@@ -26,7 +26,7 @@ public class Organization_DialogAdapter extends RecyclerView.Adapter<Organizatio
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.ab_cust_dialog_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.ab_organization_dialog_item, parent, false);
         MyViewHolder holder = new MyViewHolder(view, mClickListener);
         return holder;
     }
@@ -43,8 +43,8 @@ public class Organization_DialogAdapter extends RecyclerView.Adapter<Organizatio
         if (holder instanceof MyViewHolder) {
             MyViewHolder mholder = (MyViewHolder) holder;
             mholder.tv_row.setText(String.valueOf(pos + 1));
-            mholder.tv_fnumber.setText(datas.get(pos).getFnumber());
-            mholder.tv_fname.setText(datas.get(pos).getFname());
+            mholder.tv_fnumber.setText(datas.get(pos).getNumber());
+            mholder.tv_fname.setText(datas.get(pos).getName());
         }
     }
 

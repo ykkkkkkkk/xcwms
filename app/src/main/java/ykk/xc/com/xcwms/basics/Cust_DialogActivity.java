@@ -35,13 +35,13 @@ import ykk.xc.com.xcwms.util.JsonUtil;
 /**
  * 选择组织dialog
  */
-public class Organization_DialogActivity extends BaseDialogActivity {
+public class Cust_DialogActivity extends BaseDialogActivity {
 
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    private Organization_DialogActivity context = this;
+    private Cust_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
     private List<Organization> list;
     private Organization_DialogAdapter mAdapter;
@@ -52,19 +52,19 @@ public class Organization_DialogActivity extends BaseDialogActivity {
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Organization_DialogActivity> mActivity;
+        private final WeakReference<Cust_DialogActivity> mActivity;
 
-        public MyHandler(Organization_DialogActivity activity) {
-            mActivity = new WeakReference<Organization_DialogActivity>(activity);
+        public MyHandler(Cust_DialogActivity activity) {
+            mActivity = new WeakReference<Cust_DialogActivity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Organization_DialogActivity m = mActivity.get();
+            Cust_DialogActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.list = JsonUtil.strToList((String) msg.obj, Organization.class);
+                        m.list = JsonUtil.strToList2((String) msg.obj, Organization.class);
                         m.updateUI();
 
                         break;
@@ -80,7 +80,7 @@ public class Organization_DialogActivity extends BaseDialogActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.ab_organization_dialog;
+        return R.layout.ab_cust_dialog;
     }
 
     @Override

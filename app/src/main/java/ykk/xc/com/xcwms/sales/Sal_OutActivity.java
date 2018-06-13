@@ -302,7 +302,7 @@ public class Sal_OutActivity extends BaseActivity {
                 }
                 isStockALong = false;
                 bundle = new Bundle();
-                bundle.putInt("stockId", stock.getFitemId());
+                bundle.putInt("stockId", stock.getfStockid());
                 showForResult(StockArea_DialogActivity.class, SEL_STOCKA, bundle);
 
                 break;
@@ -334,7 +334,7 @@ public class Sal_OutActivity extends BaseActivity {
                 }
                 bundle = new Bundle();
                 bundle.putInt("fitemId", mat.getK3FitemId());
-                bundle.putInt("stockId", stock.getFitemId());
+                bundle.putInt("stockId", stock.getfStockid());
                 showForResult(Batch_DialogActivity.class, SEL_BATCH, bundle);
 
                 break;
@@ -429,7 +429,7 @@ public class Sal_OutActivity extends BaseActivity {
                 }
                 isStockALong = true;
                 bundle = new Bundle();
-                bundle.putInt("stockId", stock.getFitemId());
+                bundle.putInt("stockId", stock.getfStockid());
                 showForResult(StockArea_DialogActivity.class, SEL_STOCKA, bundle);
 
                 break;
@@ -635,7 +635,7 @@ public class Sal_OutActivity extends BaseActivity {
 //        ScanningRecord2 sr2 = new ScanningRecord2();
 ////        sr2.setSource_finterID(1);
 //        sr2.setSupplierId(organization.getId());
-//        sr2.setSupplierName(organization.getFname());
+//        sr2.setSupplierName(organization.getName());
 //        sr2.setStockId(stock.getId());
 //        sr2.setStockName(stock.getFname());
 //        sr2.setStockAreaId(stockA.getId());
@@ -672,7 +672,7 @@ public class Sal_OutActivity extends BaseActivity {
         ScanningRecord2 sr2 = new ScanningRecord2();
 //        sr2.setSource_finterID(1);
         sr2.setSupplierId(organization.getId());
-        sr2.setSupplierName(organization.getFname());
+        sr2.setSupplierName(organization.getName());
         sr2.setStockId(stock.getId());
         sr2.setStock(stock);
         sr2.setStockAreaId(stockA.getId());
@@ -712,9 +712,9 @@ public class Sal_OutActivity extends BaseActivity {
             case SEL_CUST: //查询客户	返回
                 if (resultCode == RESULT_OK) {
                     organization = data.getParcelableExtra("obj");
-                    Log.e("onActivityResult --> SEL_CUST", organization.getFname());
+                    Log.e("onActivityResult --> SEL_CUST", organization.getName());
                     if (organization != null) {
-                        tvCustSel.setText(organization.getFname());
+                        tvCustSel.setText(organization.getName());
                     }
                 }
 
@@ -732,12 +732,12 @@ public class Sal_OutActivity extends BaseActivity {
             case SEL_STOCK: //查询仓库	返回
                 if (resultCode == RESULT_OK) {
                     Stock stock = data.getParcelableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCK", stock.getFname());
+                    Log.e("onActivityResult --> SEL_STOCK", stock.getfName());
                     if (this.stock != null && stock != null && stock.getId() == this.stock.getId()) {
                         // 长按了，并且启用了库区管理
                         if (isStockLong && stock.isReservoirArea()) {
                             Bundle bundle = new Bundle();
-                            bundle.putInt("stockId", stock.getFitemId());
+                            bundle.putInt("stockId", stock.getfStockid());
                             showForResult(StockArea_DialogActivity.class, SEL_STOCKA, bundle);
                         }
                         return;
@@ -870,7 +870,7 @@ public class Sal_OutActivity extends BaseActivity {
                 sr2.setStockPName(stockP.getFname());
             }
             sr2.setCustomerId(s.getFcustId());
-            sr2.setCustomerName(s.getOrganization().getFname());
+            sr2.setCustomerName(s.getOrganization().getName());
             sr2.setEmpId(0);
 //                            sr2.setOperationId(0); // 操作员id
 
@@ -906,8 +906,8 @@ public class Sal_OutActivity extends BaseActivity {
      */
     private void getStockAfter() {
         if (stock != null) {
-            setTexts(etWhName, stock.getFname());
-            stockBarcode = stock.getFname();
+            setTexts(etWhName, stock.getfName());
+            stockBarcode = stock.getfName();
             stockA = null;
             etWhArea.setText("");
             stockP = null;
@@ -937,7 +937,7 @@ public class Sal_OutActivity extends BaseActivity {
             if (isStockLong && stock.isReservoirArea()) {
                 isStockALong = true;
                 Bundle bundle = new Bundle();
-                bundle.putInt("stockId", stock.getFitemId());
+                bundle.putInt("stockId", stock.getfStockid());
                 showForResult(StockArea_DialogActivity.class, SEL_STOCKA, bundle);
             }
         }
@@ -1025,7 +1025,7 @@ public class Sal_OutActivity extends BaseActivity {
                 if(entity.getMtl().getIs_batch()) { // 选择批号
                     Bundle bundle = new Bundle();
                     bundle.putInt("fitemId", entity.getMtl().getK3FitemId());
-                    bundle.putInt("stockId", entity.getStock().getFitemId());
+                    bundle.putInt("stockId", entity.getStock().getfStockid());
                     showForResult(Batch_DialogActivity.class, CODE1, bundle);
                 }
             }

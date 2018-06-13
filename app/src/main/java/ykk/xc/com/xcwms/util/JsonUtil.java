@@ -89,7 +89,7 @@ public class JsonUtil {
         JsonObject extend = jsonObj.getAsJsonObject("extend");
         if(extend.has("ykk_jsonArr")) { // 判断有没有数据集
             JsonParser parse = new JsonParser();
-            String strDatas = extend.getAsJsonObject("ykk_jsonArr").toString();
+            String strDatas = extend.get("ykk_jsonArr").toString();
             if(strDatas.indexOf("[") == -1) {
                 strDatas = "[" +strDatas + "]";
             }

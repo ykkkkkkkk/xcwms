@@ -37,8 +37,8 @@ public class ProductBarcode5Adapter extends BaseArrayRecyclerAdapter<Department>
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getFnumber());
-            tv_fname.setText(entity.getFname());
+            tv_fnumber.setText(entity.getDepartmentNumber());
+            tv_fname.setText(entity.getDepartmentName());
 
             View.OnClickListener click = new View.OnClickListener() {
                 @Override

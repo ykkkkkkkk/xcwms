@@ -110,7 +110,7 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
             organization = bundle.getParcelable("organization");
-            tvCustInfo.setText("供应商：" + organization.getFname());
+            tvCustInfo.setText("供应商：" + organization.getName());
         }
     }
 
@@ -175,7 +175,7 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("findSeOrderListByParam");
         FormBody formBody = new FormBody.Builder()
-                .add("custId", String.valueOf(organization.getFitemID()))
+                .add("custId", String.valueOf(organization.getfOrganiztionId()))
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();

@@ -44,8 +44,8 @@ public class Stock_DialogAdapter extends RecyclerView.Adapter<Stock_DialogAdapte
         if (holder instanceof MyViewHolder) {
             MyViewHolder mholder = (MyViewHolder) holder;
             mholder.tv_row.setText(String.valueOf(pos + 1));
-            mholder.tv_fnumber.setText(datas.get(pos).getFnumber());
-            mholder.tv_fname.setText(datas.get(pos).getFname());
+            mholder.tv_fnumber.setText(datas.get(pos).getfNumber());
+            mholder.tv_fname.setText(datas.get(pos).getfName().trim());
 
         }
     }

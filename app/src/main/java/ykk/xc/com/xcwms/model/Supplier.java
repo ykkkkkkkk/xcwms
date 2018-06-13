@@ -7,46 +7,95 @@ import android.os.Parcelable;
  * 供应商表t_Supplier
  */
 public class Supplier implements Parcelable {
-    //供应商表	t_Supplier
-    //id
-   // fitemID	K3 ID
-    //fnumber	供应商代码
-    //fname	供应商名称
-    private int id;
-    private int fitemID;
-    private String fnumber;
-    private String fname;
+    /*id*/
+    private Integer id;
+    /*供应商id*/
+    private Integer fsupplierid;
+    /*供应商编码*/
+    private String fNumber;
+    /*供应商名称*/
+    private String fName;
+    /*创建时间*/
+    private String fCreateDate;
+    /*修改时间*/
+    private String fModifyDate;
+    /*创建组织编码*/
+    private String orgFnumber;
+    /*使用组织编码*/
+    private String uorgFnumber;
+    /*K3数据状态*/
+    private String dataStatus;
+    /*wms非物理删除标识*/
+    private String isDelete;
+    /*k3是否禁用*/
+    private String enabled;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
-
-    public int getFitemID() {
-        return fitemID;
+    public Integer getFsupplierid() {
+        return fsupplierid;
+    }
+    public void setFsupplierid(Integer fsupplierid) {
+        this.fsupplierid = fsupplierid;
+    }
+    public String getfNumber() {
+        return fNumber;
+    }
+    public void setfNumber(String fNumber) {
+        this.fNumber = fNumber;
+    }
+    public String getfName() {
+        return fName;
+    }
+    public void setfName(String fName) {
+        this.fName = fName;
+    }
+    public String getfCreateDate() {
+        return fCreateDate;
+    }
+    public void setfCreateDate(String fCreateDate) {
+        this.fCreateDate = fCreateDate;
+    }
+    public String getfModifyDate() {
+        return fModifyDate;
+    }
+    public void setfModifyDate(String fModifyDate) {
+        this.fModifyDate = fModifyDate;
+    }
+    public String getOrgFnumber() {
+        return orgFnumber;
+    }
+    public void setOrgFnumber(String orgFnumber) {
+        this.orgFnumber = orgFnumber;
+    }
+    public String getUorgFnumber() {
+        return uorgFnumber;
+    }
+    public void setUorgFnumber(String uorgFnumber) {
+        this.uorgFnumber = uorgFnumber;
     }
 
-    public void setFitemID(int fitemID) {
-        this.fitemID = fitemID;
+    public String getDataStatus() {
+        return dataStatus;
     }
-
-    public String getFnumber() {
-        return fnumber;
+    public void setDataStatus(String dataStatus) {
+        this.dataStatus = dataStatus;
     }
-
-    public void setFnumber(String fnumber) {
-        this.fnumber = fnumber;
+    public String getIsDelete() {
+        return isDelete;
     }
-
-    public String getFname() {
-        return fname;
+    public void setIsDelete(String isDelete) {
+        this.isDelete = isDelete;
     }
-
-    public void setFname(String fname) {
-        this.fname = fname;
+    public String getEnabled() {
+        return enabled;
+    }
+    public void setEnabled(String enabled) {
+        this.enabled = enabled;
     }
 
     public Supplier() {
@@ -65,9 +114,16 @@ public class Supplier implements Parcelable {
      */
     public Supplier(Parcel source) {
         id = source.readInt();
-        fitemID = source.readInt();
-        fnumber = source.readString();
-        fname = source.readString();
+        fsupplierid = source.readInt();
+        fNumber = source.readString();
+        fName = source.readString();
+        fCreateDate = source.readString();
+        fModifyDate = source.readString();
+        orgFnumber = source.readString();
+        uorgFnumber = source.readString();
+        dataStatus = source.readString();
+        isDelete = source.readString();
+        enabled = source.readString();
     }
 
     @Override
@@ -78,9 +134,16 @@ public class Supplier implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeInt(fitemID);
-        dest.writeString(fnumber);
-        dest.writeString(fname);
+        dest.writeInt(fsupplierid);
+        dest.writeString(fNumber);
+        dest.writeString(fName);
+        dest.writeString(fCreateDate);
+        dest.writeString(fModifyDate);
+        dest.writeString(orgFnumber);
+        dest.writeString(uorgFnumber);
+        dest.writeString(dataStatus);
+        dest.writeString(isDelete);
+        dest.writeString(enabled);
     }
 
     public static final Creator<Supplier> CREATOR = new Creator<Supplier>() {

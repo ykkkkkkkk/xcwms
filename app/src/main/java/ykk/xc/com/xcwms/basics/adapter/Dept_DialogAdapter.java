@@ -43,10 +43,8 @@ public class Dept_DialogAdapter extends RecyclerView.Adapter<Dept_DialogAdapter.
         if (holder instanceof MyViewHolder) {
             MyViewHolder mholder = (MyViewHolder) holder;
             mholder.tv_row.setText(String.valueOf(pos + 1));
-            mholder.tv_fnumber.setText(datas.get(pos).getFnumber());
-            mholder.tv_fname.setText(datas.get(pos).getFname());
-
-
+            mholder.tv_fnumber.setText(datas.get(pos).getDepartmentNumber());
+            mholder.tv_fname.setText(datas.get(pos).getDepartmentName());
         }
     }
 
