@@ -66,6 +66,7 @@ public class Pur_OrderSearchActivity extends BaseActivity implements XRecyclerVi
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Pur_OrderSearchAdapter mAdapter;
     private List<PurPoOrder> listDatas = new ArrayList<>();
+    private Supplier supplier;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -126,6 +127,8 @@ public class Pur_OrderSearchActivity extends BaseActivity implements XRecyclerVi
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
+            supplier = bundle.getParcelable("supplier");
+            setTexts(etSupplierName, supplier.getfName());
         }
     }
 

@@ -25,7 +25,7 @@ public class ScanningRecord2 implements Serializable {
     private int type;
     private int sourceFinterId;
     private int fitemId; // 物料id
-    private Mtl mtl;
+    private Material mtl;
     private String batchno;
     private double fqty; // 应收数量
     private double stockqty; // 实收数量，要插入到表的数量
@@ -88,11 +88,11 @@ public class ScanningRecord2 implements Serializable {
         this.fitemId = fitemId;
     }
 
-    public Mtl getMtl() {
+    public Material getMtl() {
         return mtl;
     }
 
-    public void setMtl(Mtl mtl) {
+    public void setMtl(Material mtl) {
         this.mtl = mtl;
     }
 

@@ -39,9 +39,9 @@ public class Sal_OutAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_mats.setText(entity.getMtl().getFnumber()+"\n"+entity.getMtl().getFname()+"\n"+entity.getMtl().getFmodel());
+        tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName()+"\n"+entity.getMtl().getMaterialSize());
         // 是否启用批次管理和序列号管理
-        if(!entity.getMtl().getIs_batch() && !entity.getMtl().getIs_sn()) {
+        if(entity.getMtl().getIsBatchManager() == 0 && entity.getMtl().getIsSnManager() == 0) {
             tv_batch_seqNo.setEnabled(false);
             tv_batch_seqNo.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {
@@ -49,7 +49,7 @@ public class Sal_OutAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
             tv_batch_seqNo.setBackgroundResource(R.drawable.back_style_blue2);
         }
         // 是否启用序列号
-        if(entity.getMtl().getIs_sn()) {
+        if(entity.getMtl().getIsSnManager() == 1) {
             tv_nums.setEnabled(false);
             tv_nums.setBackgroundResource(R.drawable.back_style_gray3b);
         } else {

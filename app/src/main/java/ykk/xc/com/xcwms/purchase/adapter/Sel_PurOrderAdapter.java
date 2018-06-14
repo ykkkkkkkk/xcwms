@@ -8,16 +8,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PoList;
+import ykk.xc.com.xcwms.model.pur.PurPoOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
+public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<PoList> datas;
+    private List<PurPoOrder> datas;
 
-    public Sel_PurOrderAdapter(Activity context, List<PoList> datas) {
+    public Sel_PurOrderAdapter(Activity context, List<PurPoOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -29,7 +29,7 @@ public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, PoList entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, PurPoOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_date = holder.obtainView(R.id.tv_date);
@@ -40,9 +40,10 @@ public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
             tv_date.setText(entity.getPoFdate());
-            tv_stNo.setText(entity.getPoNumber());
-            tv_mts.setText(entity.getMtl().getFnumber()+"\n"+entity.getMtl().getFname());
-            String unitName = entity.getMtl().getmUnit().getFname();
+            tv_stNo.setText(entity.getFbillno());
+//            tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
+            tv_mts.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
+            String unitName = entity.getUnitFname();
             String num1 = df.format(entity.getPoFqty());
             tv_numUnit.setText(num1+""+unitName);
             if(entity.getIsCheck() == 1) {
@@ -77,7 +78,7 @@ public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PoList> {
     }
 
     public interface MyCallBack {
-        void onClick(PoList entity, int position);
+        void onClick(PurPoOrder entity, int position);
     }
 
 

@@ -3,6 +3,9 @@ package ykk.xc.com.xcwms.model.pur;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.Mtl;
+
 public class PurPoOrder implements Parcelable {
 	private int fId; // 单据id,
 	private String fbillno; // 单据编号,
@@ -15,6 +18,7 @@ public class PurPoOrder implements Parcelable {
 	private String deptName; // 采购部门
 	private String poFdate; // 采购日期
 	private int mtlId; // 物料id
+	private Material mtl;
 	private String mtlFnumber; // 物料编码
 	private String mtlFname; // 物料名称
 	private String mtlType; // 规格型号
@@ -23,6 +27,16 @@ public class PurPoOrder implements Parcelable {
 	private double poFstockinqty; // 累计入库数量
 	private int receiveOrganizationId; // 收料组织
 	private String receiveOrganizationName; // 收料组织
+
+	public int getIsCheck() {
+		return isCheck;
+	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
+	}
+
+	private int isCheck;
 
 	public int getfId() {
 		return fId;
@@ -176,6 +190,15 @@ public class PurPoOrder implements Parcelable {
 		this.receiveOrganizationName = receiveOrganizationName;
 	}
 
+	public Material getMtl() {
+		return mtl;
+	}
+
+	public void setMtl(Material mtl) {
+		this.mtl = mtl;
+	}
+
+
 	public PurPoOrder() {
 		super();
 	}
@@ -203,6 +226,7 @@ public class PurPoOrder implements Parcelable {
 		deptId = p.readInt();
 		poFdate = p.readString();
 		mtlId = p.readInt();
+		mtl = p.readParcelable(Material.class.getClassLoader());
 		mtlFnumber = p.readString();
 		mtlFname = p.readString();
 		mtlType = p.readString();
@@ -231,6 +255,7 @@ public class PurPoOrder implements Parcelable {
 		p.writeString(deptName);
 		p.writeString(poFdate);
 		p.writeInt(mtlId);
+		p.writeParcelable(mtl, flags);
 		p.writeString(mtlFnumber);
 		p.writeString(mtlFname);
 		p.writeString(mtlType);

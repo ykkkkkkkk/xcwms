@@ -66,6 +66,9 @@
             android:name=".basics.Mtl_ListActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
+            android:name=".basics.Material_ListActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
             android:name=".basics.PrintBarcodeActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
