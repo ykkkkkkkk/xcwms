@@ -33,8 +33,6 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.model.MeasureUnit;
-import ykk.xc.com.xcwms.model.pur.PoList;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.pur.PurPoOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Sel_PurOrderAdapter;
@@ -109,7 +107,7 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
-            supplier = bundle.getParcelable("supplier");
+            supplier = (Supplier) bundle.getSerializable("supplier");
             tvCustInfo.setText("供应商：" + supplier.getfName());
         }
     }
@@ -117,7 +115,6 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
 
     @OnClick({R.id.btn_close, R.id.btn_confirm})
     public void onViewClicked(View view) {
-        Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
                 closeHandler(mHandler);
@@ -140,8 +137,9 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
                     toasts("请勾选数据行！");
                     return;
                 }
-                bundle = new Bundle();
-                bundle.putSerializable("checkDatas", (Serializable)list);
+//                String result = JsonUtil.objectToString(list);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("checkDatas", (Serializable) list);
                 setResults(context, bundle);
                 context.finish();
 

@@ -69,7 +69,7 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<Material> list = JsonUtil.strToList2((String) msg.obj, Material.class);
+                        List<Material> list = JsonUtil.strToList((String) msg.obj, Material.class);
                         m.listDatas.addAll(list);
 //                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<Material>>(){}.getType());
                         if(m.mAdapter != null) {

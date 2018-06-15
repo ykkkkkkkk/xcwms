@@ -1,12 +1,11 @@
 package ykk.xc.com.xcwms.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.io.Serializable;
 
 /**
  * 仓库表 t_stock
  */
-public class Stock implements Parcelable {
+public class Stock implements Serializable {
     /*id*/
     private Integer id;
     /*仓库id*/
@@ -231,93 +230,5 @@ public class Stock implements Parcelable {
     public Stock() {
         super();
     }
-
-    /**
-     * 这里的读的顺序必须与writeToParcel(Parcel dest, int flags)方法中
-     * 写的顺序一致，否则数据会有差错，比如你的读取顺序如果是：
-     * nickname = source.readString();
-     * username=source.readString();
-     * age = source.readInt();
-     * 即调换了username和nickname的读取顺序，那么你会发现你拿到的username是nickname的数据，
-     * 而你拿到的nickname是username的数据
-     *
-     * @param p
-     */
-    public Stock(Parcel p) {
-        id = p.readInt();
-        fStockid = p.readInt();
-        fNumber = p.readString();
-        fName = p.readString();
-        staffFnumber = p.readString();
-        fTel = p.readString();
-        fLocationid = p.readString();
-        stockProperty = p.readString();
-        fAddress = p.readString();
-        fStockStatusType = p.readString();
-        stockStatusFnumber = p.readString();
-        rechargeStatusFnumber = p.readString();
-        supFnumber = p.readString();
-        cusFnumber = p.readString();
-        corgFnumber = p.readString();
-        uorgFnumber = p.readString();
-        dataStatus = p.readString();
-        isDelete = p.readString();
-        enabled = p.readString();
-        int reservoir_area = p.readInt();
-        reservoirArea = reservoir_area > 0 ? true : false;
-        int storage_location = p.readInt();
-        storageLocation = storage_location > 0 ? true : false;
-        barcode = p.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel p, int flags) {
-        p.writeInt(id);
-        p.writeInt(fStockid);
-        p.writeString(fNumber);
-        p.writeString(fName);
-        p.writeString(staffFnumber);
-        p.writeString(fTel);
-        p.writeString(fLocationid);
-        p.writeString(stockProperty);
-        p.writeString(fAddress);
-        p.writeString(fStockStatusType);
-        p.writeString(stockStatusFnumber);
-        p.writeString(rechargeStatusFnumber);
-        p.writeString(supFnumber);
-        p.writeString(cusFnumber);
-        p.writeString(corgFnumber);
-        p.writeString(uorgFnumber);
-        p.writeString(dataStatus);
-        p.writeString(isDelete);
-        p.writeString(enabled);
-        p.writeInt(reservoirArea ? 1 : 0);
-        p.writeInt(storageLocation ? 1 : 0);
-        p.writeString(barcode);
-    }
-
-    public static final Creator<Stock> CREATOR = new Creator<Stock>() {
-        /**
-         * 供外部类反序列化本类数组使用
-         */
-        @Override
-        public Stock[] newArray(int size) {
-            return new Stock[size];
-        }
-
-        /**
-         * 从Parcel中读取数据
-         */
-        @Override
-        public Stock createFromParcel(Parcel source) {
-            return new Stock(source);
-        }
-    };
-
 
 }

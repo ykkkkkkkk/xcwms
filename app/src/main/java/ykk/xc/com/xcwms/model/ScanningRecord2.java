@@ -3,27 +3,10 @@ package ykk.xc.com.xcwms.model;
 import java.io.Serializable;
 
 public class ScanningRecord2 implements Serializable {
-
-    /**
-     * ID : 1
-     * type : 2
-     * sourceFinterId : 1
-     * fitemId : 3
-     * batchno : sample string 4
-     * fqty : 1.0
-     * stockId : 5
-     * stockAreaId : 1
-     * stockPositionId : 1
-     * supplierId : 1
-     * customerId : 1
-     * fdate : 2018-05-08T17:38:51.9715695+08:00
-     * empId : 1
-     * operationId : 1
-     */
-
     private int ID;
     private int type;
     private int sourceFinterId;
+    private String sourceFnumber;
     private int fitemId; // 物料id
     private Material mtl;
     private String batchno;
@@ -78,6 +61,14 @@ public class ScanningRecord2 implements Serializable {
 
     public void setSourceFinterId(int sourceFinterId) {
         this.sourceFinterId = sourceFinterId;
+    }
+
+    public String getSourceFnumber() {
+        return sourceFnumber;
+    }
+
+    public void setSourceFnumber(String sourceFnumber) {
+        this.sourceFnumber = sourceFnumber;
     }
 
     public int getFitemId() {

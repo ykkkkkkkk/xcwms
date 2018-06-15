@@ -3,10 +3,12 @@ package ykk.xc.com.xcwms.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * 部门表t_Department
  */
-public class Department implements Parcelable {
+public class Department implements Serializable {
     private int id;
     //K3部门id
     private int fitemID;
@@ -99,67 +101,5 @@ public class Department implements Parcelable {
     public Department() {
         super();
     }
-
-    /**
-     * 这里的读的顺序必须与writeToParcel(Parcel dest, int flags)方法中
-     * 写的顺序一致，否则数据会有差错，比如你的读取顺序如果是：
-     * nickname = source.readString();
-     * username=source.readString();
-     * age = source.readInt();
-     * 即调换了username和nickname的读取顺序，那么你会发现你拿到的username是nickname的数据，
-     * 而你拿到的nickname是username的数据
-     * @param p
-     */
-    public Department(Parcel p) {
-        id = p.readInt();
-        fitemID = p.readInt();
-        barcode = p.readString();
-        departmentNumber = p.readString();
-        departmentName = p.readString();
-        departmentUseOrgId = p.readString();
-        foundDepartment = p.readString();
-        dataStatus = p.readString();
-        isDelete = p.readString();
-        enabled = p.readString();
-        fModifyDate = p.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel p, int flags) {
-        p.writeInt(id);
-        p.writeInt(fitemID);
-        p.writeString(barcode);
-        p.writeString(departmentNumber);
-        p.writeString(departmentName);
-        p.writeString(departmentUseOrgId);
-        p.writeString(foundDepartment);
-        p.writeString(dataStatus);
-        p.writeString(isDelete);
-        p.writeString(enabled);
-        p.writeString(fModifyDate);
-    }
-
-    public static final Creator<Department> CREATOR = new Creator<Department>() {
-        /**
-         * 供外部类反序列化本类数组使用
-         */
-        @Override
-        public Department[] newArray(int size) {
-            return new Department[size];
-        }
-
-        /**
-         * 从Parcel中读取数据
-         */
-        @Override
-        public Department createFromParcel(Parcel source) {
-            return new Department(source);
-        }
-    };
 
 }

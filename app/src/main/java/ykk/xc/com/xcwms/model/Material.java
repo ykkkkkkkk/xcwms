@@ -3,10 +3,12 @@ package ykk.xc.com.xcwms.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * 物料表
  */
-public class Material implements Parcelable {
+public class Material implements Serializable {
 	/*物料id*/
 	private int id ;
 	/*k3物料id*/
@@ -342,111 +344,4 @@ public class Material implements Parcelable {
 		this.isSnManager = isSnManager;
 	}
 
-	/**
-	 * 这里的读的顺序必须与writeToParcel(Parcel dest, int flags)方法中
-	 * 写的顺序一致，否则数据会有差错，比如你的读取顺序如果是：
-	 * nickname = source.readString();
-	 * username=source.readString();
-	 * age = source.readInt();
-	 * 即调换了username和nickname的读取顺序，那么你会发现你拿到的username是nickname的数据，
-	 * 而你拿到的nickname是username的数据
-	 *
-	 * @param source
-	 */
-	public Material(Parcel source) {
-		id = source.readInt();
-		fMaterialId = source.readInt();
-		fNumber = source.readString();
-		fName = source.readString();
-		simpleName = source.readString();
-		barcode = source.readString();
-		ownerName = source.readString();
-		materialGrade = source.readString();
-		materialSize = source.readString();
-		materialTypeId = source.readInt();
-//		materialType = source.readParcelable(MeasureUnit.class.getClassLoader());
-		validityDate = source.readString();
-		shelfDate = source.readString();
-		safetyStock = source.readDouble();
-		minLackStock = source.readDouble();
-		fixScatteredStockId = source.readInt();
-//		fixScatteredStock = source.readParcelable(MeasureUnit.class.getClassLoader());
-		fixScatteredStockPositionId = source.readInt();
-//		fixScatteredStockPosition = source.readParcelable(MeasureUnit.class.getClassLoader());
-		fixWholeStockId = source.readInt();
-//		fixWholeStock = source.readParcelable(MeasureUnit.class.getClassLoader());
-		fixWholeStockPositionId = source.readInt();
-//		fixWholeStockPosition = source.readParcelable(MeasureUnit.class.getClassLoader());
-		baleBoxNumber = source.readInt();
-		lastSyncDate = source.readString();
-		lastUpdateDate = source.readString();
-		remarks = source.readString();
-		isBatchManager = source.readInt();
-		isSnManager = source.readInt();
-		isQualityPeriodManager = source.readInt();
-		dataStatus = source.readString();
-		isDelete = source.readString();
-		enabled = source.readString();
-	}
-
-	@Override
-	public int describeContents() {
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(id);
-		dest.writeInt(fMaterialId);
-		dest.writeString(fNumber);
-		dest.writeString(fName);
-		dest.writeString(simpleName);
-		dest.writeString(barcode);
-		dest.writeString(ownerName);
-		dest.writeString(materialGrade);
-		dest.writeString(materialSize);
-		dest.writeInt(materialTypeId);
-//		dest.writeParcelable(materialType, flags);
-		dest.writeString(validityDate);
-		dest.writeString(shelfDate);
-		dest.writeDouble(safetyStock);
-		dest.writeDouble(minLackStock);
-		dest.writeInt(fixScatteredStockId);
-		//		dest.writeParcelable(fixScatteredStock, flags);
-		dest.writeInt(fixScatteredStockPositionId);
-		//		dest.writeParcelable(fixScatteredStockPosition, flags);
-		dest.writeInt(fixWholeStockId);
-		//		dest.writeParcelable(fixWholeStock, flags);
-		dest.writeInt(fixWholeStockPositionId);
-		//		dest.writeParcelable(fixWholeStockPosition, flags);
-		dest.writeInt(baleBoxNumber);
-		dest.writeString(lastSyncDate);
-		dest.writeString(lastUpdateDate);
-		dest.writeString(remarks);
-		dest.writeInt(isBatchManager);
-		dest.writeInt(isSnManager);
-		dest.writeInt(isQualityPeriodManager);
-		dest.writeString(dataStatus);
-		dest.writeString(isDelete);
-		dest.writeString(enabled);
-	}
-
-	public static final Creator<Material> CREATOR = new Creator<Material>() {
-		/**
-		 * 供外部类反序列化本类数组使用
-		 */
-		@Override
-		public Material[] newArray(int size) {
-			return new Material[size];
-		}
-
-		/**
-		 * 从Parcel中读取数据
-		 */
-		@Override
-		public Material createFromParcel(Parcel source) {
-			return new Material(source);
-		}
-	};
-	
 }

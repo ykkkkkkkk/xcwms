@@ -1,12 +1,11 @@
 package ykk.xc.com.xcwms.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.io.Serializable;
 
 /**
  * 库区表stock_area
  */
-public class StockArea implements Parcelable {
+public class StockArea implements Serializable {
     //    id	int	Unchecked
 //    stock_id	int	Unchecked
 //    fnumber	nvarchar(50)	Unchecked
@@ -72,56 +71,4 @@ public class StockArea implements Parcelable {
         super();
     }
 
-    /**
-     * 这里的读的顺序必须与writeToParcel(Parcel dest, int flags)方法中
-     * 写的顺序一致，否则数据会有差错，比如你的读取顺序如果是：
-     * nickname = source.readString();
-     * username=source.readString();
-     * age = source.readInt();
-     * 即调换了username和nickname的读取顺序，那么你会发现你拿到的username是nickname的数据，
-     * 而你拿到的nickname是username的数据
-     * @param p
-     */
-    public StockArea(Parcel p) {
-        id = p.readInt();
-        stock_id = p.readInt();
-        fnumber = p.readString();
-        fname = p.readString();
-        int storage_location = p.readInt();
-        is_storage_location = storage_location > 0 ? true : false;
-        barcode = p.readString();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel p, int flags) {
-        p.writeInt(id);
-        p.writeInt(stock_id);
-        p.writeString(fnumber);
-        p.writeString(fname);
-        p.writeInt(is_storage_location ? 1 : 0);
-        p.writeString(barcode);
-    }
-
-    public static final Creator<StockArea> CREATOR = new Creator<StockArea>() {
-        /**
-         * 供外部类反序列化本类数组使用
-         */
-        @Override
-        public StockArea[] newArray(int size) {
-            return new StockArea[size];
-        }
-
-        /**
-         * 从Parcel中读取数据
-         */
-        @Override
-        public StockArea createFromParcel(Parcel source) {
-            return new StockArea(source);
-        }
-    };
 }
