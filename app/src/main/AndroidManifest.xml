@@ -46,21 +46,27 @@
         <!-- 基础模块 -->
         <activity
             android:name=".basics.Supplier_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Dept_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Organization_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Stock_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.StockArea_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.StockPos_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Mtl_ListActivity"
@@ -83,9 +89,11 @@
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".basics.Batch_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Sequence_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
 
         <!-- 设置页面用到的界面 -->

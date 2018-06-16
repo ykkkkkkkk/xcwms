@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minWidth="350dp"
     android:layout_margin="20dp"
+    android:background="@color/white"
+    android:minWidth="380dp"
     android:orientation="vertical">
 
     <LinearLayout
@@ -36,6 +37,39 @@
             android:visibility="invisible" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_margin="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/back_style_blue"
+            android:hint="请输入查询的关键字"
+            android:inputType="none"
+            android:maxLength="30"
+            android:paddingLeft="3dp"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btn_search"
+            android:layout_width="108dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@drawable/btn_blue_selector"
+            android:text="查询"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

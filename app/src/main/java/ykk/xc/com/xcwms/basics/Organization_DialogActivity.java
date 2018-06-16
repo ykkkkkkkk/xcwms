@@ -10,9 +10,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,16 +43,19 @@ public class Organization_DialogActivity extends BaseDialogActivity {
     Button btnClose;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.et_search)
+    EditText etSearch;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
     private Organization_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
-    private List<Organization> list;
+    private List<Organization> listDatas = new ArrayList<>();
     private Organization_DialogAdapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private FormBody formBody = null;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
-
     private static class MyHandler extends Handler {
         private final WeakReference<Organization_DialogActivity> mActivity;
 
@@ -64,23 +69,43 @@ public class Organization_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.list = JsonUtil.strToList((String) msg.obj, Organization.class);
-                        m.updateUI();
+                        List<Organization> list = JsonUtil.strToList((String) msg.obj, Organization.class);
+                        m.listDatas.addAll(list);
+                        m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.mAdapter.notifyDataSetChanged();
                         m.toasts("抱歉，没有加载到数据！");
 
                         break;
                 }
             }
         }
-
     }
 
     @Override
     public int setLayoutResID() {
         return R.layout.ab_organization_dialog;
+    }
+
+    @Override
+    public void initView() {
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Organization_DialogAdapter(context, listDatas);
+        recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
+            @Override
+            public void onItemClick(View view, int pos) {
+                Organization supplier = listDatas.get(pos);
+                Intent intent = new Intent();
+                intent.putExtra("obj", supplier);
+                context.setResult(RESULT_OK, intent);
+                context.finish();
+            }
+        });
     }
 
     @Override
@@ -90,11 +115,22 @@ public class Organization_DialogActivity extends BaseDialogActivity {
 
 
     // 监听事件
-    @OnClick(R.id.btn_close)
-    public void onViewClicked() {
-        closeHandler(mHandler);
-        context.finish();
+    @OnClick({R.id.btn_close, R.id.btn_search})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_close:
+                closeHandler(mHandler);
+                context.finish();
+
+                break;
+            case R.id.btn_search:
+                listDatas.clear();
+                run_okhttpDatas();
+
+                break;
+        }
     }
+
 
     /**
      * 通过okhttp加载数据
@@ -103,6 +139,7 @@ public class Organization_DialogActivity extends BaseDialogActivity {
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("findOrganizationListByParam");
         FormBody formBody = new FormBody.Builder()
+                .add("fNumberAndName", getValues(etSearch).trim())
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -124,34 +161,13 @@ public class Organization_DialogActivity extends BaseDialogActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                if(!JsonUtil.isSuccess(result)) {
+                if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Organization_DialogActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Organization_DialogAdapter(context, list);
-        recyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
-            @Override
-            public void onItemClick(View view, int pos) {
-                Organization supplier = list.get(pos);
-                Intent intent = new Intent();
-                intent.putExtra("obj", supplier);
-                context.setResult(RESULT_OK, intent);
-                context.finish();
             }
         });
     }

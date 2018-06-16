@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.Organization;
 
 public class PurPoOrder implements Serializable {
     private int fId; // 单据id,
@@ -15,11 +16,12 @@ public class PurPoOrder implements Serializable {
     private String purPerson; // 采购员,
     private int purOrganizationNameId; // 采购组织id
     private String purOrganizationName; // 采购组织
+    private Organization purOrganization;
     private int deptId; // 采购部门id
     private String deptName; // 采购部门
     private String poFdate; // 采购日期
     private int mtlId; // 物料id
-    private Material mtl;
+    private Material mtl; // 物料对象
     private String mtlFnumber; // 物料编码
     private String mtlFname; // 物料名称
     private String mtlType; // 规格型号
@@ -28,7 +30,8 @@ public class PurPoOrder implements Serializable {
     private double poFstockinqty; // 累计入库数量
     private int receiveOrganizationId; // 收料组织
     private String receiveOrganizationName; // 收料组织
-    private int isCheck; // 新加的，是否选中
+    private Organization receiveOrganization;
+    private int isCheck; // 新加的是否选中
 
     public int getfId() {
         return fId;
@@ -182,14 +185,6 @@ public class PurPoOrder implements Serializable {
         this.receiveOrganizationName = receiveOrganizationName;
     }
 
-    public int getIsCheck() {
-        return isCheck;
-    }
-
-    public void setIsCheck(int isCheck) {
-        this.isCheck = isCheck;
-    }
-
     public Material getMtl() {
         return mtl;
     }
@@ -198,9 +193,44 @@ public class PurPoOrder implements Serializable {
         this.mtl = mtl;
     }
 
-
     public PurPoOrder() {
         super();
+    }
+
+    public Organization getPurOrganization() {
+        return purOrganization;
+    }
+
+    public Organization getReceiveOrganization() {
+        return receiveOrganization;
+    }
+
+    public void setPurOrganization(Organization purOrganization) {
+        this.purOrganization = purOrganization;
+    }
+
+    public void setReceiveOrganization(Organization receiveOrganization) {
+        this.receiveOrganization = receiveOrganization;
+    }
+
+    public int getIsCheck() {
+        return isCheck;
+    }
+
+    public void setIsCheck(int isCheck) {
+        this.isCheck = isCheck;
+    }
+
+    @Override
+    public String toString() {
+        return "PurPoOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
+                + supplierName + ", purPerson=" + purPerson + ", purOrganizationNameId=" + purOrganizationNameId
+                + ", purOrganizationName=" + purOrganizationName + ", purOrganization=" + purOrganization + ", deptId="
+                + deptId + ", deptName=" + deptName + ", poFdate=" + poFdate + ", mtlId=" + mtlId + ", mtl=" + mtl
+                + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType + ", unitFname="
+                + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty + ", receiveOrganizationId="
+                + receiveOrganizationId + ", receiveOrganizationName=" + receiveOrganizationName
+                + ", receiveOrganization=" + receiveOrganization + "]";
     }
 
 }

@@ -1,6 +1,7 @@
 package ykk.xc.com.xcwms.basics;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -42,6 +45,11 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
     Button btnClose;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.et_search)
+    EditText etSearch;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
+
     private Supplier_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
     private List<Supplier> listDatas = new ArrayList<>();
@@ -66,10 +74,11 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
                     case SUCC1: // 成功
                         List<Supplier> list = JsonUtil.strToList((String) msg.obj, Supplier.class);
                         m.listDatas.addAll(list);
-                        m.updateUI();
+                        m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.mAdapter.notifyDataSetChanged();
                         m.toasts("抱歉，没有加载到数据！");
 
                         break;
@@ -85,15 +94,44 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    public void initView() {
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Supplier_DialogAdapter(context, listDatas);
+        recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
+            @Override
+            public void onItemClick(View view, int pos) {
+                Supplier supplier = listDatas.get(pos);
+                Intent intent = new Intent();
+                intent.putExtra("obj", supplier);
+                context.setResult(RESULT_OK, intent);
+                context.finish();
+            }
+        });
+    }
+
+    @Override
     public void initData() {
         run_okhttpDatas();
     }
 
     // 监听事件
-    @OnClick(R.id.btn_close)
-    public void onViewClicked() {
-        closeHandler(mHandler);
-        context.finish();
+    @OnClick({R.id.btn_close, R.id.btn_search})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_close:
+                closeHandler(mHandler);
+                context.finish();
+
+                break;
+            case R.id.btn_search:
+                listDatas.clear();
+                run_okhttpDatas();
+
+                break;
+        }
     }
 
     /**
@@ -103,6 +141,7 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("findSupplierListByParam");
         FormBody formBody = new FormBody.Builder()
+                .add("fNumberAndName", getValues(etSearch).trim())
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -123,34 +162,13 @@ public class Supplier_DialogActivity extends BaseDialogActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                if(!JsonUtil.isSuccess(result)) {
+                if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Cust_DialogActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Supplier_DialogAdapter(context, listDatas);
-        recyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
-            @Override
-            public void onItemClick(View view, int pos) {
-                Supplier supplier = listDatas.get(pos);
-                Intent intent = new Intent();
-                intent.putExtra("obj", supplier);
-                context.setResult(RESULT_OK, intent);
-                context.finish();
             }
         });
     }

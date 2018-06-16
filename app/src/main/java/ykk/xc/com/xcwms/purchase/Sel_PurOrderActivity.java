@@ -56,7 +56,6 @@ public class Sel_PurOrderActivity extends BaseActivity implements XRecyclerView.
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private Supplier supplier; // 供应商
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private FormBody formBody = null;
     private Sel_PurOrderAdapter mAdapter;
     private List<PurPoOrder> listDatas;
 

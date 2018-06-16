@@ -11,6 +11,8 @@ import java.io.Serializable;
 public class Organization implements Serializable {
     /*组织id*/
     private Integer id ;
+    /*k3组织多语言表fpkid*/
+    private Integer fpkId ;
     /*k3组织id*/
     private Integer fOrganiztionId;
     /*组织编码*/
@@ -23,6 +25,12 @@ public class Organization implements Serializable {
     private String isDelete;
     /*k3是否禁用*/
     private String enabled;
+    /**
+     * 构造方法
+     */
+    public Organization() {
+        super();
+    }
     /**
      * seteer/getter方法
      * @return
@@ -63,6 +71,7 @@ public class Organization implements Serializable {
     public void setEnabled(String enabled) {
         this.enabled = enabled;
     }
+
     public Integer getfOrganiztionId() {
         return fOrganiztionId;
     }
@@ -70,8 +79,18 @@ public class Organization implements Serializable {
         this.fOrganiztionId = fOrganiztionId;
     }
 
-    public Organization() {
-        super();
+    public Integer getFpkId() {
+        return fpkId;
+    }
+    public void setFpkId(Integer fpkId) {
+        this.fpkId = fpkId;
+    }
+
+    @Override
+    public String toString() {
+        return "Organization [id=" + id + ", fpkId=" + fpkId + ", fOrganiztionId=" + fOrganiztionId + ", number="
+                + number + ", name=" + name + ", dataStatus=" + dataStatus + ", isDelete=" + isDelete + ", enabled="
+                + enabled + "]";
     }
 
 }
