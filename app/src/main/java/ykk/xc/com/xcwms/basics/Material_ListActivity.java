@@ -146,7 +146,7 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("findMaterialListByParam");
         FormBody formBody = new FormBody.Builder()
-                .add("fname", getValues(etSearch).trim())
+                .add("fNumberAndName", getValues(etSearch).trim())
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();

@@ -7,12 +7,12 @@ import java.io.Serializable;
  */
 public class StockArea implements Serializable {
     //    id	int	Unchecked
-//    stock_id	int	Unchecked
+//    stockId	int	Unchecked
 //    fnumber	nvarchar(50)	Unchecked
 //    fname	nvarchar(50)	Unchecked
 //    is_storage_location	bit	Unchecked
     private int id;
-    private int stock_id;
+    private int stockId;
     private String fnumber;
     private String fname;
     private boolean is_storage_location;
@@ -27,12 +27,12 @@ public class StockArea implements Serializable {
         this.id = id;
     }
 
-    public int getStock_id() {
-        return stock_id;
+    public int getStockId() {
+        return stockId;
     }
 
-    public void setStock_id(int stock_id) {
-        this.stock_id = stock_id;
+    public void setStockId(int stockId) {
+        this.stockId = stockId;
     }
 
     public String getFnumber() {

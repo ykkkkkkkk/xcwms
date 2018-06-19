@@ -10,15 +10,19 @@ import java.io.Serializable;
  */
 public class Material implements Serializable {
 	/*物料id*/
-	private int id ;
+	private Integer id ;
 	/*k3物料id*/
-	private int fMaterialId;
+	private Integer fMaterialId;
 	/*k3物料编号*/
 	private String fNumber;
 	/*k3物料名称*/
 	private String fName;
 	/*物料简称*/
 	private String simpleName;
+	/*基本单位id*/
+	private Integer basicUnitId;
+	/*基本单位*/
+	private Unit unit;
 	/*物料条码*/
 	private String barcode;
 	/*货主名称*/
@@ -28,9 +32,9 @@ public class Material implements Serializable {
 	/*产品规格*/
 	private String materialSize;
 	/*产品类别id*/
-	private int materialTypeId;
+	private Integer materialTypeId;
 	/*产品类别*/
-//	private MaterialType materialType;
+	private MaterialType materialType;
 	/*有效期*/
 	private String validityDate;
 	/*贮藏期*/
@@ -40,23 +44,23 @@ public class Material implements Serializable {
 	/*最少补货数量*/
 	private double minLackStock;
 	/*默认零拣仓库id*/
-	private int fixScatteredStockId;
+	private Integer fixScatteredStockId;
 	/*默认零拣仓库*/
-//	private Stock fixScatteredStock;
+	private Stock fixScatteredStock;
 	/*默认零拣库位id*/
-	private int fixScatteredStockPositionId;
+	private Integer fixScatteredStockPositionId;
 	/*默认零拣库位*/
-//	private StockPosition fixScatteredStockPosition;
+	private StockPosition fixScatteredStockPosition;
 	/*默认整件仓库id*/
-	private int fixWholeStockId;
+	private Integer fixWholeStockId;
 	/*默认整件仓库*/
-//	private Stock fixWholeStock;
+	private Stock fixWholeStock;
 	/*默认整件库位id*/
-	private int fixWholeStockPositionId;
+	private Integer fixWholeStockPositionId;
 	/*默认整件库位*/
-//	private StockPosition fixWholeStockPosition;
+	private StockPosition fixWholeStockPosition;
 	/*卡板箱数*/
-	private int baleBoxNumber;
+	private Integer baleBoxNumber;
 	/*最后同步时间*/
 	private String lastSyncDate;
 	/*最后更新时间*/
@@ -64,11 +68,23 @@ public class Material implements Serializable {
 	/*备注*/
 	private String remarks;
 	/*是否启用批号管理，0代表不启用，1代表启用*/
-	private int isBatchManager;
+	private Integer isBatchManager;
+	/*批号规则id*/
+	private Integer batchRuleId;
 	/*是否启用序列号管理，0代表不启用，1代表启用*/
-	private int isSnManager;
+	private Integer isSnManager;
+	/*序列号编码规则id*/
+	private Integer snRuleId;
+	/*序列号单位id*/
+	private Integer snUnitId;
+	/*管理序列号方式id*/
+	private Integer snManagerTypeId;
 	/*是否启用保质期管理，0代表不启用，1代表启用*/
-	private int isQualityPeriodManager;
+	private Integer isQualityPeriodManager;
+	/*质保期单位id*/
+	private Integer qualityPeriodUnitId;
+	/*质保期*/
+	private double qualityPeriod;
 	/*K3数据状态*/
 	private String dataStatus;
 	/*wms非物理删除标识*/
@@ -86,19 +102,19 @@ public class Material implements Serializable {
 	 * getter/setter方法
 	 */
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public int getfMaterialId() {
+	public Integer getfMaterialId() {
 		return fMaterialId;
 	}
 
-	public void setfMaterialId(int fMaterialId) {
+	public void setfMaterialId(Integer fMaterialId) {
 		this.fMaterialId = fMaterialId;
 	}
 
@@ -150,21 +166,21 @@ public class Material implements Serializable {
 		this.materialSize = materialSize;
 	}
 
-	public int getMaterialTypeId() {
+	public Integer getMaterialTypeId() {
 		return materialTypeId;
 	}
 
-	public void setMaterialTypeId(int materialTypeId) {
+	public void setMaterialTypeId(Integer materialTypeId) {
 		this.materialTypeId = materialTypeId;
 	}
 
-//	public MaterialType getMaterialType() {
-//		return materialType;
-//	}
-//
-//	public void setMaterialType(MaterialType materialType) {
-//		this.materialType = materialType;
-//	}
+	public MaterialType getMaterialType() {
+		return materialType;
+	}
+
+	public void setMaterialType(MaterialType materialType) {
+		this.materialType = materialType;
+	}
 
 	public String getValidityDate() {
 		return validityDate;
@@ -198,75 +214,75 @@ public class Material implements Serializable {
 		this.minLackStock = minLackStock;
 	}
 
-	public int getFixScatteredStockId() {
+	public Integer getFixScatteredStockId() {
 		return fixScatteredStockId;
 	}
 
-	public void setFixScatteredStockId(int fixScatteredStockId) {
+	public void setFixScatteredStockId(Integer fixScatteredStockId) {
 		this.fixScatteredStockId = fixScatteredStockId;
 	}
 
-//	public Stock getFixScatteredStock() {
-//		return fixScatteredStock;
-//	}
+	public Stock getFixScatteredStock() {
+		return fixScatteredStock;
+	}
 
-//	public void setFixScatteredStock(Stock fixScatteredStock) {
-//		this.fixScatteredStock = fixScatteredStock;
-//	}
+	public void setFixScatteredStock(Stock fixScatteredStock) {
+		this.fixScatteredStock = fixScatteredStock;
+	}
 
-	public int getFixScatteredStockPositionId() {
+	public Integer getFixScatteredStockPositionId() {
 		return fixScatteredStockPositionId;
 	}
 
-	public void setFixScatteredStockPositionId(int fixScatteredStockPositionId) {
+	public void setFixScatteredStockPositionId(Integer fixScatteredStockPositionId) {
 		this.fixScatteredStockPositionId = fixScatteredStockPositionId;
 	}
 
-//	public StockPosition getFixScatteredStockPosition() {
-//		return fixScatteredStockPosition;
-//	}
+	public StockPosition getFixScatteredStockPosition() {
+		return fixScatteredStockPosition;
+	}
 
-//	public void setFixScatteredStockPosition(StockPosition fixScatteredStockPosition) {
-//		this.fixScatteredStockPosition = fixScatteredStockPosition;
-//	}
+	public void setFixScatteredStockPosition(StockPosition fixScatteredStockPosition) {
+		this.fixScatteredStockPosition = fixScatteredStockPosition;
+	}
 
-	public int getFixWholeStockId() {
+	public Integer getFixWholeStockId() {
 		return fixWholeStockId;
 	}
 
-	public void setFixWholeStockId(int fixWholeStockId) {
+	public void setFixWholeStockId(Integer fixWholeStockId) {
 		this.fixWholeStockId = fixWholeStockId;
 	}
 
-//	public Stock getFixWholeStock() {
-//		return fixWholeStock;
-//	}
-//
-//	public void setFixWholeStock(Stock fixWholeStock) {
-//		this.fixWholeStock = fixWholeStock;
-//	}
+	public Stock getFixWholeStock() {
+		return fixWholeStock;
+	}
 
-	public int getFixWholeStockPositionId() {
+	public void setFixWholeStock(Stock fixWholeStock) {
+		this.fixWholeStock = fixWholeStock;
+	}
+
+	public Integer getFixWholeStockPositionId() {
 		return fixWholeStockPositionId;
 	}
 
-	public void setFixWholeStockPositionId(int fixWholeStockPositionId) {
+	public void setFixWholeStockPositionId(Integer fixWholeStockPositionId) {
 		this.fixWholeStockPositionId = fixWholeStockPositionId;
 	}
 
-//	public StockPosition getFixWholeStockPosition() {
-//		return fixWholeStockPosition;
-//	}
+	public StockPosition getFixWholeStockPosition() {
+		return fixWholeStockPosition;
+	}
 
-//	public void setFixWholeStockPosition(StockPosition fixWholeStockPosition) {
-//		this.fixWholeStockPosition = fixWholeStockPosition;
-//	}
+	public void setFixWholeStockPosition(StockPosition fixWholeStockPosition) {
+		this.fixWholeStockPosition = fixWholeStockPosition;
+	}
 
-	public int getBaleBoxNumber() {
+	public Integer getBaleBoxNumber() {
 		return baleBoxNumber;
 	}
 
-	public void setBaleBoxNumber(int baleBoxNumber) {
+	public void setBaleBoxNumber(Integer baleBoxNumber) {
 		this.baleBoxNumber = baleBoxNumber;
 	}
 
@@ -294,19 +310,19 @@ public class Material implements Serializable {
 		this.remarks = remarks;
 	}
 
-	public int getIsBatchManager() {
+	public Integer getIsBatchManager() {
 		return isBatchManager;
 	}
 
-	public void setIsBatchManager(int isBatchManager) {
+	public void setIsBatchManager(Integer isBatchManager) {
 		this.isBatchManager = isBatchManager;
 	}
 
-	public int getIsQualityPeriodManager() {
+	public Integer getIsQualityPeriodManager() {
 		return isQualityPeriodManager;
 	}
 
-	public void setIsQualityPeriodManager(int isQualityPeriodManager) {
+	public void setIsQualityPeriodManager(Integer isQualityPeriodManager) {
 		this.isQualityPeriodManager = isQualityPeriodManager;
 	}
 
@@ -337,11 +353,81 @@ public class Material implements Serializable {
 		this.enabled = enabled;
 	}
 
-	public int getIsSnManager() {
+	public Integer getBasicUnitId() {
+		return basicUnitId;
+	}
+	public void setBasicUnitId(Integer basicUnitId) {
+		this.basicUnitId = basicUnitId;
+	}
+	public Unit getUnit() {
+		return unit;
+	}
+	public void setUnit(Unit unit) {
+		this.unit = unit;
+	}
+
+	public Integer getIsSnManager() {
 		return isSnManager;
 	}
-	public void setIsSnManager(int isSnManager) {
+	public void setIsSnManager(Integer isSnManager) {
 		this.isSnManager = isSnManager;
+	}
+
+	public Integer getBatchRuleId() {
+		return batchRuleId;
+	}
+	public void setBatchRuleId(Integer batchRuleId) {
+		this.batchRuleId = batchRuleId;
+	}
+	public Integer getSnRuleId() {
+		return snRuleId;
+	}
+	public void setSnRuleId(Integer snRuleId) {
+		this.snRuleId = snRuleId;
+	}
+	public Integer getSnUnitId() {
+		return snUnitId;
+	}
+	public void setSnUnitId(Integer snUnitId) {
+		this.snUnitId = snUnitId;
+	}
+	public Integer getSnManagerTypeId() {
+		return snManagerTypeId;
+	}
+	public void setSnManagerTypeId(Integer snManagerTypeId) {
+		this.snManagerTypeId = snManagerTypeId;
+	}
+	public Integer getQualityPeriodUnitId() {
+		return qualityPeriodUnitId;
+	}
+	public void setQualityPeriodUnitId(Integer qualityPeriodUnitId) {
+		this.qualityPeriodUnitId = qualityPeriodUnitId;
+	}
+	public double getQualityPeriod() {
+		return qualityPeriod;
+	}
+	public void setQualityPeriod(double qualityPeriod) {
+		this.qualityPeriod = qualityPeriod;
+	}
+	@Override
+	public String toString() {
+		return "Material [id=" + id + ", fMaterialId=" + fMaterialId + ", fNumber=" + fNumber + ", fName=" + fName
+				+ ", simpleName=" + simpleName + ", basicUnitId=" + basicUnitId + ", unit=" + unit + ", barcode="
+				+ barcode + ", ownerName=" + ownerName + ", materialGrade=" + materialGrade + ", materialSize="
+				+ materialSize + ", materialTypeId=" + materialTypeId + ", materialType=" + materialType
+				+ ", validityDate=" + validityDate + ", shelfDate=" + shelfDate + ", safetyStock=" + safetyStock
+				+ ", minLackStock=" + minLackStock + ", fixScatteredStockId=" + fixScatteredStockId
+				+ ", fixScatteredStock=" + fixScatteredStock + ", fixScatteredStockPositionId="
+				+ fixScatteredStockPositionId + ", fixScatteredStockPosition=" + fixScatteredStockPosition
+				+ ", fixWholeStockId=" + fixWholeStockId + ", fixWholeStock=" + fixWholeStock
+				+ ", fixWholeStockPositionId=" + fixWholeStockPositionId + ", fixWholeStockPosition="
+				+ fixWholeStockPosition + ", baleBoxNumber=" + baleBoxNumber + ", lastSyncDate=" + lastSyncDate
+				+ ", lastUpdateDate=" + lastUpdateDate + ", remarks=" + remarks + ", isBatchManager=" + isBatchManager
+				+ ", batchRuleId=" + batchRuleId + ", isSnManager=" + isSnManager + ", snRuleId=" + snRuleId
+				+ ", snUnitId=" + snUnitId + ", snManagerTypeId=" + snManagerTypeId + ", isQualityPeriodManager="
+				+ isQualityPeriodManager + ", qualityPeriodUnitId=" + qualityPeriodUnitId + ", qualityPeriod="
+				+ qualityPeriod + ", dataStatus=" + dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled
+				+ "]";
 	}
 
 }

@@ -131,11 +131,11 @@ public class Pur_InActivity extends BaseActivity {
     private StockArea stockA; // 库区
     private StockPosition stockP; // 库位
     private Department department; // 部门
-    private Organization organization, organization2; // 组织
+    private Organization receiveOrganization, purOrganization; // 组织
     private Material mtl; // 物料
     private Pur_InAdapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
-    private char dataType = '1'; // 1：来源单，2：无源单
+    private char dataType = '0'; // 1：来源单，2：无源单
     private String stockBarcode, stockABarcode, stockPBarcode, deptBarcode, matBarcode, sourceBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库区， 3：库位， 4：部门， 5：物料
     private int curPos; // 当前行
@@ -194,6 +194,8 @@ public class Pur_InActivity extends BaseActivity {
 
                                 break;
                             case '5':
+                                if(m.dataType == '0') m.dataType = '2';
+
                                 m.mtl = JsonUtil.strToObject((String) msg.obj, Material.class);
                                 m.setTexts(m.etMatNo, m.mtl.getfNumber());
                                 m.matBarcode = m.mtl.getfNumber();
@@ -285,6 +287,48 @@ public class Pur_InActivity extends BaseActivity {
     }
 
     @Override
+    public void initView() {
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Pur_InAdapter(context, checkDatas);
+        recyclerView.setAdapter(mAdapter);
+        mAdapter.setCallBack(new Pur_InAdapter.MyCallBack() {
+            @Override
+            public void onClick_batch(View v, ScanningRecord2 entity, int position) {
+                Log.e("batch", "行：" + position);
+                curPos = position;
+                if (entity.getMtl().getIsBatchManager() == 1 && entity.getMtl().getIsSnManager() == 1) {
+                    String batchNo = isNULLS(entity.getBatchno());
+                    String seqNo = isNULLS(entity.getSequenceNo());
+                    showInputDialog2("批号和序列号", "批号", "序列号", batchNo, seqNo, CODE3);
+
+                } else if (entity.getMtl().getIsBatchManager() == 1 && entity.getMtl().getIsSnManager() == 0) { // 输入批号
+                    String batchNo = isNULLS(entity.getBatchno());
+                    showInputDialog("批号", batchNo, "none", CODE1);
+
+                } else if (entity.getMtl().getIsSnManager() == 1 && entity.getMtl().getIsBatchManager() == 0) { // 输入序列号
+                    String seqNo = isNULLS(entity.getSequenceNo());
+                    showInputDialog("序列号", seqNo, "none", CODE2);
+                }
+            }
+
+            @Override
+            public void onClick_num(View v, ScanningRecord2 entity, int position) {
+                Log.e("num", "行：" + position);
+                curPos = position;
+                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE4);
+            }
+
+            @Override
+            public void onClick_del(ScanningRecord2 entity, int position) {
+                Log.e("del", "行：" + position);
+                checkDatas.remove(position);
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
     public void initData() {
         hideSoftInputMode(etMatNo);
         hideSoftInputMode(etWhName);
@@ -292,6 +336,7 @@ public class Pur_InActivity extends BaseActivity {
         hideSoftInputMode(etWhPos);
         hideSoftInputMode(etDeptName);
         hideSoftInputMode(etSourceNo);
+        tvPurDate.setText(Comm.getSysDate(7));
     }
 
     @OnClick({R.id.btn_close, R.id.btn_sourceNo, R.id.btn_maker_code, R.id.tv_custSel, R.id.btn_whName, R.id.btn_whArea,
@@ -324,7 +369,6 @@ public class Pur_InActivity extends BaseActivity {
                 bundle = new Bundle();
                 bundle.putSerializable("supplier", supplier);
                 showForResult(Sel_PurOrderActivity.class, SEL_ORDER, bundle);
-//                showForResult(Pur_OrderSearchActivity.class, SEL_ORDER, bundle);
 
                 break;
             case R.id.tv_custSel: // 选择供应商
@@ -387,11 +431,10 @@ public class Pur_InActivity extends BaseActivity {
 
                 break;
             case R.id.btn_save: // 保存
-                if (checkDatas == null || checkDatas.size() == 0) {
-                    showWarnDialog("请先插入行！");
+                hideKeyboard(getCurrentFocus());
+                if(!saveBefore()) {
                     return;
                 }
-                hideKeyboard(getCurrentFocus());
                 run_findMatIsExistList();
 //                run_addScanningRecord();
 
@@ -440,6 +483,46 @@ public class Pur_InActivity extends BaseActivity {
         if (stock.isStorageLocation() && stockP == null) {
             showWarnDialog("请选择库位！");
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * 选择保存之前的判断
+     */
+    private boolean saveBefore() {
+        if (checkDatas == null || checkDatas.size() == 0) {
+            showWarnDialog("请先插入行！");
+            return false;
+        }
+        if(receiveOrganization == null) {
+            showWarnDialog("请选择收料组织！");
+            return false;
+        }
+        if(purOrganization == null) {
+            showWarnDialog("请选择采购组织！");
+            return false;
+        }
+
+        // 检查数据
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            ScanningRecord2 sr2 = checkDatas.get(i);
+            if (sr2.getMtl().getIsBatchManager() == 1 && sr2.getBatchno().length() == 0) {
+                showWarnDialog("第" + (i + 1) + "行请输入（批号）！");
+                return false;
+            }
+            if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
+                showWarnDialog("第" + (i + 1) + "行请输入（序列号）！");
+                return false;
+            }
+            if (sr2.getStockqty() == 0) {
+                showWarnDialog("第" + (i + 1) + "行（实收数）必须大于0！");
+                return false;
+            }
+            if (sr2.getStockqty() > sr2.getFqty()) {
+                showWarnDialog("第" + (i + 1) + "行（实收数）不能大于（应收数）！");
+                return false;
+            }
         }
         return true;
     }
@@ -612,6 +695,8 @@ public class Pur_InActivity extends BaseActivity {
         tvMatName.setText(""); // 物料名称
         tvType.setText(""); // 规格
         etNum.setText(""); // 数量
+        setEnables(tvReceiveOrganization, R.drawable.back_style_blue, true);
+        setEnables(tvPurOrganization, R.drawable.back_style_blue, true);
         setEnables(etNum, R.drawable.back_style_blue, true);
         etBatchNo.setText(""); // 批号
         etSequenceNo.setText(""); // 序列号
@@ -635,13 +720,18 @@ public class Pur_InActivity extends BaseActivity {
         etWhArea.setText("");
         etWhPos.setText("");
         etDeptName.setText("");
+        tvReceiveOrganization.setText("");
+        tvPurOrganization.setText("");
         supplier = null;
         stock = null;
         stockA = null;
         stockP = null;
         department = null;
-        dataType = '1';
+        receiveOrganization = null;
+        purOrganization = null;
+        dataType = '0';
         curViewFlag = '1';
+        tvPurDate.setText(Comm.getSysDate(7));
     }
 
     /**
@@ -685,54 +775,17 @@ public class Pur_InActivity extends BaseActivity {
         }
         // 隐藏键盘
         hideKeyboard(getCurrentFocus());
-
-//        ScanningRecord2 sr2 = new ScanningRecord2();
-////        sr2.setSource_finterID(1);
-//        sr2.setSupplierId(supplier.getId());
-//        sr2.setSupplierName(supplier.getFname());
-//        sr2.setStockId(stock.getId());
-//        sr2.setStockName(stock.getFname());
-//        sr2.setStockAreaId(stockA.getId());
-//        sr2.setStockAName(stockA.getFname());
-//        sr2.setStockPositionId(stockP.getId());
-//        sr2.setStockPName(stockP.getFname());
-//        sr2.setFitemId(mtl.getK3FitemId());
-//        sr2.setMaterial(mtl);
-//        sr2.setBatchno(batch);
-//        if(department != null) {
-//            sr2.setEmpId(department.getId());
-//        }
-//        sr2.setFqty(num);
-//        sr2.setStockqty(num); //
-//
-//        boolean isAlike = false; // 是否存在重复数据，存在加1
-//        for(int j=0, sizej=checkDatas.size(); j<sizej; j++) {
-//            ScanningRecord2 sr2a = checkDatas.get(j);
-//            if(mtl.getK3FitemId() == sr2a.getFitemId()){
-//                if(!mtl.getIs_sn()) {
-//                    sr2a.setFqty(sr2a.getFqty()+num);
-//                    sr2a.setStockqty(sr2a.getStockqty()+num);
-//                    isAlike = true;
-//                } else {
-//                    isAlike = false;
-//                }
-//                break;
-//            }
-//        }
-//        if(!isAlike) {
-//            checkDatas.add(sr2);
-//        }
         addRowSon(batch, seqNo, num);
 
         reset('1');
-        updateUI();
+        mAdapter.notifyDataSetChanged();
     }
 
     private void addRowSon(String batchNo, String seqNo, double num) {
         ScanningRecord2 sr2 = new ScanningRecord2();
-        sr2.setSupplierId(supplier.getId());
+        sr2.setSupplierId(supplier.getFsupplierid());
         sr2.setSupplierName(supplier.getfName());
-        sr2.setStockId(stock.getId());
+        sr2.setStockId(stock.getfStockid());
         sr2.setStock(stock);
         sr2.setStockAreaId(stockA.getId());
         sr2.setStockAName(stockA.getFname());
@@ -743,7 +796,7 @@ public class Pur_InActivity extends BaseActivity {
         sr2.setBatchno(batchNo);
         sr2.setSequenceNo(seqNo);
         if (department != null) {
-            sr2.setEmpId(department.getId());
+            sr2.setEmpId(department.getFitemID());
         }
         double fqty = num == -1 ? 1 : num;
         sr2.setFqty(fqty);
@@ -752,12 +805,10 @@ public class Pur_InActivity extends BaseActivity {
         boolean isAlike = false; // 是否存在重复数据，存在加1
         for (int j = 0, sizej = checkDatas.size(); j < sizej; j++) {
             ScanningRecord2 sr2a = checkDatas.get(j);
-            if (mtl.getfMaterialId() == sr2a.getFitemId()) {
-                if (mtl.getIsSnManager() == 1) { // 没有启用序列化
-                    sr2a.setFqty(sr2a.getFqty() + num);
-                    sr2a.setStockqty(sr2a.getStockqty() + num);
-                    isAlike = true;
-                }
+            if (mtl.getfMaterialId() == sr2a.getFitemId() && mtl.getIsSnManager() == 0) { // 没有启用序列化
+                sr2a.setFqty(sr2a.getFqty() + num);
+                sr2a.setStockqty(sr2a.getStockqty() + num);
+                isAlike = true;
                 break;
             }
         }
@@ -848,16 +899,16 @@ public class Pur_InActivity extends BaseActivity {
                 break;
             case SEL_ORGANIZATION: //查询收料组织   	返回
                 if (resultCode == RESULT_OK) {
-                    organization = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", organization.getName());
+                    receiveOrganization = (Organization) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_DEPT", receiveOrganization.getName());
                     getOrganizationAfter();
                 }
 
                 break;
             case SEL_ORGANIZATION2: //查询采购组织   	返回
                 if (resultCode == RESULT_OK) {
-                    organization2 = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", organization2.getName());
+                    purOrganization = (Organization) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_DEPT", purOrganization.getName());
                     getOrganization2After();
                 }
 
@@ -940,7 +991,7 @@ public class Pur_InActivity extends BaseActivity {
                 sr2.setStockqty(1);
             }
             if (stock != null) {
-                sr2.setStockId(stock.getId());
+                sr2.setStockId(stock.getfStockid());
                 sr2.setStock(stock);
             }
             if (stockA != null) {
@@ -955,7 +1006,17 @@ public class Pur_InActivity extends BaseActivity {
             sr2.setSupplierName(p.getSupplierName());
             sr2.setCustomerId(0);
             if (department != null) {
-                sr2.setEmpId(department.getId()); // 部门
+                sr2.setEmpId(department.getFitemID()); // 部门
+            }
+            receiveOrganization = p.getReceiveOrganization();
+            if(receiveOrganization != null) { // 收料组织
+                setEnables(tvReceiveOrganization, R.drawable.back_style_gray3, false);
+                tvReceiveOrganization.setText(receiveOrganization.getName());
+            }
+            purOrganization = p.getPurOrganization();
+            if(purOrganization != null) { // 采购组织
+                setEnables(tvPurOrganization, R.drawable.back_style_gray3, false);
+                tvPurOrganization.setText(purOrganization.getName());
             }
 //                            sr2.setOperationId(0); // 操作员id
 
@@ -974,7 +1035,8 @@ public class Pur_InActivity extends BaseActivity {
                 checkDatas.add(sr2);
             }
         }
-        dataType = '1';
+        if(dataType == '0') dataType = '1';
+
         if (isSaoma) { // 只有扫码的时候才显示单号
             String poNumber = list.get(0).getFbillno();
             setTexts(etSourceNo, poNumber);
@@ -983,7 +1045,8 @@ public class Pur_InActivity extends BaseActivity {
         setEnables(btnSelMat, R.drawable.back_style_gray6, false);
         setEnables(btnAdd, R.drawable.back_style_gray3, false);
         setFocusable(etMatNo); // 物料代码获取焦点
-        updateUI();
+
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -1070,8 +1133,8 @@ public class Pur_InActivity extends BaseActivity {
      * 选择（收料组织）返回的值
      */
     private void getOrganizationAfter() {
-        if (organization != null) {
-            tvReceiveOrganization.setText(organization.getName());
+        if (receiveOrganization != null) {
+            tvReceiveOrganization.setText(receiveOrganization.getName());
         }
     }
 
@@ -1079,8 +1142,8 @@ public class Pur_InActivity extends BaseActivity {
      * 选择（采购组织）返回的值
      */
     private void getOrganization2After() {
-        if (organization2 != null) {
-            tvPurOrganization.setText(organization2.getName());
+        if (purOrganization != null) {
+            tvPurOrganization.setText(purOrganization.getName());
         }
     }
 
@@ -1089,12 +1152,13 @@ public class Pur_InActivity extends BaseActivity {
      */
     private void getMaterialAfter() {
         if (mtl != null) {
+            if(dataType == '0') dataType = '2';
+
             setTexts(etMatNo, mtl.getfNumber());
             matBarcode = mtl.getfNumber();
             tvMatName.setText(mtl.getfName());
             tvType.setText(mtl.getMaterialSize());
             setTexts(etNum, mtl.getIsSnManager() == 1 ? "1" : "");
-            dataType = '2';
             setEnables(etSourceNo, R.drawable.back_style_gray5, false);
             setEnables(btnSourceNo, R.drawable.back_style_gray6, false);
             // 物料是否需要输入批号
@@ -1105,7 +1169,7 @@ public class Pur_InActivity extends BaseActivity {
                 setEnables(etBatchNo, R.drawable.back_style_gray3, false);
             }
             // 是否启用物料的序列号,如果启用了，则数量为1
-            if (mtl.getIsSnManager() ==1) {
+            if (mtl.getIsSnManager() == 1) {
                 setEnables(etSequenceNo, R.drawable.back_style_blue, true);
                 etNum.setText("1");
                 setEnables(etNum, R.drawable.back_style_gray3, false);
@@ -1119,78 +1183,9 @@ public class Pur_InActivity extends BaseActivity {
     }
 
     /**
-     * 更新UI
-     */
-    private void updateUI() {
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-        } else {
-            recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new Pur_InAdapter(context, checkDatas);
-            recyclerView.setAdapter(mAdapter);
-        }
-        mAdapter.setCallBack(new Pur_InAdapter.MyCallBack() {
-            @Override
-            public void onClick_batch(View v, ScanningRecord2 entity, int position) {
-                Log.e("batch", "行：" + position);
-                curPos = position;
-                if (entity.getMtl().getIsBatchManager() == 1 && entity.getMtl().getIsSnManager() == 1) {
-                    String batchNo = isNULLS(entity.getBatchno());
-                    String seqNo = isNULLS(entity.getSequenceNo());
-                    showInputDialog2("批号和序列号", "批号", "序列号", batchNo, seqNo, CODE3);
-
-                } else if (entity.getMtl().getIsBatchManager() == 1 && entity.getMtl().getIsSnManager() == 0) { // 输入批号
-                    String batchNo = isNULLS(entity.getBatchno());
-                    showInputDialog("批号", batchNo, "none", CODE1);
-
-                } else if (entity.getMtl().getIsSnManager() == 1 && entity.getMtl().getIsBatchManager() == 0) { // 输入序列号
-                    String seqNo = isNULLS(entity.getSequenceNo());
-                    showInputDialog("序列号", seqNo, "none", CODE2);
-                }
-            }
-
-            @Override
-            public void onClick_num(View v, ScanningRecord2 entity, int position) {
-                Log.e("num", "行：" + position);
-                curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE4);
-            }
-
-            @Override
-            public void onClick_del(ScanningRecord2 entity, int position) {
-                Log.e("del", "行：" + position);
-                checkDatas.remove(position);
-                mAdapter.notifyDataSetChanged();
-            }
-        });
-    }
-
-    /**
      * 保存方法
      */
     private void run_addScanningRecord() {
-        // 检查数据
-        for (int i = 0, size = checkDatas.size(); i < size; i++) {
-            ScanningRecord2 sr2 = checkDatas.get(i);
-            if (sr2.getMtl().getIsBatchManager() == 1 && sr2.getBatchno().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（批号）！");
-                return;
-            }
-            if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（序列号）！");
-                return;
-            }
-            if (sr2.getStockqty() == 0) {
-                showWarnDialog("第" + (i + 1) + "行（实收数）必须大于0！");
-                return;
-            }
-            if (sr2.getStockqty() > sr2.getFqty()) {
-                showWarnDialog("第" + (i + 1) + "行（实收数）不能大于（应收数）！");
-                return;
-            }
-        }
-
         showLoadDialog("保存中...");
 
         List<ScanningRecord> list = new ArrayList<>();
@@ -1207,16 +1202,16 @@ public class Pur_InActivity extends BaseActivity {
             record.setStockK3Id(sr2.getStockId());
             record.setStockAreaId(sr2.getStockAreaId());
             record.setStockPositionId(sr2.getStockPositionId());
-            record.setSupplierK3Id(supplier.getId());
+            record.setSupplierK3Id(supplier.getFsupplierid());
             record.setCustomerK3Id(0);
             if (department != null) {
-                record.setDepartmentK3Id(department.getId());
+                record.setDepartmentK3Id(department.getFitemID());
             }
             record.setPdaRowno((i+1));
             record.setBatchNo(sr2.getBatchno());
             record.setSequenceNo(sr2.getSequenceNo());
             record.setFqty(sr2.getStockqty());
-            record.setFdate(Comm.getSysDate(0));
+            record.setFdate(getValues(tvPurDate));
             record.setPdaNo("");
             // 得到用户对象
             User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
@@ -1277,7 +1272,6 @@ public class Pur_InActivity extends BaseActivity {
                 isStockALong = false;
                 break;
             case '3':
-                mUrl = Consts.getURL("findStockPositionByBarcode");
                 barcode = stockPBarcode;
                 break;
             case '4':

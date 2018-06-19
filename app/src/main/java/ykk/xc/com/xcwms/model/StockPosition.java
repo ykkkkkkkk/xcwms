@@ -10,12 +10,12 @@ import java.io.Serializable;
  */
 public class StockPosition implements Serializable {
     // [ID] [int] IDENTITY(1,1) NOT NULL,
-    // [area_id] [int] NOT NULL,
+    // [areaId] [int] NOT NULL,
     // [fnumber] [nvarchar](50) NOT NULL,
     // [fname] [nvarchar](50) NOT NULL,
     private int id;
-    private int stock_id;
-    private int area_id;
+    private int stockId;
+    private int areaId;
     private String fnumber;
     private String fname;
     private String barcode;
@@ -24,12 +24,12 @@ public class StockPosition implements Serializable {
         return id;
     }
 
-    public int getStock_id() {
-        return stock_id;
+    public int getStockId() {
+        return stockId;
     }
 
-    public int getArea_id() {
-        return area_id;
+    public int getAreaId() {
+        return areaId;
     }
 
     public String getFnumber() {
@@ -48,12 +48,12 @@ public class StockPosition implements Serializable {
         this.id = id;
     }
 
-    public void setStock_id(int stock_id) {
-        this.stock_id = stock_id;
+    public void setStockId(int stockId) {
+        this.stockId = stockId;
     }
 
-    public void setArea_id(int area_id) {
-        this.area_id = area_id;
+    public void setAreaId(int areaId) {
+        this.areaId = areaId;
     }
 
     public void setFnumber(String fnumber) {
