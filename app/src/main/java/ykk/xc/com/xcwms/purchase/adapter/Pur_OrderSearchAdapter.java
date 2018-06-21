@@ -43,12 +43,12 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
         tv1.setText(String.valueOf(pos + 1));
         tv2.setText(entity.getFbillno());
         tv3.setText(entity.getSupplierName());
-        tv4.setText(entity.getPurPerson()+"\n"+entity.getPurOrganizationName());
+        tv4.setText(entity.getPurPerson()+"\n"+entity.getPurOrgName());
         tv5.setText(entity.getDeptName());
         tv6.setText(entity.getPoFdate());
         tv7.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname()+"\n"+entity.getMtlType());
         tv8.setText(entity.getPoFdate()+""+entity.getUnitFname()+"\n"+entity.getPoFstockinqty());
-        tv9.setText(entity.getPurOrganizationName());
+        tv9.setText(entity.getPurOrgName());
     }
 
     public void setCallBack(MyCallBack callBack) {

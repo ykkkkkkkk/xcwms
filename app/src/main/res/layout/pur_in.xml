@@ -338,7 +338,7 @@
 
 
         <TextView
-            android:id="@+id/tv_receiveOrganization"
+            android:id="@+id/tv_receiveOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
@@ -360,7 +360,7 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_purOrganization"
+            android:id="@+id/tv_purOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"

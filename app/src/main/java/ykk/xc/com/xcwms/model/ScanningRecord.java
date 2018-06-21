@@ -30,14 +30,26 @@ public class ScanningRecord implements Serializable {
     private String k3number;
     private String fdate;
     private String status;
-    private int tmpSourceId; // 新加的单据id（采购id,销售id）
+    // 新加的
+    private String receiveOrgFnumber;
+    private String purOrgFnumber;
+    private String supplierFnumber;
+    private String mtlFnumber;
+    private String unitFnumber;
+    private String batchFnumber;
+    private String stockFnumber;
 
+    public ScanningRecord() {
+        super();
+    }
     public int getId() {
         return id;
     }
+
     public int getType() {
         return type;
     }
+
     public int getSourceK3Id() {
         return sourceK3Id;
     }
@@ -95,8 +107,26 @@ public class ScanningRecord implements Serializable {
     public String getStatus() {
         return status;
     }
-    public int getTmpSourceId() {
-        return tmpSourceId;
+    public String getReceiveOrgFnumber() {
+        return receiveOrgFnumber;
+    }
+    public String getPurOrgFnumber() {
+        return purOrgFnumber;
+    }
+    public String getSupplierFnumber() {
+        return supplierFnumber;
+    }
+    public String getMtlFnumber() {
+        return mtlFnumber;
+    }
+    public String getUnitFnumber() {
+        return unitFnumber;
+    }
+    public String getBatchFnumber() {
+        return batchFnumber;
+    }
+    public String getStockFnumber() {
+        return stockFnumber;
     }
     public void setId(int id) {
         this.id = id;
@@ -161,12 +191,39 @@ public class ScanningRecord implements Serializable {
     public void setStatus(String status) {
         this.status = status;
     }
-    public void setTmpSourceId(int tmpSourceId) {
-        this.tmpSourceId = tmpSourceId;
+    public void setReceiveOrgFnumber(String receiveOrgFnumber) {
+        this.receiveOrgFnumber = receiveOrgFnumber;
+    }
+    public void setPurOrgFnumber(String purOrgFnumber) {
+        this.purOrgFnumber = purOrgFnumber;
+    }
+    public void setSupplierFnumber(String supplierFnumber) {
+        this.supplierFnumber = supplierFnumber;
+    }
+    public void setMtlFnumber(String mtlFnumber) {
+        this.mtlFnumber = mtlFnumber;
+    }
+    public void setUnitFnumber(String unitFnumber) {
+        this.unitFnumber = unitFnumber;
+    }
+    public void setBatchFnumber(String batchFnumber) {
+        this.batchFnumber = batchFnumber;
+    }
+    public void setStockFnumber(String stockFnumber) {
+        this.stockFnumber = stockFnumber;
     }
 
-    public ScanningRecord() {
-        super();
+    @Override
+    public String toString() {
+        return "ScanningRecord [id=" + id + ", type=" + type + ", sourceK3Id=" + sourceK3Id + ", sourceFnumber="
+                + sourceFnumber + ", mtlK3Id=" + mtlK3Id + ", stockK3Id=" + stockK3Id + ", stockAreaId=" + stockAreaId
+                + ", stockPositionId=" + stockPositionId + ", supplierK3Id=" + supplierK3Id + ", customerK3Id="
+                + customerK3Id + ", departmentK3Id=" + departmentK3Id + ", operationId=" + operationId + ", pdaRowno="
+                + pdaRowno + ", fqty=" + fqty + ", batchNo=" + batchNo + ", sequenceNo=" + sequenceNo + ", barcode="
+                + barcode + ", pdaNo=" + pdaNo + ", k3number=" + k3number + ", fdate=" + fdate + ", status=" + status
+                + ", receiveOrgFnumber=" + receiveOrgFnumber + ", purOrgFnumber=" + purOrgFnumber + ", supplierFnumber="
+                + supplierFnumber + ", mtlFnumber=" + mtlFnumber + ", unitFnumber=" + unitFnumber + ", batchFnumber="
+                + batchFnumber + ", stockFnumber=" + stockFnumber + "]";
     }
 
 }

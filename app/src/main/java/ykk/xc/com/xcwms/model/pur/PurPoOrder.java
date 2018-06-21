@@ -1,8 +1,5 @@
 package ykk.xc.com.xcwms.model.pur;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.Material;
@@ -14,9 +11,9 @@ public class PurPoOrder implements Serializable {
     private int supplierId; // 供应商Id,
     private String supplierName; // 供应商,
     private String purPerson; // 采购员,
-    private int purOrganizationNameId; // 采购组织id
-    private String purOrganizationName; // 采购组织
-    private Organization purOrganization;
+    private int purOrgId; // 采购组织id
+    private String purOrgName; // 采购组织
+    private Organization purOrg;
     private int deptId; // 采购部门id
     private String deptName; // 采购部门
     private String poFdate; // 采购日期
@@ -28,9 +25,9 @@ public class PurPoOrder implements Serializable {
     private String unitFname; // 单位
     private double poFqty; // 采购数量
     private double poFstockinqty; // 累计入库数量
-    private int receiveOrganizationId; // 收料组织
-    private String receiveOrganizationName; // 收料组织
-    private Organization receiveOrganization;
+    private int receiveOrgId; // 收料组织
+    private String receiveOrgName; // 收料组织
+    private Organization receiveOrg;
     private int isCheck; // 新加的是否选中
 
     public int getfId() {
@@ -57,12 +54,12 @@ public class PurPoOrder implements Serializable {
         return purPerson;
     }
 
-    public int getPurOrganizationNameId() {
-        return purOrganizationNameId;
+    public int getPurOrgId() {
+        return purOrgId;
     }
 
-    public String getPurOrganizationName() {
-        return purOrganizationName;
+    public String getPurOrgName() {
+        return purOrgName;
     }
 
     public int getDeptId() {
@@ -105,12 +102,12 @@ public class PurPoOrder implements Serializable {
         return poFstockinqty;
     }
 
-    public int getReceiveOrganizationId() {
-        return receiveOrganizationId;
+    public int getReceiveOrgId() {
+        return receiveOrgId;
     }
 
-    public String getReceiveOrganizationName() {
-        return receiveOrganizationName;
+    public String getReceiveOrgName() {
+        return receiveOrgName;
     }
 
     public void setFbillno(String fbillno) {
@@ -129,12 +126,12 @@ public class PurPoOrder implements Serializable {
         this.purPerson = purPerson;
     }
 
-    public void setPurOrganizationNameId(int purOrganizationNameId) {
-        this.purOrganizationNameId = purOrganizationNameId;
+    public void setPurOrgId(int purOrgId) {
+        this.purOrgId = purOrgId;
     }
 
-    public void setPurOrganizationName(String purOrganizationName) {
-        this.purOrganizationName = purOrganizationName;
+    public void setPurOrgName(String purOrgName) {
+        this.purOrgName = purOrgName;
     }
 
     public void setDeptId(int deptId) {
@@ -177,12 +174,12 @@ public class PurPoOrder implements Serializable {
         this.poFstockinqty = poFstockinqty;
     }
 
-    public void setReceiveOrganizationId(int receiveOrganizationId) {
-        this.receiveOrganizationId = receiveOrganizationId;
+    public void setReceiveOrgId(int receiveOrgId) {
+        this.receiveOrgId = receiveOrgId;
     }
 
-    public void setReceiveOrganizationName(String receiveOrganizationName) {
-        this.receiveOrganizationName = receiveOrganizationName;
+    public void setReceiveOrgName(String receiveOrgName) {
+        this.receiveOrgName = receiveOrgName;
     }
 
     public Material getMtl() {
@@ -197,20 +194,20 @@ public class PurPoOrder implements Serializable {
         super();
     }
 
-    public Organization getPurOrganization() {
-        return purOrganization;
+    public Organization getPurOrg() {
+        return purOrg;
     }
 
-    public Organization getReceiveOrganization() {
-        return receiveOrganization;
+    public Organization getReceiveOrg() {
+        return receiveOrg;
     }
 
-    public void setPurOrganization(Organization purOrganization) {
-        this.purOrganization = purOrganization;
+    public void setPurOrg(Organization purOrg) {
+        this.purOrg = purOrg;
     }
 
-    public void setReceiveOrganization(Organization receiveOrganization) {
-        this.receiveOrganization = receiveOrganization;
+    public void setReceiveOrg(Organization receiveOrg) {
+        this.receiveOrg = receiveOrg;
     }
 
     public int getIsCheck() {
@@ -224,13 +221,13 @@ public class PurPoOrder implements Serializable {
     @Override
     public String toString() {
         return "PurPoOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
-                + supplierName + ", purPerson=" + purPerson + ", purOrganizationNameId=" + purOrganizationNameId
-                + ", purOrganizationName=" + purOrganizationName + ", purOrganization=" + purOrganization + ", deptId="
+                + supplierName + ", purPerson=" + purPerson + ", purOrgId=" + purOrgId
+                + ", purOrgName=" + purOrgName + ", purOrg=" + purOrg + ", deptId="
                 + deptId + ", deptName=" + deptName + ", poFdate=" + poFdate + ", mtlId=" + mtlId + ", mtl=" + mtl
                 + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType + ", unitFname="
-                + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty + ", receiveOrganizationId="
-                + receiveOrganizationId + ", receiveOrganizationName=" + receiveOrganizationName
-                + ", receiveOrganization=" + receiveOrganization + "]";
+                + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty + ", receiveOrgId="
+                + receiveOrgId + ", receiveOrgName=" + receiveOrgName
+                + ", receiveOrg=" + receiveOrg + "]";
     }
 
 }

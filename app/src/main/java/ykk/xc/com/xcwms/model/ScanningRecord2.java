@@ -29,14 +29,17 @@ public class ScanningRecord2 implements Serializable {
     private int fentryId;
     private String k3no;
     private String sequenceNo;
-    private int tmpSourceId; // 新加的单据id（采购id,销售id）
+    // 新加的
+    private String receiveOrgFnumber;
+    private String purOrgFnumber;
+    private String supplierFnumber;
+    private String mtlFnumber;
+    private String unitFnumber;
+    private String batchFnumber;
+    private String stockFnumber;
 
-    public int getTmpSourceId() {
-        return tmpSourceId;
-    }
-
-    public void setTmpSourceId(int tmpSourceId) {
-        this.tmpSourceId = tmpSourceId;
+    public ScanningRecord2() {
+        super();
     }
 
     public int getID() {
@@ -183,6 +186,14 @@ public class ScanningRecord2 implements Serializable {
         this.customerId = customerId;
     }
 
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
     public String getFdate() {
         return fdate;
     }
@@ -205,14 +216,6 @@ public class ScanningRecord2 implements Serializable {
 
     public void setOperationId(int operationId) {
         this.operationId = operationId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
     }
 
     public String getSrNo() {
@@ -247,8 +250,62 @@ public class ScanningRecord2 implements Serializable {
         this.sequenceNo = sequenceNo;
     }
 
-    public ScanningRecord2() {
-        super();
+    public String getReceiveOrgFnumber() {
+        return receiveOrgFnumber;
     }
+
+    public void setReceiveOrgFnumber(String receiveOrgFnumber) {
+        this.receiveOrgFnumber = receiveOrgFnumber;
+    }
+
+    public String getPurOrgFnumber() {
+        return purOrgFnumber;
+    }
+
+    public void setPurOrgFnumber(String purOrgFnumber) {
+        this.purOrgFnumber = purOrgFnumber;
+    }
+
+    public String getSupplierFnumber() {
+        return supplierFnumber;
+    }
+
+    public void setSupplierFnumber(String supplierFnumber) {
+        this.supplierFnumber = supplierFnumber;
+    }
+
+    public String getMtlFnumber() {
+        return mtlFnumber;
+    }
+
+    public void setMtlFnumber(String mtlFnumber) {
+        this.mtlFnumber = mtlFnumber;
+    }
+
+    public String getUnitFnumber() {
+        return unitFnumber;
+    }
+
+    public void setUnitFnumber(String unitFnumber) {
+        this.unitFnumber = unitFnumber;
+    }
+
+    public String getBatchFnumber() {
+        return batchFnumber;
+    }
+
+    public void setBatchFnumber(String batchFnumber) {
+        this.batchFnumber = batchFnumber;
+    }
+
+    public String getStockFnumber() {
+        return stockFnumber;
+    }
+
+    public void setStockFnumber(String stockFnumber) {
+        this.stockFnumber = stockFnumber;
+    }
+
+
 
 }

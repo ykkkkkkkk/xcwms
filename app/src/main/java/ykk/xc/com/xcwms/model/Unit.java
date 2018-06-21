@@ -1,6 +1,8 @@
 package ykk.xc.com.xcwms.model;
 
-public class Unit {
+import java.io.Serializable;
+
+public class Unit implements Serializable{
 	/*单位ID*/
 	private Integer id;
 	/*单位内码*/
