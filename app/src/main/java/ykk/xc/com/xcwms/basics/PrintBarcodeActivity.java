@@ -56,7 +56,7 @@ import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.Mtl;
 import ykk.xc.com.xcwms.model.pur.PoList;
-import ykk.xc.com.xcwms.model.pur.SeOrder;
+import ykk.xc.com.xcwms.model.sal.SalListOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockArea;
 import ykk.xc.com.xcwms.model.StockPosition;
@@ -112,7 +112,7 @@ public class PrintBarcodeActivity extends BaseActivity implements XRecyclerView.
     private List<StockPosition> list4;
     private List<Department> list5;
     private List<PoList> list6;
-    private List<SeOrder> list7;
+    private List<SalListOrder> list7;
     private ProductBarcode1Adapter mAdapter1; // 物料
     private ProductBarcode2Adapter mAdapter2; // 仓库
     private ProductBarcode3Adapter mAdapter3; // 库区
@@ -455,7 +455,7 @@ public class PrintBarcodeActivity extends BaseActivity implements XRecyclerView.
                 list6 = JsonUtil.strToList2(json, PoList.class);
                 break;
             case '7':
-                list7 = JsonUtil.strToList2(json, SeOrder.class);
+                list7 = JsonUtil.strToList2(json, SalListOrder.class);
                 break;
         }
     }
@@ -612,7 +612,7 @@ public class PrintBarcodeActivity extends BaseActivity implements XRecyclerView.
             case '7':
                 mAdapter7.setCallBack(new ProductBarcode7Adapter.MyCallBack() {
                     @Override
-                    public void onPrint(SeOrder e, int pos) {
+                    public void onPrint(SalListOrder e, int pos) {
                         Log.e("setListener-777", e.getSeroderNmber());
                         setAdapterListenerSon(e.getBarcode(), "seOrder", pos, e.getSeorderId());
                     }

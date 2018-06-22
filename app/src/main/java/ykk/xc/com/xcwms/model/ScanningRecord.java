@@ -38,10 +38,10 @@ public class ScanningRecord implements Serializable {
     private String unitFnumber;
     private String batchFnumber;
     private String stockFnumber;
+    private int poFid; // 采购订单id
+    private String poFbillno; // 采购订单编码
+    private double poFmustqty; // 采购订单剩余数
 
-    public ScanningRecord() {
-        super();
-    }
     public int getId() {
         return id;
     }
@@ -213,17 +213,68 @@ public class ScanningRecord implements Serializable {
         this.stockFnumber = stockFnumber;
     }
 
-    @Override
-    public String toString() {
-        return "ScanningRecord [id=" + id + ", type=" + type + ", sourceK3Id=" + sourceK3Id + ", sourceFnumber="
-                + sourceFnumber + ", mtlK3Id=" + mtlK3Id + ", stockK3Id=" + stockK3Id + ", stockAreaId=" + stockAreaId
-                + ", stockPositionId=" + stockPositionId + ", supplierK3Id=" + supplierK3Id + ", customerK3Id="
-                + customerK3Id + ", departmentK3Id=" + departmentK3Id + ", operationId=" + operationId + ", pdaRowno="
-                + pdaRowno + ", fqty=" + fqty + ", batchNo=" + batchNo + ", sequenceNo=" + sequenceNo + ", barcode="
-                + barcode + ", pdaNo=" + pdaNo + ", k3number=" + k3number + ", fdate=" + fdate + ", status=" + status
-                + ", receiveOrgFnumber=" + receiveOrgFnumber + ", purOrgFnumber=" + purOrgFnumber + ", supplierFnumber="
-                + supplierFnumber + ", mtlFnumber=" + mtlFnumber + ", unitFnumber=" + unitFnumber + ", batchFnumber="
-                + batchFnumber + ", stockFnumber=" + stockFnumber + "]";
+    public int getPoFid() {
+        return poFid;
     }
 
+    public String getPoFbillno() {
+        return poFbillno;
+    }
+
+    public double getPoFmustqty() {
+        return poFmustqty;
+    }
+
+    public void setPoFid(int poFid) {
+        this.poFid = poFid;
+    }
+
+    public void setPoFbillno(String poFbillno) {
+        this.poFbillno = poFbillno;
+    }
+
+    public void setPoFmustqty(double poFmustqty) {
+        this.poFmustqty = poFmustqty;
+    }
+
+    public ScanningRecord() {
+        super();
+    }
+
+    @Override
+    public String toString() {
+        return "ScanningRecord{" +
+                "id=" + id +
+                ", type=" + type +
+                ", sourceK3Id=" + sourceK3Id +
+                ", sourceFnumber='" + sourceFnumber + '\'' +
+                ", mtlK3Id=" + mtlK3Id +
+                ", stockK3Id=" + stockK3Id +
+                ", stockAreaId=" + stockAreaId +
+                ", stockPositionId=" + stockPositionId +
+                ", supplierK3Id=" + supplierK3Id +
+                ", customerK3Id=" + customerK3Id +
+                ", departmentK3Id=" + departmentK3Id +
+                ", operationId=" + operationId +
+                ", pdaRowno=" + pdaRowno +
+                ", fqty=" + fqty +
+                ", batchNo='" + batchNo + '\'' +
+                ", sequenceNo='" + sequenceNo + '\'' +
+                ", barcode='" + barcode + '\'' +
+                ", pdaNo='" + pdaNo + '\'' +
+                ", k3number='" + k3number + '\'' +
+                ", fdate='" + fdate + '\'' +
+                ", status='" + status + '\'' +
+                ", receiveOrgFnumber='" + receiveOrgFnumber + '\'' +
+                ", purOrgFnumber='" + purOrgFnumber + '\'' +
+                ", supplierFnumber='" + supplierFnumber + '\'' +
+                ", mtlFnumber='" + mtlFnumber + '\'' +
+                ", unitFnumber='" + unitFnumber + '\'' +
+                ", batchFnumber='" + batchFnumber + '\'' +
+                ", stockFnumber='" + stockFnumber + '\'' +
+                ", poFid=" + poFid +
+                ", poFbillno='" + poFbillno + '\'' +
+                ", poFmustqty=" + poFmustqty +
+                '}';
+    }
 }

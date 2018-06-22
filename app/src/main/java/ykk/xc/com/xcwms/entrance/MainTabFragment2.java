@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
+import ykk.xc.com.xcwms.sales.Sal_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
@@ -88,7 +89,8 @@ public class MainTabFragment2 extends BaseFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.relative1:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                show(Sal_OrderSearchActivity.class, null);
+
                 break;
             case R.id.relative2: // 销售出库
                 show(Sal_OutActivity.class, null);

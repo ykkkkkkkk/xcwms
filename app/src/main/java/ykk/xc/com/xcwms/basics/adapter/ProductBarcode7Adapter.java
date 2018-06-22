@@ -7,18 +7,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.SeOrder;
+import ykk.xc.com.xcwms.model.sal.SalListOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
  * 采购列表适配器
  */
-public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SeOrder> {
+public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalListOrder> {
 
     private Activity context;
     private MyCallBack callBack;
 
-    public ProductBarcode7Adapter(Activity context, List<SeOrder> datas) {
+    public ProductBarcode7Adapter(Activity context, List<SalListOrder> datas) {
         super(datas);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SeOrder> {
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final SeOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final SalListOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
@@ -61,7 +61,7 @@ public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SeOrder> {
     }
 
     public interface MyCallBack {
-        void onPrint(SeOrder entity, int position);
+        void onPrint(SalListOrder entity, int position);
     }
 
 

@@ -106,7 +106,7 @@
             android:name=".purchase.Pur_InActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Sel_PurOrderActivity"
+            android:name=".purchase.Pur_SelOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Pur_OrderSearchActivity"
@@ -117,7 +117,10 @@
             android:name=".sales.Sal_OutActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".sales.Sal_OrderActivity"
+            android:name=".sales.Sal_SelOrderActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_OrderSearchActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".MainActivity" />

@@ -11,13 +11,13 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.model.pur.PurPoOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
+public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
     private List<PurPoOrder> datas;
 
-    public Sel_PurOrderAdapter(Activity context, List<PurPoOrder> datas) {
+    public Pur_SelOrderAdapter(Activity context, List<PurPoOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -25,7 +25,7 @@ public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.sel_pur_order_item;
+        return R.layout.pur_sel_order_item;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class Sel_PurOrderAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
 //            tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
             tv_mts.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
             String unitName = entity.getUnitFname();
-            String num1 = df.format(entity.getPoFqty());
+            String num1 = df.format(entity.getPoFqty()-entity.getPoFstockinqty());
             tv_numUnit.setText(num1+""+unitName);
             if(entity.getIsCheck() == 1) {
                 tv_check.setBackgroundResource(R.drawable.check_true);

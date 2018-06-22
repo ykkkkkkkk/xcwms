@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase.adapter;
+package ykk.xc.com.xcwms.sales.adapter;
 
 import android.app.Activity;
 import android.widget.TextView;
@@ -7,16 +7,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PurPoOrder;
+import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
+public class Sal_OrderSearchAdapter extends BaseArrayRecyclerAdapter<SalOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<PurPoOrder> datas;
+    private List<SalOrder> datas;
 
-    public Pur_OrderSearchAdapter(Activity context, List<PurPoOrder> datas) {
+    public Sal_OrderSearchAdapter(Activity context, List<SalOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -24,11 +24,11 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_order_search_item;
+        return R.layout.sal_order_search_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, PurPoOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, SalOrder entity, final int pos) {
         // 初始化id
         TextView tv1 = holder.obtainView(R.id.tv1);
         TextView tv2 = holder.obtainView(R.id.tv2);
@@ -37,20 +37,14 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
         TextView tv5 = holder.obtainView(R.id.tv5);
         TextView tv6 = holder.obtainView(R.id.tv6);
         TextView tv7 = holder.obtainView(R.id.tv7);
-        TextView tv7a = holder.obtainView(R.id.tv7a);
-        TextView tv8 = holder.obtainView(R.id.tv8);
-        TextView tv9 = holder.obtainView(R.id.tv9);
         // 赋值
         tv1.setText(String.valueOf(pos + 1));
-        tv2.setText(entity.getFbillno());
-        tv3.setText(entity.getSupplierName());
-        tv4.setText(entity.getPurPerson()+"\n"+entity.getPurOrgName());
-        tv5.setText(entity.getDeptName());
-        tv6.setText(entity.getPoFdate());
+        tv2.setText(entity.getFbillno()+"\n"+entity.getFbillType());
+        tv3.setText(entity.getCustName());
+        tv4.setText(entity.getSalOrgName()+"\n"+entity.getInventoryOrgName());
+        tv5.setText(entity.getSalDate());
+        tv6.setText(df.format(entity.getSalFqty())+""+entity.getMtlUnitName()+"\n"+df.format(entity.getSalFstockoutqty())+"/"+df.format(entity.getSalFcanoutqty()));
         tv7.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
-        tv7a.setText(entity.getMtlType());
-        tv8.setText(df.format(entity.getPoFqty())+""+entity.getUnitFname()+"\n"+df.format(entity.getPoFstockinqty()));
-        tv9.setText(entity.getPurOrgName());
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -58,7 +52,7 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
     }
 
     public interface MyCallBack {
-        void onClick(PurPoOrder entity, int position);
+        void onClick(SalOrder entity, int position);
     }
 
 

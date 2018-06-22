@@ -37,10 +37,9 @@ public class ScanningRecord2 implements Serializable {
     private String unitFnumber;
     private String batchFnumber;
     private String stockFnumber;
-
-    public ScanningRecord2() {
-        super();
-    }
+    private int poFid; // 采购订单id
+    private String poFbillno; // 采购订单编码
+    private double poFmustqty; // 采购订单剩余数
 
     public int getID() {
         return ID;
@@ -306,6 +305,73 @@ public class ScanningRecord2 implements Serializable {
         this.stockFnumber = stockFnumber;
     }
 
+    public int getPoFid() {
+        return poFid;
+    }
 
+    public String getPoFbillno() {
+        return poFbillno;
+    }
 
+    public double getPoFmustqty() {
+        return poFmustqty;
+    }
+
+    public void setPoFid(int poFid) {
+        this.poFid = poFid;
+    }
+
+    public void setPoFbillno(String poFbillno) {
+        this.poFbillno = poFbillno;
+    }
+
+    public void setPoFmustqty(double poFmustqty) {
+        this.poFmustqty = poFmustqty;
+    }
+
+    public ScanningRecord2() {
+        super();
+    }
+
+    @Override
+    public String toString() {
+        return "ScanningRecord2{" +
+                "ID=" + ID +
+                ", type=" + type +
+                ", sourceFinterId=" + sourceFinterId +
+                ", sourceFnumber='" + sourceFnumber + '\'' +
+                ", fitemId=" + fitemId +
+                ", mtl=" + mtl +
+                ", batchno='" + batchno + '\'' +
+                ", fqty=" + fqty +
+                ", stockqty=" + stockqty +
+                ", stockId=" + stockId +
+                ", stock=" + stock +
+                ", stockAreaId=" + stockAreaId +
+                ", stockAName='" + stockAName + '\'' +
+                ", stockPositionId=" + stockPositionId +
+                ", stockPName='" + stockPName + '\'' +
+                ", supplierId=" + supplierId +
+                ", supplierName='" + supplierName + '\'' +
+                ", customerId=" + customerId +
+                ", customerName='" + customerName + '\'' +
+                ", fdate='" + fdate + '\'' +
+                ", empId=" + empId +
+                ", operationId=" + operationId +
+                ", srNo='" + srNo + '\'' +
+                ", fentryId=" + fentryId +
+                ", k3no='" + k3no + '\'' +
+                ", sequenceNo='" + sequenceNo + '\'' +
+                ", receiveOrgFnumber='" + receiveOrgFnumber + '\'' +
+                ", purOrgFnumber='" + purOrgFnumber + '\'' +
+                ", supplierFnumber='" + supplierFnumber + '\'' +
+                ", mtlFnumber='" + mtlFnumber + '\'' +
+                ", unitFnumber='" + unitFnumber + '\'' +
+                ", batchFnumber='" + batchFnumber + '\'' +
+                ", stockFnumber='" + stockFnumber + '\'' +
+                ", poFid=" + poFid +
+                ", poFbillno='" + poFbillno + '\'' +
+                ", poFmustqty=" + poFmustqty +
+                '}';
+    }
 }

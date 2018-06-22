@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.sales;
+package ykk.xc.com.xcwms.purchase;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,14 +33,13 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.model.MeasureUnit;
-import ykk.xc.com.xcwms.model.Organization;
-import ykk.xc.com.xcwms.model.pur.SeOrder;
-import ykk.xc.com.xcwms.sales.adapter.Sal_OrderAdapter;
+import ykk.xc.com.xcwms.model.Supplier;
+import ykk.xc.com.xcwms.model.pur.PurPoOrder;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
-public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
+public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.btn_close)
     Button btnClose;
@@ -53,33 +52,31 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
 
-    private Sal_OrderActivity context = this;
+    private Pur_SelOrderActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
-    private Organization organization; // 供应商
+    private Supplier supplier; // 供应商
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private FormBody formBody = null;
-    private Sal_OrderAdapter mAdapter;
-    private List<SeOrder> listDatas;
-    private MeasureUnit unit;
+    private Pur_SelOrderAdapter mAdapter;
+    private List<PurPoOrder> listDatas;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Sal_OrderActivity> mActivity;
+        private final WeakReference<Pur_SelOrderActivity> mActivity;
 
-        public MyHandler(Sal_OrderActivity activity) {
-            mActivity = new WeakReference<Sal_OrderActivity>(activity);
+        public MyHandler(Pur_SelOrderActivity activity) {
+            mActivity = new WeakReference<Pur_SelOrderActivity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Sal_OrderActivity m = mActivity.get();
+            Pur_SelOrderActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.listDatas = JsonUtil.strToList2((String) msg.obj, SeOrder.class);
+                        m.listDatas = JsonUtil.strToList2((String) msg.obj, PurPoOrder.class);
 //                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<PO_list>>(){}.getType());
 
                         m.updateUI();
@@ -97,7 +94,7 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
 
     @Override
     public int setLayoutResID() {
-        return R.layout.sal_order;
+        return R.layout.pur_sel_order;
     }
 
     @Override
@@ -109,15 +106,14 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
-            organization = bundle.getParcelable("organization");
-            tvCustInfo.setText("供应商：" + organization.getName());
+            supplier = (Supplier) bundle.getSerializable("supplier");
+            tvCustInfo.setText("供应商：" + supplier.getfName());
         }
     }
 
 
     @OnClick({R.id.btn_close, R.id.btn_confirm})
     public void onViewClicked(View view) {
-        Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
                 closeHandler(mHandler);
@@ -129,9 +125,9 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
                     toasts("请选择数据在确认！");
                     return;
                 }
-                List<SeOrder> list = new ArrayList<SeOrder>();
+                List<PurPoOrder> list = new ArrayList<>();
                 for(int i = 0, size = listDatas.size(); i<size; i++) {
-                    SeOrder p = listDatas.get(i);
+                    PurPoOrder p = listDatas.get(i);
                     if(p.getIsCheck() == 1) {
                         list.add(p);
                     }
@@ -140,8 +136,9 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
                     toasts("请勾选数据行！");
                     return;
                 }
-                bundle = new Bundle();
-                bundle.putSerializable("checkDatas", (Serializable)list);
+//                String result = JsonUtil.objectToString(list);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("checkDatas", (Serializable) list);
                 setResults(context, bundle);
                 context.finish();
 
@@ -156,12 +153,12 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
         }
         if (isChecked) {
             for (int i = 0, size = listDatas.size(); i < size; i++) {
-                SeOrder p = listDatas.get(i);
+                PurPoOrder p = listDatas.get(i);
                 p.setIsCheck(1);
             }
         } else {
             for (int i = 0, size = listDatas.size(); i < size; i++) {
-                SeOrder p = listDatas.get(i);
+                PurPoOrder p = listDatas.get(i);
                 p.setIsCheck(0);
             }
         }
@@ -173,9 +170,15 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findSeOrderListByParam");
+        String mUrl = Consts.getURL("findPurPoOrderList");
         FormBody formBody = new FormBody.Builder()
-                .add("custId", String.valueOf(organization.getfOrganiztionId()))
+//                .add("fbillno", getValues(etFbillno).trim())
+                .add("supplierId", String.valueOf(supplier.getFsupplierid()))
+//                .add("supplierName", supplier.)
+//                .add("mtlFnumber", getValues(etMtlFnumber).trim())
+//                .add("mtlFname", getValues(etMtlFname).trim())
+//                .add("poFdateBeg", getValues(tvBegDate))
+//                .add("poFdateEnd", getValues(tvEndDate))
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -202,7 +205,7 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Ware_Sal_OrderActivity --> onResponse", result);
+                Log.e("Ware_Pur_OrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -217,7 +220,7 @@ public class Sal_OrderActivity extends BaseActivity implements XRecyclerView.Loa
 //        xRecyclerView.setLayoutManager(layoutManager);
         xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Sal_OrderAdapter(context, listDatas);
+        mAdapter = new Pur_SelOrderAdapter(context, listDatas);
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 

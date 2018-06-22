@@ -10,9 +10,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,11 +27,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.adapter.Organization_DialogAdapter;
+import ykk.xc.com.xcwms.basics.adapter.Cust_DialogAdapter;
 import ykk.xc.com.xcwms.comm.BaseDialogActivity;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.comm.OnItemClickListener2;
-import ykk.xc.com.xcwms.model.Organization;
+import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 /**
@@ -41,12 +43,16 @@ public class Cust_DialogActivity extends BaseDialogActivity {
     Button btnClose;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.et_search)
+    EditText etSearch;
+    @BindView(R.id.btn_search)
+    Button btnSearch;
+
     private Cust_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
-    private List<Organization> list;
-    private Organization_DialogAdapter mAdapter;
+    private List<Customer> listDatas = new ArrayList<>();
+    private Cust_DialogAdapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private FormBody formBody = null;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -64,8 +70,9 @@ public class Cust_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.list = JsonUtil.strToList2((String) msg.obj, Organization.class);
-                        m.updateUI();
+                        List<Customer> list = JsonUtil.strToList2((String) msg.obj, Customer.class);
+                        m.listDatas.addAll(list);
+                        m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -84,16 +91,45 @@ public class Cust_DialogActivity extends BaseDialogActivity {
     }
 
     @Override
+    public void initView() {
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Cust_DialogAdapter(context, listDatas);
+        recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
+            @Override
+            public void onItemClick(View view, int pos) {
+                Customer cust = listDatas.get(pos);
+                Intent intent = new Intent();
+                intent.putExtra("obj", cust);
+                context.setResult(RESULT_OK, intent);
+                context.finish();
+            }
+        });
+    }
+
+    @Override
     public void initData() {
         run_okhttpDatas();
     }
 
 
     // 监听事件
-    @OnClick(R.id.btn_close)
-    public void onViewClicked() {
-        closeHandler(mHandler);
-        context.finish();
+    @OnClick({R.id.btn_close, R.id.btn_search})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_close:
+                closeHandler(mHandler);
+                context.finish();
+
+                break;
+            case R.id.btn_search:
+                listDatas.clear();
+                run_okhttpDatas();
+
+                break;
+        }
     }
 
     /**
@@ -101,8 +137,9 @@ public class Cust_DialogActivity extends BaseDialogActivity {
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findOrganizationListByParam");
+        String mUrl = Consts.getURL("findCustomerByParam");
         FormBody formBody = new FormBody.Builder()
+                .add("fNumberAndName", getValues(etSearch).trim())
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -131,27 +168,6 @@ public class Cust_DialogActivity extends BaseDialogActivity {
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Organization_DialogActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Organization_DialogAdapter(context, list);
-        recyclerView.setAdapter(mAdapter);
-
-        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
-            @Override
-            public void onItemClick(View view, int pos) {
-                Organization supplier = list.get(pos);
-                Intent intent = new Intent();
-                intent.putExtra("obj", supplier);
-                context.setResult(RESULT_OK, intent);
-                context.finish();
             }
         });
     }

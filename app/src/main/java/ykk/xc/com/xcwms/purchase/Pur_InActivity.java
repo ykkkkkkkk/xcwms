@@ -206,7 +206,7 @@ public class Pur_InActivity extends BaseActivity {
                                     }
                                     for (int i = 0, size = m.checkDatas.size(); i < size; i++) {
                                         ScanningRecord2 sr2 = m.checkDatas.get(i);
-                                        if (m.mtl.getfMaterialId() == sr2.getMtl().getfMaterialId() && sr2.getMtl().getIsSnManager() == 1 && sr2.getFqty() > sr2.getStockqty()) {
+                                        if (m.mtl.getfMaterialId() == sr2.getMtl().getfMaterialId() && sr2.getMtl().getIsSnManager() == 0 && sr2.getFqty() > sr2.getStockqty()) {
                                             // 没有启用序列号，并且应发数量大于实发数量
                                             sr2.setStockqty(sr2.getStockqty() + 1);
                                             break;
@@ -368,7 +368,7 @@ public class Pur_InActivity extends BaseActivity {
                 }
                 bundle = new Bundle();
                 bundle.putSerializable("supplier", supplier);
-                showForResult(Sel_PurOrderActivity.class, SEL_ORDER, bundle);
+                showForResult(Pur_SelOrderActivity.class, SEL_ORDER, bundle);
 
                 break;
             case R.id.tv_custSel: // 选择供应商
@@ -815,6 +815,9 @@ public class Pur_InActivity extends BaseActivity {
         double fqty = num == -1 ? 1 : num;
         sr2.setFqty(fqty);
         sr2.setStockqty(fqty);
+        sr2.setPoFid(0);
+        sr2.setPoFbillno("");
+        sr2.setPoFmustqty(fqty);
 
         boolean isAlike = false; // 是否存在重复数据，存在加1
         for (int j = 0, sizej = checkDatas.size(); j < sizej; j++) {
@@ -998,10 +1001,14 @@ public class Pur_InActivity extends BaseActivity {
             sr2.setMtl(p.getMtl());
             sr2.setMtlFnumber(p.getMtl().getfNumber());
             sr2.setUnitFnumber(p.getMtl().getUnit().getUnitNumber());
+            sr2.setPoFid(p.getfId());
+            sr2.setPoFbillno(p.getFbillno());
+            sr2.setPoFmustqty(p.getPoFqty()-p.getPoFstockinqty());
 
             sr2.setBatchno(""); // 批号默认为空
             sr2.setSequenceNo(""); // 序列号默认为空
-            sr2.setFqty(p.getPoFqty());
+            sr2.setFqty(p.getPoFqty()-p.getPoFstockinqty());
+
             // 是否启用物料的序列号,如果启用了，则数量为1
             if (p.getMtl().getIsSnManager() == 1) {
                 sr2.setStockqty(1);
@@ -1228,6 +1235,10 @@ public class Pur_InActivity extends BaseActivity {
             record.setReceiveOrgFnumber(sr2.getReceiveOrgFnumber());
             record.setPurOrgFnumber(sr2.getPurOrgFnumber());
             record.setCustomerK3Id(0);
+            record.setPoFid(sr2.getPoFid());
+            record.setPoFbillno(sr2.getPoFbillno());
+            record.setPoFmustqty(sr2.getPoFmustqty());
+
             if (department != null) {
                 record.setDepartmentK3Id(department.getFitemID());
             }

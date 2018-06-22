@@ -8,16 +8,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.SeOrder;
+import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Sal_OrderAdapter extends BaseArrayRecyclerAdapter<SeOrder> {
+public class Sal_SelOrderAdapter extends BaseArrayRecyclerAdapter<SalOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<SeOrder> datas;
+    private List<SalOrder> datas;
 
-    public Sal_OrderAdapter(Activity context, List<SeOrder> datas) {
+    public Sal_SelOrderAdapter(Activity context, List<SalOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -25,11 +25,11 @@ public class Sal_OrderAdapter extends BaseArrayRecyclerAdapter<SeOrder> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.sal_order_item;
+        return R.layout.sal_sel_order_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, SeOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, SalOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_date = holder.obtainView(R.id.tv_date);
@@ -39,11 +39,11 @@ public class Sal_OrderAdapter extends BaseArrayRecyclerAdapter<SeOrder> {
             TextView tv_check = holder.obtainView(R.id.tv_check);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_date.setText(entity.getSeroderFdate());
-            tv_stNo.setText(entity.getSeroderNmber());
-            tv_mts.setText(entity.getMtl().getFnumber()+"\n"+entity.getMtl().getFname());
-            String unitName = entity.getMtl().getmUnit().getFname().trim();
-            String num1 = df.format(entity.getSeorderFqty());
+            tv_date.setText(entity.getSalDate());
+            tv_stNo.setText(entity.getFbillno());
+            tv_mts.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
+            String unitName = entity.getMtlUnitName();
+            String num1 = df.format(entity.getSalFcanoutqty());
             tv_numUnit.setText(num1+""+unitName);
             if(entity.getIsCheck() == 1) {
                 tv_check.setBackgroundResource(R.drawable.check_true);
@@ -77,7 +77,7 @@ public class Sal_OrderAdapter extends BaseArrayRecyclerAdapter<SeOrder> {
     }
 
     public interface MyCallBack {
-        void onClick(SeOrder entity, int position);
+        void onClick(SalOrder entity, int position);
     }
 
 
