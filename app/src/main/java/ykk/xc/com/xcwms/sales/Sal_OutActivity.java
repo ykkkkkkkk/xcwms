@@ -47,7 +47,6 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Customer;
-import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
@@ -738,7 +737,7 @@ public class Sal_OutActivity extends BaseActivity {
             case SEL_CUST: //查询客户	返回
                 if (resultCode == RESULT_OK) {
                     customer = data.getParcelableExtra("obj");
-                    Log.e("onActivityResult --> SEL_CUST", customer.getCustomerName()));
+                    Log.e("onActivityResult --> SEL_CUST", customer.getCustomerName());
                     if (customer != null) {
                         tvCustSel.setText(customer.getCustomerName());
                     }
@@ -760,7 +759,7 @@ public class Sal_OutActivity extends BaseActivity {
                     Stock stock = data.getParcelableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCK", stock.getfName());
                     if (this.stock != null && stock != null && stock.getId() == this.stock.getId()) {
-                        // 长按了，并且启用了库区管理
+//                         长按了，并且启用了库区管理
                         if (isStockLong && stock.isReservoirArea()) {
                             Bundle bundle = new Bundle();
                             bundle.putInt("stockId", stock.getfStockid());
@@ -778,7 +777,7 @@ public class Sal_OutActivity extends BaseActivity {
                     StockArea stockA = data.getParcelableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKA", stockA.getFname());
                     if (this.stockA != null && stockA != null && stockA.getId() == this.stockA.getId()) {
-                        // 长按了，并且启用了库位管理
+//                         长按了，并且启用了库位管理
                         if (isStockALong && stock.isStorageLocation()) {
                             isStockALong = true;
                             Bundle bundle = new Bundle();
@@ -894,8 +893,8 @@ public class Sal_OutActivity extends BaseActivity {
             sr2.setBatchno(""); // 批号默认为空
             sr2.setSequenceNo(""); // 批号默认为空
             sr2.setFqty(s.getSalFqty());
-            // 是否启用物料的序列号,如果启用了，则数量为1
-            if (s.getMtl().getIs_sn()) {
+//             是否启用物料的序列号,如果启用了，则数量为1
+            if (s.getMtl().getIsSnManager() == 1) {
                 sr2.setStockqty(1);
             }
             if (stock != null) {
@@ -910,20 +909,20 @@ public class Sal_OutActivity extends BaseActivity {
                 sr2.setStockPositionId(stockP.getId());
                 sr2.setStockPName(stockP.getFname());
             }
-            sr2.setCustomerId(s.getFcustId());
-            sr2.setCustomerName(s.getOrganization().getName());
+            sr2.setCustomerId(s.getCustId());
+            sr2.setCustomerName(s.getCustName());
             sr2.setEmpId(0);
-//                            sr2.setOperationId(0); // 操作员id
+            sr2.setOperationId(0); // 操作员id
 
             boolean isAlike = false; // 是否存在重复数据，存在加1
             for (int j = 0, sizej = checkDatas.size(); j < sizej; j++) {
                 ScanningRecord2 sr2a = checkDatas.get(j);
-                if (s.getId() == sr2a.getTmpSourceId() && s.getMtl().getId() == sr2a.getMtl().getId()) {
-//                                    if(sr2a.getStockqty() < sr2a.getFqty()) { // 未装満，加1
-//                                        sr2a.setStockqty(sr2a.getStockqty()+1);
+                if (s.getfId() == sr2a.getSourceFinterId() && s.getMtl().getId() == sr2a.getMtl().getId()) {
+                                    if(sr2a.getStockqty() < sr2a.getFqty()) { // 未装満，加1
+                                        sr2a.setStockqty(sr2a.getStockqty()+1);
                     isAlike = true;
                     break;
-//                                    }
+                                    }
                 }
             }
             if (!isAlike) {
@@ -932,7 +931,7 @@ public class Sal_OutActivity extends BaseActivity {
         }
         dataType = '1';
         if (isSaoma) { // 只有扫码的时候才显示单号
-            String seroderNmber = list.get(0).getSeroderNmber();
+            String seroderNmber = list.get(0).getFbillno();
             setTexts(etSourceNo, seroderNmber);
             sourceBarcode = seroderNmber;
         }
@@ -953,7 +952,7 @@ public class Sal_OutActivity extends BaseActivity {
             etWhArea.setText("");
             stockP = null;
             etWhPos.setText("");
-            // 启用库区
+//             启用库区
             if (stock.isReservoirArea()) {
                 setEnables(etWhArea, R.drawable.back_style_blue4, true);
                 setEnables(btnWhArea, R.drawable.btn_blue3_selector, true);
@@ -964,7 +963,7 @@ public class Sal_OutActivity extends BaseActivity {
                 setEnables(etWhArea, R.drawable.back_style_gray5, false);
                 setEnables(btnWhArea, R.drawable.back_style_gray6, false);
             }
-            // 启用库位
+//             启用库位
             if (stock.isStorageLocation()) {
                 setEnables(etWhPos, R.drawable.back_style_blue4, true);
                 setEnables(btnWhPos, R.drawable.btn_blue3_selector, true);
@@ -974,7 +973,7 @@ public class Sal_OutActivity extends BaseActivity {
                 setEnables(etWhPos, R.drawable.back_style_gray5, false);
                 setEnables(btnWhPos, R.drawable.back_style_gray6, false);
             }
-            // 长按了，并且启用了库区管理
+//             长按了，并且启用了库区管理
             if (isStockLong && stock.isReservoirArea()) {
                 isStockALong = true;
                 Bundle bundle = new Bundle();
@@ -993,7 +992,7 @@ public class Sal_OutActivity extends BaseActivity {
             stockABarcode = stockA.getFname();
             stockP = null;
             etWhPos.setText("");
-            // 长按了，并且启用了库位管理
+//             长按了，并且启用了库位管理
             if (isStockALong && stock.isStorageLocation()) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("areaId", stockA.getId());
@@ -1017,23 +1016,23 @@ public class Sal_OutActivity extends BaseActivity {
      */
     private void getMtlAfter() {
         if (mtl != null) {
-            setTexts(etMatNo, mtl.getFnumber());
-            matBarcode = mtl.getFnumber();
-            tvMatName.setText(mtl.getFname());
-            tvType.setText(mtl.getFmodel());
-            setTexts(etNum, mtl.getIs_sn() ? "1" : "");
+            setTexts(etMatNo, mtl.getfNumber());
+            matBarcode = mtl.getfNumber();
+            tvMatName.setText(mtl.getfName());
+            tvType.setText(mtl.getMaterialSize());
+            setTexts(etNum, mtl.getIsSnManager() == 1 ? "1" : "");
             dataType = '2';
             setEnables(etSourceNo, R.drawable.back_style_gray5, false);
             setEnables(btnSourceNo, R.drawable.back_style_gray6, false);
-            // 物料是否需要输入批号
-            if (mtl.getIs_batch()) {
+//             物料是否需要输入批号
+            if (mtl.getIsSnManager() == 1) {
                 setEnables(tvBatchNo, R.drawable.back_style_blue, true);
             } else {
                 tvBatchNo.setText("");
                 setEnables(tvBatchNo, R.drawable.back_style_gray3, false);
             }
-            // 是否启用物料的序列号,如果启用了，则数量为1
-            if (mtl.getIs_sn()) {
+//             是否启用物料的序列号,如果启用了，则数量为1
+            if (mtl.getIsSnManager() == 1) {
                 setEnables(tvSequenceNo, R.drawable.back_style_blue, true);
                 etNum.setText("1");
                 setEnables(etNum, R.drawable.back_style_gray3, false);
@@ -1081,9 +1080,9 @@ public class Sal_OutActivity extends BaseActivity {
             public void onClick_batch_top(View v, ScanningRecord2 entity, int position) {
                 Log.e("batch", "行：" + position);
                 curPos = position;
-                if (entity.getMtl().getIs_batch()) { // 选择批号
+                if (entity.getMtl().getIsSnManager() == 1) { // 选择批号
                     Bundle bundle = new Bundle();
-                    bundle.putInt("fitemId", entity.getMtl().getK3FitemId());
+                    bundle.putInt("fitemId", entity.getMtl().getfMaterialId());
                     bundle.putInt("stockId", entity.getStock().getfStockid());
                     showForResult(Batch_DialogActivity.class, CODE1, bundle);
                 }
@@ -1093,7 +1092,7 @@ public class Sal_OutActivity extends BaseActivity {
             public void onClick_batch_long(View v, ScanningRecord2 entity, int position) {
                 Log.e("sequence", "行：" + position);
                 curPos = position;
-                if (entity.getMtl().getIs_sn()) { // 选择序列号
+                if (entity.getMtl().getIsSnManager() == 1) { // 选择序列号
                     showForResult(Sequence_DialogActivity.class, CODE2, null);
                 }
             }
@@ -1118,14 +1117,14 @@ public class Sal_OutActivity extends BaseActivity {
      * 保存方法
      */
     private void run_addScanningRecord() {
-        // 检查数据
+//         检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-            if (sr2.getMtl().getIs_batch() && sr2.getBatchno().length() == 0) {
+            if (sr2.getMtl().getIsSnManager() == 1 && sr2.getBatchno().length() == 0) {
                 showWarnDialog("第" + (i + 1) + "行请输入（批号）！");
                 return;
             }
-            if (sr2.getMtl().getIs_sn() && sr2.getSequenceNo().length() == 0) {
+            if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
                 showWarnDialog("第" + (i + 1) + "行请输入（序列号）！");
                 return;
             }
@@ -1145,23 +1144,23 @@ public class Sal_OutActivity extends BaseActivity {
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             ScanningRecord record = new ScanningRecord();
-//            record.setId(sr2.get);
-            record.setTmpSourceId(sr2.getTmpSourceId());
-            // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库
+            record.setId(sr2.getPoFid());
+//            record.setTmpSourceId(sr2.getTmpSourceId());
+//          type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库
             record.setType(2);
-            record.setSourceFinterId(sr2.getSourceFinterId());
-            record.setFitemId(sr2.getFitemId());
-            record.setBatchno(sr2.getBatchno());
+            record.setSourceK3Id(sr2.getSourceFinterId());
+            record.setMtlK3Id(sr2.getFitemId());
+            record.setBatchNo(sr2.getBatchno());
             record.setSequenceNo(sr2.getSequenceNo());
             record.setFqty(sr2.getStockqty());
-            record.setStockId(sr2.getStockId());
+            record.setStockK3Id(sr2.getStockId());
             record.setStockAreaId(sr2.getStockAreaId());
             record.setStockPositionId(sr2.getStockPositionId());
-            record.setSupplierId(0);
-            record.setCustomerId(organization.getId());
+            record.setSupplierK3Id(0);
+            record.setCustomerK3Id(customer.getFcustId());
             record.setFdate(Comm.getSysDate(0));
-            record.setEmpId(0);
-            // 得到用户对象
+            record.setDepartmentK3Id(0);
+//             得到用户对象
             User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
             record.setOperationId(user.getId());
 
@@ -1179,7 +1178,7 @@ public class Sal_OutActivity extends BaseActivity {
                 .addHeader("cookie", getSession())
                 .url(mUrl)
                 .post(formBody)
-//                .post(body)
+                .post(body)
                 .build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
@@ -1272,7 +1271,7 @@ public class Sal_OutActivity extends BaseActivity {
         StringBuilder strFiterIds = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-            strFiterIds.append(sr2.getMtl().getK3FitemId() + ",");
+            strFiterIds.append(sr2.getMtl().getfMaterialId() + ",");
         }
         String mUrl = Consts.getURL("findMatIsExistList");
         FormBody formBody = new FormBody.Builder()
