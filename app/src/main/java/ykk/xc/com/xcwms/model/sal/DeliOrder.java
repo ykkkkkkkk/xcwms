@@ -1,9 +1,5 @@
 package ykk.xc.com.xcwms.model.sal;
 
-import com.xc.wms.bean.Material;
-import com.xc.wms.bean.Organization;
-import com.xc.wms.bean.Stock;
-
 import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.Material;
@@ -35,6 +31,7 @@ public class DeliOrder implements Serializable{
 	private Stock stock; // 出货仓库
 	private double deliFqty; // 销售数量
 	private double deliFremainoutqty; // 未出库数量
+	private int isCheck; // 新加的是否选中
 
 	public DeliOrder() {
 		super();
@@ -190,6 +187,14 @@ public class DeliOrder implements Serializable{
 
 	public void setDeliFremainoutqty(double deliFremainoutqty) {
 		this.deliFremainoutqty = deliFremainoutqty;
+	}
+
+	public int getIsCheck() {
+		return isCheck;
+	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
 	}
 
 	@Override

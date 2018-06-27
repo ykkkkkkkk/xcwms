@@ -332,13 +332,13 @@
             android:layout_height="match_parent"
             android:ems="2"
             android:gravity="center"
-            android:text="发货组织"
+            android:text="库存组织"
             android:textColor="#000000"
             android:textSize="12sp" />
 
 
         <TextView
-            android:id="@+id/tv_deliveryOrganization"
+            android:id="@+id/tv_inventoryOrganization"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"

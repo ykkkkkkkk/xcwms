@@ -1,7 +1,7 @@
 package ykk.xc.com.xcwms.comm;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,9 +13,12 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -29,21 +32,39 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.basics.PublicInputDialog;
+import ykk.xc.com.xcwms.basics.PublicInputDialog2;
+import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
 /**
  * 父类Fragment
  */
-@SuppressLint("HandlerLeak")
-public class BaseFragment extends Fragment {
-	private Activity mActivity;
+public abstract class BaseFragment extends Fragment {
+	public Activity parentActivity;
 	private LoadingDialog parentLoadDialog;
+	protected Unbinder mBinder;
+
+	public abstract View setLayoutResID(LayoutInflater inflater, ViewGroup container);
+	public void initView(){}
+	public void initData(){}
+	public void setListener(){}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mActivity = getActivity();
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		parentActivity = getActivity();
+
+		View view = setLayoutResID(inflater, container);
+		UncaughtException.getInstance().setContext(parentActivity);
+		mBinder = ButterKnife.bind(this, view);
+
+		initView();
+		initData();
+		setListener();
+		return view;
 	}
 
 	/**
@@ -75,7 +96,7 @@ public class BaseFragment extends Fragment {
 	 * 得到xml文件
 	 */
 	public SharedPreferences spf(String xmlName) {
-		return mActivity.getSharedPreferences(xmlName, Context.MODE_PRIVATE);
+		return parentActivity.getSharedPreferences(xmlName, Context.MODE_PRIVATE);
 	}
 
 	/**
@@ -111,10 +132,24 @@ public class BaseFragment extends Fragment {
 	}
 
 	/**
+	 * 显示xml中的对象
+	 * @param cls
+	 * @param xmlName
+	 */
+	public <T> T showObjectToXml(Class<T> cls, String xmlName) {
+		SharedPreferences sp = parentActivity.getSharedPreferences(xmlName, Context.MODE_PRIVATE);
+		String json = sp.getString("strJson", "");
+		if(json.length() == 0) {
+			return null;
+		}
+		return JsonUtil.stringToObject(json, cls);
+	}
+
+	/**
 	 * 得到string.xml中的值
 	 */
 	public String getResStr(int idName) {
-		return mActivity.getResources().getString(idName);
+		return parentActivity.getResources().getString(idName);
 	}
 
 	/**
@@ -150,8 +185,8 @@ public class BaseFragment extends Fragment {
 	/**
 	 * Toast打印
 	 */
-	public void toast(String str) {
-		Toast.makeText(mActivity, str, Toast.LENGTH_LONG).show();
+	public void toasts(String str) {
+		Toast.makeText(parentActivity, str, Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -268,20 +303,20 @@ public class BaseFragment extends Fragment {
 	/**
 	 * 刷新	发起跳转的onActivity
 	 */
-	public void setResults(Activity context) {
+	public void setResults() {
 		Intent intent = new Intent();
 		intent.putExtra("isRefresh", true);
-		context.setResult(Activity.RESULT_OK, intent);
+		parentActivity.setResult(Activity.RESULT_OK, intent);
 	}
-	public void setResults(Activity context, String str) {
+	public void setResults(String str) {
 		Intent intent = new Intent();
 		intent.putExtra("resultValue", str);
-		context.setResult(Activity.RESULT_OK, intent);
+		parentActivity.setResult(Activity.RESULT_OK, intent);
 	}
-	public void setResults(Activity context, Bundle bundle) {
+	public void setResults(Bundle bundle) {
 		Intent intent = new Intent();
 		intent.putExtras(bundle);
-		context.setResult(Activity.RESULT_OK, intent);
+		parentActivity.setResult(Activity.RESULT_OK, intent);
 	}
 
 	/**
@@ -322,14 +357,23 @@ public class BaseFragment extends Fragment {
 	}
 
 	/**
+	 * 关闭Handler
+	 */
+	public void closeHandler(Handler mHandle) {
+		if(mHandle != null) {
+			mHandle.removeCallbacksAndMessages(null);
+		}
+	}
+
+	/**
 	 * 显示加载框
 	 * @param loadText
 	 */
 	public void showLoadDialog(String loadText) {
-		parentLoadDialog = new LoadingDialog(mActivity, loadText, true);
+		parentLoadDialog = new LoadingDialog(parentActivity, loadText, true);
 	}
 	public void showLoadDialog(String loadText, boolean isCancel) {
-		parentLoadDialog = new LoadingDialog(mActivity, loadText, isCancel);
+		parentLoadDialog = new LoadingDialog(parentActivity, loadText, isCancel);
 	}
 
 	public void hideLoadDialog() {
@@ -337,6 +381,72 @@ public class BaseFragment extends Fragment {
 			parentLoadDialog.dismiss();
 			parentLoadDialog = null;
 		}
+	}
+
+	/**
+	 * 设置View是否可用和改变背景色
+	 */
+	public void setEnables(View vw, int drawableId, boolean isEnable) {
+		vw.setEnabled(isEnable);
+		vw.setBackgroundResource(drawableId);
+	}
+
+	/**
+	 * 打开通用的输入dialog
+	 * @param hintName
+	 * @param val
+	 * @param inputType 0:表示数字, 0.0表示有小数点， none:调用系统输入键盘
+	 * @param codes
+	 */
+	public void showInputDialog(String hintName, String val, String inputType, int codes) {
+		Bundle bundle = new Bundle();
+		bundle.putString("hintName", hintName);
+		bundle.putString("value", val);
+		// 0:表示数字, 0.0表示有小数点， none:调用系统输入键盘
+		bundle.putString("inputType", inputType);
+		showForResult(PublicInputDialog.class, codes, bundle);
+	}
+
+	/**
+	 *
+	 * @param hintName
+	 * @param val
+	 * @param val2
+	 * @param codes
+	 */
+	public void showInputDialog2(String hintName, String itemName, String itemName2, String val, String val2, int codes) {
+		Bundle bundle = new Bundle();
+		bundle.putString("hintName", hintName);
+		bundle.putString("itemName", itemName);
+		bundle.putString("itemName2", itemName2);
+		bundle.putString("value", val);
+		bundle.putString("value2", val2);
+		showForResult(PublicInputDialog2.class, codes, bundle);
+	}
+
+	/**
+	 * 强行获取焦点
+	 * @param view
+	 */
+	public void setFocusable(View view) {
+		view.setFocusable(true);
+		view.setFocusableInTouchMode(true);
+		view.requestFocus();
+	}
+
+	/**
+	 * 提示框
+	 * @param message
+	 * @return
+	 */
+	public void showWarnDialog(String message) {
+		AlertDialog.Builder build = new AlertDialog.Builder(parentActivity);
+		build.setIcon(R.drawable.caution);
+		build.setTitle("系统提示");
+		build.setMessage(message);
+		build.setNegativeButton("知道了", null);
+		build.setCancelable(false);
+		build.show();
 	}
 
 }

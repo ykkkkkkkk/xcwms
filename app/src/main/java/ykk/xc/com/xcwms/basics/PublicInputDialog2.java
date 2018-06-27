@@ -44,10 +44,10 @@ public class PublicInputDialog2 extends BaseDialogActivity {
 //    private MyHandler mHandler = new MyHandler(this);
 //
 //    private static class MyHandler extends Handler {
-//        private final WeakReference<PublicInputDialog2> mActivity;
+//        private final WeakReference<PublicInputDialog2> parentActivity;
 //
 //        public MyHandler(PublicInputDialog2 activity) {
-//            mActivity = new WeakReference<PublicInputDialog2>(activity);
+//            parentActivity = new WeakReference<PublicInputDialog2>(activity);
 //        }
 //
 //    }

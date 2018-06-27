@@ -65,7 +65,7 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
     LinearLayout linItem4;
     @BindView(R.id.lin_item5)
     LinearLayout linItem5;
-    Unbinder unbinder;
+//    Unbinder unbinder;
     private static final int SUCC1 = 200, UNSUCC1 = 500, TEST = 201, UNTEST = 501;
     @BindView(R.id.tv_updatePlan)
     TextView tvUpdatePlan;
@@ -73,7 +73,7 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
     private static final int REQUESTCODE = 101;
     private IDownloadPresenter mPresenter;
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Activity mActivity = null;
+    private Activity mContext = null;
 
     public MainTabFragment4() {
     }
@@ -96,23 +96,23 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
                 switch (msg.what) {
                     case SUCC1: // 得到更新信息
                         AppInfo appInfo = JsonUtil.strToObject((String) msg.obj, AppInfo.class);
-                        if (m.getAppVersionCode(m.mActivity) != appInfo.getAppVersion()) {
+                        if (m.getAppVersionCode(m.mContext) != appInfo.getAppVersion()) {
                             m.showNoticeDialog(appInfo.getAppRemark());
                         } else {
-                            m.toast("已经是最新版本了！");
+                            m.toasts("已经是最新版本了！");
                         }
 
                         break;
                     case UNSUCC1: // 得到更新信息失败
-                        m.toast("已经是最新版本了！！！");
+                        m.toasts("已经是最新版本了！！！");
 
                         break;
                     case TEST: // 网络ok
-                        m.toast("网络通畅");
+                        m.toasts("网络通畅");
 
                         break;
                     case UNTEST: // 网络异常
-                        m.toast("网络异常，请检查ip和端口！");
+                        m.toasts("网络异常，请检查ip和端口！");
 
                         break;
                 }
@@ -121,15 +121,15 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.aa_main_item4, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        mActivity = getActivity();
+    public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.aa_main_item4, container, false);
+    }
+
+    @Override
+    public void initData() {
+        mContext = getActivity();
         mPresenter = new IDownloadPresenter(this);
         requestPermission();
-
-        return view;
     }
 
     @OnClick({R.id.lin_item1, R.id.lin_item2, R.id.lin_item3, R.id.lin_item4, R.id.lin_item5})
@@ -162,11 +162,11 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
      * 提示下载框
      */
     private void showNoticeDialog(String remark) {
-        AlertDialog alertDialog = new AlertDialog.Builder(mActivity)
+        AlertDialog alertDialog = new AlertDialog.Builder(mContext)
                 .setTitle("更新版本").setMessage(remark)
                 .setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        mPresenter.downApk(mActivity);
+                        mPresenter.downApk(mContext);
                         dialog.dismiss();
                     }
                 })
@@ -275,7 +275,7 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
     private void requestPermission() {
         // 判断sdk是是否大于等于6.0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int check = mActivity.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            int check = mContext.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             if (check != PackageManager.PERMISSION_DENIED) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUESTCODE);
 
@@ -296,7 +296,7 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
                 createFile();
             } else {
                 //用户不同意
-                AlertDialog alertDialog = new AlertDialog.Builder(mActivity)
+                AlertDialog alertDialog = new AlertDialog.Builder(mContext)
                         .setTitle("去授权").setMessage("您已禁用了SD卡的读写权限,会导致部分功能不能用，去打开吧！")
                         .setPositiveButton("好的", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -304,11 +304,11 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
                                 mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 if (Build.VERSION.SDK_INT >= 9) {
                                     mIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-                                    mIntent.setData(Uri.fromParts("package", mActivity.getPackageName(), null));
+                                    mIntent.setData(Uri.fromParts("package", mContext.getPackageName(), null));
                                 } else if (Build.VERSION.SDK_INT <= 8) {
                                     mIntent.setAction(Intent.ACTION_VIEW);
                                     mIntent.setClassName("com.android.settings", "com.android.setting.InstalledAppDetails");
-                                    mIntent.putExtra("com.android.settings.ApplicationPkgName", mActivity.getPackageName());
+                                    mIntent.putExtra("com.android.settings.ApplicationPkgName", mContext.getPackageName());
                                 }
                                 startActivity(mIntent);
                             }
@@ -341,14 +341,14 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
 
     @Override
     public void showFail(String msg) {
-        toast(msg);
+        toasts(msg);
     }
 
     @Override
     public void showComplete(File file) {
         try {
-            String authority = mActivity.getApplicationContext().getPackageName() + ".fileProvider";
-            Uri fileUri = FileProvider.getUriForFile(mActivity, authority, file);
+            String authority = mContext.getApplicationContext().getPackageName() + ".fileProvider";
+            Uri fileUri = FileProvider.getUriForFile(mContext, authority, file);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -373,8 +373,7 @@ public class MainTabFragment4 extends BaseFragment implements IDownloadContract.
 
     @Override
     public void onDestroyView() {
-        unbinder.unbind();
-        mPresenter.unbind(mActivity);
+//        mPresenter.unbind(mContext);
         super.onDestroyView();
     }
 }

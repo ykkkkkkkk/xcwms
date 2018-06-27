@@ -109,8 +109,8 @@ public class Sal_OutActivity extends BaseActivity {
     TextView tvOrderTypeSel;
     @BindView(R.id.tv_salDate)
     TextView tvSalDate;
-    @BindView(R.id.tv_deliveryOrganization)
-    TextView tvDeliveryOrganization;
+    @BindView(R.id.tv_inventoryOrganization)
+    TextView tvInventoryOrganization;
     @BindView(R.id.tv_salOrganization)
     TextView tvSalOrganization;
 
@@ -131,7 +131,7 @@ public class Sal_OutActivity extends BaseActivity {
     private char curViewFlag = '1'; // 1：仓库，2：库区， 3：库位， 4：物料
     private int curPos; // 当前行
     private boolean isStockLong, isStockALong; // 判断选择（仓库，库区）是否长按了
-    private Organization deliveryOrganization, salOrganization; // 组织
+    private Organization inventoryOrganization, salOrganization; // 组织
 
     private OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -276,7 +276,7 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     @OnClick({R.id.btn_close, R.id.btn_sourceNo, R.id.btn_maker_code, R.id.tv_custSel, R.id.btn_whName, R.id.tv_batchNo, R.id.tv_sequenceNo, R.id.btn_whArea, R.id.btn_whPos,
-            R.id.btn_selMat, R.id.btn_add, R.id.btn_save, R.id.btn_clone, R.id.tv_salDate, R.id.tv_deliveryOrganization, R.id.tv_salOrganization})
+            R.id.btn_selMat, R.id.btn_add, R.id.btn_save, R.id.btn_clone, R.id.tv_salDate, R.id.tv_inventoryOrganization, R.id.tv_salOrganization})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -295,7 +295,8 @@ public class Sal_OutActivity extends BaseActivity {
                 }
                 bundle = new Bundle();
                 bundle.putSerializable("customer", customer);
-                showForResult(Sal_SelOrderActivity.class, SEL_ORDER, bundle);
+//                showForResult(Sal_SelOrderActivity.class, SEL_ORDER, bundle);
+                showForResult(Sal_SelSourceFragmentActivity.class, SEL_ORDER, bundle);
 
                 break;
             case R.id.tv_custSel: // 选择客户
@@ -398,7 +399,7 @@ public class Sal_OutActivity extends BaseActivity {
                 Comm.showDateDialog(context, view, 0);
 
                 break;
-            case R.id.tv_deliveryOrganization: // 出货组织
+            case R.id.tv_inventoryOrganization: // 库存组织
                 showForResult(Organization_DialogActivity.class, SEL_ORGANIZATION, null);
 
                 break;
@@ -736,7 +737,7 @@ public class Sal_OutActivity extends BaseActivity {
         switch (requestCode) {
             case SEL_CUST: //查询客户	返回
                 if (resultCode == RESULT_OK) {
-                    customer = data.getParcelableExtra("obj");
+                    customer = (Customer) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_CUST", customer.getCustomerName());
                     if (customer != null) {
                         tvCustSel.setText(customer.getCustomerName());
@@ -756,7 +757,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case SEL_STOCK: //查询仓库	返回
                 if (resultCode == RESULT_OK) {
-                    Stock stock = data.getParcelableExtra("obj");
+                    Stock stock = (Stock) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCK", stock.getfName());
                     if (this.stock != null && stock != null && stock.getId() == this.stock.getId()) {
 //                         长按了，并且启用了库区管理
@@ -774,7 +775,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case SEL_STOCKA: //查询库区	返回
                 if (resultCode == RESULT_OK) {
-                    StockArea stockA = data.getParcelableExtra("obj");
+                    StockArea stockA = (StockArea) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKA", stockA.getFname());
                     if (this.stockA != null && stockA != null && stockA.getId() == this.stockA.getId()) {
 //                         长按了，并且启用了库位管理
@@ -793,7 +794,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case SEL_STOCKP: //查询库位	返回
                 if (resultCode == RESULT_OK) {
-                    stockP = data.getParcelableExtra("obj");
+                    stockP = (StockPosition) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKP", stockP.getFname());
                     getStockPAfter();
                 }
@@ -801,7 +802,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case SEL_MAT: //查询物料	返回
                 if (resultCode == RESULT_OK) {
-                    mtl = data.getParcelableExtra("obj");
+                    mtl = (Material) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_MAT", mtl.getfName());
                     getMtlAfter();
                 }
@@ -809,8 +810,8 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case SEL_ORGANIZATION: //查询收料组织   	返回
                 if (resultCode == RESULT_OK) {
-                    deliveryOrganization = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", deliveryOrganization.getName());
+                    inventoryOrganization = (Organization) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_DEPT", inventoryOrganization.getName());
                     getOrganizationAfter();
                 }
 
@@ -1046,11 +1047,11 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     /**
-     * 选择（收料组织）返回的值
+     * 选择（库存组织）返回的值
      */
     private void getOrganizationAfter() {
-        if (deliveryOrganization != null) {
-            tvDeliveryOrganization.setText(deliveryOrganization.getName());
+        if (inventoryOrganization != null) {
+            tvInventoryOrganization.setText(inventoryOrganization.getName());
         }
     }
 

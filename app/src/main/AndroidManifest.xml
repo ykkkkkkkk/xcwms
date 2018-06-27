@@ -53,6 +53,10 @@
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
+            android:name=".basics.Cust_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:theme="@style/dialogStyle" />
+        <activity
             android:name=".basics.Organization_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
@@ -121,6 +125,9 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_OrderSearchActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_SelSourceFragmentActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".MainActivity" />

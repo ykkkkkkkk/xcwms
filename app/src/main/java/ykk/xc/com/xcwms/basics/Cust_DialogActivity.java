@@ -70,7 +70,7 @@ public class Cust_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<Customer> list = JsonUtil.strToList2((String) msg.obj, Customer.class);
+                        List<Customer> list = JsonUtil.strToList((String) msg.obj, Customer.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 

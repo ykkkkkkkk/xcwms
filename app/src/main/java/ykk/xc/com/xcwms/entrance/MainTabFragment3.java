@@ -48,42 +48,29 @@ public class MainTabFragment3 extends BaseFragment {
     RelativeLayout relative4;
     @BindView(R.id.lin_tab2)
     LinearLayout linTab2;
-    Unbinder unbinder;
 
     public MainTabFragment3() {
     }
 
-    private LoadingDialog mLoadDialog;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.aa_main_item3, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.aa_main_item3, container, false);
     }
 
     @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.relative1:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                showLoadDialog("连接服务器...");
                 break;
             case R.id.relative2:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                showLoadDialog("连接服务器...");
                 break;
             case R.id.relative3:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                showLoadDialog("连接服务器...");
                 break;
             case R.id.relative4:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                showLoadDialog("连接服务器...");
                 break;
         }
     }

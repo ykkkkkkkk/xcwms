@@ -144,19 +144,18 @@ public class LoginActivity extends BaseActivity {
 
                 break;
             case R.id.btn_login: // 登录
-//                String userName = getValues(etUserName).trim();
-//                if(userName.length() == 0) {
-//                    toasts("请输入账号！");
-//                    return;
-//                }
-//                String pwd = getValues(etPwd).trim();
-//                if(pwd.length() == 0) {
-//                    toasts("请输入密码！");
-//                    return;
-//                }
-//                hideKeyboard(getCurrentFocus());
-//                run_appLogin();
-                show(MainTabFragmentActivity.class, null);
+                String userName = getValues(etUserName).trim();
+                if(userName.length() == 0) {
+                    toasts("请输入账号！");
+                    return;
+                }
+                String pwd = getValues(etPwd).trim();
+                if(pwd.length() == 0) {
+                    toasts("请输入密码！");
+                    return;
+                }
+                hideKeyboard(getCurrentFocus());
+                run_appLogin();
 
                 break;
         }

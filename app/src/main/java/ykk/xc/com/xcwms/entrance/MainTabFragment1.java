@@ -37,28 +37,13 @@ public class MainTabFragment1 extends BaseFragment {
     RelativeLayout relative3;
     @BindView(R.id.lin_tab)
     LinearLayout linTab;
-    Unbinder unbinder;
 
     public MainTabFragment1() {
     }
 
-    private LoadingDialog mLoadDialog;
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.aa_main_item1, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        return view;
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.aa_main_item1, container, false);
     }
 
     @OnClick({R.id.relative1, R.id.relative2, R.id.relative3})
@@ -73,7 +58,7 @@ public class MainTabFragment1 extends BaseFragment {
 
                 break;
             case R.id.relative3:
-                mLoadDialog = new LoadingDialog(getActivity(), "连接服务器...", true);
+                showLoadDialog("连接服务器...");
                 break;
         }
     }
