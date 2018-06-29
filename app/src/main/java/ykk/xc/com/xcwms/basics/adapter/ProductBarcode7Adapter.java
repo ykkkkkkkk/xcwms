@@ -7,18 +7,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.sal.SalListOrder;
+import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
  * 采购列表适配器
  */
-public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalListOrder> {
+public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalOrder> {
 
     private Activity context;
     private MyCallBack callBack;
 
-    public ProductBarcode7Adapter(Activity context, List<SalListOrder> datas) {
+    public ProductBarcode7Adapter(Activity context, List<SalOrder> datas) {
         super(datas);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalListOrde
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final SalListOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final SalOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
@@ -37,8 +37,8 @@ public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalListOrde
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getSeroderNmber());
-            tv_fdate.setText(entity.getSeroderFdate());
+            tv_fnumber.setText(entity.getFbillno());
+            tv_fdate.setText(entity.getSalDate());
 
             View.OnClickListener click = new View.OnClickListener() {
                 @Override
@@ -61,7 +61,7 @@ public class ProductBarcode7Adapter extends BaseArrayRecyclerAdapter<SalListOrde
     }
 
     public interface MyCallBack {
-        void onPrint(SalListOrder entity, int position);
+        void onPrint(SalOrder entity, int position);
     }
 
 

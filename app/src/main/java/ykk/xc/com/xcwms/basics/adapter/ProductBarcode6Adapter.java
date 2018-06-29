@@ -7,18 +7,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PoList;
+import ykk.xc.com.xcwms.model.pur.PurPoOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
  * 采购列表适配器
  */
-public class ProductBarcode6Adapter extends BaseArrayRecyclerAdapter<PoList> {
+public class ProductBarcode6Adapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
 
     private Activity context;
     private MyCallBack callBack;
 
-    public ProductBarcode6Adapter(Activity context, List<PoList> datas) {
+    public ProductBarcode6Adapter(Activity context, List<PurPoOrder> datas) {
         super(datas);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class ProductBarcode6Adapter extends BaseArrayRecyclerAdapter<PoList> {
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final PoList entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final PurPoOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
@@ -37,7 +37,7 @@ public class ProductBarcode6Adapter extends BaseArrayRecyclerAdapter<PoList> {
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getPoNumber());
+            tv_fnumber.setText(entity.getFbillno());
             tv_fdate.setText(entity.getPoFdate());
 
             View.OnClickListener click = new View.OnClickListener() {
@@ -61,7 +61,7 @@ public class ProductBarcode6Adapter extends BaseArrayRecyclerAdapter<PoList> {
     }
 
     public interface MyCallBack {
-        void onPrint(PoList entity, int position);
+        void onPrint(PurPoOrder entity, int position);
     }
 
 

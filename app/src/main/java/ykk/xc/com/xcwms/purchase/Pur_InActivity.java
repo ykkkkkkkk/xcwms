@@ -695,6 +695,7 @@ public class Pur_InActivity extends BaseActivity {
         tvMatName.setText(""); // 物料名称
         tvType.setText(""); // 规格
         etNum.setText(""); // 数量
+
         setEnables(tvReceiveOrg, R.drawable.back_style_blue, true);
         setEnables(tvPurOrg, R.drawable.back_style_blue, true);
         setEnables(etNum, R.drawable.back_style_blue, true);
@@ -759,7 +760,7 @@ public class Pur_InActivity extends BaseActivity {
             return;
         }
         if(purOrg == null) { // 采购组织
-            showWarnDialog("请选择采购！");
+            showWarnDialog("请选择采购组织！");
             return;
         }
         if (mtl == null) {
@@ -853,8 +854,6 @@ public class Pur_InActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
-//                        String result = bundle.getString("resultValue");
-//                        List<PurPoOrder> list = JsonUtil.stringToList(result, PurPoOrder.class);
                         List<PurPoOrder> list = (List<PurPoOrder>) bundle.getSerializable("checkDatas");
                         getSourceAfter(list, false);
                     }
@@ -917,7 +916,7 @@ public class Pur_InActivity extends BaseActivity {
             case SEL_ORG: //查询收料组织   	返回
                 if (resultCode == RESULT_OK) {
                     receiveOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", receiveOrg.getName());
+                    Log.e("onActivityResult --> SEL_ORG", receiveOrg.getName());
                     getOrgAfter();
                 }
 
@@ -925,7 +924,7 @@ public class Pur_InActivity extends BaseActivity {
             case SEL_ORG2: //查询采购组织   	返回
                 if (resultCode == RESULT_OK) {
                     purOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", purOrg.getName());
+                    Log.e("onActivityResult --> SEL_ORG2", purOrg.getName());
                     getOrg2After();
                 }
 
@@ -1029,7 +1028,6 @@ public class Pur_InActivity extends BaseActivity {
             sr2.setSupplierId(p.getSupplierId());
             sr2.setSupplierName(p.getSupplierName());
             sr2.setSupplierFnumber(supplier.getfNumber());
-            sr2.setCustomerId(0);
             if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
             }
@@ -1186,6 +1184,7 @@ public class Pur_InActivity extends BaseActivity {
             tvMatName.setText(mtl.getfName());
             tvType.setText(mtl.getMaterialSize());
             setTexts(etNum, mtl.getIsSnManager() == 1 ? "1" : "");
+            dataType = '2';
             setEnables(etSourceNo, R.drawable.back_style_gray5, false);
             setEnables(btnSourceNo, R.drawable.back_style_gray6, false);
             // 物料是否需要输入批号

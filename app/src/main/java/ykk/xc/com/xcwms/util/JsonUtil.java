@@ -8,6 +8,8 @@ import com.solidfire.gson.JsonElement;
 import com.solidfire.gson.JsonObject;
 import com.solidfire.gson.JsonParser;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +81,42 @@ public class JsonUtil {
         return list;
 
     }
+
+    /**
+     * 判断后台的值是成功的还是失败
+     * {"code":100,"msg":"处理成功","extend":{}}
+     * {"code":200,"msg":"处理失败","extend":{}}
+     */
+    public static boolean isSuccess(String strJson) {
+        try{
+            return strJson.indexOf("{\"code\":100,\"msg\":\"处理成功\"") > -1;
+        }catch(Exception e) {
+            Log.e("isSuccess-Exception", strJson+"\n"+e);
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 是否可以加载下一页数据
+     */
+    public static boolean isNextPage(String strJson, int curPage) {
+        JsonObject jsonObj = null;
+        try{
+            JsonObject jsonObj2 = new JsonParser().parse(strJson).getAsJsonObject();
+            JsonObject extend = jsonObj2.getAsJsonObject("extend");
+            if(extend.has("ykk_jsonArr")) { // 判断有没有数据集
+                jsonObj = extend.getAsJsonObject("ykk_jsonArr");
+            }
+        }catch(Exception e) {
+            Log.e("isSuccess-Exception", strJson+"\n"+e);
+            e.printStackTrace();
+            return false;
+        }
+        int pages = jsonObj.get("pages").getAsInt();
+        return curPage <= pages;
+    }
+
     /**
      * json --> list 实体类（读取自定义的json数据）无分页模块
      * {"code":100,"msg":"处理成功","extend":{"ykk_jsonArr":{"id":1,"username":"admin","password":"123456","sex":1,"turename":null,"deptId":1,"createTime":1525932994633,"createrId":0,"createrName":"","dept":null}}}
@@ -172,25 +210,6 @@ public class JsonUtil {
             return list;
         }
         return null;
-    }
-
-    /**
-     * 判断后台的值是成功的还是失败
-     * {"code":100,"msg":"处理成功","extend":{}}
-     * {"code":200,"msg":"处理失败","extend":{}}
-     */
-    public static boolean isSuccess(String strJson) {
-        JsonObject jsonObj = null;
-        try{
-            jsonObj = new JsonParser().parse(strJson).getAsJsonObject();
-        }catch(Exception e) {
-            Log.e("isSuccess", strJson+"\n"+e);
-            e.printStackTrace();
-            return false;
-        }
-
-        // 100：成功，200：失败
-        return jsonObj.get("code").getAsInt() == 100;
     }
 
     /**

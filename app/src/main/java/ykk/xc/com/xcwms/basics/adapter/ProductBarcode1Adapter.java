@@ -7,18 +7,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.Mtl;
+import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
  * 物料列表适配器
  */
-public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Mtl> {
-
+public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Material> {
+//
     private Activity context;
     private MyCallBack callBack;
 
-    public ProductBarcode1Adapter(Activity context, List<Mtl> datas) {
+    public ProductBarcode1Adapter(Activity context, List<Material> datas) {
         super(datas);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Mtl> {
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final Mtl entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final Material entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
@@ -38,9 +38,9 @@ public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Mtl> {
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getFnumber());
-            tv_fname.setText(entity.getFname());
-            tv_fModel.setText(entity.getFmodel());
+            tv_fnumber.setText(entity.getfNumber());
+            tv_fname.setText(entity.getfName());
+            tv_fModel.setText(entity.getMaterialSize());
 
             View.OnClickListener click = new View.OnClickListener() {
                 @Override
@@ -63,7 +63,7 @@ public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Mtl> {
     }
 
     public interface MyCallBack {
-        void onPrint(Mtl entity, int position);
+        void onPrint(Material entity, int position);
     }
 
 

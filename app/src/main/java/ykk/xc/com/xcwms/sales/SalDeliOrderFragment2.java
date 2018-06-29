@@ -109,6 +109,7 @@ public class SalDeliOrderFragment2 extends BaseFragment implements XRecyclerView
         return inflater.inflate(R.layout.sal_deli_sel_order, container, false);
     }
 
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -132,7 +133,7 @@ public class SalDeliOrderFragment2 extends BaseFragment implements XRecyclerView
     }
 
 
-    @OnClick({R.id.btn_close, R.id.btn_confirm})
+    @OnClick({R.id.btn_confirm})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {

@@ -59,7 +59,7 @@
             android:background="@drawable/back_style_blue"
             android:drawableRight="@drawable/xiala3"
             android:gravity="center"
-            android:text="标准采购入库"
+            android:text="标准销售出库"
             android:textColor="@color/black"
             android:textSize="@dimen/_14sp" />
 
@@ -338,7 +338,7 @@
 
 
         <TextView
-            android:id="@+id/tv_inventoryOrganization"
+            android:id="@+id/tv_inventoryOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
@@ -360,7 +360,7 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_salOrganization"
+            android:id="@+id/tv_salOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"

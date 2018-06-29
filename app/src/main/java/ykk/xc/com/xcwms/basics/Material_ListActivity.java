@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.solidfire.gson.JsonObject;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -51,6 +53,8 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Material_ListAdapter mAdapter;
     private List<Material> listDatas = new ArrayList<>();
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -69,14 +73,18 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<Material> list = JsonUtil.strToList((String) msg.obj, Material.class);
+                        List<Material> list = JsonUtil.strToList2((String) msg.obj, Material.class);
                         m.listDatas.addAll(list);
-//                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<Material>>(){}.getType());
-                        if(m.mAdapter != null) {
-                            m.mAdapter.notifyDataSetChanged();
-                        } else {
-                            m.updateUI();
+                        m.mAdapter.notifyDataSetChanged();
+
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
                         }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
+
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -102,8 +110,8 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
-        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
 
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -119,7 +127,7 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
 
     @Override
     public void initData() {
-        //run_okhttpDatas();
+        initLoadDatas();
     }
 
     @OnClick({R.id.btn_close, R.id.btn_search})
@@ -132,11 +140,16 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
 
                 break;
             case R.id.btn_search: // 查询
-                listDatas.clear();
-                run_okhttpDatas();
+                initLoadDatas();
 
                 break;
         }
+    }
+
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
     }
 
     /**
@@ -147,8 +160,8 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
         String mUrl = Consts.getURL("findMaterialListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -172,6 +185,8 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Material_ListActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
@@ -179,51 +194,19 @@ public class Material_ListActivity extends BaseDialogActivity implements XRecycl
         });
     }
 
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-//        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        xRecyclerView.setLayoutManager(layoutManager);
-
-
-//        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-//        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-//        mAdapter = new Material_ListAdapter(context, listDatas);
-//        xRecyclerView.setAdapter(mAdapter);
-//        xRecyclerView.setLoadingListener(context);
-//
-//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
-//
-//        mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
-//                Material m = listDatas.get(pos-1);
-//                Intent intent = new Intent();
-//                intent.putExtra("obj", m);
-//                context.setResult(RESULT_OK, intent);
-//                context.finish();
-//            }
-//        });
-    }
-
-
     @Override
     public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
     }
 
     @Override
     public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override
