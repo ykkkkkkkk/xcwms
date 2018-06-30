@@ -154,6 +154,7 @@ public class SalDeliOrderFragment2 extends BaseFragment implements XRecyclerView
                     return;
                 }
                 bundle = new Bundle();
+                bundle.putChar("sourceType", '2'); // 1.销售订单，2.发货通知单
                 bundle.putSerializable("checkDatas", (Serializable)list);
                 setResults(bundle);
                 mContext.finish();

@@ -55,6 +55,7 @@ import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockArea;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -152,13 +153,13 @@ public class Sal_OutActivity extends BaseActivity {
                     case SUCC1:
                         m.reset('0');
 
-                        m.showWarnDialog("保存成功√");
+                        Comm.showWarnDialog(m.context, "保存成功√");
                         m.checkDatas.clear();
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
                     case UNSUCC1:
-                        m.showWarnDialog("服务器繁忙，请稍候再试！");
+                        Comm.showWarnDialog(m.context, "服务器繁忙，请稍候再试！");
 
                         break;
                     case SUCC2: // 扫码成功后进入
@@ -184,7 +185,7 @@ public class Sal_OutActivity extends BaseActivity {
                                 m.matBarcode = m.mtl.getfNumber();
                                 if (m.dataType == '1') { // 来源单
                                     if (m.mtl.getIsSnManager() == 1) {
-                                        m.showWarnDialog("该物料已启用序列号，数量为1");
+                                        Comm.showWarnDialog(m.context, "该物料已启用序列号，数量为1");
                                         return;
                                     }
                                     for (int i = 0, size = m.checkDatas.size(); i < size; i++) {
@@ -212,7 +213,7 @@ public class Sal_OutActivity extends BaseActivity {
                         break;
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
-                        m.showWarnDialog("很抱歉，没能找到数据！");
+                        Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
 
 
                         break;
@@ -242,7 +243,7 @@ public class Sal_OutActivity extends BaseActivity {
                         for (int i = 0, len = idArr.length; i < len; i++) {
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
                                 if (m.parseInt(idArr[i]) == m.checkDatas.get(j).getMtl().getfMaterialId()) {
-                                    m.showWarnDialog("第" + (i + 1) + "行物料已扫过！");
+                                    Comm.showWarnDialog(m.context, "第" + (i + 1) + "行物料已扫过！");
                                     return;
                                 }
                             }
@@ -362,7 +363,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.btn_whArea: // 选择库区
                 if (stock == null) {
-                    showWarnDialog("请先选择仓库！");
+                    Comm.showWarnDialog(context,"请先选择仓库！");
                     return;
                 }
                 isStockALong = false;
@@ -373,7 +374,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.btn_whPos: // 选择库位
                 if (stockA == null) {
-                    showWarnDialog("请先选择库区！");
+                    Comm.showWarnDialog(context,"请先选择库区！");
                     return;
                 }
                 bundle = new Bundle();
@@ -398,11 +399,11 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.tv_batchNo: // 选择批号
                 if (stock == null) {
-                    showWarnDialog("请选择仓库！");
+                    Comm.showWarnDialog(context,"请选择仓库！");
                     return;
                 }
                 if (mtl == null) {
-                    showWarnDialog("请选择物料！");
+                    Comm.showWarnDialog(context,"请选择物料！");
                     return;
                 }
                 bundle = new Bundle();
@@ -413,7 +414,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.tv_sequenceNo: // 选择序列号
                 if (mtl == null) {
-                    showWarnDialog("请选择物料！");
+                    Comm.showWarnDialog(context,"请选择物料！");
                     return;
                 }
                 showForResult(Sequence_DialogActivity.class, SEL_SEQUENCE, null);
@@ -462,19 +463,19 @@ public class Sal_OutActivity extends BaseActivity {
      */
     private boolean selectSourceBefore() {
         if (customer == null) {
-            showWarnDialog("请选择客户！");
+            Comm.showWarnDialog(context,"请选择客户！");
             return false;
         }
         if (stock == null) {
-            showWarnDialog("请选择仓库！");
+            Comm.showWarnDialog(context,"请选择仓库！");
             return false;
         }
         if (stock.isReservoirArea() && stockA == null) {
-            showWarnDialog("请选择库区！");
+            Comm.showWarnDialog(context,"请选择库区！");
             return false;
         }
         if (stock.isStorageLocation() && stockP == null) {
-            showWarnDialog("请选择库位！");
+            Comm.showWarnDialog(context,"请选择库位！");
             return false;
         }
         return true;
@@ -485,15 +486,15 @@ public class Sal_OutActivity extends BaseActivity {
      */
     private boolean saveBefore() {
         if (checkDatas == null || checkDatas.size() == 0) {
-            showWarnDialog("请先插入行！");
+            Comm.showWarnDialog(context,"请先插入行！");
             return false;
         }
         if(inventoryOrg == null) {
-            showWarnDialog("请选择库存组织！");
+            Comm.showWarnDialog(context,"请选择库存组织！");
             return false;
         }
         if(salOrg == null) {
-            showWarnDialog("请选择销售组织！");
+            Comm.showWarnDialog(context,"请选择销售组织！");
             return false;
         }
 
@@ -501,19 +502,19 @@ public class Sal_OutActivity extends BaseActivity {
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             if (sr2.getMtl().getIsBatchManager() == 1 && sr2.getBatchno().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（批号）！");
+                Comm.showWarnDialog(context, "第" + (i + 1) + "行请输入（批号）！");
                 return false;
             }
             if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（序列号）！");
+                Comm.showWarnDialog(context, "第" + (i + 1) + "行请输入（序列号）！");
                 return false;
             }
             if (sr2.getStockqty() == 0) {
-                showWarnDialog("第" + (i + 1) + "行（实发数）必须大于0！");
+                Comm.showWarnDialog(context, "第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
             if (sr2.getStockqty() > sr2.getFqty()) {
-                showWarnDialog("第" + (i + 1) + "行（实发数）不能大于（应发数）！");
+                Comm.showWarnDialog(context, "第" + (i + 1) + "行（实发数）不能大于（应发数）！");
                 return false;
             }
         }
@@ -536,7 +537,7 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.btn_whArea: // 长按选择库区
                 if (stock == null) {
-                    showWarnDialog("请先选择仓库！");
+                    Comm.showWarnDialog(context, "请先选择仓库！");
                     return true;
                 }
                 isStockALong = true;
@@ -716,46 +717,46 @@ public class Sal_OutActivity extends BaseActivity {
      */
     private void addRow() {
         if (customer == null) {
-            showWarnDialog("请选择客户！");
+            Comm.showWarnDialog(context, "请选择客户！");
             return;
         }
         if (stock == null) {
-            showWarnDialog("请选择仓库！");
+            Comm.showWarnDialog(context, "请选择仓库！");
             return;
         }
         if (stock.isStorageLocation() && stockA == null) {
-            showWarnDialog("请选择库区！");
+            Comm.showWarnDialog(context, "请选择库区！");
             return;
         }
         if (stock.isStorageLocation() && stockP == null) {
-            showWarnDialog("请选择库位！");
+            Comm.showWarnDialog(context, "请选择库位！");
             return;
         }
         if(inventoryOrg == null) { // 库存组织
-            showWarnDialog("请选择库存组织！");
+            Comm.showWarnDialog(context, "请选择库存组织！");
             return;
         }
         if(salOrg == null) { // 销售组织
-            showWarnDialog("请选择销售组织！");
+            Comm.showWarnDialog(context, "请选择销售组织！");
             return;
         }
         if (mtl == null) {
-            showWarnDialog("请选择物料！");
+            Comm.showWarnDialog(context, "请选择物料！");
             return;
         }
         double num = parseDouble(getValues(etNum).trim());
         if (num == 0) {
-            showWarnDialog("请输入数量！");
+            Comm.showWarnDialog(context, "请输入数量！");
             return;
         }
         String batch = getValues(tvBatchNo).trim();
         if (mtl.getIsSnManager() == 1 && batch.length() == 0) {
-            showWarnDialog("该物料启用了批号，请选择批号！");
+            Comm.showWarnDialog(context, "该物料启用了批号，请选择批号！");
             return;
         }
         String seqNo = getValues(tvSequenceNo).trim();
         if (mtl.getIsSnManager() == 1 && seqNo.length() == 0) {
-            showWarnDialog("该物料启用了序列号，请选择序列号！");
+            Comm.showWarnDialog(context, "该物料启用了序列号，请选择序列号！");
             return;
         }
         // 隐藏键盘
@@ -855,8 +856,19 @@ public class Sal_OutActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
-                        List<SalOrder> list = (List<SalOrder>) bundle.getSerializable("checkDatas");
-                        getSourceAfter(list, false);
+                        char sourceType = bundle.getChar("sourceType");
+                        switch (sourceType) {
+                            case '1': //  销售订单
+                                List<SalOrder> list = (List<SalOrder>) bundle.getSerializable("checkDatas");
+                                getSourceAfter(list, false);
+
+                                break;
+                            case '2': //  发货通知单
+                                List<DeliOrder> list2 = (List<DeliOrder>) bundle.getSerializable("checkDatas");
+                                getSourceAfter2(list2, false);
+
+                                break;
+                        }
                     }
                 }
 
@@ -987,7 +999,7 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     /**
-     * 选择来源单返回
+     * 选择来源单返回（销售订单）
      */
     private void getSourceAfter(List<SalOrder> list, boolean isSaoma) {
         for (int i = 0, size = list.size(); i < size; i++) {
@@ -1048,6 +1060,76 @@ public class Sal_OutActivity extends BaseActivity {
                     isAlike = true;
                     break;
                                     }
+                }
+            }
+            if (!isAlike) {
+                checkDatas.add(sr2);
+            }
+        }
+
+        if(dataType == '0') dataType = '1';
+
+        if (isSaoma) { // 只有扫码的时候才显示单号
+            String seroderNmber = list.get(0).getFbillno();
+            setTexts(etSourceNo, seroderNmber);
+            sourceBarcode = seroderNmber;
+        }
+        setEnables(btnSelMat, R.drawable.back_style_gray6, false);
+        setEnables(btnAdd, R.drawable.back_style_gray3, false);
+        setFocusable(etMatNo); // 物料代码获取焦点
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 选择来源单返回（发货通知单）
+     */
+    private void getSourceAfter2(List<DeliOrder> list, boolean isSaoma) {
+        for (int i = 0, size = list.size(); i < size; i++) {
+            DeliOrder s = list.get(i);
+            ScanningRecord2 sr2 = new ScanningRecord2();
+            sr2.setType(2);
+            sr2.setSourceFinterId(s.getfId());
+            sr2.setSourceFnumber(s.getFbillno());
+            sr2.setFitemId(s.getMtl().getfMaterialId());
+            sr2.setMtl(s.getMtl());
+            sr2.setMtlFnumber(s.getMtl().getfNumber());
+            sr2.setUnitFnumber(s.getMtl().getUnit().getUnitNumber());
+            sr2.setPoFbillno(s.getFbillno());
+            sr2.setPoFmustqty(s.getDeliFremainoutqty());
+
+            sr2.setBatchno(""); // 批号默认为空
+            sr2.setSequenceNo(""); // 批号默认为空
+            sr2.setFqty(s.getDeliFremainoutqty());
+//             是否启用物料的序列号,如果启用了，则数量为1
+            if (s.getMtl().getIsSnManager() == 1) {
+                sr2.setStockqty(1);
+            }
+            if (stock != null) {
+                sr2.setStockId(stock.getId());
+                sr2.setStock(stock);
+                sr2.setStockFnumber(stock.getfNumber());
+            }
+            if (stockA != null) {
+                sr2.setStockAreaId(stockA.getId());
+                sr2.setStockAName(stockA.getFname());
+            }
+            if (stockP != null) {
+                sr2.setStockPositionId(stockP.getId());
+                sr2.setStockPName(stockP.getFname());
+            }
+            sr2.setCustomerId(s.getCustId());
+            sr2.setCustomerName(s.getCustName());
+
+            boolean isAlike = false; // 是否存在重复数据，存在加1
+            for (int j = 0, sizej = checkDatas.size(); j < sizej; j++) {
+                ScanningRecord2 sr2a = checkDatas.get(j);
+                if (s.getfId() == sr2a.getSourceFinterId() && s.getMtl().getId() == sr2a.getMtl().getId()) {
+                    if(sr2a.getStockqty() < sr2a.getFqty()) { // 未装満，加1
+                        sr2a.setStockqty(sr2a.getStockqty()+1);
+                        isAlike = true;
+                        break;
+                    }
                 }
             }
             if (!isAlike) {
@@ -1244,7 +1326,7 @@ public class Sal_OutActivity extends BaseActivity {
                 .addHeader("cookie", getSession())
                 .url(mUrl)
                 .post(formBody)
-                .post(body)
+//                .post(body)
                 .build();
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
@@ -1256,11 +1338,11 @@ public class Sal_OutActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_addScanningRecord --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
-                Log.e("run_addScanningRecord --> onResponse", result);
                 mHandler.sendEmptyMessage(SUCC1);
             }
         });

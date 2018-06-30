@@ -501,19 +501,5 @@ public abstract class BaseActivity extends AppCompatActivity {
 		view.requestFocus();
 	}
 
-	/**
-	 * 提示框
-	 * @param message
-	 * @return
-	 */
-	public void showWarnDialog(String message) {
-		AlertDialog.Builder build = new AlertDialog.Builder(mContext);
-		build.setIcon(R.drawable.caution);
-		build.setTitle("系统提示");
-		build.setMessage(message);
-		build.setNegativeButton("知道了", null);
-		build.setCancelable(false);
-		build.show();
-	}
 
 }

@@ -332,4 +332,18 @@ public class Comm {
 		return code.toString() + "0" + id;
 	}
 
+	/**
+	 * 提示框
+	 * @return
+	 */
+	public static void showWarnDialog(Activity mContext, String message) {
+		AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+		build.setIcon(R.drawable.caution);
+		build.setTitle("系统提示");
+		build.setMessage(message);
+		build.setNegativeButton("知道了", null);
+		build.setCancelable(false);
+		build.show();
+	}
+
 }

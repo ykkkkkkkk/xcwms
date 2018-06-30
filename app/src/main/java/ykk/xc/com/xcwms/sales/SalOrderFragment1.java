@@ -143,6 +143,7 @@ public class SalOrderFragment1 extends BaseFragment implements XRecyclerView.Loa
                     return;
                 }
                 bundle = new Bundle();
+                bundle.putChar("sourceType", '1'); // 1.销售订单，2.发货通知单
                 bundle.putSerializable("checkDatas", (Serializable)list);
                 setResults(bundle);
                 mContext.finish();

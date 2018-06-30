@@ -164,11 +164,11 @@ public class Pur_InActivity extends BaseActivity {
 
                         m.checkDatas.clear();
                         m.mAdapter.notifyDataSetChanged();
-                        m.showWarnDialog("保存成功");
+                        Comm.showWarnDialog(m.context,"保存成功");
 
                         break;
                     case UNSUCC1:
-                        m.showWarnDialog("服务器繁忙，请稍候再试！");
+                        Comm.showWarnDialog(m.context,"服务器繁忙，请稍候再试！");
 
                         break;
                     case SUCC2: // 扫码成功后进入
@@ -201,7 +201,7 @@ public class Pur_InActivity extends BaseActivity {
                                 m.matBarcode = m.mtl.getfNumber();
                                 if (m.dataType == '1') { // 来源单
                                     if (m.mtl.getIsSnManager() == 1) {
-                                        m.showWarnDialog("该物料已启用序列号，数量为1！");
+                                        Comm.showWarnDialog(m.context,"该物料已启用序列号，数量为1！");
                                         return;
                                     }
                                     for (int i = 0, size = m.checkDatas.size(); i < size; i++) {
@@ -230,7 +230,7 @@ public class Pur_InActivity extends BaseActivity {
                         break;
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
-                        m.showWarnDialog("很抱歉，没能找到数据！");
+                        Comm.showWarnDialog(m.context,"很抱歉，没能找到数据！");
 
                         break;
                     case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
@@ -262,7 +262,7 @@ public class Pur_InActivity extends BaseActivity {
                         for (int i = 0, len = idArr.length; i < len; i++) {
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
                                 if (m.parseInt(idArr[i]) == m.checkDatas.get(j).getMtl().getfMaterialId()) {
-                                    m.showWarnDialog("第" + (i + 1) + "行物料已扫过！");
+                                    Comm.showWarnDialog(m.context,"第" + (i + 1) + "行物料已扫过！");
                                     return;
                                 }
                             }
@@ -382,7 +382,7 @@ public class Pur_InActivity extends BaseActivity {
                 break;
             case R.id.btn_whArea: // 选择库区
                 if (stock == null) {
-                    showWarnDialog("请先选择仓库！");
+                    Comm.showWarnDialog(context,"请先选择仓库！");
                     return;
                 }
                 isStockALong = false;
@@ -393,7 +393,7 @@ public class Pur_InActivity extends BaseActivity {
                 break;
             case R.id.btn_whPos: // 选择库位
                 if (stockA == null) {
-                    showWarnDialog("请先选择库区！");
+                    Comm.showWarnDialog(context,"请先选择库区！");
                     return;
                 }
                 bundle = new Bundle();
@@ -469,19 +469,19 @@ public class Pur_InActivity extends BaseActivity {
      */
     private boolean selectSourceBefore() {
         if (supplier == null) {
-            showWarnDialog("请选择供应商！");
+            Comm.showWarnDialog(context,"请选择供应商！");
             return false;
         }
         if (stock == null) {
-            showWarnDialog("请选择仓库！");
+            Comm.showWarnDialog(context,"请选择仓库！");
             return false;
         }
         if (stock.isReservoirArea() && stockA == null) {
-            showWarnDialog("请选择库区！");
+            Comm.showWarnDialog(context,"请选择库区！");
             return false;
         }
         if (stock.isStorageLocation() && stockP == null) {
-            showWarnDialog("请选择库位！");
+            Comm.showWarnDialog(context,"请选择库位！");
             return false;
         }
         return true;
@@ -492,15 +492,15 @@ public class Pur_InActivity extends BaseActivity {
      */
     private boolean saveBefore() {
         if (checkDatas == null || checkDatas.size() == 0) {
-            showWarnDialog("请先插入行！");
+            Comm.showWarnDialog(context,"请先插入行！");
             return false;
         }
         if(receiveOrg == null) {
-            showWarnDialog("请选择收料组织！");
+            Comm.showWarnDialog(context,"请选择收料组织！");
             return false;
         }
         if(purOrg == null) {
-            showWarnDialog("请选择采购组织！");
+            Comm.showWarnDialog(context,"请选择采购组织！");
             return false;
         }
 
@@ -508,19 +508,19 @@ public class Pur_InActivity extends BaseActivity {
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             if (sr2.getMtl().getIsBatchManager() == 1 && sr2.getBatchno().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（批号）！");
+                Comm.showWarnDialog(context,"第" + (i + 1) + "行请输入（批号）！");
                 return false;
             }
             if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
-                showWarnDialog("第" + (i + 1) + "行请输入（序列号）！");
+                Comm.showWarnDialog(context,"第" + (i + 1) + "行请输入（序列号）！");
                 return false;
             }
             if (sr2.getStockqty() == 0) {
-                showWarnDialog("第" + (i + 1) + "行（实收数）必须大于0！");
+                Comm.showWarnDialog(context,"第" + (i + 1) + "行（实收数）必须大于0！");
                 return false;
             }
             if (sr2.getStockqty() > sr2.getFqty()) {
-                showWarnDialog("第" + (i + 1) + "行（实收数）不能大于（应收数）！");
+                Comm.showWarnDialog(context,"第" + (i + 1) + "行（实收数）不能大于（应收数）！");
                 return false;
             }
         }
@@ -543,7 +543,7 @@ public class Pur_InActivity extends BaseActivity {
                 break;
             case R.id.btn_whArea: // 长按选择库区
                 if (stock == null) {
-                    showWarnDialog("请先选择仓库！");
+                    Comm.showWarnDialog(context,"请先选择仓库！");
                     return true;
                 }
                 isStockALong = true;
@@ -740,46 +740,46 @@ public class Pur_InActivity extends BaseActivity {
      */
     private void addRow() {
         if (supplier == null) {
-            showWarnDialog("请选择供应商！");
+            Comm.showWarnDialog(context,"请选择供应商！");
             return;
         }
         if (stock == null) {
-            showWarnDialog("请选择仓库！");
+            Comm.showWarnDialog(context,"请选择仓库！");
             return;
         }
         if (stock.isStorageLocation() && stockA == null) {
-            showWarnDialog("请选择库区！");
+            Comm.showWarnDialog(context,"请选择库区！");
             return;
         }
         if (stock.isStorageLocation() && stockP == null) {
-            showWarnDialog("请选择库位！");
+            Comm.showWarnDialog(context,"请选择库位！");
             return;
         }
         if(receiveOrg == null) { // 收料组织
-            showWarnDialog("请选择收料组织！");
+            Comm.showWarnDialog(context,"请选择收料组织！");
             return;
         }
         if(purOrg == null) { // 采购组织
-            showWarnDialog("请选择采购组织！");
+            Comm.showWarnDialog(context,"请选择采购组织！");
             return;
         }
         if (mtl == null) {
-            showWarnDialog("请选择物料！");
+            Comm.showWarnDialog(context,"请选择物料！");
             return;
         }
         double num = parseDouble(getValues(etNum).trim());
         if (num == 0) {
-            showWarnDialog("请输入数量！");
+            Comm.showWarnDialog(context,"请输入数量！");
             return;
         }
         String batch = getValues(etBatchNo).trim();
         if (mtl.getIsBatchManager() == 1 && batch.length() == 0) {
-            showWarnDialog("该物料启用了批号，请输入批号！");
+            Comm.showWarnDialog(context,"该物料启用了批号，请输入批号！");
             return;
         }
         String seqNo = getValues(etSequenceNo).trim();
         if (mtl.getIsSnManager() == 1 && seqNo.length() == 0) {
-            showWarnDialog("该物料启用了序列号，请输入序列号！");
+            Comm.showWarnDialog(context,"该物料启用了序列号，请输入序列号！");
             return;
         }
         // 隐藏键盘
@@ -1250,7 +1250,7 @@ public class Pur_InActivity extends BaseActivity {
             // 得到用户对象
             User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
             record.setOperationId(user.getId());
-            Log.e("111", record.toString());
+
             list.add(record);
         }
 
