@@ -14,6 +14,7 @@ public class StockPosition implements Serializable {
     // [fnumber] [nvarchar](50) NOT NULL,
     // [fname] [nvarchar](50) NOT NULL,
     private int id;
+    private int fStockPositionId;
     private int stockId;
     private int areaId;
     private String fnumber;
@@ -22,6 +23,10 @@ public class StockPosition implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public int getfStockPositionId() {
+        return fStockPositionId;
     }
 
     public int getStockId() {
@@ -46,6 +51,10 @@ public class StockPosition implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setfStockPositionId(int fStockPositionId) {
+        this.fStockPositionId = fStockPositionId;
     }
 
     public void setStockId(int stockId) {
