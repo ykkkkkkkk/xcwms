@@ -73,9 +73,6 @@
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
-            android:name=".basics.Mtl_ListActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity
             android:name=".basics.Material_ListActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
@@ -128,6 +125,9 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_SelSourceFragmentActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_BoxActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".MainActivity" />

@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
+import ykk.xc.com.xcwms.sales.Sal_BoxActivity;
 import ykk.xc.com.xcwms.sales.Sal_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
@@ -74,7 +75,7 @@ public class MainTabFragment2 extends BaseFragment {
     @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5, R.id.relative6})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.relative1:
+            case R.id.relative1: // 销售订单
                 show(Sal_OrderSearchActivity.class, null);
 
                 break;
@@ -82,14 +83,15 @@ public class MainTabFragment2 extends BaseFragment {
                 show(Sal_OutActivity.class, null);
 
                 break;
-            case R.id.relative3:
+            case R.id.relative3: // 单据下推
                 showLoadDialog("连接服务器...");
                 break;
-            case R.id.relative4:
+            case R.id.relative4: // 生产领料
                 showLoadDialog("连接服务器...");
                 break;
-            case R.id.relative5:
-                showLoadDialog("连接服务器...");
+            case R.id.relative5: // 产品包装
+                show(Sal_BoxActivity.class, null);
+
                 break;
             case R.id.relative6:
                 showLoadDialog("连接服务器...");

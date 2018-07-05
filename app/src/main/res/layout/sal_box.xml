@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="物料装箱"
+            android:text="产品装箱"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -30,9 +30,9 @@
             android:background="@drawable/btn_blue2_selector"
             android:ems="2"
             android:text="重置"
-            android:visibility="invisible"
             android:textColor="#ffffff"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <LinearLayout
@@ -217,6 +217,7 @@
             android:layout_marginLeft="2dp"
             android:layout_weight="1"
             android:background="@drawable/back_style_blue"
+            android:enabled="false"
             android:hint="请在此扫描物料条码"
             android:inputType="none"
             android:paddingLeft="2dp"
@@ -317,36 +318,37 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="物料代码/名称"
             android:textColor="#000000"
             android:textSize="12sp" />
 
         <TextView
-            android:layout_width="76dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="交货方式"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="56dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="发货方式"
+            android:text="数量"
             android:textColor="#000000"
             android:textSize="12sp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.9"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="客户"
             android:textColor="#000000"
             android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="@dimen/_42dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="操作"
-            android:textColor="#000000"
-            android:textSize="@dimen/_10sp" />
 
     </LinearLayout>
 
@@ -368,10 +370,10 @@
             android:layout_width="0dp"
             android:layout_height="38dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_blue2_selector"
+            android:background="@drawable/btn_gray2_selector"
             android:gravity="center"
             android:text="删除行"
-            android:textColor="@color/white"
+            android:textColor="#666666"
             android:textSize="16sp" />
 
         <Button
@@ -379,7 +381,7 @@
             android:layout_width="0dp"
             android:layout_height="38dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_purple2_selector"
+            android:background="@drawable/btn_green2_selector"
             android:gravity="center"
             android:text="解封"
             android:textColor="@color/white"
@@ -390,7 +392,7 @@
             android:layout_width="0dp"
             android:layout_height="38dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_green2_selector"
+            android:background="@drawable/btn_purple2_selector"
             android:gravity="center"
             android:text="封箱"
             android:textColor="@color/white"
