@@ -41,7 +41,7 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
         tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
         tv_deliMode.setText("");
         // 是否启用批次管理和序列号管理
-        tv_num.setText(df.format(entity.getSmNumber()));
+        tv_num.setText(df.format(entity.getNumber()));
         tv_custName.setText(entity.getCustomer().getCustomerName());
 
         View.OnClickListener click = new View.OnClickListener() {

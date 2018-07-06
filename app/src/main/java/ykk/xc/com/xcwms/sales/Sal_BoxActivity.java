@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
+import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.sal.BoxBarCode;
@@ -47,6 +49,12 @@ import ykk.xc.com.xcwms.util.JsonUtil;
 
 public class Sal_BoxActivity extends BaseActivity {
 
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.viewRadio1)
+    View viewRadio1;
+    @BindView(R.id.viewRadio2)
+    View viewRadio2;
     @BindView(R.id.et_boxCode)
     EditText etBoxCode;
     @BindView(R.id.tv_status)
@@ -87,13 +95,13 @@ public class Sal_BoxActivity extends BaseActivity {
     private Customer customer; // 客户
     private BoxBarCode boxBarCode; // 箱码表
     private Sal_BoxAdapter mAdapter;
-    private char dataType = '1'; // 1：来源单，2：无源单
+    private char dataType = '1'; // 1：无源单，2：来源单
     private String strBoxBarcode, strMtlBarcode; // 对应的条码号
     private List<MaterialBinningRecord> listMtl = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
     private int curPos; // 当前行
     private DecimalFormat df = new DecimalFormat("#.####");
-
+    private View curRadio; // 当前来源View
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
@@ -131,8 +139,14 @@ public class Sal_BoxActivity extends BaseActivity {
 
                                 break;
                             case '2':
-                                MaterialBinningRecord mtl = JsonUtil.strToObject((String) msg.obj, MaterialBinningRecord.class);
-                                m.getMtlBinningRecord(mtl);
+                                BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
+                                m.setEnables(m.tvCustSel,R.drawable.back_style_gray3,false);
+                                m.curRadio.setEnabled(false);
+
+                                if(barCodeTable.getRelationBillId() == null || barCodeTable.getRelationBillId() == 0)
+                                    m.getBarCodeTable(barCodeTable);
+                                else m.getBarCodeTable2(barCodeTable);
+
 
                                 break;
                         }
@@ -188,8 +202,8 @@ public class Sal_BoxActivity extends BaseActivity {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
-                curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", CODE3);
+//                curPos = position;
+//                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", CODE3);
             }
         });
     }
@@ -198,15 +212,26 @@ public class Sal_BoxActivity extends BaseActivity {
     public void initData() {
         hideSoftInputMode(etBoxCode);
         hideSoftInputMode(etMtlCode);
+        curRadio = viewRadio1;
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_custSel, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
+    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
                 closeHandler(mHandler);
                 context.finish();
+
+                break;
+            case R.id.lin_tab1:
+                tabSelected(viewRadio1);
+                tvTitle.setText("产品装箱-无源单");
+
+                break;
+            case R.id.lin_tab2:
+                tabSelected(viewRadio2);
+                tvTitle.setText("产品装箱-有源单");
 
                 break;
             case R.id.tv_custSel: // 选择客户
@@ -261,6 +286,15 @@ public class Sal_BoxActivity extends BaseActivity {
     }
 
     /**
+     * 选中之后改变样式
+     */
+    private void tabSelected(View v) {
+        curRadio.setBackgroundResource(R.drawable.check_off2);
+        v.setBackgroundResource(R.drawable.check_on);
+        curRadio = v;
+    }
+
+    /**
      * 选择保存之前的判断
      */
     private boolean saveBefore() {
@@ -270,11 +304,6 @@ public class Sal_BoxActivity extends BaseActivity {
         }
 
         return true;
-    }
-
-    @OnFocusChange({R.id.et_boxCode, R.id.et_mtlCode})
-    public void onViewFocusChange(View v, boolean hasFocus) {
-        if (hasFocus) hideKeyboard(v);
     }
 
     @Override
@@ -300,6 +329,10 @@ public class Sal_BoxActivity extends BaseActivity {
                         break;
                     case R.id.et_mtlCode: // 物料
                         String mtlCode = getValues(etMtlCode).trim();
+                        if(!smMtlBefore()) {
+                            etMtlCode.setText("");
+                            return true;
+                        }
                         if (isKeyDownEnter(mtlCode, event, keyCode)) {
                             if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
                                 String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
@@ -319,6 +352,21 @@ public class Sal_BoxActivity extends BaseActivity {
         };
         etBoxCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
+    }
+
+    /**
+     * 扫码物料之前的判断
+     */
+    private boolean smMtlBefore() {
+        if (customer == null) {
+            Comm.showWarnDialog(context,"请选择客户！");
+            return false;
+        }
+//        if (stock == null) {
+//            Comm.showWarnDialog(context,"请选择选择发货方式！");
+//            return false;
+//        }
+        return true;
     }
 
     /**
@@ -376,11 +424,11 @@ public class Sal_BoxActivity extends BaseActivity {
             }
             int status = boxBarCode.getStatus();
             if(status == 0) {
-                tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：已开箱</font>"));
+                tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
             } else if(status == 1) {
-                tvStatus.setText(Html.fromHtml("状态："+"<font color='#008800'>已开箱</font>"));
+                tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
             } else if(status == 2) {
-                tvStatus.setText(Html.fromHtml("状态："+"<font color='#6A4BC5'>已封箱</font>"));
+                tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
             }
             etMtlCode.setEnabled(true);
             setFocusable(etMtlCode);
@@ -396,36 +444,110 @@ public class Sal_BoxActivity extends BaseActivity {
         }
     }
     /**
-     * 选择（物料）返回的值
+     * （条码表 无源单）返回的值
      */
-    private void getMtlBinningRecord(MaterialBinningRecord mtl) {
-        if (mtl != null) {
+    private void getBarCodeTable(BarCodeTable barCodeTable) {
+        if (barCodeTable != null) {
+            setTexts(etMtlCode, barCodeTable.getMaterialNumber());
+            strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
             MaterialBinningRecord tmpMtl = null;
+            // 已装箱的物料
             if(size > 0) {
                 MaterialBinningRecord mtl2 = listMtl.get(0);
-                if(mtl2.getCustomerId() != mtl.getCustomerId()) {
-                    Comm.showWarnDialog(context, "客户不一致，不能装箱！");
-                    return;
-                }
-                if(mtl2.getExpressType() != mtl.getExpressType()) {
-                    Comm.showWarnDialog(context, "交货方式不一致，不能装箱！");
-                    return;
-                }
+
+                // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMtl.get(i);
-                    if(mtl.getMaterialId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) < mtl.getNumber()) {
+                    if(barCodeTable.getMaterialId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
                         tmpMtl = forMtl;
+                        tmpMtl.setNumber(forMtl.getNumber()+1);
+
                         break;
+                    } else if(barCodeTable.getMaterialId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) > barCodeTable.getMtlPack().getNumber()) {
+                        Comm.showWarnDialog(context,"该物料已经只能装"+barCodeTable.getMtlPack().getNumber()+"个");
+
+                        return;
                     }
                 }
             }
-            if(tmpMtl != null) {
+            if(tmpMtl == null) {
+                tmpMtl = new MaterialBinningRecord();
+                tmpMtl.setId(0);
+                tmpMtl.setBoxBarCodeId(boxBarCode.getId());
+                tmpMtl.setMaterialId(barCodeTable.getMaterialId());
+                tmpMtl.setNumber(1);
+                tmpMtl.setRelationBillId(barCodeTable.getRelationBillId());
+                tmpMtl.setRelationBillNumber(barCodeTable.getRelationBillNumber());
+                tmpMtl.setCustomerId(customer.getFcustId());
+//                tmpMtl.setExpressType(1);
+                tmpMtl.setPackageWorkType(2);
 
+            } else {
+                tmpMtl.setNumber(tmpMtl.getNumber()+1);
             }
-            mtl.setNumber(1);
             // 把对象转成json字符串
-            String strJson = JsonUtil.objectToString(mtl);
+            String strJson = JsonUtil.objectToString(tmpMtl);
+            // 添加到箱子并返回箱子的中的物料列表
+            run_save(strJson);
+        }
+    }
+
+    /**
+     * （条码表 有源单）返回的值
+     */
+    private void getBarCodeTable2(BarCodeTable barCodeTable) {
+        if (barCodeTable != null) {
+            setTexts(etMtlCode, barCodeTable.getMaterialNumber());
+            strMtlBarcode = barCodeTable.getMaterialNumber();
+            int size = listMtl.size();
+            MaterialBinningRecord tmpMtl = null;
+            SalOrder salOrder = null;
+            // 得到销售订单
+            if(barCodeTable.getRelationObj() != null && barCodeTable.getRelationObj().length() > 0) {
+                salOrder = JsonUtil.stringToObject(barCodeTable.getRelationObj(), SalOrder.class);
+            }
+            // 已装箱的物料
+            if(size > 0) {
+                MaterialBinningRecord mtl2 = listMtl.get(0);
+                if(salOrder != null && mtl2.getCustomerId() != salOrder.getCustId()) {
+                    Comm.showWarnDialog(context, "客户不一致，不能装箱！");
+                    return;
+                }
+//                if(salOrder != null && mtl2.getExpressType() != mtl.getExpressType()) {
+//                    Comm.showWarnDialog(context, "交货方式不一致，不能装箱！");
+//                    return;
+//                }
+                // 相同的物料就+1，否则为1
+                for(int i=0; i<size; i++) {
+                    MaterialBinningRecord forMtl = listMtl.get(i);
+                    if(salOrder != null && salOrder.getMtlId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
+                        tmpMtl = forMtl;
+
+                        break;
+                    } else if(salOrder != null && salOrder.getMtlId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) > barCodeTable.getMtlPack().getNumber()) {
+                        Comm.showWarnDialog(context,"该物料已经只能装"+barCodeTable.getMtlPack().getNumber()+"个");
+
+                        return;
+                    }
+                }
+            }
+            if(tmpMtl == null) {
+                tmpMtl = new MaterialBinningRecord();
+                tmpMtl.setId(0);
+                tmpMtl.setBoxBarCodeId(boxBarCode.getId());
+                tmpMtl.setMaterialId(barCodeTable.getMaterialId());
+                tmpMtl.setNumber(1);
+                tmpMtl.setRelationBillId(barCodeTable.getRelationBillId());
+                tmpMtl.setRelationBillNumber(barCodeTable.getRelationBillNumber());
+                tmpMtl.setCustomerId(salOrder.getCustId());
+//                tmpMtl.setExpressType(); // 发货方式
+                tmpMtl.setPackageWorkType(2);
+            } else {
+                tmpMtl.setNumber(tmpMtl.getNumber()+1);
+            }
+            // 把对象转成json字符串
+            String strJson = JsonUtil.objectToString(tmpMtl);
             run_save(strJson);
         }
     }
@@ -447,7 +569,9 @@ public class Sal_BoxActivity extends BaseActivity {
                 barcode = strMtlBarcode;
                 break;
         }
+        String boxId = boxBarCode != null ? String.valueOf(boxBarCode.getBoxId()) : "";
         FormBody formBody = new FormBody.Builder()
+                .add("boxId", boxId)
                 .add("barcode", barcode)
                 .build();
 

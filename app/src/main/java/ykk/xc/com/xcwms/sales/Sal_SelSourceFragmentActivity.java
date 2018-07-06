@@ -25,10 +25,10 @@ import ykk.xc.com.xcwms.sales.adapter.SelSourceFragmentAdapter;
 
 public class Sal_SelSourceFragmentActivity extends BaseActivity {
 
-    @BindView(R.id.radio1)
-    RadioButton radio1;
-    @BindView(R.id.radio2)
-    RadioButton radio2;
+    @BindView(R.id.viewRadio1)
+    View radio1;
+    @BindView(R.id.viewRadio2)
+    View radio2;
     @BindView(R.id.lin_tab1)
     LinearLayout linTab1;
     @BindView(R.id.lin_tab2)
@@ -42,7 +42,7 @@ public class Sal_SelSourceFragmentActivity extends BaseActivity {
     @BindView(R.id.btn_confirm)
     Button btnConfirm;
     private Sal_SelSourceFragmentActivity context = this;
-    private RadioButton curRadio;
+    private View curRadio;
     private Customer customer; // 客户
 
     @Override
@@ -113,14 +113,14 @@ public class Sal_SelSourceFragmentActivity extends BaseActivity {
     /**
      * 选中之后改变样式
      */
-    private void tabSelected(RadioButton rb) {
-        curRadio.setChecked(false);
-        rb.setChecked(true);
-        curRadio = rb;
+    private void tabSelected(View v) {
+        curRadio.setBackgroundResource(R.drawable.check_off2);
+        v.setBackgroundResource(R.drawable.check_on);
+        curRadio = v;
     }
 
 
-    @OnClick({R.id.lin_tab1, R.id.lin_tab2})
+    @OnClick({R.id.btn_close, R.id.lin_tab1, R.id.lin_tab2})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭

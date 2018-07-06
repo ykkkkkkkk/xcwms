@@ -23,8 +23,6 @@ public class MaterialBinningRecord implements Serializable {
 	private Material material;
 	/*箱子里装入物料的数量*/
 	private double number;
-	/*扫码数量--前台用到的*/
-	private double smNumber;
 	/*关联单据id*/
 	private Integer relationBillId;
 	/*关联单据号*/
@@ -115,18 +113,12 @@ public class MaterialBinningRecord implements Serializable {
 	public void setPackageWorkType(Integer packageWorkType) {
 		this.packageWorkType = packageWorkType;
 	}
-	public double getSmNumber() {
-		return smNumber;
-	}
-	public void setSmNumber(double smNumber) {
-		this.smNumber = smNumber;
-	}
 
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", material=" + material + ", number=" + number + ", smNumber="
-				+ smNumber + ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber
+				+ ", materialId=" + materialId + ", material=" + material + ", number=" + number +
+				", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber
 				+ ", customerId=" + customerId + ", customer=" + customer + ", expressType=" + expressType
 				+ ", packageWorkType=" + packageWorkType + "]";
 	}
