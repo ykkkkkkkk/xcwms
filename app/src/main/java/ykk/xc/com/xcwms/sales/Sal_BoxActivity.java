@@ -15,7 +15,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -26,7 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.OnFocusChange;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -51,6 +50,10 @@ public class Sal_BoxActivity extends BaseActivity {
 
     @BindView(R.id.tv_title)
     TextView tvTitle;
+    @BindView(R.id.lin_tab1)
+    LinearLayout linTab1;
+    @BindView(R.id.lin_tab2)
+    LinearLayout linTab2;
     @BindView(R.id.viewRadio1)
     View viewRadio1;
     @BindView(R.id.viewRadio2)
@@ -135,18 +138,20 @@ public class Sal_BoxActivity extends BaseActivity {
                         switch (m.curViewFlag) {
                             case '1':
                                 m.boxBarCode = JsonUtil.strToObject((String) msg.obj, BoxBarCode.class);
-                                m.getBoxBarcode();
+                                m.linTab1.setEnabled(false);
+                                m.linTab2.setEnabled(false);
+                                m.getBox();
 
                                 break;
                             case '2':
                                 BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
-                                m.setEnables(m.tvCustSel,R.drawable.back_style_gray3,false);
-                                m.curRadio.setEnabled(false);
-
-                                if(barCodeTable.getRelationBillId() == null || barCodeTable.getRelationBillId() == 0)
+                                m.getBarCodeTableAfter(); // 禁用一些控件
+                                // 无源单和来源的分支
+                                if(barCodeTable.getRelationBillId() == null || barCodeTable.getRelationBillId() == 0) {
                                     m.getBarCodeTable(barCodeTable);
-                                else m.getBarCodeTable2(barCodeTable);
-
+                                } else {
+                                    m.getBarCodeTable2(barCodeTable);
+                                }
 
                                 break;
                         }
@@ -210,9 +215,25 @@ public class Sal_BoxActivity extends BaseActivity {
 
     @Override
     public void initData() {
+        initDataSon(false);
         hideSoftInputMode(etBoxCode);
         hideSoftInputMode(etMtlCode);
         curRadio = viewRadio1;
+    }
+
+    /**
+     *
+     */
+    private void initDataSon(boolean enable) {
+        if(enable) {
+            setEnables(etMtlCode, R.drawable.back_style_blue, enable);
+            setEnables(tvCustSel, R.drawable.back_style_blue, enable);
+            setEnables(tvDeliverSel, R.drawable.back_style_blue, enable);
+        } else {
+            setEnables(etMtlCode, R.drawable.back_style_gray3, enable);
+            setEnables(tvCustSel, R.drawable.back_style_gray3, enable);
+            setEnables(tvDeliverSel, R.drawable.back_style_gray3, enable);
+        }
     }
 
     @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
@@ -313,36 +334,40 @@ public class Sal_BoxActivity extends BaseActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 switch (v.getId()) {
                     case R.id.et_boxCode: // 箱码
-                        String boxCode = getValues(etBoxCode).trim();
-                        if (isKeyDownEnter(boxCode, event, keyCode)) {
-                            if (strBoxBarcode != null && strBoxBarcode.length() > 0) {
-                                String tmp = boxCode.replaceFirst(strBoxBarcode, "");
-                                strBoxBarcode = tmp.replace("\n", "");
-                            } else {
-                                strBoxBarcode = boxCode.replace("\n", "");
+                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                            String boxCode = getValues(etBoxCode).trim();
+                            if (isKeyDownEnter(boxCode, event, keyCode)) {
+                                if (strBoxBarcode != null && strBoxBarcode.length() > 0) {
+                                    String tmp = boxCode.replaceFirst(strBoxBarcode, "");
+                                    strBoxBarcode = tmp.replace("\n", "");
+                                } else {
+                                    strBoxBarcode = boxCode.replace("\n", "");
+                                }
+                                curViewFlag = '1';
+                                // 执行查询方法
+                                run_smGetDatas();
                             }
-                            curViewFlag = '1';
-                            // 执行查询方法
-                            run_smGetDatas();
                         }
 
                         break;
                     case R.id.et_mtlCode: // 物料
-                        String mtlCode = getValues(etMtlCode).trim();
-                        if(!smMtlBefore()) {
-                            etMtlCode.setText("");
-                            return true;
-                        }
-                        if (isKeyDownEnter(mtlCode, event, keyCode)) {
-                            if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
-                                String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
-                                strMtlBarcode = tmp.replace("\n", "");
-                            } else {
-                                strMtlBarcode = mtlCode.replace("\n", "");
+                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                            String mtlCode = getValues(etMtlCode).trim();
+                            if (!smMtlBefore()) {
+                                etMtlCode.setText("");
+                                return false;
                             }
-                            curViewFlag = '2';
-                            // 执行查询方法
-                            run_smGetDatas();
+                            if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                                if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
+                                    String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
+                                    strMtlBarcode = tmp.replace("\n", "");
+                                } else {
+                                    strMtlBarcode = mtlCode.replace("\n", "");
+                                }
+                                curViewFlag = '2';
+                                // 执行查询方法
+                                run_smGetDatas();
+                            }
                         }
 
                         break;
@@ -410,7 +435,7 @@ public class Sal_BoxActivity extends BaseActivity {
     /**
      * 扫描（箱码）返回
      */
-    private void getBoxBarcode() {
+    private void getBox() {
         if(boxBarCode != null) {
             listMtl.clear();
             setTexts(etBoxCode, boxBarCode.getBox().getBoxName());
@@ -419,7 +444,24 @@ public class Sal_BoxActivity extends BaseActivity {
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
                 tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
                 listMtl.addAll(boxBarCode.getMtlBinningRecord());
+
+                MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
+                // 固定当前是无源单还是有源单
+                if(mtlbr.getRelationBillId() == null || mtlbr.getRelationBillId() == 0) {
+                    tabSelected(viewRadio1);
+                } else {
+                    tabSelected(viewRadio2);
+                }
+                // 显示当前的客户
+                if(customer == null) customer = new Customer();
+                customer.setFcustId(mtlbr.getCustomerId());
+                customer.setCustomerName(mtlbr.getCustomer().getCustomerName());
+                tvCustSel.setText(mtlbr.getCustomer().getCustomerName());
+                // 显示交货方式
+
+
             } else {
+                initDataSon(true);
                 tvCount.setText("物料数量：0");
             }
             int status = boxBarCode.getStatus();
@@ -430,7 +472,7 @@ public class Sal_BoxActivity extends BaseActivity {
             } else if(status == 2) {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
             }
-            etMtlCode.setEnabled(true);
+            setEnables(etMtlCode, R.drawable.back_style_blue, true);
             setFocusable(etMtlCode);
 
             tvBoxName.setText(boxBarCode.getBox().getBoxName());
@@ -443,6 +485,7 @@ public class Sal_BoxActivity extends BaseActivity {
             mAdapter.notifyDataSetChanged();
         }
     }
+
     /**
      * （条码表 无源单）返回的值
      */
@@ -451,23 +494,24 @@ public class Sal_BoxActivity extends BaseActivity {
             setTexts(etMtlCode, barCodeTable.getMaterialNumber());
             strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
+            tvCount.setText("物料数量："+size);
+
             MaterialBinningRecord tmpMtl = null;
             // 已装箱的物料
             if(size > 0) {
-                MaterialBinningRecord mtl2 = listMtl.get(0);
-
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMtl.get(i);
-                    if(barCodeTable.getMaterialId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
-                        tmpMtl = forMtl;
-                        tmpMtl.setNumber(forMtl.getNumber()+1);
+                    if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
+                        if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
+                            tmpMtl = forMtl;
 
-                        break;
-                    } else if(barCodeTable.getMaterialId() == forMtl.getMaterialId() && (forMtl.getNumber()+1) > barCodeTable.getMtlPack().getNumber()) {
-                        Comm.showWarnDialog(context,"该物料已经只能装"+barCodeTable.getMtlPack().getNumber()+"个");
+                            break;
+                        } else {
+                            Comm.showWarnDialog(context,"该物料已经只能装"+barCodeTable.getMtlPack().getNumber()+"个");
 
-                        return;
+                            return;
+                        }
                     }
                 }
             }
@@ -476,16 +520,14 @@ public class Sal_BoxActivity extends BaseActivity {
                 tmpMtl.setId(0);
                 tmpMtl.setBoxBarCodeId(boxBarCode.getId());
                 tmpMtl.setMaterialId(barCodeTable.getMaterialId());
-                tmpMtl.setNumber(1);
                 tmpMtl.setRelationBillId(barCodeTable.getRelationBillId());
                 tmpMtl.setRelationBillNumber(barCodeTable.getRelationBillNumber());
                 tmpMtl.setCustomerId(customer.getFcustId());
 //                tmpMtl.setExpressType(1);
                 tmpMtl.setPackageWorkType(2);
 
-            } else {
-                tmpMtl.setNumber(tmpMtl.getNumber()+1);
             }
+            tmpMtl.setNumber(1);
             // 把对象转成json字符串
             String strJson = JsonUtil.objectToString(tmpMtl);
             // 添加到箱子并返回箱子的中的物料列表
@@ -501,6 +543,7 @@ public class Sal_BoxActivity extends BaseActivity {
             setTexts(etMtlCode, barCodeTable.getMaterialNumber());
             strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
+            tvCount.setText("物料数量："+size);
             MaterialBinningRecord tmpMtl = null;
             SalOrder salOrder = null;
             // 得到销售订单
@@ -550,6 +593,14 @@ public class Sal_BoxActivity extends BaseActivity {
             String strJson = JsonUtil.objectToString(tmpMtl);
             run_save(strJson);
         }
+    }
+
+    /**
+     * 扫描物料之后的控制
+     */
+    private void getBarCodeTableAfter() {
+        setEnables(tvCustSel,R.drawable.back_style_gray3,false);
+        tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
     }
 
     /**
