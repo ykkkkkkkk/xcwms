@@ -11,9 +11,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -92,19 +96,23 @@ public class Sal_BoxActivity extends BaseActivity {
     Button btnSave;
     
     private Sal_BoxActivity context = this;
-    private static final int SEL_CUST = 11;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
-    private static final int CODE1 = 1, CODE2 = 2, CODE3 = 3, CODE20 = 20;
+    private static final int SEL_CUST = 11, SEL_NUM = 12;
+    private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504;
+    private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
     private Customer customer; // 客户
     private BoxBarCode boxBarCode; // 箱码表
     private Sal_BoxAdapter mAdapter;
     private char dataType = '1'; // 1：无源单，2：来源单
-    private String strBoxBarcode, strMtlBarcode; // 对应的条码号
+    private String strBoxBarcode, strMtlBarcode, strMtlBarcode_del; // 对应的条码号
     private List<MaterialBinningRecord> listMtl = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
-    private int curPos; // 当前行
     private DecimalFormat df = new DecimalFormat("#.####");
+    private int curPos; // 当前行
     private View curRadio; // 当前来源View
+    private AlertDialog delDialog;
+    private EditText etMtlCode2;
+    private CheckBox checkClose;
+    private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
@@ -122,29 +130,18 @@ public class Sal_BoxActivity extends BaseActivity {
                 m.hideLoadDialog();
 
                 switch (msg.what) {
-                    case SUCC1:
-//                        m.reset('0');
-
-//                        Comm.showWarnDialog(m.context, "保存成功√");
-//                        m.listMtl.clear();
-//                        m.mAdapter.notifyDataSetChanged();
-
-                        break;
-                    case UNSUCC1:
-                        Comm.showWarnDialog(m.context, "服务器繁忙，请稍候再试！");
-
-                        break;
-                    case SUCC2: // 扫码成功后进入
+                    case SUCC1: // 扫码成功后进入
                         switch (m.curViewFlag) {
-                            case '1':
+                            case '1': // 箱码扫码   返回
                                 m.boxBarCode = JsonUtil.strToObject((String) msg.obj, BoxBarCode.class);
                                 m.linTab1.setEnabled(false);
                                 m.linTab2.setEnabled(false);
                                 m.getBox();
 
                                 break;
-                            case '2':
+                            case '2': // 物料扫码   返回
                                 BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
+
                                 m.getBarCodeTableAfter(); // 禁用一些控件
                                 // 无源单和来源的分支
                                 if(barCodeTable.getRelationBillId() == null || barCodeTable.getRelationBillId() == 0) {
@@ -154,34 +151,86 @@ public class Sal_BoxActivity extends BaseActivity {
                                 }
 
                                 break;
+                            case '3': // 删除物料扫码     返回
+                                BarCodeTable barCodeTable2 = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
+                                m.getBarCodeTable_delete(barCodeTable2);
+
+                                break;
                         }
 
                         break;
-                    case UNSUCC2:
-                        m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
+                    case UNSUCC1:
+                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
 
 
                         break;
-                    case SUCC3: // 扫描后的保存 成功
+                    case SAVE: // 扫描后的保存 成功
                         m.listMtl.clear();
                         List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                         m.listMtl.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
-                    case UNSUCC3: // 扫描后的保存 失败
-                        Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
+                    case UNSAVE: // 扫描后的保存 失败
+                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
+                        m.mAdapter.notifyDataSetChanged();
+                        Log.e("执行保存...","服务器繁忙，请稍候再试");
+//                        Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
 
 
                         break;
-                    case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
+                    case DELETE: // 删除 成功
+                        m.listMtl.clear();
+                        List<MaterialBinningRecord> list2 = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
+                        m.listMtl.addAll(list2);
+                        m.mAdapter.notifyDataSetChanged();
+                        // 如果点击了关闭窗口的复选框
+                        m.setCloseDelDialog();
+
+                        break;
+                    case UNDELETE: // 删除 失败
+                        String str = (String) msg.obj;
+                        if(str != null) {
+                            String size = JsonUtil.strToString((String) msg.obj);
+                            if(m.parseInt(size) == 0) {
+                                m.listMtl.clear();
+                            }
+                        }
+                        m.setCloseDelDialog();
+                        m.mAdapter.notifyDataSetChanged();
+                        Log.e("执行删除...","服务器繁忙，请稍候再试");
+//                        Comm.showWarnDialog(m.context, "服务器繁忙，请稍候再试！");
+
+                        break;
+                    case MODIFY: // 修改 成功
+
+
+                        break;
+                    case UNMODIFY: // 修改 失败
+
+
+                        break;
+                    case CODE1: // 清空数据
+                        m.etMtlCode.setText("");
+                        m.strMtlBarcode = "";
+
+                        break;
+                    case CODE2: // Dialog默认得到焦点，隐藏软键盘
+                        m.hideSoftInputMode(m.etMtlCode2);
+                        m.setFocusable(m.etMtlCode2);
+
+                        break;
+                    case CODE60: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
-                            case '1':
+                            case '1': // 箱码扫码
                                 m.setTexts(m.etBoxCode, m.strBoxBarcode);
                                 break;
-                            case '2':
+                            case '2': // 物料扫码
                                 m.setTexts(m.etMtlCode, m.strMtlBarcode);
+                                break;
+                            case '3': // 删除扫码
+                                m.setTexts(m.etMtlCode2, m.strMtlBarcode_del);
                                 break;
                         }
 
@@ -208,7 +257,7 @@ public class Sal_BoxActivity extends BaseActivity {
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
 //                curPos = position;
-//                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", CODE3);
+//                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", SEL_NUM);
             }
         });
     }
@@ -236,7 +285,7 @@ public class Sal_BoxActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
+    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_reset, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -260,25 +309,31 @@ public class Sal_BoxActivity extends BaseActivity {
 
                 break;
             case R.id.btn_del: // 删除
-//                addRow();
+                if(listMtl != null && listMtl.size() > 0) {
+                    deleteRowDialog();
+                } else {
+                    Comm.showWarnDialog(context,"箱子中没有物料，不能删除！");
+                }
 
                 break;
             case R.id.btn_unSave: // 解封
-//                hideKeyboard(getCurrentFocus());
-//                if (!saveBefore()) {
-//                    return;
-//                }
-//                run_findMatIsExistList();
-//                run_addScanningRecord();
+                if(boxBarCode == null) {
+                    Comm.showWarnDialog(context,"请先扫描箱码！");
+                    return;
+                }
+                run_modifyStatus("1");
 
                 break;
             case R.id.btn_save: // 封箱保存
-                hideKeyboard(getCurrentFocus());
-                if (!saveBefore()) {
+                if(boxBarCode == null) {
+                    Comm.showWarnDialog(context,"请先扫描箱码！");
                     return;
                 }
-//                run_findMatIsExistList();
-//                run_addScanningRecord();
+                if(listMtl == null || listMtl.size() == 0) {
+                    Comm.showWarnDialog(context,"箱子里还没有物料不能封箱！");
+                    return;
+                }
+                run_modifyStatus("2");
 
                 break;
             case R.id.btn_reset: // 重置
@@ -291,7 +346,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     build.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-//                            resetSon();
+                            reset();
                         }
                     });
                     build.setNegativeButton("否", null);
@@ -299,11 +354,43 @@ public class Sal_BoxActivity extends BaseActivity {
                     build.show();
 
                 } else {
-//                    resetSon();
+                    reset();
                 }
 
                 break;
         }
+    }
+
+    /**
+     * 重置
+     */
+    private void reset() {
+        tabSelected(viewRadio1);
+        tvTitle.setText("产品装箱-无源单");
+        linTab1.setEnabled(true);
+        linTab2.setEnabled(true);
+        etBoxCode.setText("");
+        boxBarCode = null;
+        tvStatus.setText("状态:未开箱");
+        tvBoxName.setText("");
+        tvBoxSize.setText("");
+        tvBoxLength.setText("");
+        tvBoxWidth.setText("");
+        tvBoxAltitude.setText("");
+        tvBoxVolume.setText("");
+        etMtlCode.setText("");
+//        tvCustSel.setText("");
+        setEnables(tvCustSel, R.drawable.back_style_blue, true);
+//        customer = null;
+//        tvDeliverSel.setText("");
+        setEnables(tvCustSel, R.drawable.back_style_blue, true);
+        tvCount.setText("物料数量：0");
+
+        dataType = '1';
+        curViewFlag = '1';
+
+        listMtl.clear();
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -325,6 +412,73 @@ public class Sal_BoxActivity extends BaseActivity {
         }
 
         return true;
+    }
+
+    /**
+     * 删除行的dialog
+     */
+    private void deleteRowDialog() {
+        View v = context.getLayoutInflater().inflate(R.layout.sal_box_item_del_dialog, null);
+        delDialog = new AlertDialog.Builder(context).setView(v).create();
+        // 初始化id
+        etMtlCode2 = (EditText) v.findViewById(R.id.et_mtlCode2);
+        Button btnClose = (Button) v.findViewById(R.id.btn_close);
+        checkClose = v.findViewById(R.id.check_close);
+        checkClose.setChecked(isCloseDelDialog);
+        mHandler.sendEmptyMessageDelayed(CODE2,200);
+
+        // 关闭
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkClose.setChecked(true);
+                setCloseDelDialog();
+            }
+        });
+        etMtlCode2.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                    String mtlCode = getValues(etMtlCode2).trim();
+                    if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                        if (strMtlBarcode_del != null && strMtlBarcode_del.length() > 0) {
+                            String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
+                            strMtlBarcode_del = tmp.replace("\n", "");
+                        } else {
+                            strMtlBarcode_del = mtlCode.replace("\n", "");
+                        }
+                        curViewFlag = '3';
+                        // 执行查询方法
+                        run_smGetDatas();
+                    }
+                }
+
+                return false;
+            }
+        });
+
+        Window window = delDialog.getWindow();
+        delDialog.setCancelable(false);
+        delDialog.show();
+        window.setGravity(Gravity.CENTER);
+    }
+
+    /**
+     * 删除扫码的时候是否关闭窗口
+     */
+    private void setCloseDelDialog() {
+        // 如果点击了关闭窗口的复选框
+        if(checkClose.isChecked()) {
+            setFocusable(etMtlCode);
+            etMtlCode2.setOnKeyListener(null);
+            etMtlCode2 = null;
+            delDialog.dismiss();
+            delDialog = null;
+            isCloseDelDialog = true;
+        } else {
+            isCloseDelDialog = false;
+            mHandler.sendEmptyMessageDelayed(CODE60, 200);
+        }
     }
 
     @Override
@@ -354,7 +508,7 @@ public class Sal_BoxActivity extends BaseActivity {
                         if(event.getAction() == KeyEvent.ACTION_DOWN) {
                             String mtlCode = getValues(etMtlCode).trim();
                             if (!smMtlBefore()) {
-                                etMtlCode.setText("");
+                                mHandler.sendEmptyMessageDelayed(CODE1,200);
                                 return false;
                             }
                             if (isKeyDownEnter(mtlCode, event, keyCode)) {
@@ -418,7 +572,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
 
                 break;
-            case CODE3: // 数量
+            case SEL_NUM: // 数量
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
@@ -508,7 +662,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
                             break;
                         } else {
-                            Comm.showWarnDialog(context,"该物料已经只能装"+barCodeTable.getMtlPack().getNumber()+"个");
+                            Comm.showWarnDialog(context,"该物料已经装满");
 
                             return;
                         }
@@ -544,6 +698,7 @@ public class Sal_BoxActivity extends BaseActivity {
             strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
             tvCount.setText("物料数量："+size);
+
             MaterialBinningRecord tmpMtl = null;
             SalOrder salOrder = null;
             // 得到销售订单
@@ -596,6 +751,39 @@ public class Sal_BoxActivity extends BaseActivity {
     }
 
     /**
+     * （条码表）删除返回的值
+     */
+    private void getBarCodeTable_delete(BarCodeTable barCodeTable) {
+        if (barCodeTable != null) {
+            setTexts(etMtlCode, barCodeTable.getMaterialNumber());
+            strMtlBarcode = barCodeTable.getMaterialNumber();
+
+            int size = listMtl.size();
+            MaterialBinningRecord tmpMtl = null;
+            // 已装箱的物料
+            if(size > 0) {
+                // 相同的物料就+1，否则为1
+                for(int i=0; i<size; i++) {
+                    MaterialBinningRecord forMtl = listMtl.get(i);
+                    if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
+                        tmpMtl = forMtl;
+
+                        break;
+                    }
+                }
+            }
+            if(tmpMtl == null) {
+                Comm.showWarnDialog(context,"扫码物料与箱子不匹配");
+                return;
+            }
+            // 把对象转成json字符串
+            String strJson = JsonUtil.objectToString(tmpMtl);
+            // 添加到箱子并返回箱子的中的物料列表
+            run_delete(strJson);
+        }
+    }
+
+    /**
      * 扫描物料之后的控制
      */
     private void getBarCodeTableAfter() {
@@ -619,6 +807,10 @@ public class Sal_BoxActivity extends BaseActivity {
                 mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
                 barcode = strMtlBarcode;
                 break;
+            case '3': // 物料
+                mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
+                barcode = strMtlBarcode_del;
+                break;
         }
         String boxId = boxBarCode != null ? String.valueOf(boxBarCode.getBoxId()) : "";
         FormBody formBody = new FormBody.Builder()
@@ -636,7 +828,7 @@ public class Sal_BoxActivity extends BaseActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC2);
+                mHandler.sendEmptyMessage(UNSUCC1);
             }
 
             @Override
@@ -644,10 +836,10 @@ public class Sal_BoxActivity extends BaseActivity {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC2);
+                    mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC2, result);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("run_smGetDatas --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
@@ -676,7 +868,7 @@ public class Sal_BoxActivity extends BaseActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC3);
+                mHandler.sendEmptyMessage(UNSAVE);
             }
 
             @Override
@@ -684,11 +876,93 @@ public class Sal_BoxActivity extends BaseActivity {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC3);
+                    mHandler.sendEmptyMessage(UNSAVE);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC3, result);
+                Message msg = mHandler.obtainMessage(SAVE, result);
                 Log.e("run_save --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 删除的方法
+     */
+    private void run_delete(String json) {
+        showLoadDialog("加载中...");
+        String mUrl = Consts.getURL("materialBinningRecord/delete");
+        MaterialBinningRecord mtl = new MaterialBinningRecord();
+
+        FormBody formBody = new FormBody.Builder()
+                .add("strJson", json)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNDELETE);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNDELETE, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(DELETE, result);
+                Log.e("run_delete --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 开箱或者封箱
+     */
+    private void run_modifyStatus(String status) {
+        showLoadDialog("加载中...");
+        String mUrl = Consts.getURL("boxBarCode/modifyStatus");
+        MaterialBinningRecord mtl = new MaterialBinningRecord();
+
+        FormBody formBody = new FormBody.Builder()
+                .add("id", String.valueOf(boxBarCode.getId()))
+                .add("status", status)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNMODIFY);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    mHandler.sendEmptyMessage(UNMODIFY);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(MODIFY, result);
+                Log.e("run_delete --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
