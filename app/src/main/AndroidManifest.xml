@@ -53,6 +53,10 @@
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
         <activity
+            android:name=".basics.DeliveryWay_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:theme="@style/dialogStyle" />
+        <activity
             android:name=".basics.Cust_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />

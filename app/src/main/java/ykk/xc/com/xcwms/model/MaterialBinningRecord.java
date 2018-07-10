@@ -36,6 +36,7 @@ public class MaterialBinningRecord implements Serializable {
 	 * 2代表物流
 	 * */
 	private Integer expressType;
+	private String deliveryWay; // 交货方式
 	/**装箱业务类型
 	 * 1代表外购入库
 	 * 2代表销售出库
@@ -113,14 +114,30 @@ public class MaterialBinningRecord implements Serializable {
 	public void setPackageWorkType(Integer packageWorkType) {
 		this.packageWorkType = packageWorkType;
 	}
+	public String getDeliveryWay() {
+		return deliveryWay;
+	}
+	public void setDeliveryWay(String deliveryWay) {
+		this.deliveryWay = deliveryWay;
+	}
 
 	@Override
 	public String toString() {
-		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", material=" + material + ", number=" + number +
-				", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber
-				+ ", customerId=" + customerId + ", customer=" + customer + ", expressType=" + expressType
-				+ ", packageWorkType=" + packageWorkType + "]";
+		return "MaterialBinningRecord{" +
+				"id=" + id +
+				", boxBarCodeId=" + boxBarCodeId +
+				", boxBarCode=" + boxBarCode +
+				", materialId=" + materialId +
+				", material=" + material +
+				", number=" + number +
+				", relationBillId=" + relationBillId +
+				", relationBillNumber='" + relationBillNumber + '\'' +
+				", customerId=" + customerId +
+				", customer=" + customer +
+				", expressType=" + expressType +
+				", deliveryWay='" + deliveryWay + '\'' +
+				", packageWorkType=" + packageWorkType +
+				'}';
 	}
 
 	public MaterialBinningRecord() {

@@ -27,7 +27,7 @@
         android:textSize="@dimen/_11sp" />
 
     <TextView
-        android:id="@+id/tv_deliMode"
+        android:id="@+id/tv_deliWay"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="@dimen/_46dp"

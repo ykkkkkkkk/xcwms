@@ -33,13 +33,13 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_mats = holder.obtainView(R.id.tv_mats);
-        TextView tv_deliMode = holder.obtainView(R.id.tv_deliMode);
+        TextView tv_deliWay = holder.obtainView(R.id.tv_deliWay);
         TextView tv_num = holder.obtainView(R.id.tv_num);
         TextView tv_custName = holder.obtainView(R.id.tv_custName);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
-        tv_deliMode.setText("");
+        tv_deliWay.setText(entity.getDeliveryWay());
         // 是否启用批次管理和序列号管理
         tv_num.setText(df.format(entity.getNumber()));
         tv_custName.setText(entity.getCustomer().getCustomerName());

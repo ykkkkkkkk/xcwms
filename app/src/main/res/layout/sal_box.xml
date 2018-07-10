@@ -25,12 +25,12 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/btn_reset"
+            android:id="@+id/btn_clone"
             android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@drawable/btn_blue2_selector"
             android:ems="2"
-            android:text="重置"
+            android:text="清空"
             android:textColor="#ffffff"
             android:textSize="14sp"
              />
@@ -442,7 +442,7 @@
             android:layout_weight="1"
             android:background="@drawable/btn_green2_selector"
             android:gravity="center"
-            android:text="解封"
+            android:text="开箱"
             android:textColor="@color/white"
             android:textSize="16sp" />
 
