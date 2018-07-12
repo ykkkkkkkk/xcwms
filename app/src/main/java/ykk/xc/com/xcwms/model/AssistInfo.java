@@ -9,7 +9,7 @@ import java.io.Serializable;
  */
 public class AssistInfo implements Serializable {
 	private Integer id; // id
-	private Integer parentId; // 父类id
+	private String parentId; // 父类id
 	private String categoryName; // 类别名称
 	private String uniquenessId; // 唯一id
 	private String fName; // 交货名称
@@ -23,7 +23,7 @@ public class AssistInfo implements Serializable {
 		return id;
 	}
 
-	public Integer getParentId() {
+	public String getParentId() {
 		return parentId;
 	}
 
@@ -47,7 +47,7 @@ public class AssistInfo implements Serializable {
 		this.id = id;
 	}
 
-	public void setParentId(Integer parentId) {
+	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
 

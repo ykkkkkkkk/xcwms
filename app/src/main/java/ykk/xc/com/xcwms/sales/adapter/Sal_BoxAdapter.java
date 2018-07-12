@@ -39,7 +39,8 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
-        tv_deliWay.setText(entity.getDeliveryWay());
+        String deliWay = Comm.isNULLS(entity.getDeliveryWay());
+        tv_deliWay.setText(deliWay.length() > 0 ? deliWay : "待定");
         // 是否启用批次管理和序列号管理
         tv_num.setText(df.format(entity.getNumber()));
         tv_custName.setText(entity.getCustomer().getCustomerName());

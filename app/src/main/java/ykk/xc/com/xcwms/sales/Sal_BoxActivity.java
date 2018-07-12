@@ -801,7 +801,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
             }
             if(tmpMtl == null) {
-                Comm.showWarnDialog(context,"扫码物料与箱子不匹配");
+                Comm.showWarnDialog(context,"扫描物料与箱子不匹配");
                 return;
             }
             // 把对象转成json字符串
@@ -829,7 +829,7 @@ public class Sal_BoxActivity extends BaseActivity {
         String barcode = null;
         switch (curViewFlag) {
             case '1': // 箱码
-                mUrl = Consts.getURL("findBoxBarCodeByBarCode");
+                mUrl = Consts.getURL("boxBarCode/findBarcode");
                 barcode = strBoxBarcode;
                 break;
             case '2': // 物料
