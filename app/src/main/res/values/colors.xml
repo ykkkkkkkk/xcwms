@@ -28,6 +28,9 @@
     <color name="default_color">#F0F0F0</color>
     <color name="c_eaeaea">#EAEAEA</color>
     <color name="c_cccccc">#CCCCCC</color>
+    <color name="c_666666">#666666</color>
+    <color name="c_777777">#777777</color>
+    <color name="c_888888">#888888</color>
     <color name="c_999999">#999999</color>
     <color name="c_515151">#515151</color>
     <color name="c_303f9f">#303f9f</color>

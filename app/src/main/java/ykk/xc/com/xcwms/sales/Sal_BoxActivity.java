@@ -3,6 +3,7 @@ package ykk.xc.com.xcwms.sales;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +21,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -96,6 +99,11 @@ public class Sal_BoxActivity extends BaseActivity {
     Button btnUnSave;
     @BindView(R.id.btn_save)
     Button btnSave;
+    @BindView(R.id.rb_type1)
+    RadioButton rbType1;
+    @BindView(R.id.rb_type2)
+    RadioButton rbType2;
+
     
     private Sal_BoxActivity context = this;
     private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_NUM = 13;
@@ -117,6 +125,7 @@ public class Sal_BoxActivity extends BaseActivity {
     private CheckBox checkClose;
     private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
     private char status = '0'; // 箱子状态
+    private char binningType = '1'; // 1.单色装，2.混色装
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
@@ -170,6 +179,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
                         break;
                     case SAVE: // 扫描后的保存 成功
+                        m.status = '1';
                         m.listMtl.clear();
                         List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                         m.listMtl.addAll(list);
@@ -201,6 +211,7 @@ public class Sal_BoxActivity extends BaseActivity {
                             if(m.parseInt(size) == 0) {
                                 m.listMtl.clear();
                                 m.initDataSon(true);
+                                m.tvStatus.setText(Html.fromHtml("状态：<font color='#000000'>未开箱</font>"));
                                 m.tvCount.setText("物料数量：0");
                             }
                         }
@@ -303,7 +314,7 @@ public class Sal_BoxActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save})
+    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save, R.id.rb_type1, R.id.rb_type2})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -313,11 +324,13 @@ public class Sal_BoxActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab1:
+                dataType = '1';
                 tabSelected(viewRadio1);
                 tvTitle.setText("产品装箱-无源单");
 
                 break;
             case R.id.lin_tab2:
+                dataType = '2';
                 tabSelected(viewRadio2);
                 tvTitle.setText("产品装箱-有源单");
 
@@ -364,6 +377,16 @@ public class Sal_BoxActivity extends BaseActivity {
                 reset();
 
                 break;
+            case R.id.rb_type1: // 装箱类型--单装
+                binningType = '1';
+                clickRadioChange();
+
+                break;
+            case R.id.rb_type2: // 装箱类型--混装
+                binningType = '2';
+                clickRadioChange();
+
+                break;
         }
     }
 
@@ -391,6 +414,9 @@ public class Sal_BoxActivity extends BaseActivity {
 //        tvDeliverSel.setText("");
         setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
         tvCount.setText("物料数量：0");
+        rbType1.setEnabled(true);
+        rbType2.setEnabled(true);
+        rbType1.setChecked(true);
 
         dataType = '1';
         curViewFlag = '1';
@@ -418,6 +444,14 @@ public class Sal_BoxActivity extends BaseActivity {
         }
 
         return true;
+    }
+
+    /**
+     * 点击装箱类型后改变的
+     */
+    private void clickRadioChange() {
+        rbType1.setTextColor(Color.parseColor(rbType1.isChecked() ? "#FFFFFF" : "#666666"));
+        rbType2.setTextColor(Color.parseColor(rbType2.isChecked() ? "#FFFFFF" : "#666666"));
     }
 
     /**
@@ -537,6 +571,7 @@ public class Sal_BoxActivity extends BaseActivity {
         };
         etBoxCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
+
     }
 
     /**
@@ -631,6 +666,14 @@ public class Sal_BoxActivity extends BaseActivity {
                 if(assist == null) assist = new AssistInfo();
                 assist.setfName(mtlbr.getDeliveryWay());
                 tvDeliverSel.setText(mtlbr.getDeliveryWay());
+                binningType = mtlbr.getBinningType();
+                // 自动选中对应类型
+                if(binningType == '1') rbType1.setChecked(true);
+                else rbType2.setChecked(true);
+                clickRadioChange();
+
+                rbType1.setEnabled(false);
+                rbType2.setEnabled(false);
 
             } else {
                 initDataSon(true);
@@ -688,6 +731,11 @@ public class Sal_BoxActivity extends BaseActivity {
 
                             return;
                         }
+                    } else {
+                        if(binningType == '1') {
+                            Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                            return;
+                        }
                     }
                 }
             }
@@ -703,6 +751,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     tmpMtl.setDeliveryWay(assist.getfName());
                 }
                 tmpMtl.setPackageWorkType(2);
+                tmpMtl.setBinningType(binningType);
 
             }
             tmpMtl.setNumber(1);
@@ -733,6 +782,8 @@ public class Sal_BoxActivity extends BaseActivity {
             orderIsnull = salOrder == null;
             // 已装箱的物料
             if(size > 0) {
+
+
                 MaterialBinningRecord mtl2 = listMtl.get(0);
                 if(orderIsnull && mtl2.getCustomerId() != salOrder.getCustId()) {
                     Comm.showWarnDialog(context, "客户不一致，不能装箱！");
@@ -755,6 +806,11 @@ public class Sal_BoxActivity extends BaseActivity {
 
                             return;
                         }
+                    } else {
+                        if(binningType == '1') {
+                            Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                            return;
+                        }
                     }
                 }
             }
@@ -770,6 +826,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     tmpMtl.setDeliveryWay(assist.getfName());
                 }
                 tmpMtl.setPackageWorkType(2);
+                tmpMtl.setBinningType(binningType);
             }
             tmpMtl.setNumber(1);
             // 把对象转成json字符串
@@ -817,6 +874,8 @@ public class Sal_BoxActivity extends BaseActivity {
     private void getBarCodeTableAfter() {
         setEnables(tvCustSel,R.drawable.back_style_gray3,false);
         setEnables(tvDeliverSel,R.drawable.back_style_gray3,false);
+        rbType1.setEnabled(false);
+        rbType2.setEnabled(false);
         tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
     }
 
@@ -832,19 +891,26 @@ public class Sal_BoxActivity extends BaseActivity {
                 mUrl = Consts.getURL("boxBarCode/findBarcode");
                 barcode = strBoxBarcode;
                 break;
-            case '2': // 物料
+            case '2': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
                 barcode = strMtlBarcode;
                 break;
-            case '3': // 物料
+            case '3': // 删除物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
                 barcode = strMtlBarcode_del;
                 break;
         }
         String boxId = boxBarCode != null ? String.valueOf(boxBarCode.getBoxId()) : "";
+        String strCaseId = ""; // 方案id
+        if(curViewFlag == '2') {
+            if(dataType == '1')  strCaseId = "11"; // 无源单
+
+            else strCaseId = "32,33"; // 有源单（销售订单、发货通知单）
+        }
         FormBody formBody = new FormBody.Builder()
                 .add("boxId", boxId)
                 .add("barcode", barcode)
+                .add("strCaseId", strCaseId)
                 .build();
 
         Request request = new Request.Builder()

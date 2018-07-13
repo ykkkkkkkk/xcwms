@@ -42,6 +42,9 @@ public class MaterialBinningRecord implements Serializable {
 	 * 2代表销售出库
 	 * */
 	private Integer packageWorkType;
+	/* 物料包装类型（1：单色装，2：混色装 */
+	private char binningType;
+
 	public Integer getId() {
 		return id;
 	}
@@ -120,24 +123,20 @@ public class MaterialBinningRecord implements Serializable {
 	public void setDeliveryWay(String deliveryWay) {
 		this.deliveryWay = deliveryWay;
 	}
+	public char getBinningType() {
+		return binningType;
+	}
+	public void setBinningType(char binningType) {
+		this.binningType = binningType;
+	}
 
 	@Override
 	public String toString() {
-		return "MaterialBinningRecord{" +
-				"id=" + id +
-				", boxBarCodeId=" + boxBarCodeId +
-				", boxBarCode=" + boxBarCode +
-				", materialId=" + materialId +
-				", material=" + material +
-				", number=" + number +
-				", relationBillId=" + relationBillId +
-				", relationBillNumber='" + relationBillNumber + '\'' +
-				", customerId=" + customerId +
-				", customer=" + customer +
-				", expressType=" + expressType +
-				", deliveryWay='" + deliveryWay + '\'' +
-				", packageWorkType=" + packageWorkType +
-				'}';
+		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
+				+ ", materialId=" + materialId + ", material=" + material + ", number=" + number + ", relationBillId="
+				+ relationBillId + ", relationBillNumber=" + relationBillNumber + ", customerId=" + customerId
+				+ ", customer=" + customer + ", expressType=" + expressType + ", deliveryWay=" + deliveryWay
+				+ ", packageWorkType=" + packageWorkType + ", binningType=" + binningType + "]";
 	}
 
 	public MaterialBinningRecord() {
