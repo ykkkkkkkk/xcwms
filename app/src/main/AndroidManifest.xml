@@ -100,6 +100,10 @@
             android:name=".basics.Sequence_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
+        <activity
+            android:name=".basics.Box_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:theme="@style/dialogStyle" />
 
         <!-- 设置页面用到的界面 -->
         <activity

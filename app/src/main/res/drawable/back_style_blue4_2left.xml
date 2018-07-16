@@ -7,7 +7,7 @@
                 android:width="1.2px"
                 android:color="#CCCCCC" />
             <!-- 填充色 -->
-            <solid android:color="#6699ff" />
+            <solid android:color="#6691D7" />
             <!-- 圆角的大小 -->
             <corners
                 android:bottomLeftRadius="6dp"

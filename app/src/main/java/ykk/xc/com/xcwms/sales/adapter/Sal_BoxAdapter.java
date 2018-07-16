@@ -43,6 +43,13 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
         tv_deliWay.setText(deliWay.length() > 0 ? deliWay : "待定");
         // 是否启用批次管理和序列号管理
         tv_num.setText(df.format(entity.getNumber()));
+        if(entity.getMaterial().getIsSnManager() == 1) {
+            tv_num.setBackgroundResource(R.drawable.back_style_gray2a);
+            tv_num.setEnabled(false);
+        } else {
+            tv_num.setBackgroundResource(R.drawable.back_style_gray8);
+            tv_num.setEnabled(true);
+        }
         tv_custName.setText(entity.getCustomer().getCustomerName());
 
         View.OnClickListener click = new View.OnClickListener() {

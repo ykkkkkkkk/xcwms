@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.model.sal;
+package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
 import java.util.List;

@@ -31,6 +31,7 @@ public class DeliOrder implements Serializable{
 	private Stock stock; // 出货仓库
 	private double deliFqty; // 销售数量
 	private double deliFremainoutqty; // 未出库数量
+	private String deliveryWay; // 发货方式
 	private int isCheck; // 新加的是否选中
 
 	public DeliOrder() {
@@ -40,171 +41,154 @@ public class DeliOrder implements Serializable{
 	public int getfId() {
 		return fId;
 	}
-
 	public String getFbillno() {
 		return fbillno;
 	}
-
 	public String getDeliDate() {
 		return deliDate;
 	}
-
 	public int getCustId() {
 		return custId;
 	}
-
 	public String getCustNumber() {
 		return custNumber;
 	}
-
 	public String getCustName() {
 		return custName;
 	}
-
 	public int getDeliOrgId() {
 		return deliOrgId;
 	}
-
 	public String getDeliOrgName() {
 		return deliOrgName;
 	}
-
 	public Organization getDeliOrg() {
 		return deliOrg;
 	}
-
 	public int getMtlId() {
 		return mtlId;
 	}
-
 	public Material getMtl() {
 		return mtl;
 	}
-
 	public String getMtlFnumber() {
 		return mtlFnumber;
 	}
-
 	public String getMtlFname() {
 		return mtlFname;
 	}
-
 	public String getMtlUnitName() {
 		return mtlUnitName;
 	}
-
 	public int getStockId() {
 		return stockId;
 	}
-
 	public String getStockName() {
 		return stockName;
 	}
-
 	public Stock getStock() {
 		return stock;
 	}
-
 	public double getDeliFqty() {
 		return deliFqty;
 	}
-
 	public double getDeliFremainoutqty() {
 		return deliFremainoutqty;
 	}
-
 	public void setfId(int fId) {
 		this.fId = fId;
 	}
-
 	public void setFbillno(String fbillno) {
 		this.fbillno = fbillno;
 	}
-
 	public void setDeliDate(String deliDate) {
 		this.deliDate = deliDate;
 	}
-
 	public void setCustId(int custId) {
 		this.custId = custId;
 	}
-
 	public void setCustNumber(String custNumber) {
 		this.custNumber = custNumber;
 	}
-
 	public void setCustName(String custName) {
 		this.custName = custName;
 	}
-
 	public void setDeliOrgId(int deliOrgId) {
 		this.deliOrgId = deliOrgId;
 	}
-
 	public void setDeliOrgName(String deliOrgName) {
 		this.deliOrgName = deliOrgName;
 	}
-
 	public void setDeliOrg(Organization deliOrg) {
 		this.deliOrg = deliOrg;
 	}
-
 	public void setMtlId(int mtlId) {
 		this.mtlId = mtlId;
 	}
-
 	public void setMtl(Material mtl) {
 		this.mtl = mtl;
 	}
-
 	public void setMtlFnumber(String mtlFnumber) {
 		this.mtlFnumber = mtlFnumber;
 	}
-
 	public void setMtlFname(String mtlFname) {
 		this.mtlFname = mtlFname;
 	}
-
 	public void setMtlUnitName(String mtlUnitName) {
 		this.mtlUnitName = mtlUnitName;
 	}
-
 	public void setStockId(int stockId) {
 		this.stockId = stockId;
 	}
-
 	public void setStockName(String stockName) {
 		this.stockName = stockName;
 	}
-
 	public void setStock(Stock stock) {
 		this.stock = stock;
 	}
-
 	public void setDeliFqty(double deliFqty) {
 		this.deliFqty = deliFqty;
 	}
-
 	public void setDeliFremainoutqty(double deliFremainoutqty) {
 		this.deliFremainoutqty = deliFremainoutqty;
 	}
-
+	public String getDeliveryWay() {
+		return deliveryWay;
+	}
+	public void setDeliveryWay(String deliveryWay) {
+		this.deliveryWay = deliveryWay;
+	}
 	public int getIsCheck() {
 		return isCheck;
 	}
-
 	public void setIsCheck(int isCheck) {
 		this.isCheck = isCheck;
 	}
 
 	@Override
 	public String toString() {
-		return "DeliveryNoticeOrder [fId=" + fId + ", fbillno=" + fbillno + ", deliDate=" + deliDate + ", custId="
-				+ custId + ", custNumber=" + custNumber + ", custName=" + custName + ", deliOrgId=" + deliOrgId
-				+ ", deliOrgName=" + deliOrgName + ", deliOrg=" + deliOrg + ", mtlId=" + mtlId + ", mtl=" + mtl
-				+ ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlUnitName=" + mtlUnitName
-				+ ", stockId=" + stockId + ", stockName=" + stockName + ", stock=" + stock + ", deliFqty=" + deliFqty
-				+ ", deliFremainoutqty=" + deliFremainoutqty + "]";
+		return "DeliOrder{" +
+				"fId=" + fId +
+				", fbillno='" + fbillno + '\'' +
+				", deliDate='" + deliDate + '\'' +
+				", custId=" + custId +
+				", custNumber='" + custNumber + '\'' +
+				", custName='" + custName + '\'' +
+				", deliOrgId=" + deliOrgId +
+				", deliOrgName='" + deliOrgName + '\'' +
+				", deliOrg=" + deliOrg +
+				", mtlId=" + mtlId +
+				", mtl=" + mtl +
+				", mtlFnumber='" + mtlFnumber + '\'' +
+				", mtlFname='" + mtlFname + '\'' +
+				", mtlUnitName='" + mtlUnitName + '\'' +
+				", stockId=" + stockId +
+				", stockName='" + stockName + '\'' +
+				", stock=" + stock +
+				", deliFqty=" + deliFqty +
+				", deliFremainoutqty=" + deliFremainoutqty +
+				", deliveryWay='" + deliveryWay + '\'' +
+				", isCheck=" + isCheck +
+				'}';
 	}
-	
 }

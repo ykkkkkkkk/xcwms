@@ -1,7 +1,6 @@
 package ykk.xc.com.xcwms.sales;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -18,11 +17,9 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -41,6 +38,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.basics.Box_DialogActivity;
 import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
@@ -48,9 +46,12 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.Box;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
-import ykk.xc.com.xcwms.model.sal.BoxBarCode;
+import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.BoxBarCode;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_BoxAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -59,6 +60,8 @@ public class Sal_BoxActivity extends BaseActivity {
 
     @BindView(R.id.tv_title)
     TextView tvTitle;
+    @BindView(R.id.lin_box)
+    LinearLayout linBox;
     @BindView(R.id.lin_tab1)
     LinearLayout linTab1;
     @BindView(R.id.lin_tab2)
@@ -67,6 +70,8 @@ public class Sal_BoxActivity extends BaseActivity {
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
+    @BindView(R.id.tv_box)
+    TextView tvBox;
     @BindView(R.id.et_boxCode)
     EditText etBoxCode;
     @BindView(R.id.tv_status)
@@ -93,12 +98,6 @@ public class Sal_BoxActivity extends BaseActivity {
     TextView tvCount;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @BindView(R.id.btn_del)
-    Button btnDel;
-    @BindView(R.id.btn_unSave)
-    Button btnUnSave;
-    @BindView(R.id.btn_save)
-    Button btnSave;
     @BindView(R.id.rb_type1)
     RadioButton rbType1;
     @BindView(R.id.rb_type2)
@@ -106,10 +105,11 @@ public class Sal_BoxActivity extends BaseActivity {
 
     
     private Sal_BoxActivity context = this;
-    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_NUM = 13;
-    private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504;
+    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14;
+    private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506;
     private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
     private Customer customer; // 客户
+    private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
     private Sal_BoxAdapter mAdapter;
     private char dataType = '1'; // 1：无源单，2：来源单
@@ -124,8 +124,9 @@ public class Sal_BoxActivity extends BaseActivity {
     private EditText etMtlCode2;
     private CheckBox checkClose;
     private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
-    private char status = '0'; // 箱子状态
+    private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
     private char binningType = '1'; // 1.单色装，2.混色装
+    private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
@@ -221,7 +222,7 @@ public class Sal_BoxActivity extends BaseActivity {
 //                        Comm.showWarnDialog(m.context, "服务器繁忙，请稍候再试！");
 
                         break;
-                    case MODIFY: // 修改 成功
+                    case MODIFY: // 修改状态（开箱或封箱） 成功
                         switch (m.status) {
                             case '1': // 开箱
                                 m.setEnables(m.etMtlCode,R.drawable.back_style_blue,true);
@@ -230,13 +231,39 @@ public class Sal_BoxActivity extends BaseActivity {
                                 break;
                             case '2': // 封箱
                                 m.setEnables(m.etMtlCode,R.drawable.back_style_gray3,false);
+                                m.setEnables(m.tvDeliverSel,R.drawable.back_style_gray3,false);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
 
                                 break;
                         }
 
                         break;
-                    case UNMODIFY: // 修改 失败
+                    case UNMODIFY: // 修改状态（开箱或封箱） 失败
+                        Comm.showWarnDialog(m.context,"服务器忙，请稍候操作！");
+
+                        break;
+                    case MODIFY2: // 修改发货方式 成功
+                        // 更新所有的交货方式
+                        for(int i=0, size=m.listMtl.size(); i<size; i++) {
+                            MaterialBinningRecord mbr = m.listMtl.get(i);
+                            mbr.setDeliveryWay(m.getValues(m.tvDeliverSel));
+                        }
+                        m.mAdapter.notifyDataSetChanged();
+
+                        break;
+                    case UNMODIFY2: // 修改发货方式 失败
+                        Comm.showWarnDialog(m.context,"服务器忙，请稍候操作！");
+
+                        break;
+                    case MODIFY3: // 修改条码贴到对应的箱子上  成功
+                        m.linBox.setVisibility(View.GONE);
+                        m.tvBox.setText("");
+                        m.linTab1.setEnabled(false);
+                        m.linTab2.setEnabled(false);
+                        m.getBox();
+
+                        break;
+                    case UNMODIFY3: // 修改条码贴到对应的箱子上 失败
                         Comm.showWarnDialog(m.context,"服务器忙，请稍候操作！");
 
                         break;
@@ -285,8 +312,8 @@ public class Sal_BoxActivity extends BaseActivity {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
-//                curPos = position;
-//                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", SEL_NUM);
+                curPos = position;
+                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", SEL_NUM);
             }
         });
     }
@@ -297,6 +324,7 @@ public class Sal_BoxActivity extends BaseActivity {
         hideSoftInputMode(etBoxCode);
         hideSoftInputMode(etMtlCode);
         curRadio = viewRadio1;
+        getUserInfo();
     }
 
     /**
@@ -314,7 +342,7 @@ public class Sal_BoxActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save, R.id.rb_type1, R.id.rb_type2})
+    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save, R.id.rb_type1, R.id.rb_type2, R.id.tv_box})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -343,7 +371,23 @@ public class Sal_BoxActivity extends BaseActivity {
                 showForResult(DeliveryWay_DialogActivity.class, SEL_DELI, null);
 
                 break;
+            case R.id.tv_box: // 确认箱子
+                showForResult(Box_DialogActivity.class, SEL_BOX, null);
+
+                break;
+            case R.id.btn_boxConfirm: // 确认箱子
+                if(getValues(tvBox).length() == 0) {
+                    Comm.showWarnDialog(context,"请选择箱子！");
+                    return;
+                }
+                run_modifyBoxIdByBarcode();
+
+                break;
             case R.id.btn_del: // 删除
+                if(status == '2') {
+                    Comm.showWarnDialog(context,"已经封箱，不能删除，请开箱操作！");
+                    return;
+                }
                 if(listMtl != null && listMtl.size() > 0) {
                     deleteRowDialog();
                 } else {
@@ -367,6 +411,11 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
                 if(listMtl == null || listMtl.size() == 0) {
                     Comm.showWarnDialog(context,"箱子里还没有物料不能封箱！");
+                    return;
+                }
+                if(dataType == '2' && getValues(tvDeliverSel).length() == 0) {
+                    setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
+                    Comm.showWarnDialog(context,"请选择发货方式！");
                     return;
                 }
                 status = '2';
@@ -423,6 +472,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
         listMtl.clear();
         mAdapter.notifyDataSetChanged();
+        setFocusable(etBoxCode);
     }
 
     /**
@@ -514,6 +564,7 @@ public class Sal_BoxActivity extends BaseActivity {
             etMtlCode2 = null;
             delDialog.dismiss();
             delDialog = null;
+
             isCloseDelDialog = true;
         } else {
             isCloseDelDialog = false;
@@ -578,11 +629,11 @@ public class Sal_BoxActivity extends BaseActivity {
      * 扫码物料之前的判断
      */
     private boolean smMtlBefore() {
-        if (customer == null) {
+        if (dataType == '1' && customer == null) {
             Comm.showWarnDialog(context,"请选择客户！");
             return false;
         }
-        if (assist == null) {
+        if (dataType == '1' && assist == null) {
             Comm.showWarnDialog(context,"请选择发货方式！");
             return false;
         }
@@ -619,6 +670,22 @@ public class Sal_BoxActivity extends BaseActivity {
                     Log.e("onActivityResult --> SEL_DELI", assist.getfName());
                     if (assist != null) {
                         tvDeliverSel.setText(assist.getfName());
+
+                        if(dataType == '2' && listMtl.size() > 0) {
+                            run_modifyWay();
+                        }
+                    }
+                }
+
+                break;
+            case SEL_BOX: //查询箱子	返回
+                if (resultCode == RESULT_OK) {
+                    box = (Box) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_BOX", box.getBoxName());
+                    if (box != null) {
+                        tvBox.setText(box.getBoxName());
+                        boxBarCode.setBoxId(box.getId());
+                        boxBarCode.setBox(box);
                     }
                 }
 
@@ -643,8 +710,15 @@ public class Sal_BoxActivity extends BaseActivity {
     private void getBox() {
         if(boxBarCode != null) {
             listMtl.clear();
-            setTexts(etBoxCode, boxBarCode.getBox().getBoxName());
-            strBoxBarcode = boxBarCode.getBox().getBoxName();
+            setTexts(etBoxCode, boxBarCode.getBarCode());
+            strBoxBarcode = boxBarCode.getBarCode();
+            // 箱子为空提示选择
+            if(boxBarCode.getBox() == null) {
+                linBox.setVisibility(View.VISIBLE);
+                Comm.showWarnDialog(context,"请选择箱子！");
+                return;
+            }
+
             // 把箱子里的物料显示出来
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
                 tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
@@ -654,8 +728,10 @@ public class Sal_BoxActivity extends BaseActivity {
                 // 固定当前是无源单还是有源单
                 if(mtlbr.getRelationBillId() == null || mtlbr.getRelationBillId() == 0) {
                     tabSelected(viewRadio1);
+                    dataType = '1';
                 } else {
                     tabSelected(viewRadio2);
+                    dataType = '2';
                 }
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
@@ -714,6 +790,7 @@ public class Sal_BoxActivity extends BaseActivity {
             strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
             tvCount.setText("物料数量："+size);
+            getUserInfo();
 
             MaterialBinningRecord tmpMtl = null;
             // 已装箱的物料
@@ -727,7 +804,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
                             break;
                         } else {
-                            Comm.showWarnDialog(context,"该物料已经装满");
+                            Comm.showWarnDialog(context,"第"+(i+1)+"行，物料已经装满！");
 
                             return;
                         }
@@ -752,9 +829,14 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
                 tmpMtl.setPackageWorkType(2);
                 tmpMtl.setBinningType(binningType);
-
+                tmpMtl.setCaseId(barCodeTable.getCaseId());
             }
             tmpMtl.setNumber(1);
+            tmpMtl.setBarcode(barCodeTable.getBarcode());
+            tmpMtl.setCreateUserId(user.getId());
+            tmpMtl.setCreateUserName(user.getUsername());
+            tmpMtl.setModifyUserId(user.getId());
+            tmpMtl.setModifyUserName(user.getUsername());
             // 把对象转成json字符串
             String strJson = JsonUtil.objectToString(tmpMtl);
             // 添加到箱子并返回箱子的中的物料列表
@@ -771,46 +853,128 @@ public class Sal_BoxActivity extends BaseActivity {
             strMtlBarcode = barCodeTable.getMaterialNumber();
             int size = listMtl.size();
             tvCount.setText("物料数量："+size);
+            getUserInfo();
 
             MaterialBinningRecord tmpMtl = null;
             SalOrder salOrder = null;
-            boolean orderIsnull = false; // 销售订单是否为空
+            DeliOrder deliOrder = null;
+            boolean salOrderNotnull = false; // 销售订单是否为空
+            boolean deliOrderNotnull = false; // 发货通知单是否为空
+
+            MaterialBinningRecord mtl2 = null;
+            if(size > 0) {
+                mtl2 = listMtl.get(0);
+            }
+
             // 得到销售订单
             if(barCodeTable.getRelationObj() != null && barCodeTable.getRelationObj().length() > 0) {
-                salOrder = JsonUtil.stringToObject(barCodeTable.getRelationObj(), SalOrder.class);
+                // 判断来源单是否所属同一类型，销售订单，或者发货通知单
+                if(mtl2 != null && mtl2.getCaseId() != barCodeTable.getCaseId()) { // 是否为相同订单
+                    Comm.showWarnDialog(context, "当前订单不一致，请检查！" +
+                            "（已装箱为："+(mtl2.getCaseId() == 32 ? "销售订单" : "发货通知单")+"，" +
+                            "当前扫码为："+(barCodeTable.getCaseId() == 32 ? "销售订单" : "发货通知单")+"）");
+                    return;
+                }
+
+                //  得到对象    销售订单、发货通知单
+                switch (barCodeTable.getCaseId()) {
+                    case 32: // 销售订单
+                        salOrder = JsonUtil.stringToObject(barCodeTable.getRelationObj(), SalOrder.class);
+
+                        break;
+                    case 33: // 发货通知单
+                        deliOrder = JsonUtil.stringToObject(barCodeTable.getRelationObj(), DeliOrder.class);
+
+                        break;
+                }
             }
-            orderIsnull = salOrder == null;
+            // 对象是否为空
+            salOrderNotnull = salOrder != null;
+            deliOrderNotnull = deliOrder != null;
+
+            // 带上客户和发货方式
+            if(getValues(tvCustSel).length() == 0) {
+                if(customer == null) customer = new Customer();
+                customer.setFcustId(salOrderNotnull ? salOrder.getCustId() : deliOrder.getCustId());
+                customer.setCustomerName(salOrderNotnull ? salOrder.getCustName() : deliOrder.getCustName());
+                tvCustSel.setText(customer.getCustomerName());
+                //                setEnables(tvCustSel, R.drawable.back_style_blue, true);
+            }
+            if(getValues(tvDeliverSel).length() == 0) {
+                // 显示交货方式
+                if(assist == null) assist = new AssistInfo();
+                assist.setfName(salOrderNotnull ? salOrder.getDeliveryWay() : deliOrder.getDeliveryWay());
+                tvDeliverSel.setText(assist.getfName());
+//                setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
+            }
+
+            // 判断客户和发货方式是否一致
+            switch (barCodeTable.getCaseId()) {
+                case 32: // 销售订单
+                    if(salOrderNotnull && mtl2 != null && mtl2.getCustomerId() != salOrder.getCustId()) {
+                        Comm.showWarnDialog(context, "客户不一致，不能装箱！");
+                        return;
+                    }
+                    if(salOrderNotnull && mtl2 != null && isNULLS(mtl2.getDeliveryWay()).length() > 0 && mtl2.getDeliveryWay() != mtl2.getDeliveryWay()) {
+                        Comm.showWarnDialog(context, "发货方式不一致，不能装箱！");
+                        return;
+                    }
+
+                    break;
+                case 33: // 发货通知单
+                    if(deliOrderNotnull && mtl2 != null && mtl2.getCustomerId() != deliOrder.getCustId()) {
+                        Comm.showWarnDialog(context, "客户不一致，不能装箱！");
+                        return;
+                    }
+                    if(deliOrderNotnull && mtl2 != null && isNULLS(mtl2.getDeliveryWay()).length() > 0 && mtl2.getDeliveryWay() != mtl2.getDeliveryWay()) {
+                        Comm.showWarnDialog(context, "发货方式不一致，不能装箱！");
+                        return;
+                    }
+
+                    break;
+            }
+
             // 已装箱的物料
             if(size > 0) {
-
-
-                MaterialBinningRecord mtl2 = listMtl.get(0);
-                if(orderIsnull && mtl2.getCustomerId() != salOrder.getCustId()) {
-                    Comm.showWarnDialog(context, "客户不一致，不能装箱！");
-                    return;
-                }
-                if(orderIsnull && mtl2.getDeliveryWay().length() > 0 && mtl2.getDeliveryWay() != mtl2.getDeliveryWay()) {
-                    Comm.showWarnDialog(context, "发货方式不一致，不能装箱！");
-                    return;
-                }
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMtl.get(i);
-                    if(orderIsnull && salOrder.getMtlId() == forMtl.getMaterialId()) {
-                        if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
-                            tmpMtl = forMtl;
 
-                            break;
-                        } else {
-                            Comm.showWarnDialog(context,"该物料已经装满");
+                    // 判断物料是否装满，单色装或者混色装
+                    if(barCodeTable.getCaseId() == 32) { // 销售订单
+                        if(salOrderNotnull && salOrder.getfId() == forMtl.getRelationBillId() && salOrder.getMtlId() == forMtl.getMaterialId()) {
+                            if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
+                                tmpMtl = forMtl;
+                                break;
+                            } else {
+                                Comm.showWarnDialog(context,"第"+(i+1)+"行，物料已经装满！");
 
-                            return;
+                                return;
+                            }
+                        }  else {
+                            if(binningType == '1') {
+                                Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                                return;
+                            }
                         }
-                    } else {
-                        if(binningType == '1') {
-                            Comm.showWarnDialog(context,"单色装只能装一种物料！");
-                            return;
+
+                    } else if(barCodeTable.getCaseId() == 32) { // 发货通知单
+                        if(deliOrderNotnull && deliOrder.getfId() == forMtl.getRelationBillId() && deliOrder.getMtlId() == forMtl.getMaterialId()) {
+                            if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
+                                tmpMtl = forMtl;
+                                break;
+                            } else {
+                                Comm.showWarnDialog(context,"第"+(i+1)+"行，物料已经装满！");
+
+                                return;
+                            }
+                        }  else {
+                            if(binningType == '1') {
+                                Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                                return;
+                            }
                         }
+
                     }
                 }
             }
@@ -827,8 +991,14 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
                 tmpMtl.setPackageWorkType(2);
                 tmpMtl.setBinningType(binningType);
+                tmpMtl.setCaseId(barCodeTable.getCaseId());
             }
             tmpMtl.setNumber(1);
+            tmpMtl.setBarcode(barCodeTable.getBarcode());
+            tmpMtl.setCreateUserId(user.getId());
+            tmpMtl.setCreateUserName(user.getUsername());
+            tmpMtl.setModifyUserId(user.getId());
+            tmpMtl.setModifyUserName(user.getUsername());
             // 把对象转成json字符串
             String strJson = JsonUtil.objectToString(tmpMtl);
             run_save(strJson);
@@ -892,11 +1062,11 @@ public class Sal_BoxActivity extends BaseActivity {
                 barcode = strBoxBarcode;
                 break;
             case '2': // 物料扫码
-                mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
+                mUrl = Consts.getURL("barCodeTable/findBarcodeByParam");
                 barcode = strMtlBarcode;
                 break;
             case '3': // 删除物料扫码
-                mUrl = Consts.getURL("barCodeTable/findBarCodeTable2ByParam");
+                mUrl = Consts.getURL("barCodeTable/findBarcodeByParam");
                 barcode = strMtlBarcode_del;
                 break;
         }
@@ -982,6 +1152,49 @@ public class Sal_BoxActivity extends BaseActivity {
     }
 
     /**
+     * 修改发货方式
+     */
+    private void run_modifyWay() {
+        showLoadDialog("加载中...");
+        String mUrl = Consts.getURL("materialBinningRecord/modifyDeliveryway");
+        MaterialBinningRecord mtl = new MaterialBinningRecord();
+
+        FormBody formBody = new FormBody.Builder()
+                .add("boxBarCodeId", String.valueOf(boxBarCode.getId()))
+                .add("deliveryWay", getValues(tvDeliverSel))
+                .add("userId", String.valueOf(user.getId()))
+                .add("userName", user.getUsername())
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNMODIFY2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    mHandler.sendEmptyMessage(UNMODIFY2);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(MODIFY2, result);
+                Log.e("run_modifyWay --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
      * 删除的方法
      */
     private void run_delete(String json) {
@@ -1057,10 +1270,60 @@ public class Sal_BoxActivity extends BaseActivity {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(MODIFY, result);
-                Log.e("run_delete --> onResponse", result);
+                Log.e("run_modifyStatus --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
+    }
+
+    /**
+     * 修改对应的箱子
+     */
+    private void run_modifyBoxIdByBarcode() {
+        showLoadDialog("加载中...");
+        String mUrl = Consts.getURL("boxBarCode/modifyBoxIdByBarcode");
+        MaterialBinningRecord mtl = new MaterialBinningRecord();
+
+        FormBody formBody = new FormBody.Builder()
+                .add("boxId", String.valueOf(boxBarCode.getBoxId()))
+                .add("barCode", boxBarCode.getBarCode())
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNMODIFY3);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    mHandler.sendEmptyMessage(UNMODIFY3);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(MODIFY3, result);
+                Log.e("run_modifyBoxIdByBarcode --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     *  得到用户对象
+     */
+    private void getUserInfo() {
+        if(user == null) {
+            user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+        }
     }
 
     @Override

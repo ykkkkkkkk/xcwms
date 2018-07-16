@@ -27,17 +27,19 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.basics.adapter.Box_DialogAdapter;
 import ykk.xc.com.xcwms.basics.adapter.Cust_DialogAdapter;
 import ykk.xc.com.xcwms.comm.BaseDialogActivity;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.comm.OnItemClickListener2;
-import ykk.xc.com.xcwms.model.Customer;
+import ykk.xc.com.xcwms.model.Box;
+import ykk.xc.com.xcwms.model.Box;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 /**
- * 选择组织dialog
+ * 选择箱子dialog
  */
-public class Cust_DialogActivity extends BaseDialogActivity {
+public class Box_DialogActivity extends BaseDialogActivity {
 
     @BindView(R.id.btn_close)
     Button btnClose;
@@ -48,29 +50,29 @@ public class Cust_DialogActivity extends BaseDialogActivity {
     @BindView(R.id.btn_search)
     Button btnSearch;
 
-    private Cust_DialogActivity context = this;
+    private Box_DialogActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501;
-    private List<Customer> listDatas = new ArrayList<>();
-    private Cust_DialogAdapter mAdapter;
+    private List<Box> listDatas = new ArrayList<>();
+    private Box_DialogAdapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Cust_DialogActivity> mActivity;
+        private final WeakReference<Box_DialogActivity> mActivity;
 
-        public MyHandler(Cust_DialogActivity activity) {
-            mActivity = new WeakReference<Cust_DialogActivity>(activity);
+        public MyHandler(Box_DialogActivity activity) {
+            mActivity = new WeakReference<Box_DialogActivity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Cust_DialogActivity m = mActivity.get();
+            Box_DialogActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<Customer> list = JsonUtil.strToList((String) msg.obj, Customer.class);
+                        List<Box> list = JsonUtil.strToList((String) msg.obj, Box.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
@@ -87,20 +89,20 @@ public class Cust_DialogActivity extends BaseDialogActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.ab_cust_dialog;
+        return R.layout.ab_box_dialog;
     }
 
     @Override
     public void initView() {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Cust_DialogAdapter(context, listDatas);
+        mAdapter = new Box_DialogAdapter(context, listDatas);
         recyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(new OnItemClickListener2() {
             @Override
             public void onItemClick(View view, int pos) {
-                Customer cust = listDatas.get(pos);
+                Box cust = listDatas.get(pos);
                 Intent intent = new Intent();
                 intent.putExtra("obj", cust);
                 context.setResult(RESULT_OK, intent);
@@ -137,9 +139,9 @@ public class Cust_DialogActivity extends BaseDialogActivity {
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findCustomerByParam");
+        String mUrl = Consts.getURL("box/findBoxByParam");
         FormBody formBody = new FormBody.Builder()
-                .add("fNumberAndName", getValues(etSearch).trim())
+                .add("NameAndSize", getValues(etSearch).trim())
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
@@ -166,7 +168,7 @@ public class Cust_DialogActivity extends BaseDialogActivity {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Cust_DialogActivity --> onResponse", result);
+                Log.e("Box_DialogActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

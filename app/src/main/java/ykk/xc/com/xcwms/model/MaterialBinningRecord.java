@@ -2,8 +2,6 @@ package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
 
-import ykk.xc.com.xcwms.model.sal.BoxBarCode;
-
 /**
  * 物料装箱记录类
  * @author Administrator
@@ -19,6 +17,8 @@ public class MaterialBinningRecord implements Serializable {
 	private BoxBarCode boxBarCode;
 	/*物料id*/
 	private Integer materialId;
+	/* 对应t_barCodeTable 表中的barcode字段  */
+	private String barcode;
 	/*物料类*/
 	private Material material;
 	/*箱子里装入物料的数量*/
@@ -44,103 +44,223 @@ public class MaterialBinningRecord implements Serializable {
 	private Integer packageWorkType;
 	/* 物料包装类型（1：单色装，2：混色装 */
 	private char binningType;
+	/* 方案id */
+	/**
+	 * 11代表物料
+	 * 12代表仓库
+	 * 13代表库区
+	 * 14代表库位
+	 * 15代表部门
+	 * 31代表采购订单
+	 * 32代表销售订单
+	 * 33代表发货通知单
+	 * 34代表生产任务单
+	 * 35代码采购装箱
+	 */
+	private int caseId;
+	/* 创建日期  */
+	private String createDate;
+	/* 创建人id  */
+	private int	createUserId;
+	/* 创建人名称  */
+	private String createUserName;
+	/* 修改日期  */
+	private String modifyDate;
+	/* 修改人id  */
+	private int	modifyUserId;
+	/* 修改人名称  */
+	private String modifyUserName;
+
+	public MaterialBinningRecord() {
+		super();
+	}
 
 	public Integer getId() {
 		return id;
 	}
-	public void setId(Integer id) {
-		this.id = id;
-	}
+
 	public Integer getBoxBarCodeId() {
 		return boxBarCodeId;
 	}
-	public void setBoxBarCodeId(Integer boxBarCodeId) {
-		this.boxBarCodeId = boxBarCodeId;
-	}
+
 	public BoxBarCode getBoxBarCode() {
 		return boxBarCode;
 	}
-	public void setBoxBarCode(BoxBarCode boxBarCode) {
-		this.boxBarCode = boxBarCode;
-	}
+
 	public Integer getMaterialId() {
 		return materialId;
 	}
-	public void setMaterialId(Integer materialId) {
-		this.materialId = materialId;
+
+	public String getBarcode() {
+		return barcode;
 	}
+
 	public Material getMaterial() {
 		return material;
 	}
-	public void setMaterial(Material material) {
-		this.material = material;
-	}
+
 	public double getNumber() {
 		return number;
 	}
-	public void setNumber(double number) {
-		this.number = number;
-	}
+
 	public Integer getRelationBillId() {
 		return relationBillId;
 	}
-	public void setRelationBillId(Integer relationBillId) {
-		this.relationBillId = relationBillId;
-	}
+
 	public String getRelationBillNumber() {
 		return relationBillNumber;
 	}
-	public void setRelationBillNumber(String relationBillNumber) {
-		this.relationBillNumber = relationBillNumber;
-	}
+
 	public Integer getCustomerId() {
 		return customerId;
 	}
-	public void setCustomerId(Integer customerId) {
-		this.customerId = customerId;
-	}
+
 	public Customer getCustomer() {
 		return customer;
 	}
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+
 	public Integer getExpressType() {
 		return expressType;
 	}
-	public void setExpressType(Integer expressType) {
-		this.expressType = expressType;
-	}
-	public Integer getPackageWorkType() {
-		return packageWorkType;
-	}
-	public void setPackageWorkType(Integer packageWorkType) {
-		this.packageWorkType = packageWorkType;
-	}
+
 	public String getDeliveryWay() {
 		return deliveryWay;
 	}
-	public void setDeliveryWay(String deliveryWay) {
-		this.deliveryWay = deliveryWay;
+
+	public Integer getPackageWorkType() {
+		return packageWorkType;
 	}
+
 	public char getBinningType() {
 		return binningType;
 	}
+
+	public int getCaseId() {
+		return caseId;
+	}
+
+	public String getCreateDate() {
+		return createDate;
+	}
+
+	public int getCreateUserId() {
+		return createUserId;
+	}
+
+	public String getCreateUserName() {
+		return createUserName;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public void setBoxBarCodeId(Integer boxBarCodeId) {
+		this.boxBarCodeId = boxBarCodeId;
+	}
+
+	public void setBoxBarCode(BoxBarCode boxBarCode) {
+		this.boxBarCode = boxBarCode;
+	}
+
+	public void setMaterialId(Integer materialId) {
+		this.materialId = materialId;
+	}
+
+	public void setBarcode(String barcode) {
+		this.barcode = barcode;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+
+	public void setNumber(double number) {
+		this.number = number;
+	}
+
+	public void setRelationBillId(Integer relationBillId) {
+		this.relationBillId = relationBillId;
+	}
+
+	public void setRelationBillNumber(String relationBillNumber) {
+		this.relationBillNumber = relationBillNumber;
+	}
+
+	public void setCustomerId(Integer customerId) {
+		this.customerId = customerId;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+	public void setExpressType(Integer expressType) {
+		this.expressType = expressType;
+	}
+
+	public void setDeliveryWay(String deliveryWay) {
+		this.deliveryWay = deliveryWay;
+	}
+
+	public void setPackageWorkType(Integer packageWorkType) {
+		this.packageWorkType = packageWorkType;
+	}
+
 	public void setBinningType(char binningType) {
 		this.binningType = binningType;
+	}
+
+	public void setCaseId(int caseId) {
+		this.caseId = caseId;
+	}
+
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+
+	public void setCreateUserId(int createUserId) {
+		this.createUserId = createUserId;
+	}
+
+	public void setCreateUserName(String createUserName) {
+		this.createUserName = createUserName;
+	}
+
+	public String getModifyDate() {
+		return modifyDate;
+	}
+
+	public int getModifyUserId() {
+		return modifyUserId;
+	}
+
+	public String getModifyUserName() {
+		return modifyUserName;
+	}
+
+	public void setModifyDate(String modifyDate) {
+		this.modifyDate = modifyDate;
+	}
+
+	public void setModifyUserId(int modifyUserId) {
+		this.modifyUserId = modifyUserId;
+	}
+
+	public void setModifyUserName(String modifyUserName) {
+		this.modifyUserName = modifyUserName;
 	}
 
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", material=" + material + ", number=" + number + ", relationBillId="
-				+ relationBillId + ", relationBillNumber=" + relationBillNumber + ", customerId=" + customerId
-				+ ", customer=" + customer + ", expressType=" + expressType + ", deliveryWay=" + deliveryWay
-				+ ", packageWorkType=" + packageWorkType + ", binningType=" + binningType + "]";
-	}
-
-	public MaterialBinningRecord() {
-		super();
+				+ ", materialId=" + materialId + ", barcode=" + barcode + ", material=" + material + ", number="
+				+ number + ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber
+				+ ", customerId=" + customerId + ", customer=" + customer + ", expressType=" + expressType
+				+ ", deliveryWay=" + deliveryWay + ", packageWorkType=" + packageWorkType + ", binningType="
+				+ binningType + ", caseId=" + caseId + ", createDate=" + createDate + ", createUserId=" + createUserId
+				+ ", createUserName=" + createUserName + ", modifyDate=" + modifyDate + ", modifyUserId=" + modifyUserId
+				+ ", modifyUserName=" + modifyUserName + "]";
 	}
 
 }

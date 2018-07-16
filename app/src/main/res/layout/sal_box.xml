@@ -89,6 +89,52 @@
 
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/lin_box"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginBottom="@dimen/_6dp"
+        android:layout_marginLeft="@dimen/_6dp"
+        android:layout_marginRight="@dimen/_6dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:ems="2"
+            android:gravity="center"
+            android:text="箱子"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_box"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:background="@drawable/back_style_blue"
+            android:drawableRight="@drawable/xiala4"
+            android:hint="请选择箱子"
+            android:paddingLeft="2dp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sp" />
+
+        <Button
+            android:id="@+id/btn_boxConfirm"
+            android:layout_width="@dimen/_62dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_6dp"
+            android:background="@drawable/btn_blue_selector"
+            android:gravity="center"
+            android:text="确认"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -375,10 +421,10 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/btn_radio_left_selector"
+                android:button="@null"
+                android:checked="true"
                 android:gravity="center"
                 android:text="单色装"
-                android:checked="true"
-                android:button="@null"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_14sp" />
 
@@ -387,10 +433,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:checked="false"
                 android:background="@drawable/btn_radio_right_selector"
-                android:gravity="center"
                 android:button="@null"
+                android:checked="false"
+                android:gravity="center"
                 android:text="混色装"
                 android:textColor="@color/c_666666"
                 android:textSize="@dimen/_14sp" />
