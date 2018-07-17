@@ -154,7 +154,7 @@
                 android:layout_below="@+id/tvImg5"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="产品包装"
+                android:text="销售装箱"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

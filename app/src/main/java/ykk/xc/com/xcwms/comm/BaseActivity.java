@@ -259,7 +259,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 	 * @param obj
 	 * @return
 	 */
-	public String isNULLS(String obj) {
+	public String isNULLS(Object obj) {
 		return (obj != null && !obj.equals("null")) ? obj.toString() : "";
 	}
 	public String isNULLS(JSONObject json, String key) throws JSONException {
@@ -305,7 +305,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 	/**
 	 * 数字字符串转成Int 如果Integer.parseInt(null);这个是报空指针异常
 	 */
-	public int parseInt(String obj) {
+	public int parseInt(Object obj) {
 		try {
 			String result = isNULLS(obj);
 			return result.length() > 0 ? Integer.parseInt(result) : 0;

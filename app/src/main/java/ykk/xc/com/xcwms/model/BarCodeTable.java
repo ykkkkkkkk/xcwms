@@ -42,6 +42,7 @@ public class BarCodeTable implements Serializable {
 	private String materialNumber;
 	/*物料名称*/
 	private String materialName;
+	private Material mtl;
 	/*条码*/
 	private String barcode;
 	/*是否绑定*/
@@ -54,6 +55,13 @@ public class BarCodeTable implements Serializable {
 	private MaterialPack mtlPack;
 	/* 关联单据Json对象 */
 	private String relationObj;
+	/*物料计量单位数量*/
+	private double materialCalculateNumber;
+	private MaterialBinningRecord mbr;
+
+	public BarCodeTable() {
+		super();
+	}
 
 	public Integer getId() {
 		return id;
@@ -127,33 +135,41 @@ public class BarCodeTable implements Serializable {
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
 	}
-
 	public Integer getIsBinding() {
 		return isBinding;
 	}
-
 	public void setIsBinding(Integer isBinding) {
 		this.isBinding = isBinding;
 	}
-
 	public MaterialPack getMtlPack() {
 		return mtlPack;
 	}
-
 	public void setMtlPack(MaterialPack mtlPack) {
 		this.mtlPack = mtlPack;
 	}
-
-	public BarCodeTable() {
-		super();
-	}
-
 	public String getRelationObj() {
 		return relationObj;
 	}
-
 	public void setRelationObj(String relationObj) {
 		this.relationObj = relationObj;
+	}
+	public double getMaterialCalculateNumber() {
+		return materialCalculateNumber;
+	}
+	public void setMaterialCalculateNumber(double materialCalculateNumber) {
+		this.materialCalculateNumber = materialCalculateNumber;
+	}
+	public MaterialBinningRecord getMbr() {
+		return mbr;
+	}
+	public void setMbr(MaterialBinningRecord mbr) {
+		this.mbr = mbr;
+	}
+	public Material getMtl() {
+		return mtl;
+	}
+	public void setMtl(Material mtl) {
+		this.mtl = mtl;
 	}
 
 	@Override
@@ -161,8 +177,9 @@ public class BarCodeTable implements Serializable {
 		return "BarCodeTable [id=" + id + ", snCode=" + snCode + ", caseId=" + caseId + ", batchCode=" + batchCode
 				+ ", createDateTime=" + createDateTime + ", relationBillId=" + relationBillId + ", relationBillNumber="
 				+ relationBillNumber + ", printNumber=" + printNumber + ", materialId=" + materialId
-				+ ", materialNumber=" + materialNumber + ", materialName=" + materialName + ", barcode=" + barcode
-				+ ", isBinding=" + isBinding + ", mtlPack=" + mtlPack + ", relationObj=" + relationObj + "]";
+				+ ", materialNumber=" + materialNumber + ", materialName=" + materialName + ", mtl=" + mtl
+				+ ", barcode=" + barcode + ", isBinding=" + isBinding + ", mtlPack=" + mtlPack + ", relationObj="
+				+ relationObj + ", materialCalculateNumber=" + materialCalculateNumber + ", mbr=" + mbr + "]";
 	}
 
 }

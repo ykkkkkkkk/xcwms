@@ -47,7 +47,7 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
             tv_num.setBackgroundResource(R.drawable.back_style_gray2a);
             tv_num.setEnabled(false);
         } else {
-            tv_num.setBackgroundResource(R.drawable.back_style_gray8);
+            tv_num.setBackgroundResource(R.drawable.back_style_blue2);
             tv_num.setEnabled(true);
         }
         tv_custName.setText(entity.getCustomer().getCustomerName());
