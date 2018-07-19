@@ -18,6 +18,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Pur_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
+import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
 public class MainTabFragment1 extends BaseFragment {
@@ -46,19 +47,24 @@ public class MainTabFragment1 extends BaseFragment {
         return inflater.inflate(R.layout.aa_main_item1, container, false);
     }
 
-    @OnClick({R.id.relative1, R.id.relative2, R.id.relative3})
+    @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.relative1:
+            case R.id.relative1: // 采购订单
                 show(Pur_OrderSearchActivity.class, null);
 
                 break;
-            case R.id.relative2:
+            case R.id.relative2: // 外购入库
                 show(Pur_InActivity.class, null);
 
                 break;
-            case R.id.relative3:
+            case R.id.relative3: // 产品入库
                 showLoadDialog("连接服务器...");
+
+                break;
+            case R.id.relative4: // 生产装箱
+                show(Pur_ProdBoxFragmentActivity.class, null);
+
                 break;
         }
     }

@@ -7,16 +7,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PurPoOrder;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder> {
+public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<PurPoOrder> datas;
+    private List<PurOrder> datas;
 
-    public Pur_OrderSearchAdapter(Activity context, List<PurPoOrder> datas) {
+    public Pur_OrderSearchAdapter(Activity context, List<PurOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -28,7 +28,7 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, PurPoOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, PurOrder entity, final int pos) {
         // 初始化id
         TextView tv1 = holder.obtainView(R.id.tv1);
         TextView tv2 = holder.obtainView(R.id.tv2);
@@ -58,7 +58,7 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurPoOrder>
     }
 
     public interface MyCallBack {
-        void onClick(PurPoOrder entity, int position);
+        void onClick(PurOrder entity, int position);
     }
 
 

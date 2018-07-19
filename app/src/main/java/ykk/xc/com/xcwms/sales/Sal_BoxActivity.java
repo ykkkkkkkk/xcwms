@@ -367,13 +367,13 @@ public class Sal_BoxActivity extends BaseActivity {
             case R.id.lin_tab1:
                 dataType = '1';
                 tabSelected(viewRadio1);
-                tvTitle.setText("产品装箱-无源单");
+                tvTitle.setText("销售装箱-无源单");
 
                 break;
             case R.id.lin_tab2:
                 dataType = '2';
                 tabSelected(viewRadio2);
-                tvTitle.setText("产品装箱-有源单");
+                tvTitle.setText("销售装箱-有源单");
 
                 break;
             case R.id.tv_custSel: // 选择客户
@@ -384,7 +384,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 showForResult(DeliveryWay_DialogActivity.class, SEL_DELI, null);
 
                 break;
-            case R.id.tv_box: // 确认箱子
+            case R.id.tv_box: // 选择箱子
                 showForResult(Box_DialogActivity.class, SEL_BOX, null);
 
                 break;
@@ -730,7 +730,14 @@ public class Sal_BoxActivity extends BaseActivity {
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
                 linBox.setVisibility(View.VISIBLE);
-                Comm.showWarnDialog(context,"请选择箱子！");
+                tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
+                tvBoxName.setText("");
+                tvBoxSize.setText("");
+                tvBoxLength.setText("");
+                tvBoxWidth.setText("");
+                tvBoxAltitude.setText("");
+                tvBoxVolume.setText("");
+                Comm.showWarnDialog(context,"请选择包装箱！");
                 return;
             }
 
@@ -828,7 +835,7 @@ public class Sal_BoxActivity extends BaseActivity {
 //                        }
                     } else {
                         if(binningType == '1') {
-                            Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                            Comm.showWarnDialog(context,"单装只能装一种物料！");
                             return;
                         }
                     }
@@ -958,7 +965,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMtl.get(i);
 
-                    // 判断物料是否装满，单色装或者混色装
+                    // 判断物料是否装满，单装或者混装
                     if(barCodeTable.getCaseId() == 32) { // 销售订单
                         if(salOrderNotnull && salOrder.getfId() == forMtl.getRelationBillId() && salOrder.getMtlId() == forMtl.getMaterialId()) {
                             if(forMtl.getMaterial().getIsSnManager() == 0) {
@@ -974,7 +981,7 @@ public class Sal_BoxActivity extends BaseActivity {
 //                            }
                         }  else {
                             if(binningType == '1') {
-                                Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                                Comm.showWarnDialog(context,"单装只能装一种物料！");
                                 return;
                             }
                         }
@@ -994,7 +1001,7 @@ public class Sal_BoxActivity extends BaseActivity {
 //                            }
                         }  else {
                             if(binningType == '1') {
-                                Comm.showWarnDialog(context,"单色装只能装一种物料！");
+                                Comm.showWarnDialog(context,"单装只能装一种物料！");
                                 return;
                             }
                         }

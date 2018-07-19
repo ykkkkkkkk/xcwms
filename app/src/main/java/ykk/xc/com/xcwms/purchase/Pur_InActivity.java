@@ -55,7 +55,7 @@ import ykk.xc.com.xcwms.model.StockArea;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.User;
-import ykk.xc.com.xcwms.model.pur.PurPoOrder;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_InAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -221,7 +221,7 @@ public class Pur_InActivity extends BaseActivity {
 
                                 break;
                             case '6':
-                                List<PurPoOrder> list = JsonUtil.strToList2((String) msg.obj, PurPoOrder.class);
+                                List<PurOrder> list = JsonUtil.strToList2((String) msg.obj, PurOrder.class);
                                 m.getSourceAfter(list, true);
 
                                 break;
@@ -854,7 +854,7 @@ public class Pur_InActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
-                        List<PurPoOrder> list = (List<PurPoOrder>) bundle.getSerializable("checkDatas");
+                        List<PurOrder> list = (List<PurOrder>) bundle.getSerializable("checkDatas");
                         getSourceAfter(list, false);
                     }
                 }
@@ -989,9 +989,9 @@ public class Pur_InActivity extends BaseActivity {
     /**
      * 选择来源单返回
      */
-    private void getSourceAfter(List<PurPoOrder> list, boolean isSaoma) {
+    private void getSourceAfter(List<PurOrder> list, boolean isSaoma) {
         for (int i = 0, size = list.size(); i < size; i++) {
-            PurPoOrder p = list.get(i);
+            PurOrder p = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setType(1);
             sr2.setSourceFinterId(p.getfId());

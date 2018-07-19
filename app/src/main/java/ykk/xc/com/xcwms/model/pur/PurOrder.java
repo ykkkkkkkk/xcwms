@@ -5,7 +5,7 @@ import java.io.Serializable;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 
-public class PurPoOrder implements Serializable {
+public class PurOrder implements Serializable {
     private int fId; // 单据id,
     private String fbillno; // 单据编号,
     private int supplierId; // 供应商Id,
@@ -190,7 +190,7 @@ public class PurPoOrder implements Serializable {
         this.mtl = mtl;
     }
 
-    public PurPoOrder() {
+    public PurOrder() {
         super();
     }
 

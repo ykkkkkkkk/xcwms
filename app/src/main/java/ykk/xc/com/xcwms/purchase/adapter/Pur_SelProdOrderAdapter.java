@@ -8,16 +8,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PurOrder;
+import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
+public class Pur_SelProdOrderAdapter extends BaseArrayRecyclerAdapter<ProdOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<PurOrder> datas;
+    private List<ProdOrder> datas;
 
-    public Pur_SelOrderAdapter(Activity context, List<PurOrder> datas) {
+    public Pur_SelProdOrderAdapter(Activity context, List<ProdOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -25,52 +25,25 @@ public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_sel_order_item;
+        return R.layout.pur_sel_prod_order_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, PurOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, ProdOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_date = holder.obtainView(R.id.tv_date);
             TextView tv_stNo = holder.obtainView(R.id.tv_stNo);
             TextView tv_mts = holder.obtainView(R.id.tv_mts);
             TextView tv_numUnit = holder.obtainView(R.id.tv_numUnit);
-            TextView tv_check = holder.obtainView(R.id.tv_check);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_date.setText(entity.getPoFdate());
+            tv_date.setText(entity.getProdFdate());
             tv_stNo.setText(entity.getFbillno());
-//            tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
             tv_mts.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
             String unitName = entity.getUnitFname();
-            String num1 = df.format(entity.getPoFqty()-entity.getPoFstockinqty());
-            tv_numUnit.setText(num1+""+unitName);
-            if(entity.getIsCheck() == 1) {
-                tv_check.setBackgroundResource(R.drawable.check_true);
-            } else {
-                tv_check.setBackgroundResource(R.drawable.check_false);
-            }
-            View.OnClickListener click = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switch (v.getId()){
-                        case R.id.tv_check: // 选中
-//                            if(callBack != null) {
-//                                callBack.onClick(entity, pos);
-//                            }
-                            int check = datas.get(pos).getIsCheck();
-                            if (check == 1) {
-                                datas.get(pos).setIsCheck(0);
-                            } else {
-                                datas.get(pos).setIsCheck(1);
-                            }
-                            notifyDataSetChanged();
-                            break;
-                    }
-                }
-            };
-            tv_check.setOnClickListener(click);
+            String num1 = df.format(entity.getProdFqty());
+            tv_numUnit.setText(num1+"/"+unitName);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -78,14 +51,8 @@ public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
     }
 
     public interface MyCallBack {
-        void onClick(PurOrder entity, int position);
+        void onClick(ProdOrder entity, int position);
     }
-
-
-
-
-
-
 
     /*之下的方法都是为了方便操作，并不是必须的*/
 

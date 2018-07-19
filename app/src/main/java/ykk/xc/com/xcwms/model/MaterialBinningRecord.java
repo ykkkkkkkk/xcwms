@@ -19,6 +19,10 @@ public class MaterialBinningRecord implements Serializable {
 	private Integer materialId;
 	/* 对应t_barCodeTable 表中的barcode字段  */
 	private String barcode;
+	/* 对应t_barCodeTable 表中的batchCode字段  */
+	private String batchCode;
+	/* 对应t_barCodeTable 表中的snCode字段  */
+	private String snCode;
 	/*物料类*/
 	private Material material;
 	/*箱子里装入物料的数量*/
@@ -42,7 +46,7 @@ public class MaterialBinningRecord implements Serializable {
 	 * 2代表销售出库
 	 * */
 	private Integer packageWorkType;
-	/* 物料包装类型（1：单色装，2：混色装 */
+	/* 物料包装类型（1：单装，2：混装，3：自由装） */
 	private char binningType;
 	/* 方案id */
 	/**
@@ -93,6 +97,14 @@ public class MaterialBinningRecord implements Serializable {
 
 	public String getBarcode() {
 		return barcode;
+	}
+
+	public String getBatchCode() {
+		return batchCode;
+	}
+
+	public String getSnCode() {
+		return snCode;
 	}
 
 	public Material getMaterial() {
@@ -151,6 +163,18 @@ public class MaterialBinningRecord implements Serializable {
 		return createUserName;
 	}
 
+	public String getModifyDate() {
+		return modifyDate;
+	}
+
+	public int getModifyUserId() {
+		return modifyUserId;
+	}
+
+	public String getModifyUserName() {
+		return modifyUserName;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -169,6 +193,14 @@ public class MaterialBinningRecord implements Serializable {
 
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
+	}
+
+	public void setBatchCode(String batchCode) {
+		this.batchCode = batchCode;
+	}
+
+	public void setSnCode(String snCode) {
+		this.snCode = snCode;
 	}
 
 	public void setMaterial(Material material) {
@@ -227,18 +259,6 @@ public class MaterialBinningRecord implements Serializable {
 		this.createUserName = createUserName;
 	}
 
-	public String getModifyDate() {
-		return modifyDate;
-	}
-
-	public int getModifyUserId() {
-		return modifyUserId;
-	}
-
-	public String getModifyUserName() {
-		return modifyUserName;
-	}
-
 	public void setModifyDate(String modifyDate) {
 		this.modifyDate = modifyDate;
 	}
@@ -254,13 +274,12 @@ public class MaterialBinningRecord implements Serializable {
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", barcode=" + barcode + ", material=" + material + ", number="
-				+ number + ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber
-				+ ", customerId=" + customerId + ", customer=" + customer + ", expressType=" + expressType
-				+ ", deliveryWay=" + deliveryWay + ", packageWorkType=" + packageWorkType + ", binningType="
-				+ binningType + ", caseId=" + caseId + ", createDate=" + createDate + ", createUserId=" + createUserId
-				+ ", createUserName=" + createUserName + ", modifyDate=" + modifyDate + ", modifyUserId=" + modifyUserId
-				+ ", modifyUserName=" + modifyUserName + "]";
+				+ ", materialId=" + materialId + ", barcode=" + barcode + ", batchCode=" + batchCode + ", snCode="
+				+ snCode + ", material=" + material + ", number=" + number + ", relationBillId=" + relationBillId
+				+ ", relationBillNumber=" + relationBillNumber + ", customerId=" + customerId + ", customer=" + customer
+				+ ", expressType=" + expressType + ", deliveryWay=" + deliveryWay + ", packageWorkType="
+				+ packageWorkType + ", binningType=" + binningType + ", caseId=" + caseId + ", createDate=" + createDate
+				+ ", createUserId=" + createUserId + ", createUserName=" + createUserName + ", modifyDate=" + modifyDate
+				+ ", modifyUserId=" + modifyUserId + ", modifyUserName=" + modifyUserName + "]";
 	}
-
 }

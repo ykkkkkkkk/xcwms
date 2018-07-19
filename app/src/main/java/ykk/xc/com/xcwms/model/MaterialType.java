@@ -1,11 +1,14 @@
 package ykk.xc.com.xcwms.model;
+
+import java.io.Serializable;
+
 /**
  * @author King
  * @version 创建时间：2018年6月7日 下午3:56:23
  * @ClassName
  * @Description 物料类别表
  */
-public class MaterialType {
+public class MaterialType implements Serializable {
 	/*物料类别id*/
 	private Integer id ;
 	/*物料类别编码*/

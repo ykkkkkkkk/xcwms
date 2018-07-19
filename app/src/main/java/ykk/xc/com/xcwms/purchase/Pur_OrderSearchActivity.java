@@ -31,8 +31,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.model.MeasureUnit;
-import ykk.xc.com.xcwms.model.pur.PurPoOrder;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_OrderSearchAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -65,7 +64,7 @@ public class Pur_OrderSearchActivity extends BaseActivity implements XRecyclerVi
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Pur_OrderSearchAdapter mAdapter;
-    private List<PurPoOrder> listDatas = new ArrayList<>();
+    private List<PurOrder> listDatas = new ArrayList<>();
     private Supplier supplier;
 
     // 消息处理
@@ -85,7 +84,7 @@ public class Pur_OrderSearchActivity extends BaseActivity implements XRecyclerVi
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<PurPoOrder> list = JsonUtil.strToList2((String) msg.obj, PurPoOrder.class);
+                        List<PurOrder> list = JsonUtil.strToList2((String) msg.obj, PurOrder.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 

@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.model.User;
 
 
 public class MainTabFragmentActivity extends BaseActivity {
@@ -68,6 +69,9 @@ public class MainTabFragmentActivity extends BaseActivity {
     public void initData() {
         curTv = tab1;
         curRadio = radio1;
+
+        User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+        tvTitle.setText("操作员："+user.getUsername());
 
         List<Fragment> listFragment = new ArrayList<Fragment>();
         listFragment.add(new MainTabFragment1());

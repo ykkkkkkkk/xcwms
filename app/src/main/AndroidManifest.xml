@@ -121,6 +121,13 @@
             android:name=".purchase.Pur_OrderSearchActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
+        <activity
+            android:name=".purchase.Pur_ProdBoxFragmentActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Pur_SelProdOrderActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
         <!-- 销售模块 -->
         <activity
             android:name=".sales.Sal_OutActivity"
