@@ -17,8 +17,10 @@ public class MaterialBinningRecord implements Serializable {
 	private BoxBarCode boxBarCode;
 	/*物料id*/
 	private Integer materialId;
-	/* 对应t_barCodeTable 表中的barcode字段  */
+	/* 对应t_barCodeTable或者t_SecurityCode    表中的barcode字段  */
 	private String barcode;
+	/* 条码数据来源   1：t_barCodeTable表过来的barcode，2：t_SecurityCode表过来的barcode */
+	private char barcodeSource;
 	/* 对应t_barCodeTable 表中的batchCode字段  */
 	private String batchCode;
 	/* 对应t_barCodeTable 表中的snCode字段  */
@@ -97,6 +99,10 @@ public class MaterialBinningRecord implements Serializable {
 
 	public String getBarcode() {
 		return barcode;
+	}
+
+	public char getBarcodeSource() {
+		return barcodeSource;
 	}
 
 	public String getBatchCode() {
@@ -195,6 +201,10 @@ public class MaterialBinningRecord implements Serializable {
 		this.barcode = barcode;
 	}
 
+	public void setBarcodeSource(char barcodeSource) {
+		this.barcodeSource = barcodeSource;
+	}
+
 	public void setBatchCode(String batchCode) {
 		this.batchCode = batchCode;
 	}
@@ -274,12 +284,13 @@ public class MaterialBinningRecord implements Serializable {
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", barcode=" + barcode + ", batchCode=" + batchCode + ", snCode="
-				+ snCode + ", material=" + material + ", number=" + number + ", relationBillId=" + relationBillId
-				+ ", relationBillNumber=" + relationBillNumber + ", customerId=" + customerId + ", customer=" + customer
-				+ ", expressType=" + expressType + ", deliveryWay=" + deliveryWay + ", packageWorkType="
-				+ packageWorkType + ", binningType=" + binningType + ", caseId=" + caseId + ", createDate=" + createDate
-				+ ", createUserId=" + createUserId + ", createUserName=" + createUserName + ", modifyDate=" + modifyDate
-				+ ", modifyUserId=" + modifyUserId + ", modifyUserName=" + modifyUserName + "]";
+				+ ", materialId=" + materialId + ", barcode=" + barcode + ", barcodeSource=" + barcodeSource
+				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", material=" + material + ", number=" + number
+				+ ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber + ", customerId="
+				+ customerId + ", customer=" + customer + ", expressType=" + expressType + ", deliveryWay="
+				+ deliveryWay + ", packageWorkType=" + packageWorkType + ", binningType=" + binningType + ", caseId="
+				+ caseId + ", createDate=" + createDate + ", createUserId=" + createUserId + ", createUserName="
+				+ createUserName + ", modifyDate=" + modifyDate + ", modifyUserId=" + modifyUserId + ", modifyUserName="
+				+ modifyUserName + "]";
 	}
 }

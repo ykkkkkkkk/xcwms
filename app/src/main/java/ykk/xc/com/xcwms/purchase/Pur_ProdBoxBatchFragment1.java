@@ -40,13 +40,14 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Box;
+import ykk.xc.com.xcwms.model.BoxBarCode;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.SecurityCode;
+import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxBatchFragment1Adapter;
-import ykk.xc.com.xcwms.sales.adapter.Sal_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 import static android.app.Activity.RESULT_OK;
@@ -57,10 +58,8 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     TextView tvDeptSel;
     @BindView(R.id.tv_sourceNo)
     TextView tvSourceNo;
-    @BindView(R.id.tv_mtl)
-    TextView tvMtl;
-    @BindView(R.id.tv_batch)
-    TextView tvBatch;
+    @BindView(R.id.tv_mtls)
+    TextView tvMtls;
     @BindView(R.id.tv_boxSel)
     TextView tvBoxSel;
     @BindView(R.id.tv_custSel)
@@ -79,17 +78,17 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
 
     private Pur_ProdBoxBatchFragment1 mFragment = this;
     private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SAVE = 202, UNSAVE = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
     private Department department; // 生产车间
     private ProdOrder prodOrder; // 生产订单
     private Box box; // 包装箱
-    private SecurityCode securityCode; // 包装箱条码
     private Customer customer; // 客户
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Pur_ProdBoxBatchFragment1Adapter mAdapter;
-    private List<MaterialBinningRecord> listDatas = new ArrayList<>();
+    private List<MaterialBinningRecord> listMbr = new ArrayList<>();
     private Activity mContext;
+    private User user;
     private String strBarcode; // 防伪码
 
     // 消息处理
@@ -108,14 +107,27 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.securityCode = JsonUtil.strToObject((String) msg.obj, SecurityCode.class);
-                        m.setTexts(m.etBoxCode, m.securityCode.getSecurityQrCode());
-                        m.strBarcode = m.securityCode.getSecurityQrCode();
+                        List<SecurityCode> list = JsonUtil.strToList((String) msg.obj, SecurityCode.class);
+                        m.get_smGetDatas(list);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
                         m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         Comm.showWarnDialog(m.mContext, "很抱歉，没能找到数据！");
+
+                        break;
+                    case SAVE: // 扫描后的保存 成功
+                        m.listMbr.clear();
+                        List<MaterialBinningRecord> list2 = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
+                        m.listMbr.addAll(list2);
+//                        m.tvCount.setText("物料数量："+m.listMtl.size());
+                        m.mAdapter.notifyDataSetChanged();
+
+                        break;
+                    case UNSAVE: // 扫描后的保存 失败
+                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
+                        m.mAdapter.notifyDataSetChanged();
+                        Comm.showWarnDialog(m.mContext,"保存到装箱失败，请检查！");
 
                         break;
                     case CODE1: // 清空数据
@@ -142,12 +154,14 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         mContext = getActivity();
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Pur_ProdBoxBatchFragment1Adapter(mContext, listDatas);
+        mAdapter = new Pur_ProdBoxBatchFragment1Adapter(mContext, listMbr);
         recyclerView.setAdapter(mAdapter);
     }
 
     @Override
     public void initData() {
+        hideSoftInputMode(mContext, etBoxCode);
+        getUserInfo();
         bundle();
     }
 
@@ -175,7 +189,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 showForResult(Pur_SelProdOrderActivity.class, SEL_ORDER, bundle);
 
                 break;
-            case R.id.tv_box: // 选择包装箱
+            case R.id.tv_boxSel: // 选择包装箱
                 showForResult(Box_DialogActivity.class, SEL_BOX, null);
 
                 break;
@@ -196,7 +210,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 switch (v.getId()) {
-                    case R.id.et_mtlCode: // 物料
+                    case R.id.et_boxCode: // 箱子的防伪码
                         if(event.getAction() == KeyEvent.ACTION_DOWN) {
                             String mtlCode = getValues(etBoxCode).trim();
                             if(!smBefore()) {
@@ -235,7 +249,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
             Comm.showWarnDialog(mContext,"请选择生产订单！");
             return false;
         }
-        if (customer == null) {
+        if (customer == null || getValues(tvCustSel).length() == 0) {
             Comm.showWarnDialog(mContext,"请选择客户！");
             return false;
         }
@@ -246,17 +260,25 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         return true;
     }
 
+    /**
+     * 是否按了回车键
+     */
+    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
+        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 扫码查询对应的方法
      */
     private void run_smGetDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("barCodeTable/findBarcodeByParam");
+        String mUrl = Consts.getURL("securityCode/findListByParam");
         String strCaseId = ""; // 方案id
         FormBody formBody = new FormBody.Builder()
-                .add("barcode", getValues(etBoxCode))
-                .add("strCaseId", strCaseId)
+                .add("securityQrCode2", strBarcode)
                 .build();
 
         Request request = new Request.Builder()
@@ -288,25 +310,75 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     }
 
     /**
-     * 是否按了回车键
+     * 扫码返回数据
      */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-            return true;
+    private void get_smGetDatas(List<SecurityCode> list) {
+        SecurityCode securityCode =  null;
+        // 找出与防伪码一致的对象
+        for(int i=0,size=list.size(); i<size; i++) {
+            SecurityCode sc = list.get(i);
+            if(strBarcode.equals(sc.getSecurityQrCode())) {
+                securityCode = sc;
+                list.remove(i); // 把这个箱码的
+                break;
+            }
         }
-        return false;
+        setTexts(etBoxCode, securityCode.getSecurityQrCode());
+        strBarcode = securityCode.getSecurityQrCode();
+
+        // 如果状态为1，就说明已经绑定了物料和箱子
+        if(securityCode.getStatus() != null && securityCode.getStatus() > 0) {
+            Comm.showWarnDialog(mContext,"该条码已经绑定过物料和箱子，不能重复绑定！");
+            return;
+        }
+
+        // 插入到箱子和物料记录表
+        MaterialBinningRecord mbr = new MaterialBinningRecord();
+        mbr.setId(0);
+        mbr.setMaterialId(prodOrder.getMtlId());
+        mbr.setRelationBillId(prodOrder.getfId());
+        mbr.setRelationBillNumber(prodOrder.getFbillno());
+        mbr.setCustomerId(customer.getFcustId());
+//        if(assist != null) {
+//            mbr.setDeliveryWay(assist.getfName());
+//        }
+        mbr.setPackageWorkType(1);
+        mbr.setBinningType('3');
+        mbr.setBarcodeSource('2');
+        mbr.setCaseId(34);
+        mbr.setNumber(securityCode.getGroupCount());
+        mbr.setBarcode(prodOrder.getBarcode());
+        mbr.setCreateUserId(user.getId());
+        mbr.setCreateUserName(user.getUsername());
+        mbr.setModifyUserId(user.getId());
+        mbr.setModifyUserName(user.getUsername());
+        // 箱子条码表
+        BoxBarCode boxBarCode = new BoxBarCode();
+        boxBarCode.setBoxId(box.getId());
+        boxBarCode.setBarCode(strBarcode);
+        boxBarCode.setStatus(2);
+
+        // 把对象转成json字符串
+        String strJson = JsonUtil.objectToString(mbr);
+        String strJson2 = JsonUtil.objectToString(boxBarCode);
+        // 添加到箱子并返回箱子的中的物料列表
+        run_save(strJson, strJson2, securityCode.getSecurityQrCodeGruopNumber(), String.valueOf(prodOrder.getMtl().getIsSnManager()));
     }
 
     /**
-     * 通过okhttp加载数据
+     * 保存的方法
      */
-    private void run_okhttpDatas() {
+    private void run_save(String json, String json2, String groupNo, String isSnManager) {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findProdOrderList");
+        String mUrl = Consts.getURL("materialBinningRecord/save_prod");
+        MaterialBinningRecord mtl = new MaterialBinningRecord();
+
         FormBody formBody = new FormBody.Builder()
-                .add("custId", String.valueOf(customer.getFcustId()))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("strJson", json)
+                .add("strJson2", json2)
+                .add("groupNo", groupNo)
+                .add("strBarcode", strBarcode)
+                .add("isSnManager", isSnManager)
                 .build();
 
         Request request = new Request.Builder()
@@ -319,7 +391,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC1);
+                mHandler.sendEmptyMessage(UNSAVE);
             }
 
             @Override
@@ -327,11 +399,11 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    mHandler.sendEmptyMessage(UNSAVE);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Sal_SelOrderActivity --> onResponse", result);
+                Message msg = mHandler.obtainMessage(SAVE, result);
+                Log.e("run_save --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -356,15 +428,20 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                         prodOrder = (ProdOrder) bundle.getSerializable("obj");
                         Log.e("onActivityResult --> SEL_ORDER", prodOrder.getFbillno());
                         tvSourceNo.setText(prodOrder.getFbillno());
-                        tvMtl.setText(prodOrder.getMtlFname());
-
                         String batch = prodOrder.getBatchCode();
-                        if(batch != null && batch.length() > 0) {
-                            tvBatch.setText("批号："+batch);
-                            tvBatch.setVisibility(View.VISIBLE);
-                        } else {
-                            tvBatch.setVisibility(View.GONE);
-                        }
+                        boolean isBatch = batch != null && batch.length() > 0;
+
+                        tvMtls.setText("物料："+prodOrder.getMtlFname()+"        "+(isBatch ? ("批号："+batch) : ""));
+                        tvMtls.setVisibility(View.VISIBLE);
+                        // 显示客户
+                        if(customer == null) customer = new Customer();
+                        customer.setFcustId(prodOrder.getCustId());
+                        customer.setCustomerName(prodOrder.getCustName());
+                        customer.setCustomerCode(prodOrder.getCustNumber());
+
+                        tvCustSel.setText(customer.getCustomerName());
+
+
                     }
                 }
 
@@ -385,6 +462,15 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 }
 
                 break;
+        }
+    }
+
+    /**
+     *  得到用户对象
+     */
+    private void getUserInfo() {
+        if(user == null) {
+            user = showObjectToXml(User.class, getResStr(R.string.saveUser));
         }
     }
 

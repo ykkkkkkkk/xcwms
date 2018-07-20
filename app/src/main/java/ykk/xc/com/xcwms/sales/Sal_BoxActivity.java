@@ -855,7 +855,9 @@ public class Sal_BoxActivity extends BaseActivity {
                 tmpMtl.setPackageWorkType(2);
                 tmpMtl.setBinningType(binningType);
                 tmpMtl.setCaseId(barCodeTable.getCaseId());
+
             }
+            tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             tmpMtl.setCreateUserId(user.getId());
@@ -1024,6 +1026,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 tmpMtl.setBinningType(binningType);
                 tmpMtl.setCaseId(barCodeTable.getCaseId());
             }
+            tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             tmpMtl.setCreateUserId(user.getId());

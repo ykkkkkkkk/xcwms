@@ -23,6 +23,14 @@ public class SecurityCode implements Serializable {
 	private Integer bindingType;
 	/*创建时间*/
 	private String createTime;
+	/*物料id*/
+	private Integer materialId;
+	/*物料*/
+	private Material material;
+	/*箱子id*/
+	private Integer boxId;
+	/*箱子*/
+	private Box box;
 
 	public Integer getId() {
 		return id;
@@ -67,6 +75,30 @@ public class SecurityCode implements Serializable {
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
+	public Integer getMaterialId() {
+		return materialId;
+	}
+	public void setMaterialId(Integer materialId) {
+		this.materialId = materialId;
+	}
+	public Material getMaterial() {
+		return material;
+	}
+	public void setMaterial(Material material) {
+		this.material = material;
+	}
+	public Integer getBoxId() {
+		return boxId;
+	}
+	public void setBoxId(Integer boxId) {
+		this.boxId = boxId;
+	}
+	public Box getBox() {
+		return box;
+	}
+	public void setBox(Box box) {
+		this.box = box;
+	}
 
 	public SecurityCode() {
 		super();
@@ -76,7 +108,8 @@ public class SecurityCode implements Serializable {
 	public String toString() {
 		return "SecurityCode [id=" + id + ", securityQrCode=" + securityQrCode + ", securityQrCodeGruopNumber="
 				+ securityQrCodeGruopNumber + ", groupCount=" + groupCount + ", status=" + status + ", bindingType="
-				+ bindingType + ", createTime=" + createTime + "]";
+				+ bindingType + ", createTime=" + createTime + ", materialId=" + materialId + ", material=" + material
+				+ ", boxId=" + boxId + ", box=" + box + "]";
 	}
 
 }
