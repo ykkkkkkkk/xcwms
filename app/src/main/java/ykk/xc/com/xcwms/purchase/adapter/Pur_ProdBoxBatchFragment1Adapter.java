@@ -30,19 +30,16 @@ public class Pur_ProdBoxBatchFragment1Adapter extends BaseArrayRecyclerAdapter<M
     public void onBindHoder(RecyclerHolder holder, final MaterialBinningRecord entity, final int pos) {
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
-        TextView tv_boxName = holder.obtainView(R.id.tv_boxName);
-        TextView tv_mats = holder.obtainView(R.id.tv_mats);
+        TextView tv_boxBarCode = holder.obtainView(R.id.tv_boxBarCode);
+        TextView tv_mtls = holder.obtainView(R.id.tv_mtls);
         TextView tv_batch = holder.obtainView(R.id.tv_batch);
         TextView tv_num = holder.obtainView(R.id.tv_num);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
-        String deliWay = Comm.isNULLS(entity.getDeliveryWay());
-//        tv_batch.setText(entity.getMaterial().);
+        tv_mtls.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
+        tv_boxBarCode.setText(entity.getBoxBarCode().getBarCode());
+        tv_batch.setText(Comm.isNULLS(entity.getBatchCode()));
         tv_num.setText(df.format(entity.getNumber()));
-        tv_num.setBackgroundResource(R.drawable.back_style_gray2a);
-        tv_num.setEnabled(false);
-
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

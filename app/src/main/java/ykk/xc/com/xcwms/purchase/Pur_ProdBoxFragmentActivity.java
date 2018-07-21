@@ -15,6 +15,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.util.MyViewPager;
 
 
 public class Pur_ProdBoxFragmentActivity extends BaseActivity {
@@ -28,7 +29,7 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
     @BindView(R.id.lin_tab2)
     LinearLayout linTab2;
     @BindView(R.id.viewPager)
-    ViewPager viewPager;
+    MyViewPager viewPager;
     @BindView(R.id.tv_title)
     TextView tvTitle;
     private Pur_ProdBoxFragmentActivity context = this;
@@ -58,10 +59,12 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);
+        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new Pur_ProdBoxFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
+
 
         //ViewPager页面切换监听
 //        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -75,12 +78,12 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
 //                switch (position) {
 //                    case 0:
 //                        tabSelected(radio1);
-//                        tvTitle.setText("销售订单列表");
+//                        tvTitle.setText("生产装箱-批量");
 //                        viewPager.setCurrentItem(0, false);
 //                        break;
 //                    case 1:
 //                        tabSelected(radio2);
-//                        tvTitle.setText("发货通知单列表");
+//                        tvTitle.setText("生产装箱-非批量");
 //                        viewPager.setCurrentItem(1, false);
 //                        break;
 //                }

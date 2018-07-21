@@ -119,10 +119,15 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
             @Override
             public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
                 ProdOrder m = listDatas.get(pos-1);
+                if(m.getMtl().getIsBatchManager() == 1) { // 启用了批次号，要输入
+                    inputBatchDialog(m);
+                } else {
                     Intent intent = new Intent();
                     intent.putExtra("obj", m);
+                    intent.putExtra("batch", "");
                     context.setResult(RESULT_OK, intent);
                     context.finish();
+                }
             }
         });
     }
@@ -143,6 +148,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
         }
     }
 
+
     @OnClick({R.id.btn_close, R.id.btn_search, R.id.btn_confirm})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -159,6 +165,47 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
             case R.id.btn_confirm: // 确认
                 break;
         }
+    }
+
+    /**
+     * 输入批次号的dialog
+     */
+    private void inputBatchDialog(final ProdOrder m) {
+        View v = context.getLayoutInflater().inflate(R.layout.pur_sel_prod_order_item2, null);
+        final AlertDialog delDialog = new AlertDialog.Builder(context).setView(v).create();
+        // 初始化id
+        final EditText etBatch = (EditText) v.findViewById(R.id.et_batch);
+        Button btnClose = (Button) v.findViewById(R.id.btn_close);
+        Button btnConfirm = (Button) v.findViewById(R.id.btn_confirm);
+
+        // 关闭
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                delDialog.dismiss();
+            }
+        });
+        // 确认
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String batch = getValues(etBatch).trim();
+                if(batch.length() == 0) {
+                    Comm.showWarnDialog(context,"请输入批次号！");
+                    return;
+                }
+                Intent intent = new Intent();
+                intent.putExtra("obj", m);
+                intent.putExtra("batch", batch);
+                context.setResult(RESULT_OK, intent);
+                context.finish();
+            }
+        });
+
+        Window window = delDialog.getWindow();
+        delDialog.setCancelable(false);
+        delDialog.show();
+        window.setGravity(Gravity.CENTER);
     }
 
     /**

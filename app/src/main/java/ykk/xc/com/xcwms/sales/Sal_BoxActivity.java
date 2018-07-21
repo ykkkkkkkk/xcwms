@@ -435,7 +435,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 run_modifyStatus();
 
                 break;
-            case R.id.btn_clone: // 清空
+            case R.id.btn_clone: // 新装
                 reset();
 
                 break;

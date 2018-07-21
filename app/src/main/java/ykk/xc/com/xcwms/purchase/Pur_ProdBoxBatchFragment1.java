@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,8 +68,6 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     TextView tvCustSel;
     @BindView(R.id.et_boxCode)
     EditText etBoxCode;
-    @BindView(R.id.btn_save)
-    Button btnSave;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.tv_countInfo)
@@ -90,6 +90,8 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     private Activity mContext;
     private User user;
     private String strBarcode; // 防伪码
+    private DecimalFormat df = new DecimalFormat("#.####");
+    private String batch; // 批次号
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(mFragment);
@@ -120,7 +122,14 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                         m.listMbr.clear();
                         List<MaterialBinningRecord> list2 = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                         m.listMbr.addAll(list2);
-//                        m.tvCount.setText("物料数量："+m.listMtl.size());
+
+                        m.smAfter();
+                        int size = m.listMbr.size();
+                        double count = 0;
+                        for(int i=0; i<size; i++) {
+                            count += list2.get(i).getNumber();
+                        }
+                        m.tvCountInfo.setText(size+"箱    "+m.df.format(count)+"件");
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
@@ -171,7 +180,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.tv_deptSel, R.id.tv_sourceNo, R.id.tv_boxSel, R.id.tv_custSel, R.id.btn_save})
+    @OnClick({R.id.tv_deptSel, R.id.tv_sourceNo, R.id.tv_boxSel, R.id.tv_custSel, R.id.btn_clone})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_deptSel: // 选择生产车间
@@ -197,8 +206,8 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 showForResult(Cust_DialogActivity.class, SEL_CUST, null);
 
                 break;
-            case R.id.btn_save: // 封箱
-
+            case R.id.btn_clone: // 新装
+                reset();
 
                 break;
         }
@@ -238,6 +247,30 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     }
 
     /**
+     * 重置
+     */
+    private void reset() {
+        setEnables(tvDeptSel, R.drawable.back_style_blue, true);
+        setEnables(tvSourceNo, R.drawable.back_style_blue, true);
+        setEnables(tvCustSel, R.drawable.back_style_blue, true);
+        tvSourceNo.setText("");
+        tvMtls.setText("物料：");
+        tvCustSel.setText("");
+        tvBoxSel.setText("");
+        etBoxCode.setText("");
+        tvCountInfo.setText("0箱    0件");
+
+        prodOrder = null;
+        customer = null;
+        box = null;
+        strBarcode = null;
+
+        listMbr.clear();
+        mAdapter.notifyDataSetChanged();
+        setFocusable(etBoxCode);
+    }
+
+    /**
      * 扫码防伪码之前的判断
      */
     private boolean smBefore() {
@@ -258,6 +291,15 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 扫码防伪码之后的判断
+     */
+    private void smAfter() {
+        setEnables(tvDeptSel, R.drawable.back_style_gray3, false);
+        setEnables(tvSourceNo, R.drawable.back_style_gray3, false);
+        setEnables(tvCustSel, R.drawable.back_style_gray3, false);
     }
 
     /**
@@ -348,6 +390,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         mbr.setCaseId(34);
         mbr.setNumber(securityCode.getGroupCount());
         mbr.setBarcode(prodOrder.getBarcode());
+        mbr.setBatchCode(batch);
         mbr.setCreateUserId(user.getId());
         mbr.setCreateUserName(user.getUsername());
         mbr.setModifyUserId(user.getId());
@@ -426,9 +469,9 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                     Bundle bundle  = data.getExtras();
                     if(bundle != null) {
                         prodOrder = (ProdOrder) bundle.getSerializable("obj");
+                        batch = bundle.getString("batch", "");
                         Log.e("onActivityResult --> SEL_ORDER", prodOrder.getFbillno());
                         tvSourceNo.setText(prodOrder.getFbillno());
-                        String batch = prodOrder.getBatchCode();
                         boolean isBatch = batch != null && batch.length() > 0;
 
                         tvMtls.setText("物料："+prodOrder.getMtlFname()+"        "+(isBatch ? ("批号："+batch) : ""));
@@ -440,8 +483,6 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                         customer.setCustomerCode(prodOrder.getCustNumber());
 
                         tvCustSel.setText(customer.getCustomerName());
-
-
                     }
                 }
 
