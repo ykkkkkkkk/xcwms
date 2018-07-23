@@ -114,7 +114,7 @@ public class Sal_BoxActivity extends BaseActivity {
     private Sal_BoxAdapter mAdapter;
     private char dataType = '1'; // 1：无源单，2：来源单
     private String strBoxBarcode, strMtlBarcode, strMtlBarcode_del; // 对应的条码号
-    private List<MaterialBinningRecord> listMtl = new ArrayList<>();
+    private List<MaterialBinningRecord> listMbr = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
     private DecimalFormat df = new DecimalFormat("#.####");
     private int curPos; // 当前行
@@ -188,10 +188,10 @@ public class Sal_BoxActivity extends BaseActivity {
                         break;
                     case SAVE: // 扫描后的保存 成功
                         m.status = '1';
-                        m.listMtl.clear();
+                        m.listMbr.clear();
                         List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
-                        m.listMtl.addAll(list);
-                        m.tvCount.setText("物料数量："+m.listMtl.size());
+                        m.listMbr.addAll(list);
+                        m.tvCount.setText("物料数量："+m.listMbr.size());
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
@@ -202,9 +202,9 @@ public class Sal_BoxActivity extends BaseActivity {
 
                         break;
                     case DELETE: // 删除 成功
-                        m.listMtl.clear();
+                        m.listMbr.clear();
                         List<MaterialBinningRecord> list2 = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
-                        m.listMtl.addAll(list2);
+                        m.listMbr.addAll(list2);
                         m.mAdapter.notifyDataSetChanged();
                         // 如果点击了关闭窗口的复选框
                         m.setCloseDelDialog();
@@ -215,7 +215,7 @@ public class Sal_BoxActivity extends BaseActivity {
                         if(str != null) {
                             String size = JsonUtil.strToString((String) msg.obj);
                             if(m.parseInt(size) == 0) {
-                                m.listMtl.clear();
+                                m.listMbr.clear();
                                 m.initDataSon(true);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#000000'>未开箱</font>"));
                                 m.tvCount.setText("物料数量：0");
@@ -247,8 +247,8 @@ public class Sal_BoxActivity extends BaseActivity {
                         break;
                     case MODIFY2: // 修改发货方式 成功
                         // 更新所有的交货方式
-                        for(int i=0, size=m.listMtl.size(); i<size; i++) {
-                            MaterialBinningRecord mbr = m.listMtl.get(i);
+                        for(int i = 0, size = m.listMbr.size(); i<size; i++) {
+                            MaterialBinningRecord mbr = m.listMbr.get(i);
                             mbr.setDeliveryWay(m.getValues(m.tvDeliverSel));
                         }
                         m.mAdapter.notifyDataSetChanged();
@@ -272,7 +272,7 @@ public class Sal_BoxActivity extends BaseActivity {
                         break;
                     case MODIFY_NUM: // 修改数量  成功
                         double number = (double) msg.obj;
-                        m.listMtl.get(m.curPos).setNumber(number);
+                        m.listMbr.get(m.curPos).setNumber(number);
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
@@ -307,7 +307,6 @@ public class Sal_BoxActivity extends BaseActivity {
                 }
             }
         }
-
     }
 
     @Override
@@ -319,7 +318,7 @@ public class Sal_BoxActivity extends BaseActivity {
     public void initView() {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Sal_BoxAdapter(context, listMtl);
+        mAdapter = new Sal_BoxAdapter(context, listMbr);
         recyclerView.setAdapter(mAdapter);
         mAdapter.setCallBack(new Sal_BoxAdapter.MyCallBack() {
             @Override
@@ -339,10 +338,6 @@ public class Sal_BoxActivity extends BaseActivity {
         curRadio = viewRadio1;
         getUserInfo();
     }
-
-    /**
-     *
-     */
     private void initDataSon(boolean enable) {
         if(enable) {
             setEnables(etMtlCode, R.drawable.back_style_blue, true);
@@ -401,7 +396,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     Comm.showWarnDialog(context,"已经封箱，不能删除，请开箱操作！");
                     return;
                 }
-                if(listMtl != null && listMtl.size() > 0) {
+                if(listMbr != null && listMbr.size() > 0) {
                     deleteRowDialog();
                 } else {
                     Comm.showWarnDialog(context,"箱子中没有物料，不能删除！");
@@ -422,7 +417,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     Comm.showWarnDialog(context,"请先扫描箱码！");
                     return;
                 }
-                if(listMtl == null || listMtl.size() == 0) {
+                if(listMbr == null || listMbr.size() == 0) {
                     Comm.showWarnDialog(context,"箱子里还没有物料不能封箱！");
                     return;
                 }
@@ -483,7 +478,7 @@ public class Sal_BoxActivity extends BaseActivity {
         dataType = '1';
         curViewFlag = '1';
 
-        listMtl.clear();
+        listMbr.clear();
         mAdapter.notifyDataSetChanged();
         setFocusable(etBoxCode);
     }
@@ -495,18 +490,6 @@ public class Sal_BoxActivity extends BaseActivity {
         curRadio.setBackgroundResource(R.drawable.check_off2);
         v.setBackgroundResource(R.drawable.check_on);
         curRadio = v;
-    }
-
-    /**
-     * 选择保存之前的判断
-     */
-    private boolean saveBefore() {
-        if (listMtl == null || listMtl.size() == 0) {
-            Comm.showWarnDialog(context, "请先插入行！");
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -684,7 +667,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     if (assist != null) {
                         tvDeliverSel.setText(assist.getfName());
 
-                        if(dataType == '2' && listMtl.size() > 0) {
+                        if(dataType == '2' && listMbr.size() > 0) {
                             run_modifyWay();
                         }
                     }
@@ -709,7 +692,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     if (bundle != null) {
                         String value = bundle.getString("resultValue", "");
                         double number = parseDouble(value);
-                        int id = listMtl.get(curPos).getId();
+                        int id = listMbr.get(curPos).getId();
 
                         run_modifyNumber2(id, number);
                     }
@@ -724,7 +707,7 @@ public class Sal_BoxActivity extends BaseActivity {
      */
     private void getBox() {
         if(boxBarCode != null) {
-            listMtl.clear();
+            listMbr.clear();
             setTexts(etBoxCode, boxBarCode.getBarCode());
             strBoxBarcode = boxBarCode.getBarCode();
             // 箱子为空提示选择
@@ -744,7 +727,7 @@ public class Sal_BoxActivity extends BaseActivity {
             // 把箱子里的物料显示出来
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
                 tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
-                listMtl.addAll(boxBarCode.getMtlBinningRecord());
+                listMbr.addAll(boxBarCode.getMtlBinningRecord());
 
                 MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
                 // 固定当前是无源单还是有源单
@@ -810,7 +793,7 @@ public class Sal_BoxActivity extends BaseActivity {
         if (barCodeTable != null) {
             setTexts(etMtlCode, barCodeTable.getMaterialNumber());
             strMtlBarcode = barCodeTable.getMaterialNumber();
-            int size = listMtl.size();
+            int size = listMbr.size();
             tvCount.setText("物料数量："+size);
             getUserInfo();
 
@@ -819,7 +802,7 @@ public class Sal_BoxActivity extends BaseActivity {
             if(size > 0) {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
-                    MaterialBinningRecord forMtl = listMtl.get(i);
+                    MaterialBinningRecord forMtl = listMbr.get(i);
                     if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
                         if(forMtl.getMaterial().getIsSnManager() == 0) {
                             tmpMtl = forMtl;
@@ -878,7 +861,7 @@ public class Sal_BoxActivity extends BaseActivity {
         if (barCodeTable != null) {
             setTexts(etMtlCode, barCodeTable.getMaterialNumber());
             strMtlBarcode = barCodeTable.getMaterialNumber();
-            int size = listMtl.size();
+            int size = listMbr.size();
             tvCount.setText("物料数量："+size);
             getUserInfo();
 
@@ -890,7 +873,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
             MaterialBinningRecord mtl2 = null;
             if(size > 0) {
-                mtl2 = listMtl.get(0);
+                mtl2 = listMbr.get(0);
             }
 
             // 得到销售订单
@@ -965,7 +948,7 @@ public class Sal_BoxActivity extends BaseActivity {
             if(size > 0) {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
-                    MaterialBinningRecord forMtl = listMtl.get(i);
+                    MaterialBinningRecord forMtl = listMbr.get(i);
 
                     // 判断物料是否装满，单装或者混装
                     if(barCodeTable.getCaseId() == 32) { // 销售订单
@@ -1047,13 +1030,13 @@ public class Sal_BoxActivity extends BaseActivity {
             setTexts(etMtlCode, barCodeTable.getMaterialNumber());
             strMtlBarcode = barCodeTable.getMaterialNumber();
 
-            int size = listMtl.size();
+            int size = listMbr.size();
             MaterialBinningRecord tmpMtl = null;
             // 已装箱的物料
             if(size > 0) {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
-                    MaterialBinningRecord forMtl = listMtl.get(i);
+                    MaterialBinningRecord forMtl = listMbr.get(i);
                     if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
                         tmpMtl = forMtl;
 

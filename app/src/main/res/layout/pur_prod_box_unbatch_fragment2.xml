@@ -316,7 +316,6 @@
             android:layout_marginLeft="3dp"
             android:ems="2"
             android:gravity="center"
-            android:visibility="invisible"
             android:text="装箱类型"
             android:textColor="#000000"
             android:textSize="12sp" />
@@ -326,7 +325,6 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
             android:layout_weight="1"
-            android:visibility="invisible"
             android:background="@drawable/back_style_blue"
             android:gravity="center"
             android:orientation="horizontal">
@@ -387,7 +385,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.6"
             android:gravity="center"
             android:text="交货方式"
             android:textColor="#000000"
@@ -398,15 +396,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="数量"
-            android:textColor="#000000"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="客户"
             android:textColor="#000000"
             android:textSize="12sp" />
 

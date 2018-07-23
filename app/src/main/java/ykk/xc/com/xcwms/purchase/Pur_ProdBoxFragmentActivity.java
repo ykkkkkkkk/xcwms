@@ -112,7 +112,6 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
         curRadio = v;
     }
 
-
     @OnClick({R.id.btn_close, R.id.lin_tab1, R.id.lin_tab2})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画

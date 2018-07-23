@@ -37,10 +37,12 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Box_DialogActivity;
 import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
+import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
+import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.Box;
 import ykk.xc.com.xcwms.model.BoxBarCode;
 import ykk.xc.com.xcwms.model.Customer;
@@ -66,6 +68,8 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     TextView tvBoxSel;
     @BindView(R.id.tv_custSel)
     TextView tvCustSel;
+    @BindView(R.id.tv_deliverSel)
+    TextView tvDeliverSel;
     @BindView(R.id.et_boxCode)
     EditText etBoxCode;
     @BindView(R.id.recyclerView)
@@ -77,13 +81,14 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     }
 
     private Pur_ProdBoxBatchFragment1 mFragment = this;
-    private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13;
+    private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13, SEL_DELI = 14;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SAVE = 202, UNSAVE = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
     private Department department; // 生产车间
     private ProdOrder prodOrder; // 生产订单
     private Box box; // 包装箱
     private Customer customer; // 客户
+    private AssistInfo assist; // 辅助资料--发货方式
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Pur_ProdBoxBatchFragment1Adapter mAdapter;
     private List<MaterialBinningRecord> listMbr = new ArrayList<>();
@@ -180,7 +185,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.tv_deptSel, R.id.tv_sourceNo, R.id.tv_boxSel, R.id.tv_custSel, R.id.btn_clone})
+    @OnClick({R.id.tv_deptSel, R.id.tv_sourceNo, R.id.tv_boxSel, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_deptSel: // 选择生产车间
@@ -204,6 +209,10 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 break;
             case R.id.tv_custSel: // 选择客户
                 showForResult(Cust_DialogActivity.class, SEL_CUST, null);
+
+                break;
+            case R.id.tv_deliverSel: // 发货方式
+                showForResult(DeliveryWay_DialogActivity.class, SEL_DELI, null);
 
                 break;
             case R.id.btn_clone: // 新装
@@ -284,6 +293,10 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         }
         if (customer == null || getValues(tvCustSel).length() == 0) {
             Comm.showWarnDialog(mContext,"请选择客户！");
+            return false;
+        }
+        if (assist == null) {
+            Comm.showWarnDialog(mContext,"请选择发货方式！");
             return false;
         }
         if (box == null) {
@@ -381,9 +394,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         mbr.setRelationBillId(prodOrder.getfId());
         mbr.setRelationBillNumber(prodOrder.getFbillno());
         mbr.setCustomerId(customer.getFcustId());
-//        if(assist != null) {
-//            mbr.setDeliveryWay(assist.getfName());
-//        }
+        mbr.setDeliveryWay(assist.getfName());
         mbr.setPackageWorkType(1);
         mbr.setBinningType('3');
         mbr.setBarcodeSource('2');
@@ -495,11 +506,21 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
                 }
 
                 break;
-            case SEL_CUST: //查询部门	返回
+            case SEL_CUST: //查询客户	返回
                 if (resultCode == RESULT_OK) {
                     customer = (Customer) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_CUST", customer.getCustomerName());
                     tvCustSel.setText(customer.getCustomerName());
+                }
+
+                break;
+            case SEL_DELI: //查询发货方式	返回
+                if (resultCode == RESULT_OK) {
+                    assist = (AssistInfo) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_DELI", assist.getfName());
+                    if (assist != null) {
+                        tvDeliverSel.setText(assist.getfName());
+                    }
                 }
 
                 break;
