@@ -457,6 +457,9 @@ public class Sal_BoxActivity extends BaseActivity {
         linTab2.setEnabled(true);
         etBoxCode.setText("");
         boxBarCode = null;
+        strBoxBarcode = null;
+        strMtlBarcode = null;
+        strMtlBarcode_del = null;
         tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
         tvBoxName.setText("");
         tvBoxSize.setText("");

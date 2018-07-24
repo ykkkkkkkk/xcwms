@@ -35,7 +35,6 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
         TextView tv_mats = holder.obtainView(R.id.tv_mats);
         TextView tv_deliWay = holder.obtainView(R.id.tv_deliWay);
         TextView tv_num = holder.obtainView(R.id.tv_num);
-        TextView tv_custName = holder.obtainView(R.id.tv_custName);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
@@ -50,7 +49,6 @@ public class Sal_BoxAdapter extends BaseArrayRecyclerAdapter<MaterialBinningReco
             tv_num.setBackgroundResource(R.drawable.back_style_blue2);
             tv_num.setEnabled(true);
         }
-        tv_custName.setText(entity.getCustomer().getCustomerName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override

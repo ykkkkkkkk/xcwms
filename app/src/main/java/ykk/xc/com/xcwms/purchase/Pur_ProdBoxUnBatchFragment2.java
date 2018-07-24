@@ -201,6 +201,9 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                         if(str != null) {
                             String size = JsonUtil.strToString((String) msg.obj);
                             if(m.parseInt(size) == 0) {
+                                m.tvCustSel.setText("");
+                                m.setEnables(m.tvCustSel, R.drawable.back_style_gray3, false);
+                                m.customer = null;
                                 m.listMbr.clear();
                                 m.initDataSon(true);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#000000'>未开箱</font>"));
@@ -305,6 +308,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mAdapter = new Pur_ProdBoxUnBatchFragment2Adapter(mContext, listMbr);
         recyclerView.setAdapter(mAdapter);
+
         mAdapter.setCallBack(new Pur_ProdBoxUnBatchFragment2Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
@@ -325,7 +329,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     private void initDataSon(boolean enable) {
         if(enable) {
             setEnables(etMtlCode, R.drawable.back_style_blue, true);
-            setEnables(tvCustSel, R.drawable.back_style_blue, true);
+//            setEnables(tvCustSel, R.drawable.back_style_blue, true);
             setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
         } else {
             setEnables(etMtlCode, R.drawable.back_style_gray3, false);
@@ -334,7 +338,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.lin_tab1, R.id.lin_tab2, R.id.btn_close, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save, R.id.rb_type1, R.id.rb_type2, R.id.tv_box})
+    @OnClick({R.id.btn_boxConfirm, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_unSave, R.id.btn_save, R.id.rb_type1, R.id.rb_type2, R.id.tv_box})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -420,6 +424,9 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     private void reset() {
         etBoxCode.setText("");
         boxBarCode = null;
+        strBoxBarcode = null;
+        strMtlBarcode = null;
+        strMtlBarcode_del = null;
         tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
         tvBoxName.setText("");
         tvBoxSize.setText("");
@@ -428,9 +435,10 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         tvBoxAltitude.setText("");
         tvBoxVolume.setText("");
         etMtlCode.setText("");
-//        tvCustSel.setText("");
-        setEnables(tvCustSel, R.drawable.back_style_blue, true);
-//        customer = null;
+        tvCustSel.setText("");
+        setEnables(tvCustSel, R.drawable.back_style_gray3, false);
+        customer = null;
+//        setEnables(tvCustSel, R.drawable.back_style_blue, true);
 //        tvDeliverSel.setText("");
         setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
         tvCount.setText("物料数量：0");
@@ -675,10 +683,18 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
 
             // 把箱子里的物料显示出来
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
+                MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
+
+                if(mtlbr.getCaseId() != 34) {
+                    etBoxCode.setText("");
+                    strBoxBarcode = null;
+                    setFocusable(etBoxCode);
+                    Comm.showWarnDialog(mContext,"该箱子已经装了其他类型物料，请扫描未使用的箱码！");
+                    return;
+                }
                 tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
                 listMbr.addAll(boxBarCode.getMtlBinningRecord());
 
-                MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
                 customer.setFcustId(mtlbr.getCustomerId());
@@ -714,7 +730,6 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
                 setEnables(etMtlCode, R.drawable.back_style_gray3, false);
             }
-
 
             tvBoxName.setText(boxBarCode.getBox().getBoxName());
             tvBoxSize.setText(boxBarCode.getBox().getBoxSize());
@@ -769,9 +784,14 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                 customer.setFcustId(prodOrder.getCustId());
                 customer.setCustomerName(prodOrder.getCustName());
                 tvCustSel.setText(customer.getCustomerName());
-                //                setEnables(tvCustSel, R.drawable.back_style_blue, true);
             }
 
+            // 如果来源单的的客户为空，就提示选择客户
+            if(prodOrderNotnull && prodOrder.getCustId() == 0 && getValues(tvCustSel).length() == 0) {
+                setEnables(tvCustSel, R.drawable.back_style_blue, true);
+                Comm.showWarnDialog(mContext, "请选择客户！");
+                return;
+            }
             // 判断客户和发货方式是否一致
             if(prodOrderNotnull && mtl2 != null && mtl2.getCustomerId() > 0 && mtl2.getCustomerId() != prodOrder.getCustId()) {
                 Comm.showWarnDialog(mContext, "客户不一致，不能装箱！");
@@ -813,15 +833,19 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                 tmpMtl.setBinningType(binningType);
                 tmpMtl.setCaseId(barCodeTable.getCaseId());
             }
+            // 如果扫码的数据客户为空，就填输入框的客户
+            if(prodOrderNotnull && prodOrder.getCustId() == 0 && getValues(tvCustSel).length() > 0) {
+                tmpMtl.setCustomerId(customer.getFcustId());
+            }
             tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
-            // 启用了序列号
-            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsBatchManager() == 1) {
+            // 启用了批次号
+            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsBatchManager() != null && tmpMtl.getMaterial().getIsBatchManager() == 1) {
                 tmpMtl.setBatchCode(barCodeTable.getBatchCode());
             }
             // 启用了序列号
-            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsSnManager() == 1) {
+            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsSnManager() != null && tmpMtl.getMaterial().getIsSnManager() == 1) {
                 tmpMtl.setSnCode(barCodeTable.getSnCode());
             }
             tmpMtl.setCreateUserId(user.getId());
@@ -889,11 +913,11 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                 barcode = strBoxBarcode;
                 break;
             case '2': // 物料扫码
-                mUrl = Consts.getURL("barCodeTable/findBarcodeByParam");
+                mUrl = Consts.getURL("barCodeTable/findBarcode2ByParam");
                 barcode = strMtlBarcode;
                 break;
             case '3': // 删除物料扫码
-                mUrl = Consts.getURL("barCodeTable/findBarcodeByParam");
+                mUrl = Consts.getURL("barCodeTable/findBarcode2ByParam");
                 barcode = strMtlBarcode_del;
                 break;
         }
