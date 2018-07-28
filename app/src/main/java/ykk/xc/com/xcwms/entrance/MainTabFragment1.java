@@ -16,6 +16,7 @@ import butterknife.OnClick;
 import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
+import ykk.xc.com.xcwms.purchase.Prod_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
 import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
@@ -58,8 +59,8 @@ public class MainTabFragment1 extends BaseFragment {
                 show(Pur_InActivity.class, null);
 
                 break;
-            case R.id.relative3: // 产品入库
-                showLoadDialog("连接服务器...");
+            case R.id.relative3: // 生产入库
+                show(Prod_InActivity.class,null);
 
                 break;
             case R.id.relative4: // 生产装箱

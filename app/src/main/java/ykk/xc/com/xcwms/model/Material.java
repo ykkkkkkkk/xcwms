@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 public class Material implements Serializable {
 	/*物料id*/
-	private Integer id ;
+	private int id ;
 	/*k3物料id*/
-	private Integer fMaterialId;
+	private int fMaterialId;
 	/*k3物料编号*/
 	private String fNumber;
 	/*k3物料名称*/
@@ -20,7 +20,7 @@ public class Material implements Serializable {
 	/*物料简称*/
 	private String simpleName;
 	/*基本单位id*/
-	private Integer basicUnitId;
+	private int basicUnitId;
 	/*基本单位*/
 	private Unit unit;
 	/*物料条码*/
@@ -32,7 +32,7 @@ public class Material implements Serializable {
 	/*产品规格*/
 	private String materialSize;
 	/*产品类别id*/
-	private Integer materialTypeId;
+	private int materialTypeId;
 	/*产品类别*/
 	private MaterialType materialType;
 	/*有效期*/
@@ -44,23 +44,23 @@ public class Material implements Serializable {
 	/*最少补货数量*/
 	private double minLackStock;
 	/*默认零拣仓库id*/
-	private Integer fixScatteredStockId;
+	private int fixScatteredStockId;
 	/*默认零拣仓库*/
 	private Stock fixScatteredStock;
 	/*默认零拣库位id*/
-	private Integer fixScatteredStockPositionId;
+	private int fixScatteredStockPositionId;
 	/*默认零拣库位*/
 	private StockPosition fixScatteredStockPosition;
 	/*默认整件仓库id*/
-	private Integer fixWholeStockId;
+	private int fixWholeStockId;
 	/*默认整件仓库*/
 	private Stock fixWholeStock;
 	/*默认整件库位id*/
-	private Integer fixWholeStockPositionId;
+	private int fixWholeStockPositionId;
 	/*默认整件库位*/
 	private StockPosition fixWholeStockPosition;
 	/*卡板箱数*/
-	private Integer baleBoxNumber;
+	private int baleBoxNumber;
 	/*最后同步时间*/
 	private String lastSyncDate;
 	/*最后更新时间*/
@@ -68,21 +68,21 @@ public class Material implements Serializable {
 	/*备注*/
 	private String remarks;
 	/*是否启用批号管理，0代表不启用，1代表启用*/
-	private Integer isBatchManager;
+	private int isBatchManager;
 	/*批号规则id*/
-	private Integer batchRuleId;
+	private int batchRuleId;
 	/*是否启用序列号管理，0代表不启用，1代表启用*/
-	private Integer isSnManager;
+	private int isSnManager;
 	/*序列号编码规则id*/
-	private Integer snRuleId;
+	private int snRuleId;
 	/*序列号单位id*/
-	private Integer snUnitId;
+	private int snUnitId;
 	/*管理序列号方式id*/
-	private Integer snManagerTypeId;
+	private int snManagerTypeId;
 	/*是否启用保质期管理，0代表不启用，1代表启用*/
-	private Integer isQualityPeriodManager;
+	private int isQualityPeriodManager;
 	/*质保期单位id*/
-	private Integer qualityPeriodUnitId;
+	private int qualityPeriodUnitId;
 	/*质保期*/
 	private double qualityPeriod;
 	/*K3数据状态*/
@@ -102,19 +102,19 @@ public class Material implements Serializable {
 	 * getter/setter方法
 	 */
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getfMaterialId() {
+	public int getfMaterialId() {
 		return fMaterialId;
 	}
 
-	public void setfMaterialId(Integer fMaterialId) {
+	public void setfMaterialId(int fMaterialId) {
 		this.fMaterialId = fMaterialId;
 	}
 
@@ -166,11 +166,11 @@ public class Material implements Serializable {
 		this.materialSize = materialSize;
 	}
 
-	public Integer getMaterialTypeId() {
+	public int getMaterialTypeId() {
 		return materialTypeId;
 	}
 
-	public void setMaterialTypeId(Integer materialTypeId) {
+	public void setMaterialTypeId(int materialTypeId) {
 		this.materialTypeId = materialTypeId;
 	}
 
@@ -214,11 +214,11 @@ public class Material implements Serializable {
 		this.minLackStock = minLackStock;
 	}
 
-	public Integer getFixScatteredStockId() {
+	public int getFixScatteredStockId() {
 		return fixScatteredStockId;
 	}
 
-	public void setFixScatteredStockId(Integer fixScatteredStockId) {
+	public void setFixScatteredStockId(int fixScatteredStockId) {
 		this.fixScatteredStockId = fixScatteredStockId;
 	}
 
@@ -230,11 +230,11 @@ public class Material implements Serializable {
 		this.fixScatteredStock = fixScatteredStock;
 	}
 
-	public Integer getFixScatteredStockPositionId() {
+	public int getFixScatteredStockPositionId() {
 		return fixScatteredStockPositionId;
 	}
 
-	public void setFixScatteredStockPositionId(Integer fixScatteredStockPositionId) {
+	public void setFixScatteredStockPositionId(int fixScatteredStockPositionId) {
 		this.fixScatteredStockPositionId = fixScatteredStockPositionId;
 	}
 
@@ -246,11 +246,11 @@ public class Material implements Serializable {
 		this.fixScatteredStockPosition = fixScatteredStockPosition;
 	}
 
-	public Integer getFixWholeStockId() {
+	public int getFixWholeStockId() {
 		return fixWholeStockId;
 	}
 
-	public void setFixWholeStockId(Integer fixWholeStockId) {
+	public void setFixWholeStockId(int fixWholeStockId) {
 		this.fixWholeStockId = fixWholeStockId;
 	}
 
@@ -262,11 +262,11 @@ public class Material implements Serializable {
 		this.fixWholeStock = fixWholeStock;
 	}
 
-	public Integer getFixWholeStockPositionId() {
+	public int getFixWholeStockPositionId() {
 		return fixWholeStockPositionId;
 	}
 
-	public void setFixWholeStockPositionId(Integer fixWholeStockPositionId) {
+	public void setFixWholeStockPositionId(int fixWholeStockPositionId) {
 		this.fixWholeStockPositionId = fixWholeStockPositionId;
 	}
 
@@ -278,11 +278,11 @@ public class Material implements Serializable {
 		this.fixWholeStockPosition = fixWholeStockPosition;
 	}
 
-	public Integer getBaleBoxNumber() {
+	public int getBaleBoxNumber() {
 		return baleBoxNumber;
 	}
 
-	public void setBaleBoxNumber(Integer baleBoxNumber) {
+	public void setBaleBoxNumber(int baleBoxNumber) {
 		this.baleBoxNumber = baleBoxNumber;
 	}
 
@@ -310,19 +310,19 @@ public class Material implements Serializable {
 		this.remarks = remarks;
 	}
 
-	public Integer getIsBatchManager() {
+	public int getIsBatchManager() {
 		return isBatchManager;
 	}
 
-	public void setIsBatchManager(Integer isBatchManager) {
+	public void setIsBatchManager(int isBatchManager) {
 		this.isBatchManager = isBatchManager;
 	}
 
-	public Integer getIsQualityPeriodManager() {
+	public int getIsQualityPeriodManager() {
 		return isQualityPeriodManager;
 	}
 
-	public void setIsQualityPeriodManager(Integer isQualityPeriodManager) {
+	public void setIsQualityPeriodManager(int isQualityPeriodManager) {
 		this.isQualityPeriodManager = isQualityPeriodManager;
 	}
 
@@ -353,10 +353,10 @@ public class Material implements Serializable {
 		this.enabled = enabled;
 	}
 
-	public Integer getBasicUnitId() {
+	public int getBasicUnitId() {
 		return basicUnitId;
 	}
-	public void setBasicUnitId(Integer basicUnitId) {
+	public void setBasicUnitId(int basicUnitId) {
 		this.basicUnitId = basicUnitId;
 	}
 	public Unit getUnit() {
@@ -366,41 +366,41 @@ public class Material implements Serializable {
 		this.unit = unit;
 	}
 
-	public Integer getIsSnManager() {
+	public int getIsSnManager() {
 		return isSnManager;
 	}
-	public void setIsSnManager(Integer isSnManager) {
+	public void setIsSnManager(int isSnManager) {
 		this.isSnManager = isSnManager;
 	}
 
-	public Integer getBatchRuleId() {
+	public int getBatchRuleId() {
 		return batchRuleId;
 	}
-	public void setBatchRuleId(Integer batchRuleId) {
+	public void setBatchRuleId(int batchRuleId) {
 		this.batchRuleId = batchRuleId;
 	}
-	public Integer getSnRuleId() {
+	public int getSnRuleId() {
 		return snRuleId;
 	}
-	public void setSnRuleId(Integer snRuleId) {
+	public void setSnRuleId(int snRuleId) {
 		this.snRuleId = snRuleId;
 	}
-	public Integer getSnUnitId() {
+	public int getSnUnitId() {
 		return snUnitId;
 	}
-	public void setSnUnitId(Integer snUnitId) {
+	public void setSnUnitId(int snUnitId) {
 		this.snUnitId = snUnitId;
 	}
-	public Integer getSnManagerTypeId() {
+	public int getSnManagerTypeId() {
 		return snManagerTypeId;
 	}
-	public void setSnManagerTypeId(Integer snManagerTypeId) {
+	public void setSnManagerTypeId(int snManagerTypeId) {
 		this.snManagerTypeId = snManagerTypeId;
 	}
-	public Integer getQualityPeriodUnitId() {
+	public int getQualityPeriodUnitId() {
 		return qualityPeriodUnitId;
 	}
-	public void setQualityPeriodUnitId(Integer qualityPeriodUnitId) {
+	public void setQualityPeriodUnitId(int qualityPeriodUnitId) {
 		this.qualityPeriodUnitId = qualityPeriodUnitId;
 	}
 	public double getQualityPeriod() {

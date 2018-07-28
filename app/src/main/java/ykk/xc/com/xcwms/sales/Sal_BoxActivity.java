@@ -807,7 +807,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMbr.get(i);
                     if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
-                        if(forMtl.getMaterial().getIsSnManager() == 0) {
+                        if(forMtl.getMtl().getIsSnManager() == 0) {
                             tmpMtl = forMtl;
                         }
 //                        if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
@@ -956,7 +956,7 @@ public class Sal_BoxActivity extends BaseActivity {
                     // 判断物料是否装满，单装或者混装
                     if(barCodeTable.getCaseId() == 32) { // 销售订单
                         if(salOrderNotnull && salOrder.getfId() == forMtl.getRelationBillId() && salOrder.getMtlId() == forMtl.getMaterialId()) {
-                            if(forMtl.getMaterial().getIsSnManager() == 0) {
+                            if(forMtl.getMtl().getIsSnManager() == 0) {
                                 tmpMtl = forMtl;
                             }
 //                            if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {
@@ -976,7 +976,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
                     } else if(barCodeTable.getCaseId() == 33) { // 发货通知单
                         if(deliOrderNotnull && deliOrder.getfId() == forMtl.getRelationBillId() && deliOrder.getMtlId() == forMtl.getMaterialId()) {
-                            if(forMtl.getMaterial().getIsSnManager() == 0) {
+                            if(forMtl.getMtl().getIsSnManager() == 0) {
                                 tmpMtl = forMtl;
                             }
 //                            if((forMtl.getNumber()+1) <= barCodeTable.getMtlPack().getNumber()) {

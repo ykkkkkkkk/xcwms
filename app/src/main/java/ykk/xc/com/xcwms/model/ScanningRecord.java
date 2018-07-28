@@ -30,6 +30,8 @@ public class ScanningRecord implements Serializable {
     private String k3number;
     private String fdate;
     private String status;
+    private int createUserId;			//创建人id
+    private String createUserName;		//创建人
     // 新加的
     private String receiveOrgFnumber;
     private String purOrgFnumber;
@@ -41,15 +43,14 @@ public class ScanningRecord implements Serializable {
     private int poFid; // 采购订单id
     private String poFbillno; // 采购订单编码
     private double poFmustqty; // 采购订单剩余数
+    private String departmentFnumber;
 
     public int getId() {
         return id;
     }
-
     public int getType() {
         return type;
     }
-
     public int getSourceK3Id() {
         return sourceK3Id;
     }
@@ -212,29 +213,41 @@ public class ScanningRecord implements Serializable {
     public void setStockFnumber(String stockFnumber) {
         this.stockFnumber = stockFnumber;
     }
-
     public int getPoFid() {
         return poFid;
     }
-
     public String getPoFbillno() {
         return poFbillno;
     }
-
     public double getPoFmustqty() {
         return poFmustqty;
     }
-
     public void setPoFid(int poFid) {
         this.poFid = poFid;
     }
-
     public void setPoFbillno(String poFbillno) {
         this.poFbillno = poFbillno;
     }
-
     public void setPoFmustqty(double poFmustqty) {
         this.poFmustqty = poFmustqty;
+    }
+    public int getCreateUserId() {
+        return createUserId;
+    }
+    public void setCreateUserId(int createUserId) {
+        this.createUserId = createUserId;
+    }
+    public String getCreateUserName() {
+        return createUserName;
+    }
+    public void setCreateUserName(String createUserName) {
+        this.createUserName = createUserName;
+    }
+    public String getDepartmentFnumber() {
+        return departmentFnumber;
+    }
+    public void setDepartmentFnumber(String departmentFnumber) {
+        this.departmentFnumber = departmentFnumber;
     }
 
     public ScanningRecord() {
@@ -265,6 +278,8 @@ public class ScanningRecord implements Serializable {
                 ", k3number='" + k3number + '\'' +
                 ", fdate='" + fdate + '\'' +
                 ", status='" + status + '\'' +
+                ", createUserId=" + createUserId +
+                ", createUserName='" + createUserName + '\'' +
                 ", receiveOrgFnumber='" + receiveOrgFnumber + '\'' +
                 ", purOrgFnumber='" + purOrgFnumber + '\'' +
                 ", supplierFnumber='" + supplierFnumber + '\'' +
@@ -275,6 +290,7 @@ public class ScanningRecord implements Serializable {
                 ", poFid=" + poFid +
                 ", poFbillno='" + poFbillno + '\'' +
                 ", poFmustqty=" + poFmustqty +
+                ", departmentFnumber='" + departmentFnumber + '\'' +
                 '}';
     }
 }

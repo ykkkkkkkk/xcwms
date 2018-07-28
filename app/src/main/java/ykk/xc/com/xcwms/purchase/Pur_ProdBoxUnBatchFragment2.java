@@ -806,7 +806,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
 
                     // 判断物料是否装满，单装或者混装
                     if(prodOrderNotnull && prodOrder.getfId() == forMtl.getRelationBillId() && prodOrder.getMtlId() == forMtl.getMaterialId()) {
-                        if(forMtl.getMaterial().getIsSnManager() == 0) {
+                        if(forMtl.getMtl().getIsSnManager() == 0) {
                             tmpMtl = forMtl;
                         }
                     }  else {
@@ -841,11 +841,11 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
             tmpMtl.setNumber(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             // 启用了批次号
-            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsBatchManager() != null && tmpMtl.getMaterial().getIsBatchManager() == 1) {
+            if(tmpMtl.getMtl() != null && tmpMtl.getMtl().getIsBatchManager() == 1) {
                 tmpMtl.setBatchCode(barCodeTable.getBatchCode());
             }
             // 启用了序列号
-            if(tmpMtl.getMaterial() != null && tmpMtl.getMaterial().getIsSnManager() != null && tmpMtl.getMaterial().getIsSnManager() == 1) {
+            if(tmpMtl.getMtl() != null && tmpMtl.getMtl().getIsSnManager() == 1) {
                 tmpMtl.setSnCode(barCodeTable.getSnCode());
             }
             tmpMtl.setCreateUserId(user.getId());

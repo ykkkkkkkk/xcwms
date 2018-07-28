@@ -36,12 +36,12 @@ public class Pur_ProdBoxUnBatchFragment2Adapter extends BaseArrayRecyclerAdapter
         TextView tv_num = holder.obtainView(R.id.tv_num);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_mats.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
+        tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
         String deliWay = Comm.isNULLS(entity.getDeliveryWay());
         tv_deliWay.setText(deliWay);
         // 是否启用批次管理和序列号管理
         tv_num.setText(df.format(entity.getNumber()));
-        if(entity.getMaterial().getIsSnManager() == 1) {
+        if(entity.getMtl().getIsSnManager() == 1) {
             tv_num.setBackgroundResource(R.drawable.back_style_gray2a);
             tv_num.setEnabled(false);
         } else {

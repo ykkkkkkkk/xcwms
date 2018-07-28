@@ -555,90 +555,92 @@ public class Sal_OutActivity extends BaseActivity {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                switch (v.getId()) {
-                    case R.id.et_whName: // 仓库
-                        String whName = getValues(etWhName).trim();
-                        if (isKeyDownEnter(whName, event, keyCode)) {
-                            if (stockBarcode != null && stockBarcode.length() > 0) {
-                                String tmp = whName.replaceFirst(stockBarcode, "");
-                                stockBarcode = tmp.replace("\n", "");
-                            } else {
-                                stockBarcode = whName.replace("\n", "");
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (v.getId()) {
+                        case R.id.et_whName: // 仓库
+                            String whName = getValues(etWhName).trim();
+                            if (isKeyDownEnter(whName, event, keyCode)) {
+                                if (stockBarcode != null && stockBarcode.length() > 0) {
+                                    String tmp = whName.replaceFirst(stockBarcode, "");
+                                    stockBarcode = tmp.replace("\n", "");
+                                } else {
+                                    stockBarcode = whName.replace("\n", "");
+                                }
+                                curViewFlag = '1';
+                                // 执行查询方法
+                                run_smGetDatas();
                             }
-                            curViewFlag = '1';
-                            // 执行查询方法
-                            run_smGetDatas();
-                        }
 
-                        break;
-                    case R.id.et_whArea: // 库区
-                        String whArea = getValues(etWhArea).trim();
-                        if (isKeyDownEnter(whArea, event, keyCode)) {
-                            if (stockABarcode != null && stockABarcode.length() > 0) {
-                                String tmp = whArea.replaceFirst(stockABarcode, "");
-                                stockABarcode = tmp.replace("\n", "");
-                            } else {
-                                stockABarcode = whArea.replace("\n", "");
+                            break;
+                        case R.id.et_whArea: // 库区
+                            String whArea = getValues(etWhArea).trim();
+                            if (isKeyDownEnter(whArea, event, keyCode)) {
+                                if (stockABarcode != null && stockABarcode.length() > 0) {
+                                    String tmp = whArea.replaceFirst(stockABarcode, "");
+                                    stockABarcode = tmp.replace("\n", "");
+                                } else {
+                                    stockABarcode = whArea.replace("\n", "");
+                                }
+                                curViewFlag = '2';
+                                // 执行查询方法
+                                run_smGetDatas();
                             }
-                            curViewFlag = '2';
-                            // 执行查询方法
-                            run_smGetDatas();
-                        }
 
-                        break;
-                    case R.id.et_whPos: // 库位
-                        String whPos = getValues(etWhPos).trim();
-                        if (isKeyDownEnter(whPos, event, keyCode)) {
-                            if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                stockPBarcode = tmp.replace("\n", "");
-                            } else {
-                                stockPBarcode = whPos.replace("\n", "");
+                            break;
+                        case R.id.et_whPos: // 库位
+                            String whPos = getValues(etWhPos).trim();
+                            if (isKeyDownEnter(whPos, event, keyCode)) {
+                                if (stockPBarcode != null && stockPBarcode.length() > 0) {
+                                    String tmp = whPos.replaceFirst(stockPBarcode, "");
+                                    stockPBarcode = tmp.replace("\n", "");
+                                } else {
+                                    stockPBarcode = whPos.replace("\n", "");
+                                }
+                                curViewFlag = '3';
+                                // 执行查询方法
+                                run_smGetDatas();
                             }
-                            curViewFlag = '3';
-                            // 执行查询方法
-                            run_smGetDatas();
-                        }
 
-                        break;
-                    case R.id.et_matNo: // 物料
-                        String matNo = getValues(etMatNo).trim();
-                        if (!selectSourceBefore()) { // 扫码之前的判断
-                            etMatNo.setText("");
-                            return false;
-                        }
-                        if (isKeyDownEnter(matNo, event, keyCode)) {
-                            if (matBarcode != null && matBarcode.length() > 0) {
-                                String tmp = matNo.replaceFirst(matBarcode, "");
-                                matBarcode = tmp.replace("\n", "");
-                            } else {
-                                matBarcode = matNo.replace("\n", "");
+                            break;
+                        case R.id.et_matNo: // 物料
+                            String matNo = getValues(etMatNo).trim();
+                            if (!selectSourceBefore()) { // 扫码之前的判断
+                                etMatNo.setText("");
+                                return false;
                             }
-                            curViewFlag = '4';
-                            // 执行查询方法
-                            run_smGetDatas();
-                        }
-
-                        break;
-                    case R.id.et_sourceNo: // 来源单号
-                        String sourceNo = getValues(etSourceNo).trim();
-                        if (!selectSourceBefore()) { // 扫码之前的判断
-                            etSourceNo.setText("");
-                            return false;
-                        }
-                        if (isKeyDownEnter(sourceNo, event, keyCode)) {
-                            if (sourceBarcode != null && sourceBarcode.length() > 0) {
-                                String tmp = sourceNo.replaceFirst(sourceBarcode, "");
-                                sourceBarcode = tmp.replace("\n", "");
-                            } else {
-                                sourceBarcode = sourceNo.replace("\n", "");
+                            if (isKeyDownEnter(matNo, event, keyCode)) {
+                                if (matBarcode != null && matBarcode.length() > 0) {
+                                    String tmp = matNo.replaceFirst(matBarcode, "");
+                                    matBarcode = tmp.replace("\n", "");
+                                } else {
+                                    matBarcode = matNo.replace("\n", "");
+                                }
+                                curViewFlag = '4';
+                                // 执行查询方法
+                                run_smGetDatas();
                             }
-                            curViewFlag = '5';
-                            // 执行查询方法
-                            run_smGetDatas();
-                        }
 
-                        break;
+                            break;
+                        case R.id.et_sourceNo: // 来源单号
+                            String sourceNo = getValues(etSourceNo).trim();
+                            if (!selectSourceBefore()) { // 扫码之前的判断
+                                etSourceNo.setText("");
+                                return false;
+                            }
+                            if (isKeyDownEnter(sourceNo, event, keyCode)) {
+                                if (sourceBarcode != null && sourceBarcode.length() > 0) {
+                                    String tmp = sourceNo.replaceFirst(sourceBarcode, "");
+                                    sourceBarcode = tmp.replace("\n", "");
+                                } else {
+                                    sourceBarcode = sourceNo.replace("\n", "");
+                                }
+                                curViewFlag = '5';
+                                // 执行查询方法
+                                run_smGetDatas();
+                            }
+
+                            break;
+                    }
                 }
                 return false;
             }

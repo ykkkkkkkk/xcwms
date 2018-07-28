@@ -26,7 +26,7 @@ public class MaterialBinningRecord implements Serializable {
 	/* 对应t_barCodeTable 表中的snCode字段  */
 	private String snCode;
 	/*物料类*/
-	private Material material;
+	private Material mtl;
 	/*箱子里装入物料的数量*/
 	private double number;
 	/*关联单据id*/
@@ -76,6 +76,8 @@ public class MaterialBinningRecord implements Serializable {
 	private int	modifyUserId;
 	/* 修改人名称  */
 	private String modifyUserName;
+	/* 关联单据Json对象 */
+	private String relationObj;
 
 	public MaterialBinningRecord() {
 		super();
@@ -113,8 +115,8 @@ public class MaterialBinningRecord implements Serializable {
 		return snCode;
 	}
 
-	public Material getMaterial() {
-		return material;
+	public Material getMtl() {
+		return mtl;
 	}
 
 	public double getNumber() {
@@ -213,8 +215,8 @@ public class MaterialBinningRecord implements Serializable {
 		this.snCode = snCode;
 	}
 
-	public void setMaterial(Material material) {
-		this.material = material;
+	public void setMtl(Material mtl) {
+		this.mtl = mtl;
 	}
 
 	public void setNumber(double number) {
@@ -281,16 +283,24 @@ public class MaterialBinningRecord implements Serializable {
 		this.modifyUserName = modifyUserName;
 	}
 
+	public String getRelationObj() {
+		return relationObj;
+	}
+
+	public void setRelationObj(String relationObj) {
+		this.relationObj = relationObj;
+	}
+
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
 				+ ", materialId=" + materialId + ", barcode=" + barcode + ", barcodeSource=" + barcodeSource
-				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", material=" + material + ", number=" + number
+				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", mtl=" + mtl + ", number=" + number
 				+ ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber + ", customerId="
 				+ customerId + ", customer=" + customer + ", expressType=" + expressType + ", deliveryWay="
 				+ deliveryWay + ", packageWorkType=" + packageWorkType + ", binningType=" + binningType + ", caseId="
 				+ caseId + ", createDate=" + createDate + ", createUserId=" + createUserId + ", createUserName="
 				+ createUserName + ", modifyDate=" + modifyDate + ", modifyUserId=" + modifyUserId + ", modifyUserName="
-				+ modifyUserName + "]";
+				+ modifyUserName + ", relationObj=" + relationObj + "]";
 	}
 }

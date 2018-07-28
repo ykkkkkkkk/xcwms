@@ -1,7 +1,6 @@
 package ykk.xc.com.xcwms.purchase.adapter;
 
 import android.app.Activity;
-import android.view.View;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -36,7 +35,7 @@ public class Pur_ProdBoxBatchFragment1Adapter extends BaseArrayRecyclerAdapter<M
         TextView tv_num = holder.obtainView(R.id.tv_num);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_mtls.setText(entity.getMaterial().getfNumber()+"\n"+entity.getMaterial().getfName());
+        tv_mtls.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
         tv_boxBarCode.setText(entity.getBoxBarCode().getBarCode());
         tv_batch.setText(Comm.isNULLS(entity.getBatchCode()));
         tv_num.setText(df.format(entity.getNumber()));

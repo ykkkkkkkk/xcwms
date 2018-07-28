@@ -17,7 +17,7 @@ public class ProdOrder implements Serializable {
 	private int prodOrgId; // 生产组织Id,
 	private String prodOrgNumber; // 生产组织代码,
 	private String prodOrgName; // 生产组织名称,
-	private String deptId;//生产车间id
+	private int deptId;//生产车间id
 	private String deptNumber;//生产车间代码
 	private String deptName;//生产车间名称
 	private int mtlId; // 物料id
@@ -70,7 +70,7 @@ public class ProdOrder implements Serializable {
 		return prodOrgName;
 	}
 
-	public String getDeptId() {
+	public int getDeptId() {
 		return deptId;
 	}
 
@@ -150,7 +150,7 @@ public class ProdOrder implements Serializable {
 		this.prodOrgName = prodOrgName;
 	}
 
-	public void setDeptId(String deptId) {
+	public void setDeptId(int deptId) {
 		this.deptId = deptId;
 	}
 
