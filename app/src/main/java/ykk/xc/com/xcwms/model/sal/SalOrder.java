@@ -19,9 +19,11 @@ public class SalOrder implements Serializable{
     private String custNumber; // 客户代码,
     private String custName; // 客户,
     private int salOrgId; // 销售组织id
+    private String salOrgNumber; // 销售组织代码
     private String salOrgName; // 销售组织
     private Organization salOrg;
     private int inventoryOrgId; // 库存组织id
+    private String inventoryOrgNumber; // 库存组织代码
     private String inventoryOrgName; // 库存组织名称
     private Organization inventoryOrg;
     private int mtlId; // 物料id
@@ -34,6 +36,9 @@ public class SalOrder implements Serializable{
     private double salFcanoutqty; // 可出数量
     private String deliveryWay; // 发货方式
     private int isCheck; // 新加的，用于前台临时用判断是否选中
+
+    /*对应k3单据分录号字段*/
+    private Integer entryId;
 
     public SalOrder() {
         super();
@@ -223,14 +228,41 @@ public class SalOrder implements Serializable{
         this.isCheck = isCheck;
     }
 
+    public Integer getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(Integer entryId) {
+        this.entryId = entryId;
+    }
+
+    public String getSalOrgNumber() {
+        return salOrgNumber;
+    }
+
+    public String getInventoryOrgNumber() {
+        return inventoryOrgNumber;
+    }
+
+    public void setSalOrgNumber(String salOrgNumber) {
+        this.salOrgNumber = salOrgNumber;
+    }
+
+    public void setInventoryOrgNumber(String inventoryOrgNumber) {
+        this.inventoryOrgNumber = inventoryOrgNumber;
+    }
+
     @Override
     public String toString() {
         return "SalOrder [fId=" + fId + ", fbillno=" + fbillno + ", fbillType=" + fbillType + ", salDate=" + salDate
                 + ", custId=" + custId + ", custNumber=" + custNumber + ", custName=" + custName + ", salOrgId="
-                + salOrgId + ", salOrgName=" + salOrgName + ", salOrg=" + salOrg + ", inventoryOrgId=" + inventoryOrgId
+                + salOrgId + ", salOrgNumber=" + salOrgNumber + ", salOrgName=" + salOrgName + ", salOrg=" + salOrg
+                + ", inventoryOrgId=" + inventoryOrgId + ", inventoryOrgNumber=" + inventoryOrgNumber
                 + ", inventoryOrgName=" + inventoryOrgName + ", inventoryOrg=" + inventoryOrg + ", mtlId=" + mtlId
                 + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlUnitName="
                 + mtlUnitName + ", salFqty=" + salFqty + ", salFstockoutqty=" + salFstockoutqty + ", salFcanoutqty="
-                + salFcanoutqty + ", deliveryWay=" + deliveryWay + ", isCheck=" + isCheck + "]";
+                + salFcanoutqty + ", deliveryWay=" + deliveryWay + ", isCheck=" + isCheck + ", entryId=" + entryId
+                + "]";
     }
+
 }

@@ -38,6 +38,23 @@ public class ProdOrder implements Serializable {
 	/* 对应t_barCodeTable 表中的snCode字段  */
 	private String snCode;
 
+	/*对应k3单据分录号字段*/
+	private Integer entryId;
+	/*对应k3单据体里的生产顺序号*/
+	private String prodSeqNumber;
+	/*k3收货方地址*/
+	private String receiveAddress;
+	/*k3收货联系人*/
+	private String receivePerson;
+	/*k3收货人电话*/
+	private String receiveTel;
+	/*k3物流公司名称*/
+	private String deliveryCompanyName;
+	/*k3备注*/
+	private String remarks;
+	/*计划开工时间*/
+	private String planStartDate;
+
 	public ProdOrder() {
 		super();
 	}
@@ -226,6 +243,70 @@ public class ProdOrder implements Serializable {
 		this.snCode = snCode;
 	}
 
+	public Integer getEntryId() {
+		return entryId;
+	}
+
+	public void setEntryId(Integer entryId) {
+		this.entryId = entryId;
+	}
+
+	public String getProdSeqNumber() {
+		return prodSeqNumber;
+	}
+
+	public void setProdSeqNumber(String prodSeqNumber) {
+		this.prodSeqNumber = prodSeqNumber;
+	}
+
+	public String getReceiveAddress() {
+		return receiveAddress;
+	}
+
+	public void setReceiveAddress(String receiveAddress) {
+		this.receiveAddress = receiveAddress;
+	}
+
+	public String getReceivePerson() {
+		return receivePerson;
+	}
+
+	public void setReceivePerson(String receivePerson) {
+		this.receivePerson = receivePerson;
+	}
+
+	public String getReceiveTel() {
+		return receiveTel;
+	}
+
+	public void setReceiveTel(String receiveTel) {
+		this.receiveTel = receiveTel;
+	}
+
+	public String getDeliveryCompanyName() {
+		return deliveryCompanyName;
+	}
+
+	public void setDeliveryCompanyName(String deliveryCompanyName) {
+		this.deliveryCompanyName = deliveryCompanyName;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
+	public String getPlanStartDate() {
+		return planStartDate;
+	}
+
+	public void setPlanStartDate(String planStartDate) {
+		this.planStartDate = planStartDate;
+	}
+
 	@Override
 	public String toString() {
 		return "ProdOrder [fId=" + fId + ", fbillno=" + fbillno + ", fbillType=" + fbillType + ", prodFdate="
@@ -234,7 +315,10 @@ public class ProdOrder implements Serializable {
 				+ ", mtlId=" + mtlId + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname
 				+ ", unitFname=" + unitFname + ", prodFqty=" + prodFqty + ", custId=" + custId + ", custNumber="
 				+ custNumber + ", custName=" + custName + ", salOrderNo=" + salOrderNo + ", barcode=" + barcode
-				+ ", batchCode=" + batchCode + ", snCode=" + snCode + "]";
+				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", entryId=" + entryId + ", prodSeqNumber="
+				+ prodSeqNumber + ", receiveAddress=" + receiveAddress + ", receivePerson=" + receivePerson
+				+ ", receiveTel=" + receiveTel + ", deliveryCompanyName=" + deliveryCompanyName + ", remarks=" + remarks
+				+ ", planStartDate=" + planStartDate + "]";
 	}
 
 }

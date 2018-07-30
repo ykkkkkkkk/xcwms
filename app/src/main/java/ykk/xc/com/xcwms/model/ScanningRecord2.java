@@ -46,6 +46,8 @@ public class ScanningRecord2 implements Serializable {
     private String poFbillno; // 采购订单编码
     private double poFmustqty; // 采购订单剩余数
     private String departmentFnumber;
+    private String custFnumber;
+    private int entryId; // 订单分录内码
 
     public int getID() {
         return ID;
@@ -293,6 +295,17 @@ public class ScanningRecord2 implements Serializable {
     public void setDepartmentFnumber(String departmentFnumber) {
         this.departmentFnumber = departmentFnumber;
     }
+    public String getCustFnumber() {
+        return custFnumber;
+    }
+    public void setCustFnumber(String custFnumber) {
+        this.custFnumber = custFnumber;
+    }
+    public int getEntryId() { return entryId;
+    }
+    public void setEntryId(int entryId) {
+        this.entryId = entryId;
+    }
 
     public ScanningRecord2() {
         super();
@@ -342,6 +355,8 @@ public class ScanningRecord2 implements Serializable {
                 ", poFbillno='" + poFbillno + '\'' +
                 ", poFmustqty=" + poFmustqty +
                 ", departmentFnumber='" + departmentFnumber + '\'' +
+                ", custFnumber='" + custFnumber + '\'' +
+                ", entryId=" + entryId +
                 '}';
     }
 }

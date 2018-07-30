@@ -30,7 +30,6 @@
         android:id="@+id/tv_batch_seqNo"
         android:layout_width="74dp"
         android:layout_height="@dimen/_46dp"
-        android:background="@drawable/back_style_blue2"
         android:gravity="center"
         android:text="批号\n序列号"
         android:textColor="#000000"

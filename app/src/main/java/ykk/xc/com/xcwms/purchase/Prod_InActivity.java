@@ -3,6 +3,7 @@ package ykk.xc.com.xcwms.purchase;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -58,6 +59,8 @@ import ykk.xc.com.xcwms.util.JsonUtil;
 
 public class Prod_InActivity extends BaseActivity {
 
+    @BindView(R.id.lin_tabs)
+    LinearLayout linTabs;
     @BindView(R.id.lin_tab1)
     LinearLayout linTab1;
     @BindView(R.id.lin_tab2)
@@ -166,6 +169,7 @@ public class Prod_InActivity extends BaseActivity {
                                 List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                                 m.linTab1.setEnabled(false);
                                 m.linTab2.setEnabled(false);
+                                m.getBarCodeTableBefore(false);
                                 m.setTexts(m.etMatNo, m.boxBarcode);
                                 m.getSourceAfter(list, true);
 
@@ -642,9 +646,11 @@ public class Prod_InActivity extends BaseActivity {
         if(isEnable) {
             setEnables(tvInOrg, R.drawable.back_style_blue, true);
             setEnables(tvProdOrg, R.drawable.back_style_blue, true);
+            linTabs.setBackgroundColor(Color.parseColor("#EAEAEA"));
         } else {
             setEnables(tvInOrg, R.drawable.back_style_gray3, false);
             setEnables(tvProdOrg, R.drawable.back_style_gray3, false);
+            linTabs.setBackgroundColor(Color.parseColor("#00000000"));
         }
     }
 
@@ -673,7 +679,7 @@ public class Prod_InActivity extends BaseActivity {
         // 入库组织
         if(inOrg == null) inOrg = new Organization();
         inOrg.setFpkId(prodOrder.getProdOrgId());
-        inOrg.setNumber(prodOrder.getProdOrgNumber());
+        inOrg.setNumber(String.valueOf(prodOrder.getProdOrgId()));
         inOrg.setName(prodOrder.getProdOrgName());
 
         setEnables(tvInOrg, R.drawable.back_style_gray3, false);
@@ -681,7 +687,7 @@ public class Prod_InActivity extends BaseActivity {
         // 生产组织
         if(prodOrg == null) prodOrg = new Organization();
         prodOrg.setFpkId(prodOrder.getProdOrgId());
-        prodOrg.setNumber(prodOrder.getProdOrgNumber());
+        prodOrg.setNumber(String.valueOf(prodOrder.getProdOrgId()));
         prodOrg.setName(prodOrder.getProdOrgName());
 
         setEnables(tvProdOrg, R.drawable.back_style_gray3, false);
@@ -697,11 +703,12 @@ public class Prod_InActivity extends BaseActivity {
             sr2.setEmpId(department.getFitemID());
             sr2.setDepartmentFnumber(department.getDepartmentNumber());
         }
-        sr2.setFqty(1);
+        sr2.setFqty(prodOrder.getProdFqty());
         sr2.setStockqty(1);
         sr2.setPoFid(prodOrder.getfId());
+        sr2.setEntryId(prodOrder.getEntryId());
         sr2.setPoFbillno(prodOrder.getFbillno());
-        sr2.setPoFmustqty(1);
+        sr2.setPoFmustqty(prodOrder.getProdFqty());
 
         checkDatas.add(sr2);
         mAdapter.notifyDataSetChanged();
@@ -722,16 +729,16 @@ public class Prod_InActivity extends BaseActivity {
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(mbr.getRelationBillId());
             sr2.setPoFbillno(mbr.getRelationBillNumber());
-            sr2.setPoFmustqty(mbr.getNumber());
             sr2.setBatchno(mbr.getBatchCode());
             sr2.setSequenceNo(mbr.getSnCode());
             sr2.setBarcode(mbr.getBarcode());
-            sr2.setFqty(mbr.getNumber());
+//            sr2.setPoFmustqty(mbr.getNumber());
+//            sr2.setFqty(mbr.getNumber());
 
             // 是否启用物料的序列号,如果启用了，则数量为1
-            if (mbr.getMtl().getIsSnManager() == 1) {
-                sr2.setStockqty(1);
-            }
+//            if (mbr.getMtl().getIsSnManager() == 1) {
+//                sr2.setStockqty(1);
+//            }
             if (stock != null) {
                 sr2.setStockId(stock.getfStockid());
                 sr2.setStock(stock);
@@ -750,10 +757,14 @@ public class Prod_InActivity extends BaseActivity {
             }
             // 得到生产订单
             ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+            sr2.setEntryId(prodOrder.getEntryId());
+            sr2.setPoFmustqty(prodOrder.getProdFqty());
+            sr2.setFqty(prodOrder.getProdFqty());
+            sr2.setStockqty(mbr.getNumber());
             // 入库组织
             if(inOrg == null) inOrg = new Organization();
             inOrg.setFpkId(prodOrder.getProdOrgId());
-            inOrg.setNumber(prodOrder.getProdOrgNumber());
+            inOrg.setNumber(String.valueOf(prodOrder.getProdOrgId()));
             inOrg.setName(prodOrder.getProdOrgName());
 
             setEnables(tvInOrg, R.drawable.back_style_gray3, false);
@@ -763,7 +774,7 @@ public class Prod_InActivity extends BaseActivity {
             // 生产组织
             if(prodOrg == null) prodOrg = new Organization();
             prodOrg.setFpkId(prodOrder.getProdOrgId());
-            prodOrg.setNumber(prodOrder.getProdOrgNumber());
+            prodOrg.setNumber(String.valueOf(prodOrder.getProdOrgId()));
             prodOrg.setName(prodOrder.getProdOrgName());
 
             setEnables(tvProdOrg, R.drawable.back_style_gray3, false);
@@ -876,6 +887,7 @@ public class Prod_InActivity extends BaseActivity {
             record.setPurOrgFnumber(sr2.getPurOrgFnumber());
             record.setCustomerK3Id(0);
             record.setPoFid(sr2.getPoFid());
+            record.setEntryId(sr2.getEntryId());
             record.setPoFbillno(sr2.getPoFbillno());
             record.setPoFmustqty(sr2.getPoFmustqty());
 

@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="生产入库"
+            android:text="销售出库"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -35,70 +35,11 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/lin_tabs"
         android:layout_width="match_parent"
         android:layout_height="38dp"
+        android:layout_margin="6dp"
         android:gravity="center"
         android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/lin_tab1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <View
-                android:id="@+id/viewRadio1"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
-                android:background="@drawable/check_on" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="物料条码"
-                android:textColor="@android:color/black"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/lin_tab2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <View
-                android:id="@+id/viewRadio2"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
-                android:background="@drawable/check_off2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="箱码"
-                android:textColor="@android:color/black"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginLeft="@dimen/_6dp"
-        android:layout_marginRight="@dimen/_6dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
 
         <TextView
             android:layout_width="wrap_content"
@@ -113,11 +54,12 @@
             android:id="@+id/tv_orderTypeSel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
             android:layout_weight="1"
             android:background="@drawable/back_style_blue"
             android:drawableRight="@drawable/xiala3"
             android:gravity="center"
-            android:text="生产入库"
+            android:text="标准销售出库"
             android:textColor="@color/black"
             android:textSize="@dimen/_14sp" />
 
@@ -132,9 +74,10 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_prodDate"
+            android:id="@+id/tv_salDate"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
             android:layout_weight="1"
             android:background="@drawable/back_style_blue"
             android:drawableRight="@drawable/xiala3"
@@ -142,13 +85,80 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_14sp" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="@dimen/_6dp"
+        android:layout_marginRight="@dimen/_6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:ems="2"
+            android:gravity="center"
+            android:text="客户"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_custSel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/back_style_blue"
+            android:drawableRight="@drawable/xiala3"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="3dp"
+            android:ems="2"
+            android:gravity="center"
+            android:text="源单单号"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_sourceNo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/back_style_blue4"
+                android:inputType="none"
+                android:paddingLeft="2dp"
+                android:textSize="@dimen/_12sp" />
+
+            <Button
+                android:id="@+id/btn_sourceNo"
+                android:layout_width="@dimen/_38dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_blue3_selector"
+                android:text="▼"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:layout_margin="@dimen/_6dp"
+        android:layout_margin="6dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -171,6 +181,7 @@
                 android:id="@+id/et_whName"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue4"
                 android:inputType="none"
@@ -187,10 +198,19 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/_3dp"
             android:ems="2"
             android:gravity="center"
             android:text="库位"
@@ -207,6 +227,7 @@
                 android:id="@+id/et_whPos"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue4"
                 android:inputType="none"
@@ -223,38 +244,42 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:layout_marginLeft="@dimen/_6dp"
-        android:layout_marginRight="@dimen/_6dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
         <TextView
-            android:id="@+id/tv_smName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_3dp"
             android:ems="2"
             android:gravity="center"
-            android:text="物料条码"
+            android:text="物料代码"
             android:textColor="#000000"
             android:textSize="12sp" />
 
-        <EditText
-            android:id="@+id/et_matNo"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
             android:layout_weight="1"
-            android:hint="扫码区"
-            android:background="@drawable/back_style_blue"
-            android:inputType="none"
-            android:paddingLeft="@dimen/_2dp"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_12sp" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_matNo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="2dp"
+                android:layout_weight="1"
+                android:background="@drawable/back_style_blue4"
+                android:inputType="none"
+                android:paddingLeft="@dimen/_2dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12sp" />
+
+            <Button
+                android:id="@+id/btn_selMat"
+                android:layout_width="@dimen/_38dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/btn_blue3_selector"
+                android:text="▼"
+                android:textColor="@color/white" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -270,13 +295,13 @@
             android:layout_height="match_parent"
             android:ems="2"
             android:gravity="center"
-            android:text="入库组织"
+            android:text="库存组织"
             android:textColor="#000000"
             android:textSize="12sp" />
 
 
         <TextView
-            android:id="@+id/tv_inOrg"
+            android:id="@+id/tv_inventoryOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
@@ -293,12 +318,12 @@
             android:layout_marginLeft="3dp"
             android:ems="2"
             android:gravity="center"
-            android:text="生产组织"
+            android:text="销售组织"
             android:textColor="#000000"
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/tv_prodOrg"
+            android:id="@+id/tv_salOrg"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
@@ -313,7 +338,50 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="规格："
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_type"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_3dp"
+            android:gravity="center"
+            android:text="物料名称："
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_matName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="38dp"
+        android:layout_marginBottom="@dimen/_6dp"
         android:layout_marginLeft="@dimen/_6dp"
         android:layout_marginRight="@dimen/_6dp"
         android:gravity="center"
@@ -324,19 +392,19 @@
             android:layout_height="match_parent"
             android:ems="2"
             android:gravity="center"
-            android:text="仓管员"
+            android:text="数量"
             android:textColor="#000000"
             android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/tv_prodMan"
+        <EditText
+            android:id="@+id/et_num"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
             android:layout_weight="1"
             android:background="@drawable/back_style_blue"
-            android:drawableRight="@drawable/xiala3"
-            android:gravity="center"
-            android:textColor="@color/black"
+            android:inputType="numberDecimal"
+            android:paddingLeft="@dimen/_2dp"
             android:textSize="@dimen/_14sp" />
 
         <TextView
@@ -345,29 +413,26 @@
             android:layout_marginLeft="3dp"
             android:ems="2"
             android:gravity="center"
-            android:text="车间"
+            android:text="库区"
             android:textColor="#000000"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/tv_deptName"
+        <Button
+            android:id="@+id/btn_add"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
             android:layout_weight="1"
-            android:background="@drawable/back_style_blue"
-            android:inputType="none"
-            android:drawableRight="@drawable/xiala3"
-            android:paddingLeft="2dp"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_12sp" />
-
+            android:background="@drawable/btn_blue_selector"
+            android:text="添加行"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/_6dp"
         android:background="#BBBBBB" />
 
     <LinearLayout
@@ -396,7 +461,7 @@
             android:layout_width="76dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="批号\n序列号"
+            android:text="批号"
             android:textColor="#000000"
             android:textSize="12sp" />
 
@@ -404,7 +469,7 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="应收数\n实收数"
+            android:text="应发数\n实发数"
             android:textColor="#000000"
             android:textSize="12sp" />
 
@@ -413,7 +478,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="仓库\n库位"
+            android:text="仓库/库区/\n库位"
             android:textColor="#000000"
             android:textSize="12sp" />
 
@@ -437,8 +502,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_38dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_height="@dimen/_38dp">
 
         <Button
             android:id="@+id/btn_clone"
