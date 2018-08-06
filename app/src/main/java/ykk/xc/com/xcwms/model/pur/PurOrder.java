@@ -10,8 +10,10 @@ public class PurOrder implements Serializable {
     private String fbillno; // 单据编号,
     private int supplierId; // 供应商Id,
     private String supplierName; // 供应商,
+    private String supplierNumber;//供应商编码
     private String purPerson; // 采购员,
     private int purOrgId; // 采购组织id
+    private String purOrgNumber; // 采购组织代码
     private String purOrgName; // 采购组织
     private Organization purOrg;
     private int deptId; // 采购部门id
@@ -25,10 +27,14 @@ public class PurOrder implements Serializable {
     private String unitFname; // 单位
     private double poFqty; // 采购数量
     private double poFstockinqty; // 累计入库数量
-    private int receiveOrgId; // 收料组织
+    private int receiveOrgId; // 收料组织id
+    private String receiveOrgNumber; // 收料组织代码
     private String receiveOrgName; // 收料组织
     private Organization receiveOrg;
     private int isCheck; // 新加的是否选中
+
+    /*对应k3单据分录号字段*/
+    private Integer entryId;
 
     public int getfId() {
         return fId;
@@ -210,6 +216,22 @@ public class PurOrder implements Serializable {
         this.receiveOrg = receiveOrg;
     }
 
+    public String getSupplierNumber() {
+        return supplierNumber;
+    }
+
+    public void setSupplierNumber(String supplierNumber) {
+        this.supplierNumber = supplierNumber;
+    }
+
+    public Integer getEntryId() {
+        return entryId;
+    }
+
+    public void setEntryId(Integer entryId) {
+        this.entryId = entryId;
+    }
+
     public int getIsCheck() {
         return isCheck;
     }
@@ -218,16 +240,31 @@ public class PurOrder implements Serializable {
         this.isCheck = isCheck;
     }
 
-    @Override
-    public String toString() {
-        return "PurPoOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
-                + supplierName + ", purPerson=" + purPerson + ", purOrgId=" + purOrgId
-                + ", purOrgName=" + purOrgName + ", purOrg=" + purOrg + ", deptId="
-                + deptId + ", deptName=" + deptName + ", poFdate=" + poFdate + ", mtlId=" + mtlId + ", mtl=" + mtl
-                + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType + ", unitFname="
-                + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty + ", receiveOrgId="
-                + receiveOrgId + ", receiveOrgName=" + receiveOrgName
-                + ", receiveOrg=" + receiveOrg + "]";
+    public String getPurOrgNumber() {
+        return purOrgNumber;
     }
 
+    public void setPurOrgNumber(String purOrgNumber) {
+        this.purOrgNumber = purOrgNumber;
+    }
+
+    public String getReceiveOrgNumber() {
+        return receiveOrgNumber;
+    }
+
+    public void setReceiveOrgNumber(String receiveOrgNumber) {
+        this.receiveOrgNumber = receiveOrgNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "PurOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
+                + supplierName + ", supplierNumber=" + supplierNumber + ", purPerson=" + purPerson + ", purOrgId="
+                + purOrgId + ", purOrgNumber=" + purOrgNumber + ", purOrgName=" + purOrgName + ", purOrg=" + purOrg
+                + ", deptId=" + deptId + ", deptName=" + deptName + ", poFdate=" + poFdate + ", mtlId=" + mtlId
+                + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType
+                + ", unitFname=" + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty
+                + ", receiveOrgId=" + receiveOrgId + ", receiveOrgNumber=" + receiveOrgNumber + ", receiveOrgName="
+                + receiveOrgName + ", receiveOrg=" + receiveOrg + ", isCheck=" + isCheck + ", entryId=" + entryId + "]";
+    }
 }

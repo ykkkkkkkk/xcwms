@@ -40,14 +40,6 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName()+"\n"+entity.getMtl().getMaterialSize());
-        // 是否启用批次管理和序列号管理
-        if(entity.getMtl().getIsBatchManager() == 0 && entity.getMtl().getIsSnManager() == 0) {
-            tv_batch_seqNo.setEnabled(false);
-            tv_batch_seqNo.setBackgroundResource(R.drawable.back_style_gray3b);
-        } else {
-            tv_batch_seqNo.setEnabled(true);
-            tv_batch_seqNo.setBackgroundResource(R.drawable.back_style_blue2);
-        }
         // 是否启用序列号
         if(entity.getMtl().getIsSnManager() == 1) {
             tv_nums.setEnabled(false);
@@ -64,7 +56,7 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         double stockqty = entity.getStockqty();
 //        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+(stockqty > 0 ? df.format(stockqty) : "")+"</font>"));
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
-        tv_stockAP.setText(entity.getStock().getfName()+"\n"+Comm.isNULLS(entity.getStockAName())+"\n"+Comm.isNULLS(entity.getStockPName()));
+        tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
@@ -73,12 +65,6 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
                     case R.id.tv_nums: // 数量
                         if(callBack != null) {
                             callBack.onClick_num(v, entity, pos);
-                        }
-
-                        break;
-                    case R.id.tv_batch_seqNo: // 批号
-                        if(callBack != null) {
-                            callBack.onClick_batch(v, entity, pos);
                         }
 
                         break;
@@ -91,7 +77,6 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
                 }
             }
         };
-        tv_batch_seqNo.setOnClickListener(click);
         tv_nums.setOnClickListener(click);
         tv_delRow.setOnClickListener(click);
     }
@@ -101,7 +86,6 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
     }
 
     public interface MyCallBack {
-        void onClick_batch(View v, ScanningRecord2 entity, int position);
         void onClick_num(View v, ScanningRecord2 entity, int position);
         void onClick_del(ScanningRecord2 entity, int position);
     }
