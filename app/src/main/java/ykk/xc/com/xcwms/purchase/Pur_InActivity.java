@@ -129,7 +129,7 @@ public class Pur_InActivity extends BaseActivity {
     private Pur_InAdapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
     private String stockBarcode, stockPBarcode, deptBarcode, mtlBarcode, purOrderBarcode, recOrderBarcode; // 对应的条码号
-    private char dataType = '1'; // 1：物料扫码，2：采购订单，3：收料订单
+    private char dataType = '1'; // 1：物料扫码，2：采购订单，3：收料订单（物料、采购、收料； 都用同一个控件，所以用此区分）
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：部门， 4：物料，5：采购订单，6：收料订单
     private int curPos; // 当前行
     private View curRadio; // 当前扫码的 View
@@ -516,18 +516,32 @@ public class Pur_InActivity extends BaseActivity {
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        // 按了删除键，回退键
+        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     public void setListener() {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // 按下事件
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_whName: // 仓库
                             String whName = getValues(etWhName).trim();
-                            if (isKeyDownEnter(whName, event, keyCode)) {
+                            if (isKeyDownEnter(whName, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
-                                    String tmp = whName.replaceFirst(stockBarcode, "");
-                                    stockBarcode = tmp.replace("\n", "");
+                                    if(stockBarcode.equals(whName)) {
+                                        stockBarcode = whName;
+                                    } else {
+                                        String tmp = whName.replaceFirst(stockBarcode, "");
+                                        stockBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     stockBarcode = whName.replace("\n", "");
                                 }
@@ -539,10 +553,14 @@ public class Pur_InActivity extends BaseActivity {
                             break;
                         case R.id.et_whPos: // 库位
                             String whPos = getValues(etWhPos).trim();
-                            if (isKeyDownEnter(whPos, event, keyCode)) {
+                            if (isKeyDownEnter(whPos, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                    String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                    stockPBarcode = tmp.replace("\n", "");
+                                    if(stockBarcode.equals(whPos)) {
+                                        stockPBarcode = whPos;
+                                    } else {
+                                        String tmp = whPos.replaceFirst(stockPBarcode, "");
+                                        stockPBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     stockPBarcode = whPos.replace("\n", "");
                                 }
@@ -554,10 +572,14 @@ public class Pur_InActivity extends BaseActivity {
                             break;
                         case R.id.et_deptName: // 部门
                             String deptName = getValues(etDeptName).trim();
-                            if (isKeyDownEnter(deptName, event, keyCode)) {
+                            if (isKeyDownEnter(deptName, keyCode)) {
                                 if (deptBarcode != null && deptBarcode.length() > 0) {
-                                    String tmp = deptName.replaceFirst(deptBarcode, "");
-                                    deptBarcode = tmp.replace("\n", "");
+                                    if(deptBarcode.equals(deptName)) {
+                                        deptBarcode = deptName;
+                                    } else {
+                                        String tmp = deptName.replaceFirst(deptBarcode, "");
+                                        deptBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     deptBarcode = deptName.replace("\n", "");
                                 }
@@ -573,7 +595,7 @@ public class Pur_InActivity extends BaseActivity {
 //                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
 //                                return false;
 //                            }
-                            if (isKeyDownEnter(matNo, event, keyCode)) {
+                            if (isKeyDownEnter(matNo, keyCode)) {
                                 switch (dataType){
                                     case '1': // 物料
                                         isKeyDownEnterSon(matNo, mtlBarcode, '4');
@@ -605,16 +627,24 @@ public class Pur_InActivity extends BaseActivity {
     /**
      * 是否按了回车键
      */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+    private boolean isKeyDownEnter(String val, int keyCode) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (val.length() == 0) {
+                Comm.showWarnDialog(context, "请扫码条码！");
+                return false;
+            }
             return true;
         }
         return false;
     }
     private void isKeyDownEnterSon(String matNo, String barcode, char viewFlag) {
         if (barcode != null && barcode.length() > 0) {
-            String tmp = matNo.replaceFirst(barcode, "");
-            barcode = tmp.replace("\n", "");
+            if(barcode.equals(matNo)) {
+                barcode = matNo;
+            } else {
+                String tmp = matNo.replaceFirst(barcode, "");
+                barcode = tmp.replace("\n", "");
+            }
         } else {
             barcode = matNo.replace("\n", "");
         }
@@ -660,6 +690,7 @@ public class Pur_InActivity extends BaseActivity {
         etDeptName.setText("");
         tvReceiveOrg.setText("");
         tvPurOrg.setText("");
+        tvSmName.setText("物料");
         supplier = null;
         stock = null;
         stockP = null;

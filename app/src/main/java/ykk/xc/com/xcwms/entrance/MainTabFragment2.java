@@ -18,6 +18,7 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.sales.Sal_BoxActivity;
 import ykk.xc.com.xcwms.sales.Sal_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutActivity;
+import ykk.xc.com.xcwms.sales.Sal_PickingListActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
 public class MainTabFragment2 extends BaseFragment {
@@ -85,9 +86,11 @@ public class MainTabFragment2 extends BaseFragment {
                 break;
             case R.id.relative3: // 单据下推
                 showLoadDialog("连接服务器...");
+
                 break;
             case R.id.relative4: // 生产领料
-                showLoadDialog("连接服务器...");
+                show(Sal_PickingListActivity.class, null);
+
                 break;
             case R.id.relative5: // 产品包装
                 show(Sal_BoxActivity.class, null);

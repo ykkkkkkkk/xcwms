@@ -531,8 +531,12 @@ public class Sal_BoxActivity extends BaseActivity {
                     String mtlCode = getValues(etMtlCode2).trim();
                     if (isKeyDownEnter(mtlCode, event, keyCode)) {
                         if (strMtlBarcode_del != null && strMtlBarcode_del.length() > 0) {
-                            String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
-                            strMtlBarcode_del = tmp.replace("\n", "");
+                            if(strMtlBarcode_del.equals(mtlCode)) {
+                                strMtlBarcode_del = mtlCode;
+                            } else {
+                                String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
+                                strMtlBarcode_del = tmp.replace("\n", "");
+                            }
                         } else {
                             strMtlBarcode_del = mtlCode.replace("\n", "");
                         }
@@ -572,18 +576,31 @@ public class Sal_BoxActivity extends BaseActivity {
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        // 按了删除键，回退键
+        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     public void setListener() {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                switch (v.getId()) {
-                    case R.id.et_boxCode: // 箱码
-                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (v.getId()) {
+                        case R.id.et_boxCode: // 箱码
                             String boxCode = getValues(etBoxCode).trim();
                             if (isKeyDownEnter(boxCode, event, keyCode)) {
                                 if (strBoxBarcode != null && strBoxBarcode.length() > 0) {
-                                    String tmp = boxCode.replaceFirst(strBoxBarcode, "");
-                                    strBoxBarcode = tmp.replace("\n", "");
+                                    if (strBoxBarcode.equals(boxCode)) {
+                                        strBoxBarcode = boxCode;
+                                    } else {
+                                        String tmp = boxCode.replaceFirst(strBoxBarcode, "");
+                                        strBoxBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     strBoxBarcode = boxCode.replace("\n", "");
                                 }
@@ -591,20 +608,22 @@ public class Sal_BoxActivity extends BaseActivity {
                                 // 执行查询方法
                                 run_smGetDatas();
                             }
-                        }
 
-                        break;
-                    case R.id.et_mtlCode: // 物料
-                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                            break;
+                        case R.id.et_mtlCode: // 物料
                             String mtlCode = getValues(etMtlCode).trim();
                             if (!smMtlBefore()) {
-                                mHandler.sendEmptyMessageDelayed(CODE1,200);
+                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
                                 return false;
                             }
                             if (isKeyDownEnter(mtlCode, event, keyCode)) {
                                 if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
-                                    String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
-                                    strMtlBarcode = tmp.replace("\n", "");
+                                    if (strMtlBarcode.equals(mtlCode)) {
+                                        strMtlBarcode = mtlCode;
+                                    } else {
+                                        String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
+                                        strMtlBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     strMtlBarcode = mtlCode.replace("\n", "");
                                 }
@@ -612,10 +631,11 @@ public class Sal_BoxActivity extends BaseActivity {
                                 // 执行查询方法
                                 run_smGetDatas();
                             }
-                        }
 
-                        break;
+                            break;
+                    }
                 }
+
                 return false;
             }
         };
@@ -643,7 +663,11 @@ public class Sal_BoxActivity extends BaseActivity {
      * 是否按了回车键
      */
     private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (val.length() == 0) {
+                Comm.showWarnDialog(context, "请扫码条码！");
+                return false;
+            }
             return true;
         }
         return false;

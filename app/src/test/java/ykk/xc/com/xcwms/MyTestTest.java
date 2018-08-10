@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -11,10 +12,10 @@ public class MyTestTest {
 
     @Test
     public void main() {
-        String a = "{\"code\":100,\"msg\":\"处理成功\",\"extend\":{\"ykk_jsonArr\":{\"pageNum\":0,\"pageSize\":0,\"size\":5,\"startRow\":1,\"endRow\":5,\"total\":5,\"pages\":0,\"list\":[\"20161201-11\",\"20170621-12\",\"20171012-11\",\"20171110-24\",\"208507\"],\"prePage\":0,\"nextPage\":0,\"isFirstPage\":false,\"isLastPage\":true,\"hasPreviousPage\":false,\"hasNextPage\":false,\"navigatePages\":1,\"navigatepageNums\":[],\"navigateFirstPage\":0,\"navigateLastPage\":0,\"firstPage\":0,\"lastPage\":0}}}";
-        List<String> list = JsonUtil.strToList2(a);
+        String a = "[{\"fId\":100501,\"fbillno\":\"FHTZD000002\",\"deliDate\":\"2018-07-27 00:00:00.0\",\"custId\":111036,\"custNumber\":\"1.4.01.0001\",\"custName\":\"北京世骏装饰工程有限公司（荣耀国际金融中心10F电动窗帘）\",\"deliOrgId\":100001,\"deliOrgNumber\":\"003\",\"deliOrgName\":\"佛山工厂\",\"deliOrg\":null,\"mtlId\":103690,\"mtl\":null,\"mtlFnumber\":\"941.101\",\"mtlFname\":\"15灵韵手动铝百叶\",\"mtlUnitName\":\"平方米\",\"stockId\":0,\"stockName\":null,\"stock\":null,\"deliFqty\":4.0,\"deliFremainoutqty\":4.0,\"deliveryWay\":null,\"entryId\":100501,\"isCheck\":0}]";
+        List<DeliOrder> list = JsonUtil.stringToList(a, DeliOrder.class);
         for(int i=0; i<list.size(); i++){
-            System.out.println("abc:"+ list.get(i));
+            System.out.println("abc:"+ list.get(i).toString());
         }
 
     }

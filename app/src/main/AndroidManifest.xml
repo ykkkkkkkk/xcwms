@@ -148,6 +148,9 @@
         <activity
             android:name=".sales.Sal_BoxActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_PickingListActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".MainActivity" />
         <activity android:name=".entrance.MainTabFragmentActivity" />

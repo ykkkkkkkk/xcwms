@@ -113,7 +113,7 @@ public class Sal_OutActivity extends BaseActivity {
     private Sal_OutAdapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
     private String stockBarcode, stockPBarcode, deptBarcode, mtlBarcode, boxBarcode; // 对应的条码号
-    private char dataType = '1'; // 1：物料扫码，2：箱子扫码
+    private char dataType = '1'; // 1：物料扫码，2：箱子扫码（物料和箱码都用同一个控件，所以用此区分）
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
     private int curPos; // 当前行
     private View curRadio; // 当前扫码的 View
@@ -152,38 +152,34 @@ public class Sal_OutActivity extends BaseActivity {
                     case SUCC2: // 扫码成功后进入
                         BarCodeTable bt = null;
                         switch (m.curViewFlag) {
-                            case '1':
+                            case '1': // 仓库
                                 m.stock = JsonUtil.strToObject((String) msg.obj, Stock.class);
                                 bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 m.stock = JsonUtil.stringToObject(bt.getRelationObj(), Stock.class);
                                 m.getStockAfter();
 
                                 break;
-                            case '2':
+                            case '2': // 库位
                                 bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 m.stockP = JsonUtil.stringToObject(bt.getRelationObj(), StockPosition.class);
                                 m.getStockPAfter();
 
                                 break;
-                            case '3':
+                            case '3': // 销售订单
                                 BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 if(!m.getMtlAfter(barCodeTable)) return;
                                 if(m.isAlikeCust(barCodeTable, null, '1')) return;
-
                                 m.getBarCodeTableBefore(false);
-                                m.setTexts(m.etMatNo, m.mtlBarcode);
+                                if(!m.getBarCodeTableBeforeSon(bt)) return;
                                 m.getBarCodeTableAfter(barCodeTable);
 
                                 break;
-                            case '4':
+                            case '4': // 销售装箱单
                                 List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                                 if(m.isAlikeCust(null, list.get(0), '2')) return;
 
-                                m.linTab1.setEnabled(false);
-                                m.linTab2.setEnabled(false);
                                 m.getBarCodeTableBefore(false);
-                                m.setTexts(m.etMatNo, m.boxBarcode);
-                                m.getSourceAfter(list, true);
+                                m.getSourceAfter(list);
 
                                 break;
                         }
@@ -196,16 +192,16 @@ public class Sal_OutActivity extends BaseActivity {
                         break;
                     case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
-                            case '1':
+                            case '1': // 仓库
                                 m.setTexts(m.etWhName, m.stockBarcode);
                                 break;
-                            case '2':
+                            case '2': // 库位
                                 m.setTexts(m.etWhPos, m.stockPBarcode);
                                 break;
-                            case '3':
+                            case '3': // 销售订单
                                 m.setTexts(m.etMatNo, m.mtlBarcode);
                                 break;
-                            case '4':
+                            case '4': // 销售装箱单
                                 m.setTexts(m.etMatNo, m.boxBarcode);
                                 break;
                         }
@@ -465,6 +461,15 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        // 按了删除键，回退键
+        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            return false;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     public void setListener() {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
@@ -475,8 +480,12 @@ public class Sal_OutActivity extends BaseActivity {
                             String whName = getValues(etWhName).trim();
                             if (isKeyDownEnter(whName, event, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
-                                    String tmp = whName.replaceFirst(stockBarcode, "");
-                                    stockBarcode = tmp.replace("\n", "");
+                                    if (stockBarcode.equals(whName)) {
+                                        stockBarcode = whName;
+                                    } else {
+                                        String tmp = whName.replaceFirst(stockBarcode, "");
+                                        stockBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     stockBarcode = whName.replace("\n", "");
                                 }
@@ -490,8 +499,12 @@ public class Sal_OutActivity extends BaseActivity {
                             String whPos = getValues(etWhPos).trim();
                             if (isKeyDownEnter(whPos, event, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                    String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                    stockPBarcode = tmp.replace("\n", "");
+                                    if (stockPBarcode.equals(whPos)) {
+                                        stockPBarcode = whPos;
+                                    } else {
+                                        String tmp = whPos.replaceFirst(stockPBarcode, "");
+                                        stockPBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     stockPBarcode = whPos.replace("\n", "");
                                 }
@@ -510,16 +523,24 @@ public class Sal_OutActivity extends BaseActivity {
                             if (isKeyDownEnter(matNo, event, keyCode)) {
                                 if (dataType == '1') { // 物料
                                     if (mtlBarcode != null && mtlBarcode.length() > 0) {
-                                        String tmp = matNo.replaceFirst(mtlBarcode, "");
-                                        mtlBarcode = tmp.replace("\n", "");
+                                        if (mtlBarcode.equals(matNo)) {
+                                            mtlBarcode = matNo;
+                                        } else {
+                                            String tmp = matNo.replaceFirst(mtlBarcode, "");
+                                            mtlBarcode = tmp.replace("\n", "");
+                                        }
                                     } else {
                                         mtlBarcode = matNo.replace("\n", "");
                                     }
                                     curViewFlag = '3';
                                 } else { // 箱码
                                     if (boxBarcode != null && boxBarcode.length() > 0) {
-                                        String tmp = matNo.replaceFirst(boxBarcode, "");
-                                        boxBarcode = tmp.replace("\n", "");
+                                        if (boxBarcode.equals(matNo)) {
+                                            boxBarcode = matNo;
+                                        } else {
+                                            String tmp = matNo.replaceFirst(boxBarcode, "");
+                                            boxBarcode = tmp.replace("\n", "");
+                                        }
                                     } else {
                                         boxBarcode = matNo.replace("\n", "");
                                     }
@@ -544,7 +565,11 @@ public class Sal_OutActivity extends BaseActivity {
      * 是否按了回车键
      */
     private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (val.length() == 0) {
+                Comm.showWarnDialog(context, "请扫码条码！");
+                return false;
+            }
             return true;
         }
         return false;
@@ -722,9 +747,44 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     /**
+     * 来源订单 判断数据
+     */
+    private boolean getBarCodeTableBeforeSon(BarCodeTable bt) {
+        int size = checkDatas.size();
+        setTexts(etMatNo, mtlBarcode);
+        if(size > 0) {
+            for (int i = 0; i < size; i++) {
+                ScanningRecord2 sr2 = checkDatas.get(i);
+                // 如果扫码相同
+                if (mtlBarcode.equals(sr2.getBarcode())) {
+                    // 未启用序列号
+                    if (sr2.getMtl().getIsSnManager() == 0) {
+                        if (sr2.getFqty() > sr2.getStockqty()) {
+                            // 没有启用序列号，并且应发数量大于实发数量
+                            sr2.setStockqty(sr2.getStockqty() + 1);
+                            mAdapter.notifyDataSetChanged();
+                            return false;
+                        } else {
+                            // 数量已满
+                            Comm.showWarnDialog(context, "第" + (i + 1) + "行！，实发数不能大于应发数！");
+                            return false;
+                        }
+                    } else {
+                        // 启用序列号
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行！，已有相同的数据！");
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * 得到条码表的数据
      */
     private void getBarCodeTableAfter(BarCodeTable barCodeTable) {
+        setTexts(etMatNo, mtlBarcode);
         ScanningRecord2 sr2 = new ScanningRecord2();
         sr2.setSourceFinterId(barCodeTable.getRelationBillId());
         sr2.setSourceFnumber(barCodeTable.getRelationBillNumber());
@@ -797,7 +857,8 @@ public class Sal_OutActivity extends BaseActivity {
     /**
      * 选择来源单返回
      */
-    private void getSourceAfter(List<MaterialBinningRecord> list, boolean isSaoma) {
+    private void getSourceAfter(List<MaterialBinningRecord> list) {
+        setTexts(etMatNo, boxBarcode);
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();

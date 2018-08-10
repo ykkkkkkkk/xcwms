@@ -489,8 +489,12 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                     String mtlCode = getValues(etMtlCode2).trim();
                     if (isKeyDownEnter(mtlCode, event, keyCode)) {
                         if (strMtlBarcode_del != null && strMtlBarcode_del.length() > 0) {
-                            String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
-                            strMtlBarcode_del = tmp.replace("\n", "");
+                            if(strMtlBarcode_del.equals(mtlCode)) {
+                                strMtlBarcode_del = mtlCode;
+                            } else {
+                                String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
+                                strMtlBarcode_del = tmp.replace("\n", "");
+                            }
                         } else {
                             strMtlBarcode_del = mtlCode.replace("\n", "");
                         }
@@ -534,14 +538,18 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                switch (v.getId()) {
-                    case R.id.et_boxCode: // 箱码
-                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (v.getId()) {
+                        case R.id.et_boxCode: // 箱码
                             String boxCode = getValues(etBoxCode).trim();
                             if (isKeyDownEnter(boxCode, event, keyCode)) {
                                 if (strBoxBarcode != null && strBoxBarcode.length() > 0) {
-                                    String tmp = boxCode.replaceFirst(strBoxBarcode, "");
-                                    strBoxBarcode = tmp.replace("\n", "");
+                                    if (strBoxBarcode.equals(boxCode)) {
+                                        strBoxBarcode = boxCode;
+                                    } else {
+                                        String tmp = boxCode.replaceFirst(strBoxBarcode, "");
+                                        strBoxBarcode = tmp.replace("\n", "");
+                                    }
                                 } else {
                                     strBoxBarcode = boxCode.replace("\n", "");
                                 }
@@ -549,30 +557,34 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                                 // 执行查询方法
                                 run_smGetDatas();
                             }
-                        }
 
-                        break;
-                    case R.id.et_mtlCode: // 物料
-                        if(event.getAction() == KeyEvent.ACTION_DOWN) {
-                            String mtlCode = getValues(etMtlCode).trim();
-                            if (!smMtlBefore()) {
-                                mHandler.sendEmptyMessageDelayed(CODE1,200);
-                                return false;
-                            }
-                            if (isKeyDownEnter(mtlCode, event, keyCode)) {
-                                if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
-                                    String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
-                                    strMtlBarcode = tmp.replace("\n", "");
-                                } else {
-                                    strMtlBarcode = mtlCode.replace("\n", "");
+                            break;
+                        case R.id.et_mtlCode: // 物料
+                            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                                String mtlCode = getValues(etMtlCode).trim();
+                                if (!smMtlBefore()) {
+                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                    return false;
                                 }
-                                curViewFlag = '2';
-                                // 执行查询方法
-                                run_smGetDatas();
+                                if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                                    if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
+                                        if (strMtlBarcode.equals(mtlCode)) {
+                                            strMtlBarcode = mtlCode;
+                                        } else {
+                                            String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
+                                            strMtlBarcode = tmp.replace("\n", "");
+                                        }
+                                    } else {
+                                        strMtlBarcode = mtlCode.replace("\n", "");
+                                    }
+                                    curViewFlag = '2';
+                                    // 执行查询方法
+                                    run_smGetDatas();
+                                }
                             }
-                        }
 
-                        break;
+                            break;
+                    }
                 }
                 return false;
             }
@@ -601,7 +613,11 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
      * 是否按了回车键
      */
     private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (val.length() > 0 && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            if (val.length() == 0) {
+                Comm.showWarnDialog(mContext, "请扫码条码！");
+                return false;
+            }
             return true;
         }
         return false;

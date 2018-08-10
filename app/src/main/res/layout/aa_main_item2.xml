@@ -126,7 +126,7 @@
                 android:layout_below="@+id/tvImg4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="生产领料"
+                android:text="拣货单"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
