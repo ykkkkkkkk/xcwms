@@ -11,6 +11,8 @@ public class MaterialBinningRecord implements Serializable {
 
 	/*id*/
 	private Integer id;
+	/* 单据类型 */
+	private int fbillType;
 	/*包装物id*/
 	private Integer boxBarCodeId;
 	/*包装物条码类*/
@@ -57,6 +59,7 @@ public class MaterialBinningRecord implements Serializable {
 	 * 13代表库区
 	 * 14代表库位
 	 * 15代表部门
+	 * 21代表物料包装
 	 * 31代表采购订单
 	 * 32代表销售订单
 	 * 33代表发货通知单
@@ -76,8 +79,11 @@ public class MaterialBinningRecord implements Serializable {
 	private int	modifyUserId;
 	/* 修改人名称  */
 	private String modifyUserName;
+	/* 关联单据数量 */
+	private double relationBillFQTY;
 	/* 关联单据Json对象 */
 	private String relationObj;
+
 
 	public MaterialBinningRecord() {
 		super();
@@ -215,8 +221,8 @@ public class MaterialBinningRecord implements Serializable {
 		this.snCode = snCode;
 	}
 
-	public void setMtl(Material mtl) {
-		this.mtl = mtl;
+	public void setMtl(Material material) {
+		this.mtl = material;
 	}
 
 	public void setNumber(double number) {
@@ -291,16 +297,33 @@ public class MaterialBinningRecord implements Serializable {
 		this.relationObj = relationObj;
 	}
 
+	public double getRelationBillFQTY() {
+		return relationBillFQTY;
+	}
+
+	public void setRelationBillFQTY(double relationBillFQTY) {
+		this.relationBillFQTY = relationBillFQTY;
+	}
+
+	public int getFbillType() {
+		return fbillType;
+	}
+
+	public void setFbillType(int fbillType) {
+		this.fbillType = fbillType;
+	}
+
 	@Override
 	public String toString() {
-		return "MaterialBinningRecord [id=" + id + ", boxBarCodeId=" + boxBarCodeId + ", boxBarCode=" + boxBarCode
-				+ ", materialId=" + materialId + ", barcode=" + barcode + ", barcodeSource=" + barcodeSource
-				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", mtl=" + mtl + ", number=" + number
-				+ ", relationBillId=" + relationBillId + ", relationBillNumber=" + relationBillNumber + ", customerId="
-				+ customerId + ", customer=" + customer + ", expressType=" + expressType + ", deliveryWay="
-				+ deliveryWay + ", packageWorkType=" + packageWorkType + ", binningType=" + binningType + ", caseId="
-				+ caseId + ", createDate=" + createDate + ", createUserId=" + createUserId + ", createUserName="
-				+ createUserName + ", modifyDate=" + modifyDate + ", modifyUserId=" + modifyUserId + ", modifyUserName="
-				+ modifyUserName + ", relationObj=" + relationObj + "]";
+		return "MaterialBinningRecord [id=" + id + ", fbillType=" + fbillType + ", boxBarCodeId=" + boxBarCodeId
+				+ ", boxBarCode=" + boxBarCode + ", materialId=" + materialId + ", barcode=" + barcode
+				+ ", barcodeSource=" + barcodeSource + ", batchCode=" + batchCode + ", snCode=" + snCode + ", mtl="
+				+ mtl + ", number=" + number + ", relationBillId=" + relationBillId + ", relationBillNumber="
+				+ relationBillNumber + ", customerId=" + customerId + ", customer=" + customer + ", expressType="
+				+ expressType + ", deliveryWay=" + deliveryWay + ", packageWorkType=" + packageWorkType
+				+ ", binningType=" + binningType + ", caseId=" + caseId + ", createDate=" + createDate
+				+ ", createUserId=" + createUserId + ", createUserName=" + createUserName + ", modifyDate=" + modifyDate
+				+ ", modifyUserId=" + modifyUserId + ", modifyUserName=" + modifyUserName + ", relationBillFQTY="
+				+ relationBillFQTY + ", relationObj=" + relationObj + "]";
 	}
 }

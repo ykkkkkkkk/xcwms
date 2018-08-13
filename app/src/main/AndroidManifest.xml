@@ -115,6 +115,9 @@
             android:name=".purchase.Pur_InActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
+            android:name=".purchase.Pur_InFragmentsActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
             android:name=".purchase.Pur_SelOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
@@ -131,6 +134,7 @@
         <activity
             android:name=".purchase.Prod_InActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
         <!-- 销售模块 -->
         <activity
@@ -150,6 +154,12 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_PickingListActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_SelPickingListActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_RecombinationActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".MainActivity" />

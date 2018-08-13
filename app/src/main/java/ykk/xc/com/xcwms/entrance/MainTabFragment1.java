@@ -18,6 +18,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Prod_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_InActivity;
+import ykk.xc.com.xcwms.purchase.Pur_InFragmentsActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
 import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
@@ -55,8 +56,9 @@ public class MainTabFragment1 extends BaseFragment {
                 show(Pur_OrderSearchActivity.class, null);
 
                 break;
-            case R.id.relative2: // 外购入库
-                show(Pur_InActivity.class, null);
+            case R.id.relative2: // 采购入库
+//                show(Pur_InActivity.class, null);
+                show(Pur_InFragmentsActivity.class, null);
 
                 break;
             case R.id.relative3: // 生产入库

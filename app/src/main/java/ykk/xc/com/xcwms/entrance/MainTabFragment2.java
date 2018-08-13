@@ -19,6 +19,7 @@ import ykk.xc.com.xcwms.sales.Sal_BoxActivity;
 import ykk.xc.com.xcwms.sales.Sal_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutActivity;
 import ykk.xc.com.xcwms.sales.Sal_PickingListActivity;
+import ykk.xc.com.xcwms.sales.Sal_RecombinationActivity;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
 public class MainTabFragment2 extends BaseFragment {
@@ -92,12 +93,13 @@ public class MainTabFragment2 extends BaseFragment {
                 show(Sal_PickingListActivity.class, null);
 
                 break;
-            case R.id.relative5: // 产品包装
-                show(Sal_BoxActivity.class, null);
+            case R.id.relative5: // 复核单
+                show(Sal_RecombinationActivity.class, null);
 
                 break;
-            case R.id.relative6:
-                showLoadDialog("连接服务器...");
+            case R.id.relative6: // 销售装箱
+                show(Sal_BoxActivity.class, null);
+
                 break;
         }
     }

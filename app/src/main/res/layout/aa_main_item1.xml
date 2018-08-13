@@ -60,7 +60,7 @@
                 android:layout_below="@+id/tvImg2"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="外购入库"
+                android:text="采购入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

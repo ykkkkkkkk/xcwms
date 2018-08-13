@@ -42,6 +42,7 @@ public class PickingList implements Serializable{
 	private int createUserId;
 	private String createUserName;
 	private String createDate;
+	private int isCheck; // 新加的，用于前台临时用判断是否选中
 
 	public PickingList() {
 		super();
@@ -309,6 +310,14 @@ public class PickingList implements Serializable{
 
 	public void setCreateDate(String createDate) {
 		this.createDate = createDate;
+	}
+
+	public int getIsCheck() {
+		return isCheck;
+	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
 	}
 
 	@Override

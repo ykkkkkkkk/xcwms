@@ -2,6 +2,7 @@ package ykk.xc.com.xcwms.model.pur;
 
 import java.io.Serializable;
 
+import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 
@@ -32,9 +33,10 @@ public class PurOrder implements Serializable {
     private String receiveOrgName; // 收料组织
     private Organization receiveOrg;
     private int isCheck; // 新加的是否选中
+    private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
 
     /*对应k3单据分录号字段*/
-    private Integer entryId;
+    private int entryId;
 
     public int getfId() {
         return fId;
@@ -224,11 +226,11 @@ public class PurOrder implements Serializable {
         this.supplierNumber = supplierNumber;
     }
 
-    public Integer getEntryId() {
+    public int getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(Integer entryId) {
+    public void setEntryId(int entryId) {
         this.entryId = entryId;
     }
 
@@ -256,6 +258,14 @@ public class PurOrder implements Serializable {
         this.receiveOrgNumber = receiveOrgNumber;
     }
 
+    public BarCodeTable getBct() {
+        return bct;
+    }
+
+    public void setBct(BarCodeTable bct) {
+        this.bct = bct;
+    }
+
     @Override
     public String toString() {
         return "PurOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
@@ -265,6 +275,8 @@ public class PurOrder implements Serializable {
                 + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType
                 + ", unitFname=" + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty
                 + ", receiveOrgId=" + receiveOrgId + ", receiveOrgNumber=" + receiveOrgNumber + ", receiveOrgName="
-                + receiveOrgName + ", receiveOrg=" + receiveOrg + ", isCheck=" + isCheck + ", entryId=" + entryId + "]";
+                + receiveOrgName + ", receiveOrg=" + receiveOrg + ", isCheck=" + isCheck + ", bct=" + bct + ", entryId="
+                + entryId + "]";
     }
+
 }
