@@ -25,7 +25,7 @@ public class Pur_InFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRec
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_in_item;
+        return R.layout.pur_in_fragment1_item;
     }
 
     @Override

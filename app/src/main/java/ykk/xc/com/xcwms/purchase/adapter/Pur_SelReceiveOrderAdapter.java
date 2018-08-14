@@ -8,16 +8,16 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.pur.PurOrder;
+import ykk.xc.com.xcwms.model.pur.PurReceiveOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
+public class Pur_SelReceiveOrderAdapter extends BaseArrayRecyclerAdapter<PurReceiveOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
-    private List<PurOrder> datas;
+    private List<PurReceiveOrder> datas;
 
-    public Pur_SelOrderAdapter(Activity context, List<PurOrder> datas) {
+    public Pur_SelReceiveOrderAdapter(Activity context, List<PurReceiveOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -25,11 +25,11 @@ public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_sel_order_item;
+        return R.layout.pur_sel_receive_order_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, PurOrder entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, PurReceiveOrder entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_date = holder.obtainView(R.id.tv_date);
@@ -39,7 +39,7 @@ public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
             TextView tv_check = holder.obtainView(R.id.tv_check);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_date.setText(entity.getPoFdate());
+            tv_date.setText(entity.getRecFdate());
             tv_stNo.setText(entity.getFbillno());
 //            tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
             tv_mts.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
@@ -78,7 +78,7 @@ public class Pur_SelOrderAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
     }
 
     public interface MyCallBack {
-        void onClick(PurOrder entity, int position);
+        void onClick(PurReceiveOrder entity, int position);
     }
 
 

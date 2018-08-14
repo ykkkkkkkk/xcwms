@@ -1136,12 +1136,12 @@ public class Pur_InActivity extends BaseActivity {
             sr2.setEmpId(department.getFitemID());
             sr2.setDepartmentFnumber(department.getDepartmentNumber());
         }
-        sr2.setFqty(recOrder.getRecFqty());
+        sr2.setFqty(recOrder.getUsableFqty());
         sr2.setStockqty(1);
         sr2.setPoFid(recOrder.getfId());
         sr2.setEntryId(recOrder.getEntryId());
         sr2.setPoFbillno(recOrder.getFbillno());
-        sr2.setPoFmustqty(recOrder.getRecFqty());
+        sr2.setPoFmustqty(recOrder.getUsableFqty());
         sr2.setBarcode(barCodeTable.getBarcode());
 
         checkDatas.add(sr2);

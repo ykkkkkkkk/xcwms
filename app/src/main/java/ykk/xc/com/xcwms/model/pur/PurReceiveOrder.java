@@ -1,5 +1,8 @@
 package ykk.xc.com.xcwms.model.pur;
 
+import java.io.Serializable;
+
+import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
 
 /**
@@ -7,7 +10,7 @@ import ykk.xc.com.xcwms.model.Material;
  * @author Administrator
  *
  */
-public class PurReceiveOrder {
+public class PurReceiveOrder implements Serializable {
 	private int fId; // 单据id
 	private String fbillno; // 单据编号
 	private String fbillType; // 单据类型
@@ -43,12 +46,14 @@ public class PurReceiveOrder {
 	private String unitFname; // 单位
 	private double factreceiveqty; // 送料数量
 	private double finstockbaseqty; // 入库数量
-	private double recFqty; // 数量
+	private double usableFqty; // 可用数量
 	private int stockId; // 仓库ID
 	private String stockNumber; // 仓库代码
 	private String stockName; // 仓库名称
 	/*对应k3单据分录号字段*/
 	private int entryId;
+	private int isCheck; // 新加的是否选中
+	private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
 
 	public PurReceiveOrder() {
 		super();
@@ -153,8 +158,8 @@ public class PurReceiveOrder {
 	public double getFinstockbaseqty() {
 		return finstockbaseqty;
 	}
-	public double getRecFqty() {
-		return recFqty;
+	public double getUsableFqty() {
+		return usableFqty;
 	}
 	public int getStockId() {
 		return stockId;
@@ -165,7 +170,7 @@ public class PurReceiveOrder {
 	public String getStockName() {
 		return stockName;
 	}
-	public Integer getEntryId() {
+	public int getEntryId() {
 		return entryId;
 	}
 	public void setfId(int fId) {
@@ -267,8 +272,8 @@ public class PurReceiveOrder {
 	public void setFinstockbaseqty(double finstockbaseqty) {
 		this.finstockbaseqty = finstockbaseqty;
 	}
-	public void setRecFqty(double recFqty) {
-		this.recFqty = recFqty;
+	public void setUsableFqty(double recFqty) {
+		this.usableFqty = recFqty;
 	}
 	public void setStockId(int stockId) {
 		this.stockId = stockId;
@@ -279,8 +284,22 @@ public class PurReceiveOrder {
 	public void setStockName(String stockName) {
 		this.stockName = stockName;
 	}
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(int entryId) {
 		this.entryId = entryId;
+	}
+	public BarCodeTable getBct() {
+		return bct;
+	}
+
+	public void setBct(BarCodeTable bct) {
+		this.bct = bct;
+	}
+	public int getIsCheck() {
+		return isCheck;
+	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
 	}
 
 	@Override
@@ -295,10 +314,9 @@ public class PurReceiveOrder {
 				+ recDeptName + ", purDeptNumber=" + purDeptNumber + ", purDeptName=" + purDeptName + ", mtlId=" + mtlId
 				+ ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType
 				+ ", unitFnumber=" + unitFnumber + ", unitFname=" + unitFname + ", factreceiveqty=" + factreceiveqty
-				+ ", finstockbaseqty=" + finstockbaseqty + ", recFqty=" + recFqty + ", stockId=" + stockId
-				+ ", stockNumber=" + stockNumber + ", stockName=" + stockName + ", entryId=" + entryId + "]";
+				+ ", finstockbaseqty=" + finstockbaseqty + ", usableFqty=" + usableFqty + ", stockId=" + stockId
+				+ ", stockNumber=" + stockNumber + ", stockName=" + stockName + ", entryId=" + entryId + ", isCheck="
+				+ isCheck + ", bct=" + bct + "]";
 	}
-
-
 
 }

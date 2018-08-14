@@ -195,7 +195,7 @@ public abstract class BaseFragment extends Fragment {
 	 * @param obj
 	 * @return
 	 */
-	public String isNULLS(String obj) {
+	public String isNULLS(Object obj) {
 		return (obj != null && !obj.equals("null")) ? obj.toString() : "";
 	}
 	public String isNULLS(JSONObject json, String key) throws JSONException {
@@ -213,7 +213,7 @@ public abstract class BaseFragment extends Fragment {
 	/**
 	 * 数字字符串转成Double 如果Double.parseDouble(null);这个是报空指针异常
 	 */
-	public double parseDouble(String obj) {
+	public double parseDouble(Object obj) {
 		try {
 			String result = isNULLS(obj);
 			return result.length() > 0 ? Double.parseDouble(result) : 0;
@@ -229,7 +229,7 @@ public abstract class BaseFragment extends Fragment {
 			return 0;
 		}
 	}
-	public double parseDouble(String obj, double defaVal) {
+	public double parseDouble(Object obj, double defaVal) {
 		try {
 			String result = isNULLS(obj);
 			return result.length() > 0 ? Double.parseDouble(result) : defaVal;
@@ -241,7 +241,7 @@ public abstract class BaseFragment extends Fragment {
 	/**
 	 * 数字字符串转成Int 如果Integer.parseInt(null);这个是报空指针异常
 	 */
-	public int parseInt(String obj) {
+	public int parseInt(Object obj) {
 		try {
 			String result = isNULLS(obj);
 			return result.length() > 0 ? Integer.parseInt(result) : 0;

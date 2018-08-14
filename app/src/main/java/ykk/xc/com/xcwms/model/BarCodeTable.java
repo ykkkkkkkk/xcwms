@@ -24,6 +24,8 @@ public class BarCodeTable implements Serializable {
 	 * 32代表销售订单
 	 * 33代表发货通知单
 	 * 34代表生产任务单
+	 * 35代码采购装箱
+	 * 36代表采购收料通知单
 	 */
 	private Integer caseId;
 	/*批次号*/

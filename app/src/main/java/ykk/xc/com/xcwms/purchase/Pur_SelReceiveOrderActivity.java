@@ -35,12 +35,13 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Supplier;
-import ykk.xc.com.xcwms.model.pur.PurOrder;
+import ykk.xc.com.xcwms.model.pur.PurReceiveOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_SelReceiveOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
-public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
+public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.btn_close)
     Button btnClose;
@@ -53,32 +54,32 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
 
-    private Pur_SelOrderActivity context = this;
+    private Pur_SelReceiveOrderActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private Supplier supplier; // 供应商
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Pur_SelOrderAdapter mAdapter;
-    private List<PurOrder> listDatas = new ArrayList<>();
-    private List<PurOrder> sourceList; // 上个界面传来的数据列表
+    private Pur_SelReceiveOrderAdapter mAdapter;
+    private List<PurReceiveOrder> listDatas = new ArrayList<>();
+    private List<PurReceiveOrder> sourceList; // 上个界面传来的数据列表
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_SelOrderActivity> mActivity;
+        private final WeakReference<Pur_SelReceiveOrderActivity> mActivity;
 
-        public MyHandler(Pur_SelOrderActivity activity) {
-            mActivity = new WeakReference<Pur_SelOrderActivity>(activity);
+        public MyHandler(Pur_SelReceiveOrderActivity activity) {
+            mActivity = new WeakReference<Pur_SelReceiveOrderActivity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_SelOrderActivity m = mActivity.get();
+            Pur_SelReceiveOrderActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<PurOrder> list = JsonUtil.strToList2((String) msg.obj, PurOrder.class);
+                        List<PurReceiveOrder> list = JsonUtil.strToList2((String) msg.obj, PurReceiveOrder.class);
                         m.listDatas.addAll(list);
 //                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<PO_list>>(){}.getType());
                         m.mAdapter.notifyDataSetChanged();
@@ -96,14 +97,14 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_sel_order;
+        return R.layout.pur_sel_receive_order;
     }
 
     @Override
     public void initView() {
         xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Pur_SelOrderAdapter(context, listDatas);
+        mAdapter = new Pur_SelReceiveOrderAdapter(context, listDatas);
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
@@ -121,7 +122,7 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
             supplier = (Supplier) bundle.getSerializable("supplier");
-            sourceList = (List<PurOrder>) bundle.getSerializable("sourceList");
+            sourceList = (List<PurReceiveOrder>) bundle.getSerializable("sourceList");
             tvCustInfo.setText("供应商：" + supplier.getfName());
         }
     }
@@ -139,9 +140,9 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                     toasts("请选择数据在确认！");
                     return;
                 }
-                List<PurOrder> list = new ArrayList<>();
+                List<PurReceiveOrder> list = new ArrayList<>();
                 for(int i = 0, size = listDatas.size(); i<size; i++) {
-                    PurOrder p = listDatas.get(i);
+                    PurReceiveOrder p = listDatas.get(i);
 
                     int batch = parseInt(p.getMtl().getIsBatchManager());
                     int snNo = parseInt(p.getMtl().getIsSnManager());
@@ -149,7 +150,7 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                     if(p.getIsCheck() == 1) {
                         if(sourceList != null) {
                             for (int j = 0; j < sourceList.size(); j++) {
-                                PurOrder purOrder2 = sourceList.get(j);
+                                PurReceiveOrder purOrder2 = sourceList.get(j);
                                 // 如果已经选择了相同的行，就提示
                                 if (p.getfId() == purOrder2.getfId() && p.getMtlId() == purOrder2.getMtlId() && p.getEntryId() == purOrder2.getEntryId()) {
                                     Comm.showWarnDialog(context, "第" + (i + 1) + "行已经在入库的列表中，不能重复选择！");
@@ -191,12 +192,12 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
         }
         if (isChecked) {
             for (int i = 0, size = listDatas.size(); i < size; i++) {
-                PurOrder p = listDatas.get(i);
+                PurReceiveOrder p = listDatas.get(i);
                 p.setIsCheck(1);
             }
         } else {
             for (int i = 0, size = listDatas.size(); i < size; i++) {
-                PurOrder p = listDatas.get(i);
+                PurReceiveOrder p = listDatas.get(i);
                 p.setIsCheck(0);
             }
         }
@@ -208,7 +209,7 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findPurPoOrderList");
+        String mUrl = Consts.getURL("findPurReceiveOrderList");
         FormBody formBody = new FormBody.Builder()
 //                .add("fbillno", getValues(etFbillno).trim())
                 .add("supplierId", String.valueOf(supplier.getFsupplierid()))
@@ -243,7 +244,7 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Ware_Pur_OrderActivity --> onResponse", result);
+                Log.e("Pur_SelReceiveOrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

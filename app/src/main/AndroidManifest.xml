@@ -118,7 +118,10 @@
             android:name=".purchase.Pur_InFragmentsActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Pur_SelOrderActivity"
+        android:name=".purchase.Pur_SelOrderActivity"
+        android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Pur_SelReceiveOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Pur_OrderSearchActivity"
@@ -130,7 +133,6 @@
         <activity
             android:name=".purchase.Pur_SelProdOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-
         <activity
             android:name=".purchase.Prod_InActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />

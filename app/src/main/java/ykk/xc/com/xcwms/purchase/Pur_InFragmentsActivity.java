@@ -1,5 +1,7 @@
 package ykk.xc.com.xcwms.purchase;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
@@ -33,6 +35,7 @@ public class Pur_InFragmentsActivity extends BaseActivity {
     TextView tvTitle;
     private Pur_InFragmentsActivity context = this;
     private View curRadio;
+    public boolean isChange; // 返回的时候是否需要判断数据是否保存了
 //    private Customer customer; // 客户
 
     @Override
@@ -121,7 +124,23 @@ public class Pur_InFragmentsActivity extends BaseActivity {
 
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
-                context.finish();
+                if(isChange) {
+                    AlertDialog.Builder build = new AlertDialog.Builder(context);
+                    build.setIcon(R.drawable.caution);
+                    build.setTitle("系统提示");
+                    build.setMessage("您有未保存的数据，继续关闭吗？");
+                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        context.finish();
+                        }
+                    });
+                    build.setNegativeButton("否", null);
+                    build.setCancelable(false);
+                    build.show();
+                } else {
+                    context.finish();
+                }
 
                 break;
             case R.id.lin_tab1:

@@ -27,6 +27,7 @@ public class PurOrder implements Serializable {
     private String mtlType; // 规格型号
     private String unitFname; // 单位
     private double poFqty; // 采购数量
+    private double usableFqty; // 可用的数量
     private double poFstockinqty; // 累计入库数量
     private int receiveOrgId; // 收料组织id
     private String receiveOrgNumber; // 收料组织代码
@@ -36,7 +37,7 @@ public class PurOrder implements Serializable {
     private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
 
     /*对应k3单据分录号字段*/
-    private int entryId;
+    private Integer entryId;
 
     public int getfId() {
         return fId;
@@ -226,11 +227,11 @@ public class PurOrder implements Serializable {
         this.supplierNumber = supplierNumber;
     }
 
-    public int getEntryId() {
+    public Integer getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(int entryId) {
+    public void setEntryId(Integer entryId) {
         this.entryId = entryId;
     }
 
@@ -266,6 +267,14 @@ public class PurOrder implements Serializable {
         this.bct = bct;
     }
 
+    public double getUsableFqty() {
+        return usableFqty;
+    }
+
+    public void setUsableFqty(double usableFqty) {
+        this.usableFqty = usableFqty;
+    }
+
     @Override
     public String toString() {
         return "PurOrder [fId=" + fId + ", fbillno=" + fbillno + ", supplierId=" + supplierId + ", supplierName="
@@ -273,10 +282,11 @@ public class PurOrder implements Serializable {
                 + purOrgId + ", purOrgNumber=" + purOrgNumber + ", purOrgName=" + purOrgName + ", purOrg=" + purOrg
                 + ", deptId=" + deptId + ", deptName=" + deptName + ", poFdate=" + poFdate + ", mtlId=" + mtlId
                 + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType
-                + ", unitFname=" + unitFname + ", poFqty=" + poFqty + ", poFstockinqty=" + poFstockinqty
-                + ", receiveOrgId=" + receiveOrgId + ", receiveOrgNumber=" + receiveOrgNumber + ", receiveOrgName="
-                + receiveOrgName + ", receiveOrg=" + receiveOrg + ", isCheck=" + isCheck + ", bct=" + bct + ", entryId="
-                + entryId + "]";
+                + ", unitFname=" + unitFname + ", poFqty=" + poFqty + ", usableFqty=" + usableFqty + ", poFstockinqty="
+                + poFstockinqty + ", receiveOrgId=" + receiveOrgId + ", receiveOrgNumber=" + receiveOrgNumber
+                + ", receiveOrgName=" + receiveOrgName + ", receiveOrg=" + receiveOrg + ", isCheck=" + isCheck
+                + ", bct=" + bct + ", entryId=" + entryId + "]";
     }
+
 
 }
