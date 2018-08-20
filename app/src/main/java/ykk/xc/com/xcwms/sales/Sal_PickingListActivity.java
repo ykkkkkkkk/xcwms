@@ -167,7 +167,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                                 m.setTexts(m.etWhPos, m.stockPBarcode);
                                 break;
                             case '3': // 发货订单
-                                m.setTexts(m.etMtlCode, m.deliBarcode);
+                                m.setTexts(m.etDeliCode, m.deliBarcode);
                                 break;
                             case '4': // 物料
                                 m.setTexts(m.etMtlCode, m.mtlBarcode);
@@ -689,7 +689,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                         // 如果扫的是物料包装条码，就显示个数
                         double number = bt.getMaterialCalculateNumber();
                         if(number > 0) {
-                            pl.setPickingListNum(number);
+                            pl.setPickingListNum(number+pl.getPickingListNum());
                         } else {
                             pl.setPickingListNum(pl.getPickingListNum() + 1);
                         }
@@ -757,7 +757,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             tvCustSel.setText(deliOrder.getCustName());
             tvDeliverSel.setText(assist.getfName());
 
-            pl.setMtl(bt.getMtl());
+            pl.setMtl(deliOrder.getMtl());
             pl.setPickingListNum(0);
             pl.setCreateUserId(user.getId());
             pl.setCreateUserName(user.getUsername());

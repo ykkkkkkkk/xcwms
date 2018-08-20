@@ -100,13 +100,13 @@ public class Pur_InFragment1 extends BaseFragment {
     TextView tvPurMan;
 
     private Pur_InFragment1 context = this;
-    private static final int SEL_SUPPLIER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
+    private static final int SEL_SUPPLIER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15, SEL_STOCK2 = 17, SEL_STOCKP2 = 18;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
     private Supplier supplier; // 供应商
     private Material mtl;
-    private Stock stock; // 仓库
-    private StockPosition stockP; // 库位
+    private Stock stock, stock2; // 仓库
+    private StockPosition stockP, stockP2; // 库位
     private Department department; // 部门
     private Organization receiveOrg, purOrg; // 组织
     private Pur_InFragment1Adapter mAdapter;
@@ -257,6 +257,14 @@ public class Pur_InFragment1 extends BaseFragment {
                 Log.e("num", "行：" + position);
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
+            }
+
+            @Override
+            public void onClick_selStock(View v, ScanningRecord2 entity, int position) {
+                Log.e("selStock", "行：" + position);
+                curPos = position;
+
+                showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
             }
 
             @Override
@@ -565,6 +573,8 @@ public class Pur_InFragment1 extends BaseFragment {
         setEnables(tvReceiveOrg, R.drawable.back_style_blue,true);
         setEnables(tvPurOrg, R.drawable.back_style_blue,true);
         parent.isChange = false;
+        stock2 = null;
+        stockP2 = null;
     }
 
     private void resetSon() {
@@ -633,6 +643,40 @@ public class Pur_InFragment1 extends BaseFragment {
                     stockP = (StockPosition) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKP", stockP.getFname());
                     getStockPAfter();
+                }
+
+                break;
+            case SEL_STOCK2: //行事件选择仓库	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stock2 = (Stock) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
+                    // 启用了库位管理
+                    if (stock2.isStorageLocation()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("stockId", stock2.getfStockid());
+                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
+                    } else {
+                        ScanningRecord2 sr2 = checkDatas.get(curPos);
+                        sr2.setStockId(stock2.getfStockid());
+                        sr2.setStock(stock2);
+                        sr2.setStockFnumber(stock2.getfNumber());
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                break;
+            case SEL_STOCKP2: //行事件选择库位	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stockP2 = (StockPosition) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    ScanningRecord2 sr2 = checkDatas.get(curPos);
+                    sr2.setStockId(stock2.getfStockid());
+                    sr2.setStock(stock2);
+                    sr2.setStockFnumber(stock2.getfNumber());
+
+                    sr2.setStockPositionId(stockP2.getId());
+                    sr2.setStockPName(stockP2.getFname());
+                    mAdapter.notifyDataSetChanged();
                 }
 
                 break;
@@ -720,7 +764,7 @@ public class Pur_InFragment1 extends BaseFragment {
             for (int i = 0; i < size; i++) {
                 ScanningRecord2 sr2 = checkDatas.get(i);
                 // 如果扫码相同
-                if (parseInt(sr2.getMtl().getfMaterialId()) == bt.getMaterialId()) {
+                if (parseInt(sr2.getMtl().getfMaterialId()) == parseInt(bt.getMaterialId())) {
                     if(sr2.getMtl().getIsSnManager() == 0) { // 未启用序列号
                         // 应收数量大于实收数量
                         double number = bt.getMaterialCalculateNumber();
@@ -813,9 +857,9 @@ public class Pur_InFragment1 extends BaseFragment {
 
         double number = bt.getMaterialCalculateNumber();
         if(number > 0) {
-            sr2.setFqty(number);
-            sr2.setStockqty(number);
-            sr2.setPoFmustqty(number);
+            sr2.setFqty(number+sr2.getStockqty());
+            sr2.setStockqty(number+sr2.getStockqty());
+            sr2.setPoFmustqty(number+sr2.getStockqty());
         } else {
             sr2.setFqty(1);
             sr2.setStockqty(1);

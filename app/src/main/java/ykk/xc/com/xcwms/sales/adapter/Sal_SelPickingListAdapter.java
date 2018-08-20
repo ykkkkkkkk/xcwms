@@ -43,7 +43,8 @@ public class Sal_SelPickingListAdapter extends BaseArrayRecyclerAdapter<PickingL
             tv_stNo.setText(entity.getFbillno());
             tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
             String unitName = entity.getMtlUnitName();
-            String num1 = df.format(entity.getDeliFremainoutqty());
+//            String num1 = df.format(entity.getDeliFremainoutqty());
+            String num1 = df.format(entity.getUsableFqty());
             tv_numUnit.setText(num1+""+unitName);
             if(entity.getIsCheck() == 1) {
                 tv_check.setBackgroundResource(R.drawable.check_true);

@@ -82,6 +82,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
 
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.mAdapter.notifyDataSetChanged();
                         m.toasts("抱歉，没有加载到数据！");
 
                         break;
@@ -120,7 +121,6 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
                     PickingList pl2 = listDatas.get(i);
                     if(fid == pl2.getfId()) {
                         pl2.setIsCheck(1);
-                        break;
                     }
                 }
 
@@ -174,11 +174,6 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
 
                 break;
             case R.id.btn_search:
-                String searchName = getValues(etSearch).trim();
-                if(searchName.length() == 0) {
-                    Comm.showWarnDialog(context,"请输入查询条件！");
-                    return;
-                }
                 listDatas.clear();
                 run_okhttpDatas();
 
@@ -191,7 +186,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("pickingList/findAll");
+        String mUrl = Consts.getURL("pickingList/findAll2");
         FormBody formBody = new FormBody.Builder()
                 .add("pickingListNo_fbillno", getValues(etSearch).trim())
 //                .add("limit", "10")

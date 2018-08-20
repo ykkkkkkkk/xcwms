@@ -42,6 +42,8 @@ public class PickingList implements Serializable{
 	private int createUserId;
 	private String createUserName;
 	private String createDate;
+	/* 可用的数量(未存表)  */
+	private double usableFqty;
 	private int isCheck; // 新加的，用于前台临时用判断是否选中
 
 	public PickingList() {
@@ -320,6 +322,14 @@ public class PickingList implements Serializable{
 		this.isCheck = isCheck;
 	}
 
+	public double getUsableFqty() {
+		return usableFqty;
+	}
+
+	public void setUsableFqty(double usableFqty) {
+		this.usableFqty = usableFqty;
+	}
+
 	@Override
 	public String toString() {
 		return "PickingList [id=" + id + ", pickingListNo=" + pickingListNo + ", pickingListNum=" + pickingListNum
@@ -332,6 +342,7 @@ public class PickingList implements Serializable{
 				+ ", stockPositionName=" + stockPositionName + ", deliFqty=" + deliFqty + ", deliFremainoutqty="
 				+ deliFremainoutqty + ", deliveryWay=" + deliveryWay + ", entryId=" + entryId + ", batchNo=" + batchNo
 				+ ", snNo=" + snNo + ", barcode=" + barcode + ", createUserId=" + createUserId + ", createUserName="
-				+ createUserName + ", createDate=" + createDate + "]";
+				+ createUserName + ", createDate=" + createDate + ", usableFqty=" + usableFqty + ", isCheck=" + isCheck
+				+ "]";
 	}
 }

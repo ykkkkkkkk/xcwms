@@ -1,6 +1,7 @@
 package ykk.xc.com.xcwms.sales.adapter;
 
 import android.app.Activity;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -37,10 +38,9 @@ public class Sal_RecombinationAdapter extends BaseArrayRecyclerAdapter<MaterialB
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
-        String deliWay = Comm.isNULLS(entity.getDeliveryWay());
         tv_unitName.setText(entity.getMtl().getUnit().getUnitName());
         // 是否启用批次管理和序列号管理
-        tv_nums.setText(df.format(entity.getRelationBillFQTY())+"\n"+df.format(entity.getNumber()));
+        tv_nums.setText(Html.fromHtml(df.format(entity.getUsableFqty())+"<br><font color='#009900'>"+df.format(entity.getNumber())+"</font>"));
         if(entity.getMtl().getIsSnManager() == 1) {
             tv_nums.setBackgroundResource(R.drawable.back_style_gray2a);
             tv_nums.setEnabled(false);
@@ -48,12 +48,13 @@ public class Sal_RecombinationAdapter extends BaseArrayRecyclerAdapter<MaterialB
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
             tv_nums.setEnabled(true);
         }
+        tv_unitName.setText(entity.getMtl().getUnit().getUnitName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()){
-                    case R.id.tv_num: // 数量
+                    case R.id.tv_nums: // 数量
                         if(callBack != null) {
                             callBack.onClick_num(v, entity, pos);
                         }

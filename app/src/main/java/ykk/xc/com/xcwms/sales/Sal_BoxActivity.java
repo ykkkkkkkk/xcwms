@@ -869,6 +869,7 @@ public class Sal_BoxActivity extends BaseActivity {
             }
             tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
+            tmpMtl.setRelationBillFQTY(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             tmpMtl.setCreateUserId(user.getId());
             tmpMtl.setCreateUserName(user.getUsername());
@@ -1038,6 +1039,7 @@ public class Sal_BoxActivity extends BaseActivity {
             }
             tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
+            tmpMtl.setRelationBillFQTY(1);
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             tmpMtl.setCreateUserId(user.getId());
             tmpMtl.setCreateUserName(user.getUsername());

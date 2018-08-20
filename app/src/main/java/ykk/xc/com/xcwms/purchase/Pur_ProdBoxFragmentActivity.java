@@ -57,8 +57,8 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
         Pur_ProdBoxUnBatchFragment2 fragment2 = new Pur_ProdBoxUnBatchFragment2();
 //        fragment2.setArguments(bundle2); // 传参数
 
-        listFragment.add(fragment1);
         listFragment.add(fragment2);
+        listFragment.add(fragment1);
         viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new Pur_ProdBoxFragmentAdapter(getSupportFragmentManager(), listFragment));
@@ -123,16 +123,16 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
                 context.finish();
 
                 break;
-            case R.id.lin_tab1:
-                tabSelected(radio1);
-                tvTitle.setText("生产装箱-批量");
-                viewPager.setCurrentItem(0, false);
-
-                break;
             case R.id.lin_tab2:
                 tabSelected(radio2);
-                tvTitle.setText("生产装箱-非批量");
+                tvTitle.setText("生产装箱-批量");
                 viewPager.setCurrentItem(1, false);
+
+                break;
+            case R.id.lin_tab1:
+                tabSelected(radio1);
+                tvTitle.setText("生产装箱-非批量");
+                viewPager.setCurrentItem(0, false);
 
                 break;
         }

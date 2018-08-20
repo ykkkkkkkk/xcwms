@@ -712,7 +712,7 @@ public class Pur_InFragment3 extends BaseFragment {
                     if (stock2.isStorageLocation()) {
                         Bundle bundle = new Bundle();
                         bundle.putInt("stockId", stock2.getfStockid());
-                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP, bundle);
+                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
                     } else {
                         ScanningRecord2 sr2 = checkDatas.get(curPos);
                         sr2.setStockId(stock2.getfStockid());
@@ -858,7 +858,7 @@ public class Pur_InFragment3 extends BaseFragment {
         for (int i = 0; i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             // 如果扫码相同
-            if (parseInt(mtl.getfMaterialId()) == sr2.getMtl().getfMaterialId()) {
+            if (parseInt(mtl.getfMaterialId()) == parseInt(sr2.getMtl().getfMaterialId())) {
                 isFlag = true;
 
                 // 未启用序列号
@@ -871,7 +871,7 @@ public class Pur_InFragment3 extends BaseFragment {
                             number = bt.getMaterialCalculateNumber();
                         }
                         if(number > 0) {
-                            sr2.setStockqty(number);
+                            sr2.setStockqty(number+sr2.getStockqty());
                         } else {
                             sr2.setStockqty(sr2.getStockqty() + 1);
                         }
@@ -919,7 +919,7 @@ public class Pur_InFragment3 extends BaseFragment {
             for (int i = 0; i < size; i++) {
                 ScanningRecord2 sr2 = checkDatas.get(i);
                 // 如果扫码相同
-                if(sr2.getMtl().getfMaterialId() == bt.getMaterialId() && sr2.getMtl().getIsSnManager() == 0) { // 未启用序列号
+                if(parseInt(sr2.getMtl().getfMaterialId()) == parseInt(bt.getMaterialId()) && sr2.getMtl().getIsSnManager() == 0) { // 未启用序列号
                     isFlag = true;
                     // 实收数大于应收数,就看其他行有没有相同的物料
                     if(sr2.getStockqty()+1 > sr2.getFqty()) {
@@ -928,7 +928,7 @@ public class Pur_InFragment3 extends BaseFragment {
                     sr2.setStockqty(sr2.getStockqty() + 1);
                     sr2.setPoFmustqty(sr2.getStockqty() + 1);
 
-                } else if(sr2.getMtl().getfMaterialId() == bt.getMaterialId()) { // 启用序列号
+                } else if(parseInt(sr2.getMtl().getfMaterialId()) == parseInt(bt.getMaterialId())) { // 启用序列号
                     isFlag = true;
                     if(sr2.getStockqty() == 1) { // 启用了序列号，如果已经扫了一次，就提示
                         Comm.showWarnDialog(mContext, "第"+(i+1)+"物料已启用序列号，数量只能为1！");

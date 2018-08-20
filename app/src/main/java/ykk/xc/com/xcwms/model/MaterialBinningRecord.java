@@ -81,9 +81,10 @@ public class MaterialBinningRecord implements Serializable {
 	private String modifyUserName;
 	/* 关联单据数量 */
 	private double relationBillFQTY;
+	/* 可用的数量(未存表)  */
+	private double usableFqty;
 	/* 关联单据Json对象 */
 	private String relationObj;
-
 
 	public MaterialBinningRecord() {
 		super();
@@ -313,6 +314,14 @@ public class MaterialBinningRecord implements Serializable {
 		this.fbillType = fbillType;
 	}
 
+	public double getUsableFqty() {
+		return usableFqty;
+	}
+
+	public void setUsableFqty(double usableFqty) {
+		this.usableFqty = usableFqty;
+	}
+
 	@Override
 	public String toString() {
 		return "MaterialBinningRecord [id=" + id + ", fbillType=" + fbillType + ", boxBarCodeId=" + boxBarCodeId
@@ -324,6 +333,6 @@ public class MaterialBinningRecord implements Serializable {
 				+ ", binningType=" + binningType + ", caseId=" + caseId + ", createDate=" + createDate
 				+ ", createUserId=" + createUserId + ", createUserName=" + createUserName + ", modifyDate=" + modifyDate
 				+ ", modifyUserId=" + modifyUserId + ", modifyUserName=" + modifyUserName + ", relationBillFQTY="
-				+ relationBillFQTY + ", relationObj=" + relationObj + "]";
+				+ relationBillFQTY + ", usableFqty=" + usableFqty + ", relationObj=" + relationObj + "]";
 	}
 }

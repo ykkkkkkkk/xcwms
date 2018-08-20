@@ -409,6 +409,8 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         mbr.setBarcodeSource('2');
         mbr.setCaseId(34);
         mbr.setNumber(securityCode.getGroupCount());
+        mbr.setRelationBillFQTY(prodOrder.getProdFqty());
+//        mbr.setRelationBillFQTY(securityCode.getGroupCount());
         mbr.setBarcode(prodOrder.getBarcode());
         mbr.setBatchCode(batch);
         mbr.setCreateUserId(user.getId());

@@ -149,8 +149,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                                 BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 // 是否启用序列号，是否装过箱
                                 if(barCodeTable.getMtl() != null && barCodeTable.getMbr() != null && barCodeTable.getMtl().getIsSnManager() > 0 && barCodeTable.getMbr().getId() > 0) {
-                                    m.setTexts(m.etMtlCode, barCodeTable.getMaterialNumber());
-                                    m.strMtlBarcode = barCodeTable.getMaterialNumber();
+                                    m.setTexts(m.etMtlCode, m.strMtlBarcode);
                                     Comm.showWarnDialog(m.mContext,"该物料启用了序列号，不能重复装箱！");
                                     return;
                                 }
@@ -485,26 +484,26 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         etMtlCode2.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN) {
-                    String mtlCode = getValues(etMtlCode2).trim();
-                    if (isKeyDownEnter(mtlCode, event, keyCode)) {
-                        if (strMtlBarcode_del != null && strMtlBarcode_del.length() > 0) {
-                            if(strMtlBarcode_del.equals(mtlCode)) {
-                                strMtlBarcode_del = mtlCode;
-                            } else {
-                                String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
-                                strMtlBarcode_del = tmp.replace("\n", "");
-                            }
+            if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                String mtlCode = getValues(etMtlCode2).trim();
+                if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                    if (strMtlBarcode_del != null && strMtlBarcode_del.length() > 0) {
+                        if(strMtlBarcode_del.equals(mtlCode)) {
+                            strMtlBarcode_del = mtlCode;
                         } else {
-                            strMtlBarcode_del = mtlCode.replace("\n", "");
+                            String tmp = mtlCode.replaceFirst(strMtlBarcode_del, "");
+                            strMtlBarcode_del = tmp.replace("\n", "");
                         }
-                        curViewFlag = '3';
-                        // 执行查询方法
-                        run_smGetDatas();
+                    } else {
+                        strMtlBarcode_del = mtlCode.replace("\n", "");
                     }
+                    curViewFlag = '3';
+                    // 执行查询方法
+                    run_smGetDatas();
                 }
+            }
 
-                return false;
+            return false;
             }
         });
 
@@ -681,8 +680,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     private void getBox() {
         if(boxBarCode != null) {
             listMbr.clear();
-            setTexts(etBoxCode, boxBarCode.getBarCode());
-            strBoxBarcode = boxBarCode.getBarCode();
+            setTexts(etBoxCode, strBoxBarcode);
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
                 linBox.setVisibility(View.VISIBLE);
@@ -763,8 +761,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
      */
     private void getBarCodeTable2(BarCodeTable barCodeTable) {
         if (barCodeTable != null) {
-            setTexts(etMtlCode, barCodeTable.getMaterialNumber());
-            strMtlBarcode = barCodeTable.getMaterialNumber();
+            setTexts(etMtlCode, strMtlBarcode);
             int size = listMbr.size();
             tvCount.setText("物料数量："+size);
             getUserInfo();
@@ -855,6 +852,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
             }
             tmpMtl.setBarcodeSource('1');
             tmpMtl.setNumber(1);
+            tmpMtl.setRelationBillFQTY(prodOrder.getProdFqty());
             tmpMtl.setBarcode(barCodeTable.getBarcode());
             // 启用了批次号
             if(tmpMtl.getMtl() != null && tmpMtl.getMtl().getIsBatchManager() == 1) {
@@ -879,8 +877,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
      */
     private void getBarCodeTable_delete(BarCodeTable barCodeTable) {
         if (barCodeTable != null) {
-            setTexts(etMtlCode, barCodeTable.getMaterialNumber());
-            strMtlBarcode = barCodeTable.getMaterialNumber();
+            setTexts(etMtlCode, strMtlBarcode);
 
             int size = listMbr.size();
             MaterialBinningRecord tmpMtl = null;

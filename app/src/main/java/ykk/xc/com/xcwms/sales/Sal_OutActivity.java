@@ -54,6 +54,8 @@ import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.pur.ProdOrder;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -176,10 +178,21 @@ public class Sal_OutActivity extends BaseActivity {
                                 break;
                             case '4': // 销售装箱单
                                 List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
-                                if(m.isAlikeCust(null, list.get(0), '2')) return;
+                                MaterialBinningRecord mbr = list.get(0);
+                                if(m.isAlikeCust(null, mbr, '2')) return;
 
                                 m.getBarCodeTableBefore(false);
-                                m.getSourceAfter(list);
+                                switch (mbr.getCaseId()) {
+                                    case 32: // 销售装箱
+                                        m.getSourceAfter(list);
+                                        break;
+                                    case 34: // 生产装箱
+                                        m.getSourceAfter2(list);
+                                        break;
+                                    case 37: // 发货通知单，复核单装箱
+                                        m.getSourceAfter3(list);
+                                        break;
+                                }
 
                                 break;
                         }
@@ -516,10 +529,10 @@ public class Sal_OutActivity extends BaseActivity {
                             break;
                         case R.id.et_matNo: // 物料
                             String matNo = getValues(etMatNo).trim();
-//                            if (!smBefore()) { // 扫码之前的判断
-//                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-//                                return false;
-//                            }
+                            if (dataType == '2' && !smBefore()) { // 扫码之前的判断
+                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                return false;
+                            }
                             if (isKeyDownEnter(matNo, event, keyCode)) {
                                 if (dataType == '1') { // 物料
                                     if (mtlBarcode != null && mtlBarcode.length() > 0) {
@@ -720,10 +733,28 @@ public class Sal_OutActivity extends BaseActivity {
                 return true;
             }
         } if(flag == '2') {
-            SalOrder s = JsonUtil.stringToObject(mbr.getRelationObj(), SalOrder.class);
-            if(cust != null && !cust.getCustomerCode().equals(s.getCustNumber())){
-                Comm.showWarnDialog(context, "客户不同，不能操作，请检查！");
-                return true;
+            switch (mbr.getCaseId()) {
+                case 32: // 销售装箱
+                    SalOrder s = JsonUtil.stringToObject(mbr.getRelationObj(), SalOrder.class);
+                    if(cust != null && !cust.getCustomerCode().equals(s.getCustNumber())){
+                        Comm.showWarnDialog(context, "客户不同，不能操作，请检查！");
+                        return true;
+                    }
+                    break;
+                case 33: // 发货通知单，复核单装箱
+                    DeliOrder deli = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
+                    if(cust != null && !cust.getCustomerCode().equals(deli.getCustNumber())){
+                        Comm.showWarnDialog(context, "客户不同，不能操作，请检查！");
+                        return true;
+                    }
+                    break;
+                case 34: // 生产装箱
+                    ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+                    if(cust != null && !cust.getCustomerCode().equals(prodOrder.getCustNumber())){
+                        Comm.showWarnDialog(context, "客户不同，不能操作，请检查！");
+                        return true;
+                    }
+                    break;
             }
         }
         return false;
@@ -855,7 +886,7 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     /**
-     * 选择来源单返回
+     * 选择来源单返回（销售装箱）
      */
     private void getSourceAfter(List<MaterialBinningRecord> list) {
         setTexts(etMatNo, boxBarcode);
@@ -890,11 +921,11 @@ public class Sal_OutActivity extends BaseActivity {
                 sr2.setEmpId(department.getFitemID()); // 部门
                 sr2.setDepartmentFnumber(department.getDepartmentNumber());
             }
-            // 得到生产订单
+            // 得到销售订单
             SalOrder salOrder = JsonUtil.stringToObject(mbr.getRelationObj(), SalOrder.class);
             sr2.setEntryId(salOrder.getEntryId());
-            sr2.setFqty(salOrder.getSalFqty()-salOrder.getSalFstockoutqty());
-            sr2.setPoFmustqty(salOrder.getSalFqty()-salOrder.getSalFstockoutqty());
+            sr2.setFqty(mbr.getRelationBillFQTY());
+            sr2.setPoFmustqty(mbr.getRelationBillFQTY());
             sr2.setStockqty(mbr.getNumber());
             // 发货组织
             if(salOrder.getInventoryOrgId() > 0) {
@@ -931,9 +962,165 @@ public class Sal_OutActivity extends BaseActivity {
             }
             checkDatas.add(sr2);
         }
-        String poNumber = list.get(0).getRelationBillNumber();
-        setTexts(etMatNo, poNumber);
-        boxBarcode = poNumber;
+        setTexts(etMatNo, boxBarcode);
+        setFocusable(etMatNo); // 物料代码获取焦点
+
+        mAdapter.notifyDataSetChanged();
+    }
+    /**
+     * 选择来源单返回（生产装箱）
+     */
+    private void getSourceAfter2(List<MaterialBinningRecord> list) {
+        setTexts(etMatNo, boxBarcode);
+        for (int i = 0, size = list.size(); i < size; i++) {
+            MaterialBinningRecord mbr = list.get(i);
+            ScanningRecord2 sr2 = new ScanningRecord2();
+            sr2.setSourceFinterId(mbr.getRelationBillId());
+            sr2.setSourceFnumber(mbr.getRelationBillNumber());
+            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtl(mbr.getMtl());
+            sr2.setMtlFnumber(mbr.getMtl().getfNumber());
+            sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
+            sr2.setPoFid(mbr.getRelationBillId());
+            sr2.setPoFbillno(mbr.getRelationBillNumber());
+            sr2.setBatchno(mbr.getBatchCode());
+            sr2.setSequenceNo(mbr.getSnCode());
+            sr2.setBarcode(mbr.getBarcode());
+
+            if (stock != null) {
+                sr2.setStockId(stock.getfStockid());
+                sr2.setStock(stock);
+                sr2.setStockFnumber(stock.getfNumber());
+            }
+            if (stockP != null) {
+                sr2.setStockPositionId(stockP.getId());
+                sr2.setStockPName(stockP.getFname());
+            }
+//            sr2.setSupplierId(mbr.getSupplierId());
+//            sr2.setSupplierName(mbr.getSupplierName());
+//            sr2.setSupplierFnumber(supplier.getfNumber());
+            if (department != null) {
+                sr2.setEmpId(department.getFitemID()); // 部门
+                sr2.setDepartmentFnumber(department.getDepartmentNumber());
+            }
+            // 得到生产订单
+            ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+            sr2.setEntryId(prodOrder.getEntryId());
+            sr2.setFqty(mbr.getRelationBillFQTY());
+            sr2.setPoFmustqty(mbr.getRelationBillFQTY());
+            sr2.setStockqty(mbr.getNumber());
+            // 发货组织
+            if(receiveOrg == null) receiveOrg = new Organization();
+            receiveOrg.setFpkId(prodOrder.getProdOrgId());
+            receiveOrg.setNumber(prodOrder.getProdOrgNumber());
+            receiveOrg.setName(prodOrder.getProdOrgName());
+            setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
+            tvReceiveOrg.setText(receiveOrg.getName());
+            sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
+
+            if(salOrg == null) salOrg = new Organization();
+            salOrg.setFpkId(prodOrder.getProdOrgId());
+            salOrg.setNumber(prodOrder.getProdOrgNumber());
+            salOrg.setName(prodOrder.getProdOrgName());
+
+            setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
+            tvSalOrg.setText(salOrg.getName());
+            sr2.setPurOrgFnumber(salOrg.getNumber());
+
+            sr2.setCustomerId(prodOrder.getCustId());
+            sr2.setCustomerName(prodOrder.getCustName());
+            sr2.setCustFnumber(prodOrder.getCustNumber());
+            if(cust == null) {
+                cust = new Customer();
+                cust.setFcustId(prodOrder.getCustId());
+                cust.setCustomerCode(prodOrder.getCustNumber());
+                cust.setCustomerName(prodOrder.getCustName());
+
+                tvCustSel.setText("客户："+prodOrder.getCustName());
+            }
+            checkDatas.add(sr2);
+        }
+        setTexts(etMatNo, boxBarcode);
+        setFocusable(etMatNo); // 物料代码获取焦点
+
+        mAdapter.notifyDataSetChanged();
+    }
+    /**
+     * 选择来源单返回（发货订单，复核单装箱）
+     */
+    private void getSourceAfter3(List<MaterialBinningRecord> list) {
+        setTexts(etMatNo, boxBarcode);
+        for (int i = 0, size = list.size(); i < size; i++) {
+            MaterialBinningRecord mbr = list.get(i);
+            ScanningRecord2 sr2 = new ScanningRecord2();
+            sr2.setSourceFinterId(mbr.getRelationBillId());
+            sr2.setSourceFnumber(mbr.getRelationBillNumber());
+            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtl(mbr.getMtl());
+            sr2.setMtlFnumber(mbr.getMtl().getfNumber());
+            sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
+            sr2.setPoFid(mbr.getRelationBillId());
+            sr2.setPoFbillno(mbr.getRelationBillNumber());
+            sr2.setBatchno(mbr.getBatchCode());
+            sr2.setSequenceNo(mbr.getSnCode());
+            sr2.setBarcode(mbr.getBarcode());
+
+            if (stock != null) {
+                sr2.setStockId(stock.getfStockid());
+                sr2.setStock(stock);
+                sr2.setStockFnumber(stock.getfNumber());
+            }
+            if (stockP != null) {
+                sr2.setStockPositionId(stockP.getId());
+                sr2.setStockPName(stockP.getFname());
+            }
+//            sr2.setSupplierId(mbr.getSupplierId());
+//            sr2.setSupplierName(mbr.getSupplierName());
+//            sr2.setSupplierFnumber(supplier.getfNumber());
+            if (department != null) {
+                sr2.setEmpId(department.getFitemID()); // 部门
+                sr2.setDepartmentFnumber(department.getDepartmentNumber());
+            }
+            // 得到发货订单
+            DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
+            sr2.setEntryId(deliOrder.getEntryId());
+            sr2.setFqty(mbr.getRelationBillFQTY());
+            sr2.setPoFmustqty(mbr.getRelationBillFQTY());
+            sr2.setStockqty(mbr.getNumber());
+            // 发货组织
+            if(deliOrder.getDeliOrgId() > 0) {
+                if(receiveOrg == null) receiveOrg = new Organization();
+                receiveOrg.setFpkId(deliOrder.getDeliOrgId());
+                receiveOrg.setNumber(deliOrder.getDeliOrgNumber());
+                receiveOrg.setName(deliOrder.getDeliOrgName());
+                setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
+                tvReceiveOrg.setText(receiveOrg.getName());
+                sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
+
+                // 销售组织
+                if(salOrg == null) salOrg = new Organization();
+                salOrg.setFpkId(deliOrder.getDeliOrgId());
+                salOrg.setNumber(deliOrder.getDeliOrgNumber());
+                salOrg.setName(deliOrder.getDeliOrgName());
+
+                setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
+                tvSalOrg.setText(salOrg.getName());
+                sr2.setPurOrgFnumber(salOrg.getNumber());
+            }
+            sr2.setCustomerId(deliOrder.getCustId());
+            sr2.setCustomerName(deliOrder.getCustName());
+            sr2.setCustFnumber(deliOrder.getCustNumber());
+            if(cust == null) {
+                cust = new Customer();
+                cust.setFcustId(deliOrder.getCustId());
+                cust.setCustomerCode(deliOrder.getCustNumber());
+                cust.setCustomerName(deliOrder.getCustName());
+
+                tvCustSel.setText("客户："+deliOrder.getCustName());
+            }
+            checkDatas.add(sr2);
+        }
+        setTexts(etMatNo, boxBarcode);
         setFocusable(etMatNo); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();
@@ -1119,11 +1306,11 @@ public class Sal_OutActivity extends BaseActivity {
             case '4': // 箱子扫码
                 mUrl = Consts.getURL("materialBinningRecord/findList3ByParam");
                 barcode = boxBarcode;
-                caseId = 32;
+//                caseId = 32;
                 break;
         }
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", String.valueOf(caseId))
+                .add("caseId", caseId > 0 ? String.valueOf(caseId) : "")
                 .add("barcode", barcode)
                 .build();
 
