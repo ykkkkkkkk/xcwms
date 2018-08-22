@@ -296,6 +296,23 @@ public class Comm {
 	}
 
 	/**
+	 * 克隆分为两种：1.浅克隆（地址指向一样，A的数据改变，B也随着改变。），深克隆（互不相干）
+	 * 对象深度克隆
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	public static <T> T deepCopy(T src) throws IOException, ClassNotFoundException {
+		ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+		ObjectOutputStream out = new ObjectOutputStream(byteOut);
+		out.writeObject(src);
+
+		ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+		ObjectInputStream in = new ObjectInputStream(byteIn);
+		T dast = (T) in.readObject();
+		return dast;
+	}
+
+	/**
 	 * 关闭的dialog
 	 */
 	/**

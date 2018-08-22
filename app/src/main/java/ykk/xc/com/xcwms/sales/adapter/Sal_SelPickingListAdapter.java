@@ -40,7 +40,7 @@ public class Sal_SelPickingListAdapter extends BaseArrayRecyclerAdapter<PickingL
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
             tv_date.setText(entity.getCreateDate());
-            tv_stNo.setText(entity.getFbillno());
+            tv_stNo.setText(entity.getPickingListNo());
             tv_mts.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
             String unitName = entity.getMtlUnitName();
 //            String num1 = df.format(entity.getDeliFremainoutqty());

@@ -12,9 +12,9 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
  */
 public class BoxBarCode implements Serializable {
 	/*id*/
-	private Integer id;
+	private int id;
 	/*包装物id*/
-	private Integer boxId;
+	private int boxId;
 	/*包装物生成的唯一码*/
 	private String barCode;
 	/**箱子的状态
@@ -22,7 +22,7 @@ public class BoxBarCode implements Serializable {
 	 * 1代表开箱
 	 * 2代表封箱
 	 * */
-	private Integer status;
+	private int status;
 	/*箱子净重*/
 	private double roughWeight;
 	/*包装物*/
@@ -36,12 +36,12 @@ public class BoxBarCode implements Serializable {
 	}
 
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
 
-	public Integer getBoxId() {
+	public int getBoxId() {
 		return boxId;
 	}
 
@@ -51,7 +51,7 @@ public class BoxBarCode implements Serializable {
 	}
 
 
-	public Integer getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
@@ -71,12 +71,12 @@ public class BoxBarCode implements Serializable {
 	}
 
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
 
-	public void setBoxId(Integer boxId) {
+	public void setBoxId(int boxId) {
 		this.boxId = boxId;
 	}
 
@@ -86,7 +86,7 @@ public class BoxBarCode implements Serializable {
 	}
 
 
-	public void setStatus(Integer status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 

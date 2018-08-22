@@ -143,8 +143,8 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                 for(int i = 0, size = listDatas.size(); i<size; i++) {
                     PurOrder p = listDatas.get(i);
 
-                    int batch = parseInt(p.getMtl().getIsBatchManager());
-                    int snNo = parseInt(p.getMtl().getIsSnManager());
+                    int batch = p.getMtl().getIsBatchManager();
+                    int snNo = p.getMtl().getIsSnManager();
                     // 选中了行
                     if(p.getIsCheck() == 1) {
                         if(sourceList != null) {
@@ -212,6 +212,8 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
         FormBody formBody = new FormBody.Builder()
 //                .add("fbillno", getValues(etFbillno).trim())
                 .add("supplierId", String.valueOf(supplier.getFsupplierid()))
+                .add("isDefaultStock", "1") // 查询默认仓库和库位
+
 //                .add("supplierName", supplier.)
 //                .add("mtlFnumber", getValues(etMtlFnumber).trim())
 //                .add("mtlFname", getValues(etMtlFname).trim())

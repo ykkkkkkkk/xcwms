@@ -10,15 +10,15 @@ import java.io.Serializable;
 public class MaterialBinningRecord implements Serializable {
 
 	/*id*/
-	private Integer id;
+	private int id;
 	/* 单据类型 */
 	private int fbillType;
 	/*包装物id*/
-	private Integer boxBarCodeId;
+	private int boxBarCodeId;
 	/*包装物条码类*/
 	private BoxBarCode boxBarCode;
 	/*物料id*/
-	private Integer materialId;
+	private int materialId;
 	/* 对应t_barCodeTable或者t_SecurityCode    表中的barcode字段  */
 	private String barcode;
 	/* 条码数据来源   1：t_barCodeTable表过来的barcode，2：t_SecurityCode表过来的barcode */
@@ -32,24 +32,24 @@ public class MaterialBinningRecord implements Serializable {
 	/*箱子里装入物料的数量*/
 	private double number;
 	/*关联单据id*/
-	private Integer relationBillId;
+	private int relationBillId;
 	/*关联单据号*/
 	private String relationBillNumber;
 	/*客户id*/
-	private Integer customerId;
+	private int customerId;
 	/*客户*/
 	private Customer customer;
 	/**物流方式
 	 * 1代表快递
 	 * 2代表物流
 	 * */
-	private Integer expressType;
+	private int expressType;
 	private String deliveryWay; // 交货方式
 	/**装箱业务类型
 	 * 1代表外购入库
 	 * 2代表销售出库
 	 * */
-	private Integer packageWorkType;
+	private int packageWorkType;
 	/* 物料包装类型（1：单装，2：混装，3：自由装） */
 	private char binningType;
 	/* 方案id */
@@ -86,15 +86,16 @@ public class MaterialBinningRecord implements Serializable {
 	/* 关联单据Json对象 */
 	private String relationObj;
 
+
 	public MaterialBinningRecord() {
 		super();
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public Integer getBoxBarCodeId() {
+	public int getBoxBarCodeId() {
 		return boxBarCodeId;
 	}
 
@@ -102,7 +103,7 @@ public class MaterialBinningRecord implements Serializable {
 		return boxBarCode;
 	}
 
-	public Integer getMaterialId() {
+	public int getMaterialId() {
 		return materialId;
 	}
 
@@ -130,7 +131,7 @@ public class MaterialBinningRecord implements Serializable {
 		return number;
 	}
 
-	public Integer getRelationBillId() {
+	public int getRelationBillId() {
 		return relationBillId;
 	}
 
@@ -138,7 +139,7 @@ public class MaterialBinningRecord implements Serializable {
 		return relationBillNumber;
 	}
 
-	public Integer getCustomerId() {
+	public int getCustomerId() {
 		return customerId;
 	}
 
@@ -146,7 +147,7 @@ public class MaterialBinningRecord implements Serializable {
 		return customer;
 	}
 
-	public Integer getExpressType() {
+	public int getExpressType() {
 		return expressType;
 	}
 
@@ -154,7 +155,7 @@ public class MaterialBinningRecord implements Serializable {
 		return deliveryWay;
 	}
 
-	public Integer getPackageWorkType() {
+	public int getPackageWorkType() {
 		return packageWorkType;
 	}
 
@@ -190,11 +191,11 @@ public class MaterialBinningRecord implements Serializable {
 		return modifyUserName;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public void setBoxBarCodeId(Integer boxBarCodeId) {
+	public void setBoxBarCodeId(int boxBarCodeId) {
 		this.boxBarCodeId = boxBarCodeId;
 	}
 
@@ -202,7 +203,7 @@ public class MaterialBinningRecord implements Serializable {
 		this.boxBarCode = boxBarCode;
 	}
 
-	public void setMaterialId(Integer materialId) {
+	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
 	}
 
@@ -230,7 +231,7 @@ public class MaterialBinningRecord implements Serializable {
 		this.number = number;
 	}
 
-	public void setRelationBillId(Integer relationBillId) {
+	public void setRelationBillId(int relationBillId) {
 		this.relationBillId = relationBillId;
 	}
 
@@ -238,7 +239,7 @@ public class MaterialBinningRecord implements Serializable {
 		this.relationBillNumber = relationBillNumber;
 	}
 
-	public void setCustomerId(Integer customerId) {
+	public void setCustomerId(int customerId) {
 		this.customerId = customerId;
 	}
 
@@ -246,7 +247,7 @@ public class MaterialBinningRecord implements Serializable {
 		this.customer = customer;
 	}
 
-	public void setExpressType(Integer expressType) {
+	public void setExpressType(int expressType) {
 		this.expressType = expressType;
 	}
 
@@ -254,7 +255,7 @@ public class MaterialBinningRecord implements Serializable {
 		this.deliveryWay = deliveryWay;
 	}
 
-	public void setPackageWorkType(Integer packageWorkType) {
+	public void setPackageWorkType(int packageWorkType) {
 		this.packageWorkType = packageWorkType;
 	}
 

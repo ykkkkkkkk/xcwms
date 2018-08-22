@@ -11,9 +11,9 @@ import java.io.Serializable;
  */
 public class Customer implements Serializable {
 	/*客户id*/
-	private Integer id;
+	private int id;
 	/*k3客户id*/
-	private Integer fcustId;
+	private int fcustId;
 	/*创建组织Id*/
 	private String createOrgId;
 	/*客户编码*/
@@ -52,16 +52,16 @@ public class Customer implements Serializable {
 	 * getter/setter方法
 	 * @return
 	 */
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	public Integer getFcustId() {
+	public int getFcustId() {
 		return fcustId;
 	}
-	public void setFcustId(Integer fcustId) {
+	public void setFcustId(int fcustId) {
 		this.fcustId = fcustId;
 	}
 	public String getCreateOrgId() {

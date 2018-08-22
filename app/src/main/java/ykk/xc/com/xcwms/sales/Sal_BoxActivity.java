@@ -165,7 +165,7 @@ public class Sal_BoxActivity extends BaseActivity {
                                 }
                                 m.getBarCodeTableAfter(); // 禁用一些控件
                                 // 无源单和来源的分支
-                                if(barCodeTable.getRelationBillId() == null || barCodeTable.getRelationBillId() == 0) {
+                                if(barCodeTable.getRelationBillId() == 0) {
                                     m.getBarCodeTable(barCodeTable);
                                 } else {
                                     m.getBarCodeTable2(barCodeTable);
@@ -758,7 +758,7 @@ public class Sal_BoxActivity extends BaseActivity {
 
                 MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
                 // 固定当前是无源单还是有源单
-                if(mtlbr.getRelationBillId() == null || mtlbr.getRelationBillId() == 0) {
+                if(mtlbr.getRelationBillId() == 0) {
                     tabSelected(viewRadio1);
                     dataType = '1';
                 } else {
@@ -830,7 +830,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMbr.get(i);
-                    if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
+                    if(barCodeTable.getMaterialId() == forMtl.getMaterialId()){
                         if(forMtl.getMtl().getIsSnManager() == 0) {
                             tmpMtl = forMtl;
                         }
@@ -1066,7 +1066,7 @@ public class Sal_BoxActivity extends BaseActivity {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMbr.get(i);
-                    if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
+                    if(barCodeTable.getMaterialId() == forMtl.getMaterialId()){
                         tmpMtl = forMtl;
 
                         break;

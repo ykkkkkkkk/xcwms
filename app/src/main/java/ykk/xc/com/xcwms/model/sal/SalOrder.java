@@ -38,7 +38,7 @@ public class SalOrder implements Serializable{
     private int isCheck; // 新加的，用于前台临时用判断是否选中
 
     /*对应k3单据分录号字段*/
-    private Integer entryId;
+    private int entryId;
 
     public SalOrder() {
         super();
@@ -228,11 +228,11 @@ public class SalOrder implements Serializable{
         this.isCheck = isCheck;
     }
 
-    public Integer getEntryId() {
+    public int getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(Integer entryId) {
+    public void setEntryId(int entryId) {
         this.entryId = entryId;
     }
 

@@ -34,7 +34,7 @@ public class DeliOrder implements Serializable{
 	private double deliFremainoutqty; // 未出库数量
 	private String deliveryWay; // 发货方式
 	/*对应k3单据分录号字段*/
-	private Integer entryId;
+	private int entryId;
 	private int isCheck; // 新加的是否选中
 
 	public DeliOrder() {
@@ -125,7 +125,7 @@ public class DeliOrder implements Serializable{
 		return deliveryWay;
 	}
 
-	public Integer getEntryId() {
+	public int getEntryId() {
 		return entryId;
 	}
 
@@ -217,7 +217,7 @@ public class DeliOrder implements Serializable{
 		this.deliveryWay = deliveryWay;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(int entryId) {
 		this.entryId = entryId;
 	}
 

@@ -67,17 +67,17 @@ public class Pur_InActivityTemp extends BaseActivity {
     Button btnMakerCode;
     @BindView(R.id.tv_custSel)
     TextView tvCustSel;
-    @BindView(R.id.et_whName)
+    @BindView(R.id.et_stock)
     EditText etWhName;
-    @BindView(R.id.btn_whName)
+    @BindView(R.id.btn_stock)
     Button btnWhName;
     @BindView(R.id.et_whArea)
     EditText etWhArea;
     @BindView(R.id.btn_whArea)
     Button btnWhArea;
-    @BindView(R.id.et_whPos)
+    @BindView(R.id.et_stockPos)
     EditText etWhPos;
-    @BindView(R.id.btn_whPos)
+    @BindView(R.id.btn_stockPos)
     Button btnWhPos;
     @BindView(R.id.et_deptName)
     EditText etDeptName;
@@ -316,8 +316,8 @@ public class Pur_InActivityTemp extends BaseActivity {
         tvPurDate.setText(Comm.getSysDate(7));
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_sourceNo, R.id.btn_maker_code, R.id.tv_custSel, R.id.btn_whName, R.id.btn_whArea,
-            R.id.btn_whPos, R.id.btn_deptName, R.id.btn_selMat, R.id.btn_add, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_sourceNo, R.id.btn_maker_code, R.id.tv_custSel, R.id.btn_stock, R.id.btn_whArea,
+            R.id.btn_stockPos, R.id.btn_deptName, R.id.btn_selMat, R.id.btn_add, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_operationTypeSel, R.id.tv_receiveOrg, R.id.tv_purOrg, R.id.tv_purDate, R.id.tv_purMan})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -352,7 +352,7 @@ public class Pur_InActivityTemp extends BaseActivity {
                 showForResult(Supplier_DialogActivity.class, SEL_SUPPLIER, null);
 
                 break;
-            case R.id.btn_whName: // 选择仓库
+            case R.id.btn_stock: // 选择仓库
                 isStockLong = false;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
@@ -368,7 +368,7 @@ public class Pur_InActivityTemp extends BaseActivity {
                 showForResult(StockArea_DialogActivity.class, SEL_STOCKA, bundle);
 
                 break;
-            case R.id.btn_whPos: // 选择库位
+            case R.id.btn_stockPos: // 选择库位
                 if (stockA == null) {
                     Comm.showWarnDialog(context,"请先选择库区！");
                     return;
@@ -504,16 +504,16 @@ public class Pur_InActivityTemp extends BaseActivity {
         return true;
     }
 
-    @OnFocusChange({R.id.et_whName, R.id.et_whArea, R.id.et_whPos, R.id.et_deptName, R.id.et_matNo, R.id.et_sourceNo})
+    @OnFocusChange({R.id.et_stock, R.id.et_whArea, R.id.et_stockPos, R.id.et_deptName, R.id.et_matNo, R.id.et_sourceNo})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
 
-    @OnLongClick({R.id.btn_whName, R.id.btn_whArea})
+    @OnLongClick({R.id.btn_stock, R.id.btn_whArea})
     public boolean onViewLongClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
-            case R.id.btn_whName: // 长按选择仓库
+            case R.id.btn_stock: // 长按选择仓库
                 isStockLong = true;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
@@ -540,7 +540,7 @@ public class Pur_InActivityTemp extends BaseActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
-                        case R.id.et_whName: // 仓库
+                        case R.id.et_stock: // 仓库
                             String whName = getValues(etWhName).trim();
                             if (isKeyDownEnter(whName, event, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
@@ -570,7 +570,7 @@ public class Pur_InActivityTemp extends BaseActivity {
                             }
 
                             break;
-                        case R.id.et_whPos: // 库位
+                        case R.id.et_stockPos: // 库位
                             String whPos = getValues(etWhPos).trim();
                             if (isKeyDownEnter(whPos, event, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {

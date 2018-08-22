@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 public class Supplier implements Serializable {
     /*id*/
-    private Integer id;
+    private int id;
     /*供应商id*/
-    private Integer fsupplierid;
+    private int fsupplierid;
     /*供应商编码*/
     private String fNumber;
     /*供应商名称*/
@@ -32,16 +32,16 @@ public class Supplier implements Serializable {
     /*k3是否禁用*/
     private String enabled;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
-    public Integer getFsupplierid() {
+    public int getFsupplierid() {
         return fsupplierid;
     }
-    public void setFsupplierid(Integer fsupplierid) {
+    public void setFsupplierid(int fsupplierid) {
         this.fsupplierid = fsupplierid;
     }
     public String getfNumber() {

@@ -7,9 +7,9 @@ import java.io.Serializable;
  */
 public class Stock implements Serializable {
     /*id*/
-    private Integer id;
+    private int id;
     /*仓库id*/
-    private Integer fStockid ;
+    private int fStockid ;
     /*仓库编码*/
     private String fNumber;
     /*仓库名称*/
@@ -51,19 +51,19 @@ public class Stock implements Serializable {
     /* 条码 */
     private String barcode;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getfStockid() {
+    public int getfStockid() {
         return fStockid;
     }
 
-    public void setfStockid(Integer fStockid) {
+    public void setfStockid(int fStockid) {
         this.fStockid = fStockid;
     }
 

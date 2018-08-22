@@ -10,32 +10,32 @@ import java.io.Serializable;
  */
 public class SecurityCode implements Serializable {
 	/*id*/
-	private Integer id;
+	private int id;
 	/*防伪二维码号*/
 	private String securityQrCode;
 	/*防伪二维码组号*/
 	private String securityQrCodeGruopNumber;
 	/*每组数量*/
-	private Integer groupCount;
+	private int groupCount;
 	/*状态 0代表未绑定，1代表绑定*/
-	private Integer status;
+	private int status;
 	/*绑定类型 0代表物料，1代表包装*/
-	private Integer bindingType;
+	private int bindingType;
 	/*创建时间*/
 	private String createTime;
 	/*物料id*/
-	private Integer materialId;
+	private int materialId;
 	/*物料*/
 	private Material material;
 	/*箱子id*/
-	private Integer boxId;
+	private int boxId;
 	/*箱子*/
 	private Box box;
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getSecurityQrCode() {
@@ -50,22 +50,22 @@ public class SecurityCode implements Serializable {
 	public void setSecurityQrCodeGruopNumber(String securityQrCodeGruopNumber) {
 		this.securityQrCodeGruopNumber = securityQrCodeGruopNumber;
 	}
-	public Integer getGroupCount() {
+	public int getGroupCount() {
 		return groupCount;
 	}
-	public void setGroupCount(Integer groupCount) {
+	public void setGroupCount(int groupCount) {
 		this.groupCount = groupCount;
 	}
-	public Integer getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(Integer status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
-	public Integer getBindingType() {
+	public int getBindingType() {
 		return bindingType;
 	}
-	public void setBindingType(Integer bindingType) {
+	public void setBindingType(int bindingType) {
 		this.bindingType = bindingType;
 	}
 
@@ -75,10 +75,10 @@ public class SecurityCode implements Serializable {
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
 	}
-	public Integer getMaterialId() {
+	public int getMaterialId() {
 		return materialId;
 	}
-	public void setMaterialId(Integer materialId) {
+	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
 	}
 	public Material getMaterial() {
@@ -87,10 +87,10 @@ public class SecurityCode implements Serializable {
 	public void setMaterial(Material material) {
 		this.material = material;
 	}
-	public Integer getBoxId() {
+	public int getBoxId() {
 		return boxId;
 	}
-	public void setBoxId(Integer boxId) {
+	public void setBoxId(int boxId) {
 		this.boxId = boxId;
 	}
 	public Box getBox() {

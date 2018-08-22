@@ -76,13 +76,13 @@ public class Sal_OutActivity extends BaseActivity {
     Button btnClose;
     @BindView(R.id.btn_maker_code)
     Button btnMakerCode;
-    @BindView(R.id.et_whName)
+    @BindView(R.id.et_stock)
     EditText etWhName;
-    @BindView(R.id.btn_whName)
+    @BindView(R.id.btn_stock)
     Button btnWhName;
-    @BindView(R.id.et_whPos)
+    @BindView(R.id.et_stockPos)
     EditText etWhPos;
-    @BindView(R.id.btn_whPos)
+    @BindView(R.id.btn_stockPos)
     Button btnWhPos;
     @BindView(R.id.tv_deptName)
     TextView tvDeptName;
@@ -291,7 +291,7 @@ public class Sal_OutActivity extends BaseActivity {
         setFocusable(etMatNo); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_whName, R.id.btn_whPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -323,12 +323,12 @@ public class Sal_OutActivity extends BaseActivity {
 //                show(PrintBarcodeActivity.class, null);
 
                 break;
-            case R.id.btn_whName: // 选择仓库
+            case R.id.btn_stock: // 选择仓库
                 isStockLong = false;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
                 break;
-            case R.id.btn_whPos: // 选择库位
+            case R.id.btn_stockPos: // 选择库位
                 if (stock == null) {
                     Comm.showWarnDialog(context,"请先选择仓库！");
                     return;
@@ -455,16 +455,16 @@ public class Sal_OutActivity extends BaseActivity {
         return true;
     }
 
-    @OnFocusChange({R.id.et_whName, R.id.et_whPos, R.id.et_matNo})
+    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_matNo})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
 
-    @OnLongClick({R.id.btn_whName})
+    @OnLongClick({R.id.btn_stock})
     public boolean onViewLongClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
-            case R.id.btn_whName: // 长按选择仓库
+            case R.id.btn_stock: // 长按选择仓库
                 isStockLong = true;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
@@ -489,7 +489,7 @@ public class Sal_OutActivity extends BaseActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
-                        case R.id.et_whName: // 仓库
+                        case R.id.et_stock: // 仓库
                             String whName = getValues(etWhName).trim();
                             if (isKeyDownEnter(whName, event, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
@@ -508,7 +508,7 @@ public class Sal_OutActivity extends BaseActivity {
                             }
 
                             break;
-                        case R.id.et_whPos: // 库位
+                        case R.id.et_stockPos: // 库位
                             String whPos = getValues(etWhPos).trim();
                             if (isKeyDownEnter(whPos, event, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {

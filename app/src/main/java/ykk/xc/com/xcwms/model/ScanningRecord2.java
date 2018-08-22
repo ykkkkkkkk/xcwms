@@ -2,6 +2,8 @@ package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
 
+import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
+
 public class ScanningRecord2 implements Serializable {
     private int ID;
     private int type;
@@ -14,6 +16,7 @@ public class ScanningRecord2 implements Serializable {
     private double stockqty; // 实收数量，要插入到表的数量
     private int stockId;
     private Stock stock; // 新加
+    private StockPosition stockPos; // 临时用的
     private int stockAreaId;
     private String stockAName; // 新加
     private int stockPositionId;
@@ -307,56 +310,16 @@ public class ScanningRecord2 implements Serializable {
         this.entryId = entryId;
     }
 
+    public StockPosition getStockPos() {
+        return stockPos;
+    }
+
+    public void setStockPos(StockPosition stockPos) {
+        this.stockPos = stockPos;
+    }
+
     public ScanningRecord2() {
         super();
     }
 
-    @Override
-    public String toString() {
-        return "ScanningRecord2{" +
-                "ID=" + ID +
-                ", type=" + type +
-                ", sourceFinterId=" + sourceFinterId +
-                ", sourceFnumber='" + sourceFnumber + '\'' +
-                ", fitemId=" + fitemId +
-                ", mtl=" + mtl +
-                ", batchno='" + batchno + '\'' +
-                ", fqty=" + fqty +
-                ", stockqty=" + stockqty +
-                ", stockId=" + stockId +
-                ", stock=" + stock +
-                ", stockAreaId=" + stockAreaId +
-                ", stockAName='" + stockAName + '\'' +
-                ", stockPositionId=" + stockPositionId +
-                ", stockPName='" + stockPName + '\'' +
-                ", supplierId=" + supplierId +
-                ", supplierName='" + supplierName + '\'' +
-                ", customerId=" + customerId +
-                ", customerName='" + customerName + '\'' +
-                ", fdate='" + fdate + '\'' +
-                ", empId=" + empId +
-                ", operationId=" + operationId +
-                ", srNo='" + srNo + '\'' +
-                ", fentryId=" + fentryId +
-                ", k3no='" + k3no + '\'' +
-                ", sequenceNo='" + sequenceNo + '\'' +
-                ", barcode='" + barcode + '\'' +
-                ", pdaNo='" + pdaNo + '\'' +
-                ", k3number='" + k3number + '\'' +
-                ", status='" + status + '\'' +
-                ", receiveOrgFnumber='" + receiveOrgFnumber + '\'' +
-                ", purOrgFnumber='" + purOrgFnumber + '\'' +
-                ", supplierFnumber='" + supplierFnumber + '\'' +
-                ", mtlFnumber='" + mtlFnumber + '\'' +
-                ", unitFnumber='" + unitFnumber + '\'' +
-                ", batchFnumber='" + batchFnumber + '\'' +
-                ", stockFnumber='" + stockFnumber + '\'' +
-                ", poFid=" + poFid +
-                ", poFbillno='" + poFbillno + '\'' +
-                ", poFmustqty=" + poFmustqty +
-                ", departmentFnumber='" + departmentFnumber + '\'' +
-                ", custFnumber='" + custFnumber + '\'' +
-                ", entryId=" + entryId +
-                '}';
-    }
 }

@@ -55,8 +55,6 @@ import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.model.pur.PurOrder;
-import ykk.xc.com.xcwms.model.pur.PurReceiveOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Prod_InAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -76,14 +74,14 @@ public class Prod_InActivity extends BaseActivity {
     Button btnClose;
     @BindView(R.id.btn_maker_code)
     Button btnMakerCode;
-    @BindView(R.id.et_whName)
-    EditText etWhName;
-    @BindView(R.id.btn_whName)
-    Button btnWhName;
-    @BindView(R.id.et_whPos)
-    EditText etWhPos;
-    @BindView(R.id.btn_whPos)
-    Button btnWhPos;
+    @BindView(R.id.et_stock)
+    EditText etStock;
+    @BindView(R.id.btn_stock)
+    Button btnStock;
+    @BindView(R.id.et_stockPos)
+    EditText etStockPos;
+    @BindView(R.id.btn_stockPos)
+    Button btnStockPos;
     @BindView(R.id.tv_deptName)
     TextView tvDeptName;
     @BindView(R.id.tv_smName)
@@ -189,10 +187,10 @@ public class Prod_InActivity extends BaseActivity {
                     case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
                             case '1': // 仓库
-                                m.setTexts(m.etWhName, m.stockBarcode);
+                                m.setTexts(m.etStock, m.stockBarcode);
                                 break;
                             case '2': // 库位
-                                m.setTexts(m.etWhPos, m.stockPBarcode);
+                                m.setTexts(m.etStockPos, m.stockPBarcode);
                                 break;
                             case '3': // 生产订单
                                 m.setTexts(m.etMatNo, m.mtlBarcode);
@@ -266,15 +264,15 @@ public class Prod_InActivity extends BaseActivity {
     @Override
     public void initData() {
         hideSoftInputMode(etMatNo);
-        hideSoftInputMode(etWhName);
-        hideSoftInputMode(etWhPos);
+        hideSoftInputMode(etStock);
+        hideSoftInputMode(etStockPos);
         getUserInfo();
         curRadio = viewRadio1;
         tvProdDate.setText(Comm.getSysDate(7));
         setFocusable(etMatNo); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_whName, R.id.btn_whPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_prodMan})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -287,7 +285,7 @@ public class Prod_InActivity extends BaseActivity {
             case R.id.lin_tab1:
                 dataType = '1';
                 tabSelected(viewRadio1);
-                tvSmName.setText("物料扫码");
+                tvSmName.setText("生产条码");
                 resetSon2();
 
                 break;
@@ -306,12 +304,12 @@ public class Prod_InActivity extends BaseActivity {
 //                show(PrintBarcodeActivity.class, null);
 
                 break;
-            case R.id.btn_whName: // 选择仓库
+            case R.id.btn_stock: // 选择仓库
                 isStockLong = false;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
                 break;
-            case R.id.btn_whPos: // 选择库位
+            case R.id.btn_stockPos: // 选择库位
                 if (stock == null) {
                     Comm.showWarnDialog(context,"请先选择仓库！");
                     return;
@@ -438,16 +436,16 @@ public class Prod_InActivity extends BaseActivity {
         return true;
     }
 
-    @OnFocusChange({R.id.et_whName, R.id.et_whPos, R.id.et_matNo})
+    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_matNo})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
 
-    @OnLongClick({R.id.btn_whName})
+    @OnLongClick({R.id.btn_stock})
     public boolean onViewLongClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
-            case R.id.btn_whName: // 长按选择仓库
+            case R.id.btn_stock: // 长按选择仓库
                 isStockLong = true;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
@@ -472,8 +470,8 @@ public class Prod_InActivity extends BaseActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
-                        case R.id.et_whName: // 仓库
-                            String whName = getValues(etWhName).trim();
+                        case R.id.et_stock: // 仓库
+                            String whName = getValues(etStock).trim();
                             if (isKeyDownEnter(whName, event, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
                                     if(stockBarcode.equals(whName)) {
@@ -491,8 +489,8 @@ public class Prod_InActivity extends BaseActivity {
                             }
 
                             break;
-                        case R.id.et_whPos: // 库位
-                            String whPos = getValues(etWhPos).trim();
+                        case R.id.et_stockPos: // 库位
+                            String whPos = getValues(etStockPos).trim();
                             if (isKeyDownEnter(whPos, event, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
                                     if(stockPBarcode.equals(whPos)) {
@@ -552,8 +550,8 @@ public class Prod_InActivity extends BaseActivity {
                 return false;
             }
         };
-        etWhName.setOnKeyListener(keyListener);
-        etWhPos.setOnKeyListener(keyListener);
+        etStock.setOnKeyListener(keyListener);
+        etStockPos.setOnKeyListener(keyListener);
         etMatNo.setOnKeyListener(keyListener);
     }
 
@@ -589,8 +587,8 @@ public class Prod_InActivity extends BaseActivity {
         checkDatas.clear();
         mAdapter.notifyDataSetChanged();
         reset('0');
-        etWhName.setText("");
-        etWhPos.setText("");
+        etStock.setText("");
+        etStockPos.setText("");
         tvInOrg.setText("");
         tvProdOrg.setText("");
         supplier = null;
@@ -646,6 +644,14 @@ public class Prod_InActivity extends BaseActivity {
                 if (resultCode == RESULT_OK) {
                     inOrg = (Organization) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_ORG", inOrg.getName());
+                    if(prodOrg == null) {
+                        try {
+                            prodOrg = Comm.deepCopy(inOrg);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        tvProdOrg.setText(prodOrg.getName());
+                    }
                     getOrgAfter();
                 }
 
@@ -690,10 +696,10 @@ public class Prod_InActivity extends BaseActivity {
         if(mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();
-            setTexts(etWhName, stock.getfName());
-            setTexts(etWhPos, stockP.getFname());
+            setTexts(etStock, stock.getfName());
+            setTexts(etStockPos, stockP.getFnumber());
             stockBarcode = stock.getfName();
-            stockPBarcode = stockP.getFname();
+            stockPBarcode = stockP.getFnumber();
         } else {
             if (dataType == '1') { // 物料
                 setTexts(etMatNo, mtlBarcode);
@@ -768,11 +774,12 @@ public class Prod_InActivity extends BaseActivity {
 //        sr2.setSupplierId(supplier.getFsupplierid());
 //        sr2.setSupplierName(supplier.getfName());
 //        sr2.setSupplierFnumber(supplier.getfNumber());
-        sr2.setStockId(stock.getfStockid());
         sr2.setStock(stock);
+        sr2.setStockId(stock.getfStockid());
         sr2.setStockFnumber(stock.getfNumber());
 //        sr2.setStockAreaId(stockA.getId());
 //        sr2.setStockAName(stockA.getFname());
+        sr2.setStockPos(stockP);
         sr2.setStockPositionId(stockP.getId());
         sr2.setStockPName(stockP.getFname());
         // 得到生产订单
@@ -901,19 +908,19 @@ public class Prod_InActivity extends BaseActivity {
      */
     private void getStockAfter() {
         if (stock != null) {
-            setTexts(etWhName, stock.getfName());
+            setTexts(etStock, stock.getfName());
             stockBarcode = stock.getfName();
             stockP = null;
-            etWhPos.setText("");
+            etStockPos.setText("");
             // 启用库位
             if (stock.isStorageLocation()) {
-                setEnables(etWhPos, R.drawable.back_style_blue4, true);
-                setEnables(btnWhPos, R.drawable.btn_blue3_selector, true);
+                setEnables(etStockPos, R.drawable.back_style_blue4, true);
+                setEnables(btnStockPos, R.drawable.btn_blue3_selector, true);
             } else {
                 stockP = null;
-                etWhPos.setText("");
-                setEnables(etWhPos, R.drawable.back_style_gray5, false);
-                setEnables(btnWhPos, R.drawable.back_style_gray6, false);
+                etStockPos.setText("");
+                setEnables(etStockPos, R.drawable.back_style_gray5, false);
+                setEnables(btnStockPos, R.drawable.back_style_gray6, false);
             }
             // 长按了，并且启用了库位管理
             if (isStockLong && stock.isStorageLocation()) {
@@ -929,8 +936,8 @@ public class Prod_InActivity extends BaseActivity {
      */
     private void getStockPAfter() {
         if (stockP != null) {
-            setTexts(etWhPos, stockP.getFname());
-            stockPBarcode = stockP.getFname();
+            setTexts(etStockPos, stockP.getFnumber());
+            stockPBarcode = stockP.getFnumber();
             setFocusable(etMatNo);
         }
     }

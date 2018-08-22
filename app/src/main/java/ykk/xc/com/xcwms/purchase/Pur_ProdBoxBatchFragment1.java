@@ -391,7 +391,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         strBarcode = securityCode.getSecurityQrCode();
 
         // 如果状态为1，就说明已经绑定了物料和箱子
-        if(securityCode.getStatus() != null && securityCode.getStatus() > 0) {
+        if(securityCode.getStatus() > 0) {
             Comm.showWarnDialog(mContext,"该条码已经绑定过物料和箱子，不能重复绑定！");
             return;
         }

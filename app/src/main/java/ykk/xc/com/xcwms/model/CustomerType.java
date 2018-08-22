@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 public class CustomerType implements Serializable {
 	/*客户类别id*/
-	private Integer id;
+	private int id;
 	/*k3 id*/
 	private String fCustTypeId;
 	/*k3父id*/
@@ -36,10 +36,10 @@ public class CustomerType implements Serializable {
 	 * getter/setter方法
 	 * @return
 	 */
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getNumber() {

@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class Box implements Serializable {
 
 	/*id*/
-	private Integer id;
+	private int id;
 	/*箱子名称*/
 	private String boxName;
 	/*箱子规格*/
@@ -23,10 +23,10 @@ public class Box implements Serializable {
 	private double altitude;
 	/*体积*/
 	private double volume;
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getBoxName() {

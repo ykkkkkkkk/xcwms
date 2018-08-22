@@ -217,6 +217,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
         FormBody formBody = new FormBody.Builder()
                 .add("fbillno", getValues(etSearch).trim())
                 .add("deptId", String.valueOf(department.getFitemID()))
+                .add("isDefaultStock", "1") // 查询默认仓库和库位
 //                .add("supplierName", supplier.)
 //                .add("mtlFnumber", getValues(etMtlFnumber).trim())
 //                .add("mtlFname", getValues(etMtlFname).trim())

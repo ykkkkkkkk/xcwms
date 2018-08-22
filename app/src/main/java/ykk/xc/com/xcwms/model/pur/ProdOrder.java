@@ -39,7 +39,7 @@ public class ProdOrder implements Serializable {
 	private String snCode;
 
 	/*对应k3单据分录号字段*/
-	private Integer entryId;
+	private int entryId;
 	/*对应k3单据体里的生产顺序号*/
 	private String prodSeqNumber;
 	/*k3收货方地址*/
@@ -243,11 +243,11 @@ public class ProdOrder implements Serializable {
 		this.snCode = snCode;
 	}
 
-	public Integer getEntryId() {
+	public int getEntryId() {
 		return entryId;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(int entryId) {
 		this.entryId = entryId;
 	}
 

@@ -568,7 +568,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
                 MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
                 // 固定当前是无源单还是有源单
-                if(mtlbr.getRelationBillId() == null || mtlbr.getRelationBillId() == 0) {
+                if(mtlbr.getRelationBillId() == 0) {
 //                    tabSelected(viewRadio1);
 //                    dataType = '1';
                 } else {
@@ -664,7 +664,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
         for (int i = 0; i < size; i++) {
             MaterialBinningRecord mbr = mbrList.get(i);
             // 如果扫码相同
-            if (bt.getMaterialId().equals(mbr.getMaterialId())) {
+            if (bt.getMaterialId() == mbr.getMaterialId()) {
                 isFlag = true;
 
                 // 未启用序列号

@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="物料条码"
+                android:text="生产条码"
                 android:textColor="@android:color/black"
                 android:textSize="14sp" />
 
@@ -168,7 +168,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/et_whName"
+                android:id="@+id/et_stock"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -179,7 +179,7 @@
                 android:textSize="@dimen/_12sp" />
 
             <Button
-                android:id="@+id/btn_whName"
+                android:id="@+id/btn_stock"
                 android:layout_width="@dimen/_38dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/btn_blue3_selector"
@@ -204,7 +204,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/et_whPos"
+                android:id="@+id/et_stockPos"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -215,7 +215,7 @@
                 android:textSize="@dimen/_12sp" />
 
             <Button
-                android:id="@+id/btn_whPos"
+                android:id="@+id/btn_stockPos"
                 android:layout_width="@dimen/_38dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/btn_blue3_selector"
@@ -239,7 +239,7 @@
             android:layout_height="match_parent"
             android:ems="2"
             android:gravity="center"
-            android:text="物料条码"
+            android:text="生产条码"
             android:textColor="#000000"
             android:textSize="12sp" />
 

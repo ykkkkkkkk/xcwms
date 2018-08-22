@@ -113,13 +113,13 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
             public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
                 PickingList pl = listDatas.get(pos-1);
                 int size = listDatas.size();
-                int fid = pl.getfId();
+                String pickingListNo = pl.getPickingListNo();
                 for(int i=0; i<size; i++) {
                     listDatas.get(i).setIsCheck(0);
                 }
                 for(int i=0; i<size; i++) {
                     PickingList pl2 = listDatas.get(i);
-                    if(fid == pl2.getfId()) {
+                    if(pickingListNo.equals(pl2.getPickingListNo())) {
                         pl2.setIsCheck(1);
                     }
                 }

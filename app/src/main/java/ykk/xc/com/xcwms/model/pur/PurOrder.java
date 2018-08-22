@@ -37,7 +37,7 @@ public class PurOrder implements Serializable {
     private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
 
     /*对应k3单据分录号字段*/
-    private Integer entryId;
+    private int entryId;
 
     public int getfId() {
         return fId;
@@ -227,11 +227,11 @@ public class PurOrder implements Serializable {
         this.supplierNumber = supplierNumber;
     }
 
-    public Integer getEntryId() {
+    public int getEntryId() {
         return entryId;
     }
 
-    public void setEntryId(Integer entryId) {
+    public void setEntryId(int entryId) {
         this.entryId = entryId;
     }
 

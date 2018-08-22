@@ -8,7 +8,7 @@ import java.io.Serializable;
  *
  */
 public class AssistInfo implements Serializable {
-	private Integer id; // id
+	private int id; // id
 	private String parentId; // 父类id
 	private String categoryName; // 类别名称
 	private String uniquenessId; // 唯一id
@@ -19,7 +19,7 @@ public class AssistInfo implements Serializable {
 		super();
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
@@ -43,7 +43,7 @@ public class AssistInfo implements Serializable {
 		return fNumber;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

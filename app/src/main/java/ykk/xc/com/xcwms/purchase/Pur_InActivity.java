@@ -83,13 +83,13 @@ public class Pur_InActivity extends BaseActivity {
     TextView tvCustSel;
     @BindView(R.id.tv_smName)
     TextView tvSmName;
-    @BindView(R.id.et_whName)
+    @BindView(R.id.et_stock)
     EditText etWhName;
-    @BindView(R.id.btn_whName)
+    @BindView(R.id.btn_stock)
     Button btnWhName;
-    @BindView(R.id.et_whPos)
+    @BindView(R.id.et_stockPos)
     EditText etWhPos;
-    @BindView(R.id.btn_whPos)
+    @BindView(R.id.btn_stockPos)
     Button btnWhPos;
     @BindView(R.id.et_deptName)
     EditText etDeptName;
@@ -319,7 +319,7 @@ public class Pur_InActivity extends BaseActivity {
         setFocusable(etMatNo); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3, R.id.tv_custSel, R.id.btn_whName, R.id.btn_whPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3, R.id.tv_custSel, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_purOrg, R.id.tv_purDate, R.id.tv_purMan, R.id.btn_deptName})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -361,12 +361,12 @@ public class Pur_InActivity extends BaseActivity {
                 showForResult(Supplier_DialogActivity.class, SEL_SUPPLIER, null);
 
                 break;
-            case R.id.btn_whName: // 选择仓库
+            case R.id.btn_stock: // 选择仓库
                 isStockLong = false;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
                 break;
-            case R.id.btn_whPos: // 选择库位
+            case R.id.btn_stockPos: // 选择库位
                 if (stock == null) {
                     Comm.showWarnDialog(context,"请先选择仓库！");
                     return;
@@ -497,16 +497,16 @@ public class Pur_InActivity extends BaseActivity {
         return true;
     }
 
-    @OnFocusChange({R.id.et_whName, R.id.et_whPos, R.id.et_matNo, R.id.et_deptName})
+    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_matNo, R.id.et_deptName})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
 
-    @OnLongClick({R.id.btn_whName})
+    @OnLongClick({R.id.btn_stock})
     public boolean onViewLongClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
-            case R.id.btn_whName: // 长按选择仓库
+            case R.id.btn_stock: // 长按选择仓库
                 isStockLong = true;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
 
@@ -532,7 +532,7 @@ public class Pur_InActivity extends BaseActivity {
                 // 按下事件
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
-                        case R.id.et_whName: // 仓库
+                        case R.id.et_stock: // 仓库
                             String whName = getValues(etWhName).trim();
                             if (isKeyDownEnter(whName, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
@@ -551,7 +551,7 @@ public class Pur_InActivity extends BaseActivity {
                             }
 
                             break;
-                        case R.id.et_whPos: // 库位
+                        case R.id.et_stockPos: // 库位
                             String whPos = getValues(etWhPos).trim();
                             if (isKeyDownEnter(whPos, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
@@ -802,9 +802,9 @@ public class Pur_InActivity extends BaseActivity {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();
             setTexts(etWhName, stock.getfName());
-            setTexts(etWhPos, stockP.getFname());
+            setTexts(etWhPos, stockP.getFnumber());
             stockBarcode = stock.getfName();
-            stockPBarcode = stockP.getFname();
+            stockPBarcode = stockP.getFnumber();
         } else {
             switch (dataType) {
                 case '1': // 物料
@@ -1181,8 +1181,8 @@ public class Pur_InActivity extends BaseActivity {
      */
     private void getStockPAfter() {
         if (stockP != null) {
-            setTexts(etWhPos, stockP.getFname());
-            stockPBarcode = stockP.getFname();
+            setTexts(etWhPos, stockP.getFnumber());
+            stockPBarcode = stockP.getFnumber();
             setFocusable(etMatNo);
         }
     }

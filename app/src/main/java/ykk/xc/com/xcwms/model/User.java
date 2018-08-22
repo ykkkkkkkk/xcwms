@@ -9,23 +9,23 @@ import java.io.Serializable;
  * 用户   (t_user)
  */
 public class User implements Serializable {
-    private Integer id;
+    private int id;
     private String username;
     private String password;
-    private Integer sex;
+    private int sex;
     private String turename;
-    private Integer deptId;
+    private int deptId;
     private String createTime;
-    private Integer createrId;
+    private int createrId;
     private String createrName;
     private Department department;
     private String kd_username;
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -45,11 +45,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Integer getSex() {
+    public int getSex() {
         return sex;
     }
 
-    public void setSex(Integer sex) {
+    public void setSex(int sex) {
         this.sex = sex;
     }
 
@@ -61,11 +61,11 @@ public class User implements Serializable {
         this.turename = turename;
     }
 
-    public Integer getDeptId() {
+    public int getDeptId() {
         return deptId;
     }
 
-    public void setDeptId(Integer deptId) {
+    public void setDeptId(int deptId) {
         this.deptId = deptId;
     }
 
@@ -77,11 +77,11 @@ public class User implements Serializable {
         this.createTime = createTime;
     }
 
-    public Integer getCreaterId() {
+    public int getCreaterId() {
         return createrId;
     }
 
-    public void setCreaterId(Integer createrId) {
+    public void setCreaterId(int createrId) {
         this.createrId = createrId;
     }
 

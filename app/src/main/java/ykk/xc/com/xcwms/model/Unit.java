@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Unit implements Serializable{
 	/*单位ID*/
-	private Integer id;
+	private int id;
 	/*单位内码*/
-	private Integer fUnitId;
+	private int fUnitId;
 	/*分配内码*/
 	private String fMasterid;
 	/*单位编码*/
@@ -26,16 +26,16 @@ public class Unit implements Serializable{
 		super();
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
-	public Integer getfUnitId() {
+	public int getfUnitId() {
 		return fUnitId;
 	}
-	public void setfUnitId(Integer fUnitId) {
+	public void setfUnitId(int fUnitId) {
 		this.fUnitId = fUnitId;
 	}
 	public String getfMasterid() {

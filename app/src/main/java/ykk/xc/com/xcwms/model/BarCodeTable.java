@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class BarCodeTable implements Serializable {
 
 	/*id*/
-	private Integer id;
+	private int id;
 	/*序列号*/
 	private String snCode;
 	/*方案id*/
@@ -27,19 +27,19 @@ public class BarCodeTable implements Serializable {
 	 * 35代码采购装箱
 	 * 36代表采购收料通知单
 	 */
-	private Integer caseId;
+	private int caseId;
 	/*批次号*/
 	private String batchCode;
 	/*创建时间*/
 	private String createDateTime;
 	/*关联单据id*/
-	private Integer relationBillId;
+	private int relationBillId;
 	/*关联单据号*/
 	private String relationBillNumber;
 	/*打印次数*/
-	private Integer printNumber;
+	private int printNumber;
 	/*物料id*/
-	private Integer materialId;
+	private int materialId;
 	/*物料代码*/
 	private String materialNumber;
 	/*物料名称*/
@@ -53,7 +53,7 @@ public class BarCodeTable implements Serializable {
 	 * 1代表绑定
 	 * 在按照生产任务单对物料生码时设置为1，其它情况生码不需要处理
 	 */
-	private Integer isBinding;
+	private int isBinding;
 	private MaterialPack mtlPack;
 	/* 关联单据Json对象 */
 	private String relationObj;
@@ -65,10 +65,10 @@ public class BarCodeTable implements Serializable {
 		super();
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getSnCode() {
@@ -77,10 +77,10 @@ public class BarCodeTable implements Serializable {
 	public void setSnCode(String snCode) {
 		this.snCode = snCode;
 	}
-	public Integer getCaseId() {
+	public int getCaseId() {
 		return caseId;
 	}
-	public void setCaseId(Integer caseId) {
+	public void setCaseId(int caseId) {
 		this.caseId = caseId;
 	}
 	public String getBatchCode() {
@@ -95,10 +95,10 @@ public class BarCodeTable implements Serializable {
 	public void setCreateDateTime(String createDateTime) {
 		this.createDateTime = createDateTime;
 	}
-	public Integer getRelationBillId() {
+	public int getRelationBillId() {
 		return relationBillId;
 	}
-	public void setRelationBillId(Integer relationBillId) {
+	public void setRelationBillId(int relationBillId) {
 		this.relationBillId = relationBillId;
 	}
 	public String getRelationBillNumber() {
@@ -107,16 +107,16 @@ public class BarCodeTable implements Serializable {
 	public void setRelationBillNumber(String relationBillNumber) {
 		this.relationBillNumber = relationBillNumber;
 	}
-	public Integer getPrintNumber() {
+	public int getPrintNumber() {
 		return printNumber;
 	}
-	public void setPrintNumber(Integer printNumber) {
+	public void setPrintNumber(int printNumber) {
 		this.printNumber = printNumber;
 	}
-	public Integer getMaterialId() {
+	public int getMaterialId() {
 		return materialId;
 	}
-	public void setMaterialId(Integer materialId) {
+	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
 	}
 	public String getMaterialNumber() {
@@ -137,10 +137,10 @@ public class BarCodeTable implements Serializable {
 	public void setBarcode(String barcode) {
 		this.barcode = barcode;
 	}
-	public Integer getIsBinding() {
+	public int getIsBinding() {
 		return isBinding;
 	}
-	public void setIsBinding(Integer isBinding) {
+	public void setIsBinding(int isBinding) {
 		this.isBinding = isBinding;
 	}
 	public MaterialPack getMtlPack() {

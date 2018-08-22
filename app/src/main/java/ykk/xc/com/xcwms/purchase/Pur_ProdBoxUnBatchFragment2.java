@@ -886,7 +886,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
                 // 相同的物料就+1，否则为1
                 for(int i=0; i<size; i++) {
                     MaterialBinningRecord forMtl = listMbr.get(i);
-                    if(barCodeTable.getMaterialId().equals(forMtl.getMaterialId())){
+                    if(barCodeTable.getMaterialId() == forMtl.getMaterialId()){
                         tmpMtl = forMtl;
 
                         break;

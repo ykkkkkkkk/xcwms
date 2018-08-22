@@ -133,7 +133,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/et_whName"
+                android:id="@+id/et_stock"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -144,7 +144,7 @@
                 android:textSize="@dimen/_12sp" />
 
             <Button
-                android:id="@+id/btn_whName"
+                android:id="@+id/btn_stock"
                 android:layout_width="@dimen/_38dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/btn_blue3_selector"
@@ -169,7 +169,7 @@
             android:orientation="horizontal">
 
             <EditText
-                android:id="@+id/et_whPos"
+                android:id="@+id/et_stockPos"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -180,7 +180,7 @@
                 android:textSize="@dimen/_12sp" />
 
             <Button
-                android:id="@+id/btn_whPos"
+                android:id="@+id/btn_stockPos"
                 android:layout_width="@dimen/_38dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/btn_blue3_selector"
@@ -208,7 +208,7 @@
             android:textSize="12sp" />
 
         <EditText
-            android:id="@+id/et_matNo"
+            android:id="@+id/et_mtlNo"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

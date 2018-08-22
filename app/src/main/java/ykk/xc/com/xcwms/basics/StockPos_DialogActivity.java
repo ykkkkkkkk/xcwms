@@ -53,6 +53,7 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
     private List<StockPosition> listDatas = new ArrayList<>();
     private StockPos_DialogAdapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
+    private int stockId; // 仓库id
     private int areaId; // 库区id
 
     // 消息处理
@@ -119,7 +120,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
-            areaId = bundle.getInt("areaId");
+//            areaId = bundle.getInt("areaId");
+            stockId = bundle.getInt("stockId");
         }
     }
 
@@ -148,7 +150,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
         String mUrl = Consts.getURL("findStockPositionListByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())
-                .add("areaId", String.valueOf(areaId))
+                .add("stockId", String.valueOf(stockId))
+//                .add("areaId", String.valueOf(areaId))
 //                .add("limit", "10")
 //                .add("pageSize", "100")
                 .build();
