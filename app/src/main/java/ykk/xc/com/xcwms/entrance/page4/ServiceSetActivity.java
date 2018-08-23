@@ -30,7 +30,7 @@ public class ServiceSetActivity extends BaseActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.aa_main_item4_set_service;
+        return R.layout.aa_main_item5_set_service;
     }
 
     @Override

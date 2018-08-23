@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
 
     <LinearLayout
@@ -72,14 +72,15 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:clickable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/tvImg3"
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico1a_3" />
+                android:background="@drawable/aa_ico5a_1" />
 
             <TextView
                 android:id="@+id/tab3"
@@ -110,14 +111,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/tvImg4"
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico1a_4" />
+                android:background="@drawable/aa_ico5a_2" />
 
             <TextView
                 android:id="@+id/tab4"
@@ -137,8 +139,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:visibility="invisible"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/tvImg5"
@@ -165,16 +167,16 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:visibility="invisible"
             android:clickable="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/tvImg6"
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico1a_3" />
+                android:background="@drawable/aa_ico5a_1" />
 
             <TextView
                 android:id="@+id/tab6"

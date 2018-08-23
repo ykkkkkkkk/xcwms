@@ -51,8 +51,8 @@
 
             <RadioButton
                 android:id="@+id/radio1"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_tabradio1_selector"
                 android:button="@null"
@@ -79,8 +79,8 @@
 
             <RadioButton
                 android:id="@+id/radio2"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_tabradio2_selector"
                 android:button="@null"
@@ -92,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/radio2"
                 android:layout_centerHorizontal="true"
-                android:text="销售"
+                android:text="生产"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
 
@@ -107,8 +107,8 @@
 
             <RadioButton
                 android:id="@+id/radio3"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_tabradio3_selector"
                 android:button="@null"
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/radio3"
                 android:layout_centerHorizontal="true"
-                android:text="仓库"
+                android:text="销售"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
 
@@ -135,8 +135,8 @@
 
             <RadioButton
                 android:id="@+id/radio4"
-                android:layout_width="@dimen/_30dp"
-                android:layout_height="@dimen/_30dp"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
                 android:layout_centerHorizontal="true"
                 android:background="@drawable/btn_tabradio4_selector"
                 android:button="@null"
@@ -147,6 +147,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/radio4"
+                android:layout_centerHorizontal="true"
+                android:text="仓库"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relative5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/_2dp"
+            android:layout_weight="1">
+
+            <RadioButton
+                android:id="@+id/radio5"
+                android:layout_width="@dimen/_28dp"
+                android:layout_height="@dimen/_28dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/btn_tabradio5_selector"
+                android:button="@null"
+                android:checked="false" />
+
+            <TextView
+                android:id="@+id/tab5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/radio5"
                 android:layout_centerHorizontal="true"
                 android:text="设置"
                 android:textColor="@color/black"

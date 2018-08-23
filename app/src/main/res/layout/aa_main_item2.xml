@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_height="match_parent">
 
 
     <LinearLayout
@@ -24,7 +24,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_1" />
+                android:background="@drawable/aa_ico2a_2" />
 
             <TextView
                 android:id="@+id/tab1"
@@ -33,7 +33,7 @@
                 android:layout_below="@+id/tvImg1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="销售订单"
+                android:text="生产装箱"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -51,7 +51,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_2" />
+                android:background="@drawable/aa_ico2a_1" />
 
             <TextView
                 android:id="@+id/tab2"
@@ -60,7 +60,7 @@
                 android:layout_below="@+id/tvImg2"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="销售出库"
+                android:text="生产入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -72,6 +72,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:clickable="true"
+            android:visibility="invisible"
             android:gravity="center">
 
             <TextView
@@ -79,7 +80,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_3" />
+                android:background="@drawable/aa_ico2a_1" />
 
             <TextView
                 android:id="@+id/tab3"
@@ -88,7 +89,7 @@
                 android:layout_below="@+id/tvImg3"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="单据下推"
+                android:text="生产入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -110,6 +111,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:visibility="invisible"
             android:gravity="center">
 
             <TextView
@@ -117,7 +119,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_4" />
+                android:background="@drawable/aa_ico2a_2" />
 
             <TextView
                 android:id="@+id/tab4"
@@ -126,7 +128,7 @@
                 android:layout_below="@+id/tvImg4"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="拣货单"
+                android:text="生产装箱"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -137,6 +139,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:visibility="invisible"
             android:gravity="center">
 
             <TextView
@@ -144,7 +147,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_5" />
+                android:background="@drawable/aa_ico1a_2" />
 
             <TextView
                 android:id="@+id/tab5"
@@ -153,7 +156,7 @@
                 android:layout_below="@+id/tvImg5"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="复核单"
+                android:text="外购入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 
@@ -164,6 +167,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:visibility="invisible"
             android:clickable="true"
             android:gravity="center">
 
@@ -172,7 +176,7 @@
                 android:layout_width="@dimen/_60dp"
                 android:layout_height="@dimen/_60dp"
                 android:layout_centerHorizontal="true"
-                android:background="@drawable/aa_ico2a_6" />
+                android:background="@drawable/aa_ico2a_1" />
 
             <TextView
                 android:id="@+id/tab6"
@@ -181,7 +185,7 @@
                 android:layout_below="@+id/tvImg6"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="销售装箱"
+                android:text="产品入库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

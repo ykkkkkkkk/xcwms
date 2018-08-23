@@ -104,6 +104,9 @@
             android:name=".basics.Box_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
+        <activity
+            android:name=".basics.SaoMaPrintActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 设置页面用到的界面 -->
         <activity

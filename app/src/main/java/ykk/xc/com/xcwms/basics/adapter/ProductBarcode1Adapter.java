@@ -66,12 +66,6 @@ public class ProductBarcode1Adapter extends BaseArrayRecyclerAdapter<Material> {
         void onPrint(Material entity, int position);
     }
 
-
-
-
-
-
-
     /*之下的方法都是为了方便操作，并不是必须的*/
 
     //在指定位置插入，原位置的向后移动一格

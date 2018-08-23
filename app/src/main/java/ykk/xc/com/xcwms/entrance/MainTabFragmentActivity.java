@@ -51,6 +51,12 @@ public class MainTabFragmentActivity extends BaseActivity {
     TextView tab4;
     @BindView(R.id.relative4)
     RelativeLayout relative4;
+    @BindView(R.id.radio5)
+    RadioButton radio5;
+    @BindView(R.id.tab5)
+    TextView tab5;
+    @BindView(R.id.relative5)
+    RelativeLayout relative5;
     @BindView(R.id.lin_tab)
     LinearLayout linTab;
     @BindView(R.id.viewPager)
@@ -78,6 +84,7 @@ public class MainTabFragmentActivity extends BaseActivity {
         listFragment.add(new MainTabFragment2());
         listFragment.add(new MainTabFragment3());
         listFragment.add(new MainTabFragment4());
+        listFragment.add(new MainTabFragment5());
         //ViewPager设置适配器
         viewPager.setAdapter(new MainTabFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
@@ -104,6 +111,9 @@ public class MainTabFragmentActivity extends BaseActivity {
                     case 3:
                         relative4.performClick();
                         break;
+                    case 4:
+                        relative5.performClick();
+                        break;
                 }
             }
 
@@ -127,8 +137,8 @@ public class MainTabFragmentActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4,
-              R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4})
+    @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5,
+              R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4, R.id.radio5})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -151,6 +161,10 @@ public class MainTabFragmentActivity extends BaseActivity {
                 tabSelected(tab4, radio4);
                 viewPager.setCurrentItem(3, false);
                 break;
+            case R.id.relative5:
+                tabSelected(tab5, radio5);
+                viewPager.setCurrentItem(4, false);
+                break;
             case R.id.radio1: // RadioButton
                 tabSelected(tab1, radio1);
                 viewPager.setCurrentItem(0, false);
@@ -166,6 +180,10 @@ public class MainTabFragmentActivity extends BaseActivity {
             case R.id.radio4:
                 tabSelected(tab4, radio4);
                 viewPager.setCurrentItem(3, false);
+                break;
+            case R.id.radio5:
+                tabSelected(tab5, radio5);
+                viewPager.setCurrentItem(4, false);
                 break;
         }
     }
