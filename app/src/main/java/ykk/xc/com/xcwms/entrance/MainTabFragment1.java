@@ -1,8 +1,6 @@
 package ykk.xc.com.xcwms.entrance;
 
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +9,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Prod_InActivity;
-import ykk.xc.com.xcwms.purchase.Pur_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_InFragmentsActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
 import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
-import ykk.xc.com.xcwms.util.LoadingDialog;
 
 public class MainTabFragment1 extends BaseFragment {
 

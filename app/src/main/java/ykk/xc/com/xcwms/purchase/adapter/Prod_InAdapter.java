@@ -56,7 +56,11 @@ public class Prod_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         double stockqty = entity.getStockqty();
 //        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+(stockqty > 0 ? df.format(stockqty) : "")+"</font>"));
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
-        tv_stockAP.setText(entity.getStock().getfName()+"\n"+Comm.isNULLS(entity.getStockPos().getFnumber()));
+        if(entity.getStockPos() != null) {
+            tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPos().getFnumber());
+        } else {
+            tv_stockAP.setText(entity.getStock().getfName());
+        }
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override

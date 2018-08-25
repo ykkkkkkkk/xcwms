@@ -114,7 +114,7 @@ public class JsonUtil {
             return false;
         }
         int pages = jsonObj.get("pages").getAsInt();
-        return curPage <= pages;
+        return pages > curPage; // 总页数大于本页数
     }
 
     /**

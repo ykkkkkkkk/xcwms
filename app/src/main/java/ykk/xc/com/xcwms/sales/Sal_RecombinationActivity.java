@@ -11,19 +11,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +36,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Box_DialogActivity;
 import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
@@ -51,7 +47,6 @@ import ykk.xc.com.xcwms.model.BoxBarCode;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
-import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
@@ -225,13 +220,17 @@ public class Sal_RecombinationActivity extends BaseActivity {
         getUserInfo();
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.tv_pickingListSel, R.id.btn_save, R.id.tv_box})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.tv_pickingListSel, R.id.btn_save, R.id.tv_box})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
                 closeHandler(mHandler);
                 context.finish();
+
+                break;
+            case R.id.btn_print: // 打印条码界面
+                show(PrintFragmentsActivity.class, null);
 
                 break;
             case R.id.tv_custSel: // 选择客户
@@ -874,21 +873,24 @@ public class Sal_RecombinationActivity extends BaseActivity {
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
+        String strCaseId = null;
         switch (curViewFlag) {
             case '1': // 箱码
                 mUrl = Consts.getURL("boxBarCode/findBarcode");
                 barcode = strBoxBarcode;
+                strCaseId = "";
                 break;
             case '2': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = strMtlBarcode;
+                strCaseId = "11,21";
                 break;
         }
         String boxId = boxBarCode != null ? String.valueOf(boxBarCode.getBoxId()) : "";
         FormBody formBody = new FormBody.Builder()
                 .add("boxId", boxId)
                 .add("barcode", barcode)
-                .add("caseId", "")
+                .add("strCaseId", strCaseId)
                 .build();
 
         Request request = new Request.Builder()

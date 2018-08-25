@@ -54,6 +54,14 @@ public class ProdOrder implements Serializable {
 	private String remarks;
 	/*计划开工时间*/
 	private String planStartDate;
+	/*叶片*/
+	private String leaf;
+	/*叶片1*/
+	private String leaf1;
+	/*物料规格*/
+	private String mtlSize;
+	/* 单据分录生码状态查询，0是默认值代表未生码，1代表已生码 */
+	private int createCodeStatus;
 
 	public ProdOrder() {
 		super();
@@ -243,11 +251,11 @@ public class ProdOrder implements Serializable {
 		this.snCode = snCode;
 	}
 
-	public int getEntryId() {
+	public Integer getEntryId() {
 		return entryId;
 	}
 
-	public void setEntryId(int entryId) {
+	public void setEntryId(Integer entryId) {
 		this.entryId = entryId;
 	}
 
@@ -307,6 +315,38 @@ public class ProdOrder implements Serializable {
 		this.planStartDate = planStartDate;
 	}
 
+	public String getLeaf() {
+		return leaf;
+	}
+
+	public void setLeaf(String leaf) {
+		this.leaf = leaf;
+	}
+
+	public String getLeaf1() {
+		return leaf1;
+	}
+
+	public void setLeaf1(String leaf1) {
+		this.leaf1 = leaf1;
+	}
+
+	public String getMtlSize() {
+		return mtlSize;
+	}
+
+	public void setMtlSize(String mtlSize) {
+		this.mtlSize = mtlSize;
+	}
+
+	public int getCreateCodeStatus() {
+		return createCodeStatus;
+	}
+
+	public void setCreateCodeStatus(int createCodeStatus) {
+		this.createCodeStatus = createCodeStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "ProdOrder [fId=" + fId + ", fbillno=" + fbillno + ", fbillType=" + fbillType + ", prodFdate="
@@ -318,7 +358,9 @@ public class ProdOrder implements Serializable {
 				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", entryId=" + entryId + ", prodSeqNumber="
 				+ prodSeqNumber + ", receiveAddress=" + receiveAddress + ", receivePerson=" + receivePerson
 				+ ", receiveTel=" + receiveTel + ", deliveryCompanyName=" + deliveryCompanyName + ", remarks=" + remarks
-				+ ", planStartDate=" + planStartDate + "]";
+				+ ", planStartDate=" + planStartDate + ", leaf=" + leaf + ", leaf1=" + leaf1 + ", mtlSize=" + mtlSize
+				+ ", createCodeStatus=" + createCodeStatus + "]";
 	}
+
 
 }

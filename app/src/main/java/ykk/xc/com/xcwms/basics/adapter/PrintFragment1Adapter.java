@@ -7,38 +7,40 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.Stock;
+import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
- * 仓库列表适配器
+ * 物料列表适配器
  */
-public class ProductBarcode2Adapter extends BaseArrayRecyclerAdapter<Stock> {
-
+public class PrintFragment1Adapter extends BaseArrayRecyclerAdapter<Material> {
+//
     private Activity context;
     private MyCallBack callBack;
 
-    public ProductBarcode2Adapter(Activity context, List<Stock> datas) {
+    public PrintFragment1Adapter(Activity context, List<Material> datas) {
         super(datas);
         this.context = context;
     }
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.ab_print_code_item2;
+        return R.layout.ab_print_fragment1_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final Stock entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final Material entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
             TextView tv_fname = holder.obtainView(R.id.tv_fname);
+            TextView tv_fModel = holder.obtainView(R.id.tv_fModel);
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
             tv_fnumber.setText(entity.getfNumber());
             tv_fname.setText(entity.getfName());
+            tv_fModel.setText(entity.getMaterialSize());
 
             View.OnClickListener click = new View.OnClickListener() {
                 @Override
@@ -61,14 +63,8 @@ public class ProductBarcode2Adapter extends BaseArrayRecyclerAdapter<Stock> {
     }
 
     public interface MyCallBack {
-        void onPrint(Stock entity, int position);
+        void onPrint(Material entity, int position);
     }
-
-
-
-
-
-
 
     /*之下的方法都是为了方便操作，并不是必须的*/
 

@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -37,7 +36,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.PrintBarcodeActivity;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.comm.ActivityCollector;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
@@ -139,7 +138,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
 
                 break;
             case R.id.lin_item5: // 打印
-                show(PrintBarcodeActivity.class, null);
+                show(PrintFragmentsActivity.class, null);
 
                 break;
             case R.id.lin_item6: // 退出

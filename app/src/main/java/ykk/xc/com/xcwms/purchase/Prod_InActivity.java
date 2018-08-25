@@ -38,6 +38,7 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
@@ -72,7 +73,7 @@ public class Prod_InActivity extends BaseActivity {
     View viewRadio2;
     @BindView(R.id.btn_close)
     Button btnClose;
-    @BindView(R.id.btn_maker_code)
+    @BindView(R.id.btn_print)
     Button btnMakerCode;
     @BindView(R.id.et_stock)
     EditText etStock;
@@ -206,8 +207,10 @@ public class Prod_InActivity extends BaseActivity {
                         String[] barcodeArr = strBarcode.split(",");
                         for (int i = 0, len = barcodeArr.length; i < len; i++) {
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                Material mtl = sr2.getMtl();
                                 // 判断扫码表和当前扫的码对比是否一样
-                                if (barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
+                                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
                                     Comm.showWarnDialog(m.context,"第" + (i + 1) + "行已入库，不能重复操作！");
                                     return;
                                 }
@@ -272,7 +275,7 @@ public class Prod_InActivity extends BaseActivity {
         setFocusable(etMatNo); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_prodMan})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -300,8 +303,8 @@ public class Prod_InActivity extends BaseActivity {
 
 
                 break;
-            case R.id.btn_maker_code: // 打印条码界面
-//                show(PrintBarcodeActivity.class, null);
+            case R.id.btn_print: // 打印条码界面
+                show(PrintFragmentsActivity.class,null);
 
                 break;
             case R.id.btn_stock: // 选择仓库
@@ -1061,32 +1064,32 @@ public class Prod_InActivity extends BaseActivity {
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
-        int caseId = 0;
+        String strCaseId = null;
         switch (curViewFlag) {
             case '1':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
-                caseId = 12;
+                strCaseId = "12";
                 break;
             case '2':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
-                caseId = 14;
+                strCaseId = "14";
                 break;
             case '3': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarcode3ByParam");
                 barcode = mtlBarcode;
-                caseId = 34;
+                strCaseId = "34";
                 break;
             case '4': // 箱子扫码
                 mUrl = Consts.getURL("materialBinningRecord/findList3ByParam");
                 barcode = boxBarcode;
-                caseId = 34;
+                strCaseId = "34";
                 break;
         }
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", String.valueOf(caseId))
+                .add("strCaseId", strCaseId)
                 .add("barcode", barcode)
                 .build();
 

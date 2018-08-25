@@ -38,6 +38,7 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
@@ -74,7 +75,7 @@ public class Sal_OutActivity extends BaseActivity {
     View viewRadio2;
     @BindView(R.id.btn_close)
     Button btnClose;
-    @BindView(R.id.btn_maker_code)
+    @BindView(R.id.btn_print)
     Button btnMakerCode;
     @BindView(R.id.et_stock)
     EditText etWhName;
@@ -225,8 +226,10 @@ public class Sal_OutActivity extends BaseActivity {
                         String[] barcodeArr = strBarcode.split(",");
                         for (int i = 0, len = barcodeArr.length; i < len; i++) {
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                Material mtl = sr2.getMtl();
                                 // 判断扫码表和当前扫的码对比是否一样
-                                if (barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
+                                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
                                     Comm.showWarnDialog(m.context,"第" + (i + 1) + "行已出库，不能重复操作！");
                                     return;
                                 }
@@ -291,7 +294,7 @@ public class Sal_OutActivity extends BaseActivity {
         setFocusable(etMatNo); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -299,6 +302,10 @@ public class Sal_OutActivity extends BaseActivity {
             case R.id.btn_close: // 关闭
                 closeHandler(mHandler);
                 context.finish();
+
+                break;
+            case R.id.btn_print: // 打印条码界面
+                show(PrintFragmentsActivity.class, null);
 
                 break;
             case R.id.lin_tab1:
@@ -317,10 +324,6 @@ public class Sal_OutActivity extends BaseActivity {
                 break;
             case R.id.tv_orderTypeSel: // 订单类型
 
-
-                break;
-            case R.id.btn_maker_code: // 打印条码界面
-//                show(PrintBarcodeActivity.class, null);
 
                 break;
             case R.id.btn_stock: // 选择仓库
@@ -1285,32 +1288,32 @@ public class Sal_OutActivity extends BaseActivity {
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
-        int caseId = 0;
+        String strCaseId = null;
         switch (curViewFlag) {
             case '1':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
-                caseId = 12;
+                strCaseId = "12";
                 break;
             case '2':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
-                caseId = 14;
+                strCaseId = "14";
                 break;
             case '3': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarcode3ByParam");
                 barcode = mtlBarcode;
-                caseId = 32;
+                strCaseId = "32";
                 break;
             case '4': // 箱子扫码
                 mUrl = Consts.getURL("materialBinningRecord/findList3ByParam");
                 barcode = boxBarcode;
-//                caseId = 32;
+                strCaseId = "";
                 break;
         }
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", caseId > 0 ? String.valueOf(caseId) : "")
+                .add("strCaseId", strCaseId)
                 .add("barcode", barcode)
                 .build();
 

@@ -2,22 +2,18 @@ package ykk.xc.com.xcwms.sales;
 
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -27,10 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -43,11 +37,8 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
-import ykk.xc.com.xcwms.purchase.Pur_InActivity;
-import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.adapter.Sal_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
-import ykk.xc.com.xcwms.util.LoadingDialog;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
 public class SalOrderFragment1 extends BaseFragment implements XRecyclerView.LoadingListener {

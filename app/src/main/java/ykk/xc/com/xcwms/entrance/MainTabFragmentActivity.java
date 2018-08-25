@@ -1,5 +1,7 @@
 package ykk.xc.com.xcwms.entrance;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.comm.ActivityCollector;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.model.User;
 
@@ -25,8 +29,8 @@ public class MainTabFragmentActivity extends BaseActivity {
 
     @BindView(R.id.tv_title)
     TextView tvTitle;
-    @BindView(R.id.lin_title)
-    LinearLayout linTitle;
+    @BindView(R.id.relative_title)
+    RelativeLayout relativeTitle;
     @BindView(R.id.radio1)
     RadioButton radio1;
     @BindView(R.id.tab1)
@@ -137,7 +141,7 @@ public class MainTabFragmentActivity extends BaseActivity {
     }
 
 
-    @OnClick({R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5,
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.relative1, R.id.relative2, R.id.relative3, R.id.relative4, R.id.relative5,
               R.id.radio1, R.id.radio2, R.id.radio3, R.id.radio4, R.id.radio5})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
@@ -145,6 +149,27 @@ public class MainTabFragmentActivity extends BaseActivity {
         //  viewPager.setCurrentItem(0, false);
 
         switch (view.getId()) {
+            case R.id.btn_close: // 退出
+                AlertDialog.Builder build = new AlertDialog.Builder(context);
+                build.setIcon(R.drawable.caution);
+                build.setTitle("系统提示");
+                build.setMessage("主人，确定要离开我吗？");
+                build.setPositiveButton("是的", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCollector.finishAll();
+                        System.exit(0); //凡是非零都表示异常退出!0表示正常退出!
+                    }
+                });
+                build.setNegativeButton("取消", null);
+                build.setCancelable(false);
+                build.show();
+
+
+                break;
+            case R.id.btn_print: // 打印
+                show(PrintFragmentsActivity.class, null);
+                break;
             case R.id.relative1:
                 tabSelected(tab1, radio1);
                 viewPager.setCurrentItem(0, false);

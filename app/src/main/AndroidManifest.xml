@@ -80,7 +80,7 @@
             android:name=".basics.Material_ListActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".basics.PrintBarcodeActivity"
+            android:name=".basics.PrintFragmentsActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
@@ -104,9 +104,6 @@
             android:name=".basics.Box_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
-        <activity
-            android:name=".basics.SaoMaPrintActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <!-- 设置页面用到的界面 -->
         <activity
@@ -114,9 +111,6 @@
             android:windowSoftInputMode="adjustResize|stateVisible" />
 
         <!-- 采购模块 -->
-        <activity
-            android:name=".purchase.Pur_InActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Pur_InFragmentsActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />

@@ -212,8 +212,10 @@ public class Pur_InFragment1 extends BaseFragment {
                         String[] barcodeArr = strBarcode.split(",");
                         for (int i = 0, len = barcodeArr.length; i < len; i++) {
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                Material mtl = sr2.getMtl();
                                 // 判断扫码表和当前扫的码对比是否一样
-                                if (barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
+                                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
                                     Comm.showWarnDialog(m.mContext,"第" + (i + 1) + "行已入库，不能重复操作！");
                                     return;
                                 }
@@ -299,7 +301,7 @@ public class Pur_InFragment1 extends BaseFragment {
             case R.id.tv_orderTypeSel: // 订单类型
 
                 break;
-            case R.id.btn_maker_code: // 打印条码界面
+            case R.id.btn_print: // 打印条码界面
 //                show(PrintBarcodeActivity.class, null);
 
                 break;
@@ -1045,32 +1047,32 @@ public class Pur_InFragment1 extends BaseFragment {
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
-        int caseId = 0;
+        String strCaseId = null;
         switch (curViewFlag) {
             case '1':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
-                caseId = 12;
+                strCaseId = "12";
                 break;
             case '2':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
-                caseId = 14;
+                strCaseId = "14";
                 break;
             case '3':
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
-                caseId = 15;
+                strCaseId = "15";
                 break;
             case '4': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = mtlBarcode;
-//                caseId = 11; // 因为这里有物料包装或者物料的码所以不能指定caseId
+                strCaseId = "11,21"; // 因为这里有物料包装或者物料的码所以不能指定caseId
                 break;
         }
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", caseId > 0 ? String.valueOf(caseId) : "")
+                .add("strCaseId", strCaseId)
                 .add("barcode", barcode)
                 .build();
 

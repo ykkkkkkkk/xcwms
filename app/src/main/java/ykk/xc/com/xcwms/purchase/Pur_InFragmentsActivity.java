@@ -15,6 +15,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
@@ -116,7 +117,7 @@ public class Pur_InFragmentsActivity extends BaseActivity {
         curRadio = v;
     }
 
-    @OnClick({R.id.btn_close, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -141,6 +142,10 @@ public class Pur_InFragmentsActivity extends BaseActivity {
                 } else {
                     context.finish();
                 }
+
+                break;
+            case R.id.btn_print: // 打印
+                show(PrintFragmentsActivity.class,null);
 
                 break;
             case R.id.lin_tab1:

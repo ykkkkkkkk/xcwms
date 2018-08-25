@@ -17,20 +17,30 @@
     <TextView
         android:id="@+id/tv_fnumber"
         android:layout_width="0dp"
+        android:layout_weight="0.7"
         android:layout_height="@dimen/_38dp"
-        android:layout_weight="1"
         android:gravity="center"
-        android:text="销售单号"
+        android:text="物料代码"
         android:textColor="#000000"
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/tv_fdate"
+        android:id="@+id/tv_fname"
         android:layout_width="0dp"
         android:layout_height="@dimen/_38dp"
         android:layout_weight="1"
+        android:gravity="center|left"
+        android:text="名称"
+        android:textColor="#000000"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_fModel"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_38dp"
+        android:layout_weight="0.6"
         android:gravity="center"
-        android:text="销售日期"
+        android:text="规格"
         android:textColor="#000000"
         android:textSize="12sp" />
 

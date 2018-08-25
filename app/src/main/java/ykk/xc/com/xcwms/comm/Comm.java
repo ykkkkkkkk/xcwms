@@ -36,7 +36,7 @@ import ykk.xc.com.xcwms.R;
  *
  */
 public class Comm {
-	public static final String publicPaths = Environment.getExternalStorageDirectory().toString()+"/wms/";
+	public static final String publicPaths = Environment.getExternalStorageDirectory().toString()+"/xcwms/";
 	/**
 	 * WebService
 	 * 基于soap协议

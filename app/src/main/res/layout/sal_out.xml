@@ -24,12 +24,12 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/btn_maker_code"
-            android:layout_width="50dp"
+            android:id="@+id/btn_print"
+            android:layout_width="42dp"
             android:layout_height="match_parent"
-            android:background="@drawable/btn_blue2_selector"
-            android:ems="2"
-            android:text="打印\n条码"
+            android:background="@drawable/aa_ico5a_5b"
+            android:layout_marginLeft="@dimen/_4dp"
+            android:layout_marginRight="@dimen/_4dp"
             android:textColor="#ffffff"
             android:textSize="14sp" />
     </LinearLayout>

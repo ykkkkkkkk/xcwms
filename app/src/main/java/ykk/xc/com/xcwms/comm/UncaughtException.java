@@ -125,7 +125,7 @@ public class UncaughtException implements UncaughtExceptionHandler {
             return false;
         }
         // 自定义处理错误信息
-//    	saveCrashInfo2File(ex);
+    	saveCrashInfo2File(ex);
 
         return true;
     }
@@ -164,7 +164,7 @@ public class UncaughtException implements UncaughtExceptionHandler {
             String fileName = "exception.log";
 
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                String path = "wms/crash/";
+                String path = Comm.publicPaths+"crash/";
                 File dir = new File(path);
                 if (!dir.exists()) {
                     dir.mkdirs();

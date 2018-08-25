@@ -1,10 +1,13 @@
 package ykk.xc.com.xcwms.basics;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,51 +28,54 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
+import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.pur.ProdOrder;
+import ykk.xc.com.xcwms.util.interfaces.IFragmentKeyeventListener;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
-/**
- * ykk
- * 打印条码界面
- */
-public class SaoMaPrintActivity extends BaseActivity {
+public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventListener {
 
-    @BindView(R.id.btn_close)
-    Button btnClose;
     @BindView(R.id.et_code)
     EditText etCode;
     @BindView(R.id.tv_selectType)
     TextView tvSelectType;
 
-    private SaoMaPrintActivity context = this;
+    private PrintFragment2 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501, NORMAL = 10;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int caseId = 34; // （34：生产订单）
     private String barcode; // 对应的条码号
+    private Activity mContext;
+    private PrintFragmentsActivity parent;
+    private BarCodeTable bt;
+    private ProdOrder prodOrder;
 
     // 消息处理
-    final MyHandler mHandler = new MyHandler(this);
+    private PrintFragment2.MyHandler mHandler = new PrintFragment2.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<SaoMaPrintActivity> mActivity;
+        private final WeakReference<PrintFragment2> mActivity;
 
-        public MyHandler(SaoMaPrintActivity activity) {
-            mActivity = new WeakReference<SaoMaPrintActivity>(activity);
+        public MyHandler(PrintFragment2 activity) {
+            mActivity = new WeakReference<PrintFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            SaoMaPrintActivity m = mActivity.get();
+            PrintFragment2 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.toasts("打印完毕√");
+                        String result = (String) msg.obj;
+                        m.parent.setFragmentPrint2(1, result);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
-                        Comm.showWarnDialog(m.context,"服务器繁忙，请稍候再试！");
+                        String str = JsonUtil.strToString((String) msg.obj);
+                        Comm.showWarnDialog(m.mContext,str);
 
                         break;
                     case NORMAL: // 输入框矫正
@@ -81,27 +87,39 @@ public class SaoMaPrintActivity extends BaseActivity {
     }
 
     @Override
-    public int setLayoutResID() {
-        return R.layout.ab_sm_print;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        parent = (PrintFragmentsActivity) context;
+        parent.setFragmentKeyeventListener(this);
+    }
+
+    @Override
+    public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.ab_print_fragment0, container, false);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            hideKeyboard(etCode);
+        }
     }
 
     @Override
     public void initView() {
+        mContext = getActivity();
+        parent = (PrintFragmentsActivity) mContext;
     }
 
     @Override
     public void initData() {
-        hideSoftInputMode(etCode);
+        hideSoftInputMode(mContext, etCode);
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_selectType})
+    @OnClick({R.id.tv_selectType})
     public void onViewClicked(View v) {
         switch (v.getId()) {
-            case R.id.btn_close: // 关闭
-                closeHandler(mHandler);
-                context.finish();
-
-                break;
             case R.id.tv_selectType: // 选择打印的表
                 pop_selectType(v);
                 popWindow.showAsDropDown(v);
@@ -110,14 +128,14 @@ public class SaoMaPrintActivity extends BaseActivity {
         }
     }
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        // 按了删除键，回退键
-        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-            return false;
-        }
-        return super.dispatchKeyEvent(event);
-    }
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//        // 按了删除键，回退键
+//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+//            return false;
+//        }
+//        return super.dispatchKeyEvent(event);
+//    }
 
     @Override
     public void setListener() {
@@ -135,7 +153,7 @@ public class SaoMaPrintActivity extends BaseActivity {
                                     return false;
                                 }
                                 if (barcode != null && barcode.length() > 0) {
-                                    if(barcode.equals(code)) {
+                                    if (barcode.equals(code)) {
                                         barcode = code;
                                     } else {
                                         String tmp = code.replaceFirst(barcode, "");
@@ -169,7 +187,7 @@ public class SaoMaPrintActivity extends BaseActivity {
             return;
         }
         // 获取自定义布局文件popupwindow_left.xml的视图
-        final View popV = getLayoutInflater().inflate(R.layout.ab_sm_print_type, null);
+        final View popV = getLayoutInflater().inflate(R.layout.ab_print_fragment0_type, null);
         // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
         popWindow = new PopupWindow(popV, v.getWidth(), ViewGroup.LayoutParams.WRAP_CONTENT, true);
         // 设置动画效果
@@ -191,7 +209,7 @@ public class SaoMaPrintActivity extends BaseActivity {
                         break;
                 }
                 popWindow.dismiss();
-                tvSelectType.setText("打印类型--"+getValues((Button) popV.findViewById(tmpId)));
+                tvSelectType.setText("打印类型--" + getValues((Button) popV.findViewById(tmpId)));
             }
         };
         popV.findViewById(R.id.btn1).setOnClickListener(click);
@@ -202,11 +220,11 @@ public class SaoMaPrintActivity extends BaseActivity {
      */
     private void run_print() {
         showLoadDialog("打印连接中...");
-        String mUrl = Consts.getURL("appPrint");
+        String mUrl = Consts.getURL("bigPrint");
         // 条码号
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", String.valueOf(caseId))
-                .add("barcode", barcode)
+//                .add("caseId", String.valueOf(caseId))
+                .add("prodSeqNumber", barcode)
                 .build();
 
         Request request = new Request.Builder()
@@ -226,21 +244,30 @@ public class SaoMaPrintActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                if(!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("SaoMaPrintActivity --> run_print", result);
-                mHandler.sendMessageDelayed(msg, 1000);
+                mHandler.sendMessage(msg);
             }
         });
     }
 
-
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            closeHandler(mHandler);
-            context.finish();
+    public boolean onFragmentKeyEvent(KeyEvent event) {
+        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            return false;
         }
-        return false;
+        return true;
     }
 
+    @Override
+    public void onDestroyView() {
+        closeHandler(mHandler);
+        mBinder.unbind();
+        super.onDestroyView();
+    }
 }

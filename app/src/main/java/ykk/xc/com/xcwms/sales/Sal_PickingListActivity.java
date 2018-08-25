@@ -37,6 +37,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
+import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
@@ -263,7 +264,7 @@ public class Sal_PickingListActivity extends BaseActivity {
 //        setFocusable(etMtlCode); // 物料代码获取焦点
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_maker_code, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -272,8 +273,8 @@ public class Sal_PickingListActivity extends BaseActivity {
                 context.finish();
 
                 break;
-            case R.id.btn_maker_code: // 打印条码界面
-//                show(PrintBarcodeActivity.class, null);
+            case R.id.btn_print: // 打印条码界面
+                show(PrintFragmentsActivity.class, null);
 
                 break;
             case R.id.btn_stock: // 选择仓库
@@ -283,7 +284,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 break;
             case R.id.btn_stockPos: // 选择库位
                 if (stock == null) {
-                    Comm.showWarnDialog(context,"请先选择仓库！");
+                    Comm.showWarnDialog(context,"请选择仓库！");
                     return;
                 }
                 bundle = new Bundle();
@@ -879,32 +880,33 @@ public class Sal_PickingListActivity extends BaseActivity {
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
-        int caseId = 0;
+        String strCaseId = null;
         String isList = ""; // 是否根据单据查询全部
         switch (curViewFlag) {
             case '1': // 仓库
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
-                caseId = 12;
+                strCaseId = "12";
                 break;
             case '2': // 库位
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
-                caseId = 14;
+                strCaseId = "14";
                 break;
             case '3': // 发货订单
                 mUrl = Consts.getURL("deliverynotice/findBarcode");
                 barcode = deliBarcode;
+                strCaseId = "";
                 break;
             case '4': // 物料
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
                 barcode = mtlBarcode;
-//                caseId = 11; // 因为这里有物料包装或者物料的码所以不能指定caseId
+                strCaseId = "11,21";
                 break;
         }
         FormBody formBody = new FormBody.Builder()
-                .add("caseId", caseId > 0 ? String.valueOf(caseId) : "")
+                .add("strCaseId", strCaseId)
                 .add("isList", String.valueOf(isList))
                 .add("barcode", barcode)
                 .add("isDefaultStock", "1") // 查询默认仓库和库位
