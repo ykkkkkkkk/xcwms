@@ -2,6 +2,8 @@ package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +44,10 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     EditText etCode;
     @BindView(R.id.tv_selectType)
     TextView tvSelectType;
+    @BindView(R.id.btn_big)
+    Button btnBig;
+    @BindView(R.id.btn_small)
+    Button btnSmall;
 
     private PrintFragment2 context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 501, NORMAL = 10;
@@ -52,6 +58,8 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     private PrintFragmentsActivity parent;
     private BarCodeTable bt;
     private ProdOrder prodOrder;
+    private int tabFormat = 1;
+    private Button curBtn;
 
     // 消息处理
     private PrintFragment2.MyHandler mHandler = new PrintFragment2.MyHandler(this);
@@ -70,7 +78,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                 switch (msg.what) {
                     case SUCC1: // 成功
                         String result = (String) msg.obj;
-                        m.parent.setFragmentPrint2(1, result);
+                        m.parent.setFragmentPrint2(m.tabFormat, result);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -110,6 +118,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     public void initView() {
         mContext = getActivity();
         parent = (PrintFragmentsActivity) mContext;
+        curBtn = btnBig;
     }
 
     @Override
@@ -117,7 +126,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
         hideSoftInputMode(mContext, etCode);
     }
 
-    @OnClick({R.id.tv_selectType})
+    @OnClick({R.id.tv_selectType, R.id.btn_big, R.id.btn_small})
     public void onViewClicked(View v) {
         switch (v.getId()) {
             case R.id.tv_selectType: // 选择打印的表
@@ -125,7 +134,33 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                 popWindow.showAsDropDown(v);
 
                 break;
+            case R.id.btn_big: // 大标签
+                tabFormat = 1;
+                tagSelected(btnBig);
+
+                break;
+            case R.id.btn_small: // 小标签
+                tabFormat = 2;
+                tagSelected(btnSmall);
+
+                break;
         }
+    }
+
+    /**
+     * 选中之后改变样式
+     */
+    private void tagSelected(Button btn) {
+        if(curBtn.getId() == btn.getId()) {
+            return;
+        }
+        curBtn.setText(getValues(curBtn).replace("✔",""));
+        curBtn.setTextColor(Color.parseColor("#666666" +""));
+        curBtn.setBackgroundResource(R.drawable.back_style_gray3);
+        btn.setText(getValues(btn)+"✔");
+        btn.setTextColor(Color.parseColor("#FFFFFF"));
+        btn.setBackgroundResource(R.drawable.shape_purple1a);
+        curBtn = btn;
     }
 
 //    @Override

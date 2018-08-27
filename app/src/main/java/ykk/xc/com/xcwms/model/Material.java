@@ -100,6 +100,7 @@ public class Material implements Serializable {
 	private String oldName;
 	private Stock stock;
 	private StockPosition stockPos;
+	private BarCodeTable barcodeTable;
 
 	/**
 	 * 构造方法
@@ -387,6 +388,12 @@ public class Material implements Serializable {
 	public void setStockPos(StockPosition stockPos) {
 		this.stockPos = stockPos;
 	}
+	public BarCodeTable getBarcodeTable() {
+		return barcodeTable;
+	}
+	public void setBarcodeTable(BarCodeTable barcodeTable) {
+		this.barcodeTable = barcodeTable;
+	}
 
 	@Override
 	public String toString() {
@@ -406,7 +413,7 @@ public class Material implements Serializable {
 				+ qualityPeriod + ", dataStatus=" + dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled
 				+ ", isOvercharge=" + isOvercharge + ", receiveMaxScale=" + receiveMaxScale + ", receiveMinScale="
 				+ receiveMinScale + ", oldNumber=" + oldNumber + ", oldName=" + oldName + ", stock=" + stock
-				+ ", stockPos=" + stockPos + "]";
+				+ ", stockPos=" + stockPos + ", barcodeTable=" + barcodeTable + "]";
 	}
 
 }

@@ -15,7 +15,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            moduleName "serial_port"
+            abiFilters "armeabi", "armeabi-v7a", "x86", "mips", "arm64-v8a", "mips64", "x86_64"
+            ldLibs "log"
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -42,5 +49,6 @@ dependencies {
     implementation files('src/main/libs/bluetooth.jar')
     implementation files('src/main/libs/ethernet.jar')
     implementation files('src/main/libs/ksoap2-android-assembly-3.5.0-jar-with-dependencies.jar')
+    implementation files('src/main/libs/gprintersdkv1.jar')
     implementation 'com.android.support:design:27.1.1'
 }

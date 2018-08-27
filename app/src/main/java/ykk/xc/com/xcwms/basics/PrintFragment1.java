@@ -49,10 +49,6 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     XRecyclerView xRecyclerView;
 
     private PrintFragment1 context = this;
-//    private TSCActivity printUtils = new TSCActivity();
-//    private BluetoothAdapter mBluetoothAdapter;
-//    private AlertDialog alertDialog; // 已配对蓝牙列表dialog
-//    private boolean isConnected; // 判断是否连接蓝牙设备
     private List<Material> listDatas = new ArrayList<>();
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private PrintFragment1Adapter mAdapter;
@@ -113,13 +109,6 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     public void initView() {
         mContext = getActivity();
         parent = (PrintFragmentsActivity) mContext;
-        // 获取所有已经绑定的蓝牙设备
-//        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//        if(!isRegister) {
-//            // 注册蓝牙广播
-//            mContext.registerReceiver(mReceiver, makeFilters());
-//            isRegister = true;
-//        }
 
         xRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -176,7 +165,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findMaterialListByParam");
+        String mUrl = Consts.getURL("findMaterialListByParam3");
         String searchName = getValues(etSearch).trim();
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())
@@ -217,160 +206,6 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
         });
     }
 
-//    /**
-//     * 连接蓝牙前的判断
-//     */
-//    private void connectBluetoothBefore() {
-//        //获取蓝牙适配器实例。如果设备不支持蓝牙则返回null
-//        if (mBluetoothAdapter == null) {
-//            toasts("设备不支持蓝牙！");
-//            return;
-//        }
-//        // 判断蓝牙是否开启
-//        if (!mBluetoothAdapter.isEnabled()) {
-//            // 蓝牙未开启，打开蓝牙
-//            openBluetooth();
-//            return;
-//        }
-//        // 判断状态为连接
-//        if (isConnected) {
-//            printContent();
-//        } else {
-//            pair();
-//        }
-//    }
-//
-//    /**
-//     * 打开蓝牙
-//     */
-//    private void openBluetooth() {
-//        if (mBluetoothAdapter != null && !mBluetoothAdapter.isEnabled()) {
-//            Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivity(enabler);
-//        }
-//    }
-//
-//    /**
-//     * 得到已配对的列表进行配对
-//     */
-//    private void pair() {
-//        alertDialog = null;
-//        View v = context.getLayoutInflater().inflate(R.layout.bluetooth_oklist, null);
-//        alertDialog = new AlertDialog.Builder(mContext).setView(v).create();
-//        // 初始化id
-//        Button btn_close = (Button) v.findViewById(R.id.btn_close);
-//        LinearLayout lin_oklist = v.findViewById(R.id.lin_oklist);
-//        if (lin_oklist.getChildCount() > 0) { // 每次都清空子View
-//            lin_oklist.removeAllViews();
-//        }
-//
-//        // 单击事件
-//        View.OnClickListener click = new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Bundle bundle = null;
-//                switch (v.getId()) {
-//                    case R.id.btn_close: // 关闭
-//                        if (alertDialog != null && alertDialog.isShowing()) {
-//                            alertDialog.dismiss();
-//                        }
-//                        break;
-//                }
-//            }
-//        };
-//        btn_close.setOnClickListener(click);
-//        // 得到已配对的蓝牙设备
-//        Set<BluetoothDevice> devices = mBluetoothAdapter.getBondedDevices();
-//        if (devices.size() > 0) {
-//            for (BluetoothDevice blueDevice : devices) {
-//                String str = blueDevice.getName() + " : (" + blueDevice.getAddress() + ")";
-//                addView(lin_oklist, str); // 添加到布局
-//            }
-//
-//            Window window = alertDialog.getWindow();
-//            alertDialog.setCancelable(false);
-//            alertDialog.show();
-//            window.setGravity(Gravity.CENTER);
-//        } else {
-//            toasts("请先配对蓝牙打印机！");
-//        }
-//    }
-//
-//    /**
-//     * 添加到LinearLayout
-//     */
-//    private void addView(LinearLayout lin, String twoMenuName) {
-//        View v = LayoutInflater.from(mContext).inflate(R.layout.bluetooth_oklist_item, null);
-//        final TextView tv_item = (TextView) v.findViewById(R.id.tv_item);
-//        tv_item.setText(twoMenuName);
-//        // 设置单击事件
-//        tv_item.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // 点击就配对，然后关闭这个dialog
-//                String item = getValues(tv_item);
-//                // 截取的格式为：名称:(20:20:20:20:20),只截取括号里的
-//                String address = item.substring(item.indexOf("(") + 1, item.indexOf(")"));
-//                printUtils.openport(address);
-//
-//                if (alertDialog != null && alertDialog.isShowing()) {
-//                    alertDialog.dismiss();
-//                }
-//            }
-//        });
-//        ViewGroup parent = (ViewGroup) tv_item.getParent();
-//        if (parent != null) {
-//            parent.removeAllViews();
-//        }
-//        // 添加到容器中
-//        lin.addView(tv_item);
-//    }
-//
-//    /**
-//     * 打印条码的方法
-//     * flag 0:默认； 1：显示标题，日期，条码
-//     */
-//    private void printContent() {
-//        printUtils.clearbuffer();
-//        printUtils.setup(40, 30, 4, 5, 0, 2, 0);
-//        String s = null;
-//        switch (printType) {
-//            case '1': // 打印小标签
-//                String date = Comm.getSysDate(7);
-//                s = "TEXT 90,20,\"TSS24.BF2\",0,1,2,\"abc \n" +
-//                        "TEXT 20,80,\"TSS24.BF2\",0,1,1,\"操作日期:" + date + " \n";
-//
-//                break;
-//            case '2': // 打印大标签
-//                s = "TEXT 90,5,\"TSS24.BF2\",0,1,2,\"人工牙种植体 \n" +
-//                        "TEXT 20,50,\"TSS24.BF2\",0,1,1,\"生产厂商:ykk \n" +
-//                        "TEXT 20,75,\"TSS24.BF2\",0,1,1,\"型——号:38*10mm \n" +
-//                        "TEXT 20,100,\"TSS24.BF2\",0,1,1,\"生产日期:2018-05-03 \n" +
-//                        "TEXT 20,125,\"TSS24.BF2\",0,1,1,\"失效日期:2020-05-03 \n" +
-//                        "TEXT 20,150,\"TSS24.BF2\",0,1,1,\"批——号:201805003 \n";
-//                break;
-//        }
-//
-//        byte b[] = new byte[0];
-//        try {
-//            b = s.getBytes("GBK");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//        printUtils.sendcommand(b); // 打印字体
-//        // 条码和字体的行间距：28
-//        switch (printType) {
-//            case '1':
-//                printUtils.barcode(25, 115, "39", 40, 1, 0, 1, 3, barcode);
-//                break;
-//            case '2':
-//                printUtils.barcode(25, 178, "39", 40, 1, 0, 1, 3, barcode);
-//                break;
-//        }
-////        printUtils.barcode(25, 178, "39", 40, 1, 0, 1, 3, "123456789");
-//        printUtils.printlabel(1, 1);
-//    }
-
     @Override
     public void onRefresh() {
         isRefresh = true;
@@ -384,46 +219,6 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
         isLoadMore = true;
         limit += 1;
         run_okhttpDatas();
-    }
-
-//    /**
-//     * 广播监听蓝牙状态
-//     */
-//    public BroadcastReceiver mReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context2, Intent intent) {
-//            String action = intent.getAction();
-//            switch (action) {
-//                case BluetoothDevice.ACTION_ACL_CONNECTED: // 已连接
-//                    toasts("已连接蓝牙设备√");
-//                    isConnected = true;
-//                    connectBluetoothBefore();
-//
-//                    break;
-//                case BluetoothDevice.ACTION_ACL_DISCONNECTED:// 断开连接
-//                    //蓝牙连接被切断
-//                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                    String name = device.getName();
-//                    toasts(name + "的连接已断开！");
-//                    isConnected = false;
-//
-//                    break;
-//            }
-//        }
-//    };
-
-    /**
-     * 蓝牙监听需要添加的Action
-     */
-    private IntentFilter makeFilters() {
-        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction("android.openBluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED");
-//        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-//        intentFilter.addAction("android.openBluetooth.BluetoothAdapter.STATE_OFF");
-//        intentFilter.addAction("android.openBluetooth.BluetoothAdapter.STATE_ON");
-        return intentFilter;
     }
 
     @Override

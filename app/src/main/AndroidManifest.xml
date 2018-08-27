@@ -43,6 +43,13 @@
             </intent-filter>
         </activity>
 
+        <!-- 蓝牙模块 -->
+        <activity
+            android:name=".util.blueTooth.BluetoothDeviceListDialog"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/bluetooth_device_list"
+            android:theme="@android:style/Theme.Dialog"/>
+
         <!-- 基础模块 -->
         <activity
             android:name=".basics.Supplier_DialogActivity"
