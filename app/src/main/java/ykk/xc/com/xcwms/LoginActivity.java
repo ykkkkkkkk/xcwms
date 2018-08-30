@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -16,10 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +36,8 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.entrance.MainTabFragmentActivity;
 import ykk.xc.com.xcwms.entrance.page4.ServiceSetActivity;
+import ykk.xc.com.xcwms.model.EnumDict;
+import ykk.xc.com.xcwms.model.SystemSet;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -81,8 +78,19 @@ public class LoginActivity extends BaseActivity {
                     case SUCC1: // 登录成功
                         User user = JsonUtil.strToObject((String) msg.obj, User.class);
                         user.setPassword(m.getValues(m.etPwd).trim());
-                        // 保存到xml
-                        m.saveObjectToXml(user, m.getResStr(R.string.saveUser));
+                        // user对象保存到xml
+                        m.saveUserToXml(user);
+                        // 保存系统参数设置信息到Xml
+                        List<SystemSet> systemSets = user.getSysSetList();
+                        if(systemSets != null && systemSets.size() > 0) {
+                            SharedPreferences sp = m.context.getSharedPreferences(m.getResStr(R.string.saveSystemSet), MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            for(int i=0; i<systemSets.size(); i++) {
+                                SystemSet sysSet = systemSets.get(i);
+                                editor.putString(sysSet.getSetItem().name(), String.valueOf(sysSet.getValue()));
+                            }
+                            editor.commit();
+                        }
 
                         m.show(MainTabFragmentActivity.class, null);
                         m.context.finish();
@@ -119,7 +127,7 @@ public class LoginActivity extends BaseActivity {
         Consts.setIp(ip);
         Consts.setPort(port);
         // 保存在xml中的对象
-        User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+        User user = showUserByXml();
         if(user != null) {
             setTexts(etUserName, user.getUsername());
             setTexts(etPwd, user.getPassword());
@@ -270,86 +278,6 @@ public class LoginActivity extends BaseActivity {
         if (!file.exists()) {
             boolean isSuccess = file.mkdirs();
             Log.d("isSuccess:", "----------0------------------" + isSuccess);
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private void req2() {
-        //启动后台异步线程进行连接webService操作，并且根据返回结果在主线程中改变UI
-//        QueryAddressTask queryAddressTask = new QueryAddressTask();
-//        //启动后台任务
-//        queryAddressTask.execute("13888888888");
-
-    }
-
-
-    /**
-     * 手机号段归属地查询
-     */
-    public String getRemoteInfo(String mothod) throws Exception {
-        String methodName = "CheckLogin"; // 方法名称
-        SoapObject request = new SoapObject(Comm.XMLNS, methodName);
-        // 设置需调用WebService接口需要传入的两个参数mobileCode、userId
-        request.addProperty("userName", "1");
-        request.addProperty("password", "1");
-
-        //创建SoapSerializationEnvelope 对象，同时指定soap版本号(之前在wsdl中看到的)
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapSerializationEnvelope.VER11);
-        envelope.bodyOut = request;//由于是发送请求，所以是设置bodyOut
-        envelope.dotNet = true;//由于是.net开发的webservice，所以这里要设置为true
-
-        HttpTransportSE httpTransportSE = new HttpTransportSE(Comm.WEB_URI);
-        String soapAction = Comm.XMLNS + methodName;
-        httpTransportSE.call(soapAction, envelope);//调用
-
-        // 获取返回的数据
-        SoapObject object = (SoapObject) envelope.bodyIn;
-        // 获取返回的结果
-        result = object.getProperty(0).toString();
-        Log.d("getRemoteInfo-----", result);
-        return result;
-
-    }
-
-    class QueryAddressTask extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            // 查询手机号码（段）信息*/
-            try {
-                result = getRemoteInfo(params[0]);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            //将结果返回给onPostExecute方法
-            return result;
-        }
-
-        @Override
-        //此方法可以在主线程改变UI
-        protected void onPostExecute(String result) {
-            // 将WebService返回的结果显示在TextView中
-            Log.e("onPostExecute--", "result:" + result);
         }
     }
 

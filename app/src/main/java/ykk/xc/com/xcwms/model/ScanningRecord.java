@@ -46,6 +46,8 @@ public class ScanningRecord implements Serializable {
     private String departmentFnumber;
     private String custFnumber;
     private int entryId; // 订单分录内码
+    private String k3UserName; // 对应k3的用户
+    private String k3UserFnumber; // 对应k3的操作员代码
 
     public int getId() {
         return id;
@@ -263,49 +265,26 @@ public class ScanningRecord implements Serializable {
         this.entryId = entryId;
     }
 
+    public String getK3UserName() {
+        return k3UserName;
+    }
+
+    public void setK3UserName(String k3UserName) {
+        this.k3UserName = k3UserName;
+    }
+
+    public String getK3UserFnumber() {
+        return k3UserFnumber;
+    }
+
+    public void setK3UserFnumber(String k3UserFnumber) {
+        this.k3UserFnumber = k3UserFnumber;
+    }
+
     public ScanningRecord() {
         super();
     }
 
-    @Override
-    public String toString() {
-        return "ScanningRecord{" +
-                "id=" + id +
-                ", type=" + type +
-                ", sourceK3Id=" + sourceK3Id +
-                ", sourceFnumber='" + sourceFnumber + '\'' +
-                ", mtlK3Id=" + mtlK3Id +
-                ", stockK3Id=" + stockK3Id +
-                ", stockAreaId=" + stockAreaId +
-                ", stockPositionId=" + stockPositionId +
-                ", supplierK3Id=" + supplierK3Id +
-                ", customerK3Id=" + customerK3Id +
-                ", departmentK3Id=" + departmentK3Id +
-                ", operationId=" + operationId +
-                ", pdaRowno=" + pdaRowno +
-                ", fqty=" + fqty +
-                ", batchNo='" + batchNo + '\'' +
-                ", sequenceNo='" + sequenceNo + '\'' +
-                ", barcode='" + barcode + '\'' +
-                ", pdaNo='" + pdaNo + '\'' +
-                ", k3number='" + k3number + '\'' +
-                ", fdate='" + fdate + '\'' +
-                ", status='" + status + '\'' +
-                ", createUserId=" + createUserId +
-                ", createUserName='" + createUserName + '\'' +
-                ", receiveOrgFnumber='" + receiveOrgFnumber + '\'' +
-                ", purOrgFnumber='" + purOrgFnumber + '\'' +
-                ", supplierFnumber='" + supplierFnumber + '\'' +
-                ", mtlFnumber='" + mtlFnumber + '\'' +
-                ", unitFnumber='" + unitFnumber + '\'' +
-                ", batchFnumber='" + batchFnumber + '\'' +
-                ", stockFnumber='" + stockFnumber + '\'' +
-                ", poFid=" + poFid +
-                ", poFbillno='" + poFbillno + '\'' +
-                ", poFmustqty=" + poFmustqty +
-                ", departmentFnumber='" + departmentFnumber + '\'' +
-                ", custFnumber='" + custFnumber + '\'' +
-                ", entryId=" + entryId +
-                '}';
-    }
+
+
 }

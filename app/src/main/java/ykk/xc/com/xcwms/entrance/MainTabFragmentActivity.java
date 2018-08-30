@@ -80,7 +80,7 @@ public class MainTabFragmentActivity extends BaseActivity {
         curTv = tab1;
         curRadio = radio1;
 
-        User user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+        User user = showUserByXml();
         tvTitle.setText("操作员："+user.getUsername());
 
         List<Fragment> listFragment = new ArrayList<Fragment>();

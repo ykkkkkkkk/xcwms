@@ -101,6 +101,8 @@ public class Material implements Serializable {
 	private Stock stock;
 	private StockPosition stockPos;
 	private BarCodeTable barcodeTable;
+	/*计量单位数量*/
+	private double calculateFqty;
 
 	/**
 	 * 构造方法
@@ -395,6 +397,13 @@ public class Material implements Serializable {
 		this.barcodeTable = barcodeTable;
 	}
 
+	public double getCalculateFqty() {
+		return calculateFqty;
+	}
+	public void setCalculateFqty(double calculateFqty) {
+		this.calculateFqty = calculateFqty;
+	}
+
 	@Override
 	public String toString() {
 		return "Material [id=" + id + ", fMaterialId=" + fMaterialId + ", fNumber=" + fNumber + ", fName=" + fName
@@ -413,7 +422,8 @@ public class Material implements Serializable {
 				+ qualityPeriod + ", dataStatus=" + dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled
 				+ ", isOvercharge=" + isOvercharge + ", receiveMaxScale=" + receiveMaxScale + ", receiveMinScale="
 				+ receiveMinScale + ", oldNumber=" + oldNumber + ", oldName=" + oldName + ", stock=" + stock
-				+ ", stockPos=" + stockPos + ", barcodeTable=" + barcodeTable + "]";
+				+ ", stockPos=" + stockPos + ", barcodeTable=" + barcodeTable + ", calculateFqty=" + calculateFqty
+				+ "]";
 	}
 
 }

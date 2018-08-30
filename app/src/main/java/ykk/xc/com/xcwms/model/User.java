@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用户   (t_user)
@@ -20,6 +21,15 @@ public class User implements Serializable {
     private String createrName;
     private Department department;
     private String kd_username;
+    private String kdUserNumber;
+    private Integer staffId;
+    private Stock stock;
+    private StockPosition stockPos;
+    private List<SystemSet> sysSetList;
+
+    public User() {
+        super();
+    }
 
     public int getId() {
         return id;
@@ -108,8 +118,36 @@ public class User implements Serializable {
         this.kd_username = kd_username;
     }
 
-    public User() {
-        super();
+    public Stock getStock() {
+        return stock;
+    }
+
+    public StockPosition getStockPos() {
+        return stockPos;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
+    }
+
+    public void setStockPos(StockPosition stockPos) {
+        this.stockPos = stockPos;
+    }
+
+    public List<SystemSet> getSysSetList() {
+        return sysSetList;
+    }
+
+    public void setSysSetList(List<SystemSet> sysSetList) {
+        this.sysSetList = sysSetList;
+    }
+
+    public String getKdUserNumber() {
+        return kdUserNumber;
+    }
+
+    public void setKdUserNumber(String kdUserNumber) {
+        this.kdUserNumber = kdUserNumber;
     }
 
 }

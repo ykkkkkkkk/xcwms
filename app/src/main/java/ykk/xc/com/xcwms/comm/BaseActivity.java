@@ -32,6 +32,7 @@ import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PublicInputDialog;
 import ykk.xc.com.xcwms.basics.PublicInputDialog2;
+import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
@@ -213,26 +214,52 @@ public abstract class BaseActivity extends AppCompatActivity {
 	}
 
 	/**
+	 * 把User对象存到本地xml文件中
+	 * @param user
+	 */
+	public void saveUserToXml(User user) {
+		SharedPreferences sp = mContext.getSharedPreferences(getResStr(R.string.saveUser), MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		String json = JsonUtil.objectToString(user);
+		editor.putString("strUser", json);
+		editor.commit();
+	}
+	/**
+	 * 显示xml中User对象
+	 */
+	public User showUserByXml() {
+		SharedPreferences sp = mContext.getSharedPreferences(getResStr(R.string.saveUser), MODE_PRIVATE);
+		String json = sp.getString("strUser", "");
+		if(json.length() == 0) {
+			return null;
+		}
+		return JsonUtil.stringToObject(json, User.class);
+	}
+	/**
 	 * 把对象存到本地xml文件中
 	 * @param object
+	 * @param key
 	 * @param xmlName
 	 */
-	public void saveObjectToXml(Object object, String xmlName) {
+	public void saveObjectToXml(Object object, String key, String xmlName) {
 		SharedPreferences sp = mContext.getSharedPreferences(xmlName, MODE_PRIVATE);
 		SharedPreferences.Editor editor = sp.edit();
 		String json = JsonUtil.objectToString(object);
-		editor.putString("strJson", json);
+		editor.putString(key, json);
 		editor.commit();
 	}
 
 	/**
-	 * 显示xml中的对象
+	 * 显示xml中对象
 	 * @param cls
+	 * @param key
 	 * @param xmlName
+	 * @param <T>
+	 * @return
 	 */
-	public <T> T showObjectToXml(Class<T> cls, String xmlName) {
+	public <T> T showObjectByXml(Class<T> cls, String key, String xmlName) {
 		SharedPreferences sp = mContext.getSharedPreferences(xmlName, MODE_PRIVATE);
-		String json = sp.getString("strJson", "");
+		String json = sp.getString(key, "");
 		if(json.length() == 0) {
 			return null;
 		}

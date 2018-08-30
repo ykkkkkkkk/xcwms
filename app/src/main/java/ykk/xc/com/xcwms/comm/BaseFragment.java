@@ -37,6 +37,7 @@ import butterknife.Unbinder;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PublicInputDialog;
 import ykk.xc.com.xcwms.basics.PublicInputDialog2;
+import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LoadingDialog;
 
@@ -132,13 +133,52 @@ public abstract class BaseFragment extends Fragment {
 	}
 
 	/**
-	 * 显示xml中的对象
-	 * @param cls
+	 * 把User对象存到本地xml文件中
+	 * @param user
+	 */
+	public void saveUserToXml(User user) {
+		SharedPreferences sp = parentActivity.getSharedPreferences(getResStr(R.string.saveUser), Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sp.edit();
+		String json = JsonUtil.objectToString(user);
+		editor.putString("strUser", json);
+		editor.commit();
+	}
+	/**
+	 * 显示xml中User对象
+	 */
+	public User showUserByXml() {
+		SharedPreferences sp = parentActivity.getSharedPreferences(getResStr(R.string.saveUser), Context.MODE_PRIVATE);
+		String json = sp.getString("strUser", "");
+		if(json.length() == 0) {
+			return null;
+		}
+		return JsonUtil.stringToObject(json, User.class);
+	}
+	/**
+	 * 把对象存到本地xml文件中
+	 * @param object
+	 * @param key
 	 * @param xmlName
 	 */
-	public <T> T showObjectToXml(Class<T> cls, String xmlName) {
+	public void saveObjectToXml(Object object, String key, String xmlName) {
 		SharedPreferences sp = parentActivity.getSharedPreferences(xmlName, Context.MODE_PRIVATE);
-		String json = sp.getString("strJson", "");
+		SharedPreferences.Editor editor = sp.edit();
+		String json = JsonUtil.objectToString(object);
+		editor.putString(key, json);
+		editor.commit();
+	}
+
+	/**
+	 * 显示xml中对象
+	 * @param cls
+	 * @param key
+	 * @param xmlName
+	 * @param <T>
+	 * @return
+	 */
+	public <T> T showObjectByXml(Class<T> cls, String key, String xmlName) {
+		SharedPreferences sp = parentActivity.getSharedPreferences(xmlName, Context.MODE_PRIVATE);
+		String json = sp.getString(key, "");
 		if(json.length() == 0) {
 			return null;
 		}
@@ -258,17 +298,6 @@ public abstract class BaseFragment extends Fragment {
 		}
 	}
 
-
-	/**
-	 * 设置view的间距
-	 */
-	public void setMargins(View view, int left, int top, int right, int bottom) {
-		if(view.getLayoutParams() instanceof MarginLayoutParams) {
-			MarginLayoutParams p = (MarginLayoutParams) view.getLayoutParams();
-			p.setMargins(left, top, right, bottom);
-			view.requestLayout();
-		}
-	}
 
 	/**
 	 * 打开页面然后传值

@@ -10,6 +10,8 @@
     <string name="saveUser">saveUserInfo</string>
     <!-- 保存服务器配置信息 -->
     <string name="saveConfig">saveConfig</string>
+    <!-- 保存数据库系统设置信息 -->
+    <string name="saveSystemSet">saveSystemSet</string>
 
 
     <!-- 自定义listView -->

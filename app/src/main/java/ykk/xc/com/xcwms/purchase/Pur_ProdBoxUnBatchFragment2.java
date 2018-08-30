@@ -1181,9 +1181,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
      *  得到用户对象
      */
     private void getUserInfo() {
-        if(user == null) {
-            user = showObjectToXml(User.class, getResStr(R.string.saveUser));
-        }
+        if(user == null) user = showUserByXml();
     }
 
     @Override

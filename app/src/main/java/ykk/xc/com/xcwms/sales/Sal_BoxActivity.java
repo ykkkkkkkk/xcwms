@@ -1413,7 +1413,7 @@ public class Sal_BoxActivity extends BaseActivity {
      */
     private void getUserInfo() {
         if(user == null) {
-            user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+            user = showUserByXml();
         }
     }
 

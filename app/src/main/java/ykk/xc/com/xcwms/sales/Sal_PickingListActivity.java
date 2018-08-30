@@ -46,6 +46,7 @@ import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Customer;
+import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
@@ -95,6 +96,7 @@ public class Sal_PickingListActivity extends BaseActivity {
     private boolean isStockLong; // 判断选择（仓库，库区）是否长按了
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
+    private char defaultStockVal; // 默认仓库的值
 
     // 消息处理
     private Sal_PickingListActivity.MyHandler mHandler = new Sal_PickingListActivity.MyHandler(this);
@@ -262,6 +264,23 @@ public class Sal_PickingListActivity extends BaseActivity {
         getUserInfo();
         setFocusable(etDeliCode); // 物料代码获取焦点
 //        setFocusable(etMtlCode); // 物料代码获取焦点
+
+        // 得到默认仓库的值
+        defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
+        if(defaultStockVal == '2') {
+
+            if(user.getStock() != null) {
+                stock = user.getStock();
+                setTexts(etStock, stock.getfName());
+                stockBarcode = stock.getfName();
+            }
+
+            if(user.getStockPos() != null) {
+                stockP = user.getStockPos();
+                setTexts(etStockPos, stockP.getFnumber());
+                stockPBarcode = stockP.getFnumber();
+            }
+        }
     }
 
     @OnClick({R.id.btn_close, R.id.btn_print, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone})
@@ -635,7 +654,7 @@ public class Sal_PickingListActivity extends BaseActivity {
      * 得到物料数据之后，判断库位是否为空
      */
     private boolean smAfterCheck(Material mtl) {
-        if(mtl != null && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
+        if(defaultStockVal == '1' && mtl != null && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();
             setTexts(etStock, stock.getfName());
@@ -647,18 +666,6 @@ public class Sal_PickingListActivity extends BaseActivity {
             return smBefore('1');
         }
         return true;
-    }
-
-    /**
-     * 判断是相同的客户
-     */
-    private boolean isAlikeCust(BarCodeTable bct) {
-        DeliOrder deliOrder = JsonUtil.stringToObject(bct.getRelationObj(), DeliOrder.class);
-        if(cust != null && !cust.getCustomerCode().equals(deliOrder.getCustNumber())){
-            Comm.showWarnDialog(context, "客户不同，不能操作，请检查！");
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -691,20 +698,26 @@ public class Sal_PickingListActivity extends BaseActivity {
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
             PickingList pl = checkDatas.get(i);
+            Material mtl2 = pl.getMtl();
             // 如果扫码相同
-            if (mtl.getfMaterialId() == pl.getMtlId()) {
+            if (bt.getMaterialId() == mtl2.getfMaterialId()) {
                 isFlag = true;
 
+                double fqty = 1;
+                // 计量单位数量
+                if(mtl2.getCalculateFqty() > 0) fqty = mtl2.getCalculateFqty();
                 // 未启用序列号
-                if (pl.getMtl().getIsSnManager() == 0) {
+                if (mtl2.getIsSnManager() == 0) {
                     // 发货数大于拣货数
                     if (pl.getDeliFremainoutqty() > pl.getPickingListNum()) {
                         // 如果扫的是物料包装条码，就显示个数
-                        double number = bt.getMaterialCalculateNumber();
+                        double number = 0;
+                        if(bt != null) number = bt.getMaterialCalculateNumber();
+
                         if(number > 0) {
-                            pl.setPickingListNum(number+pl.getPickingListNum());
+                            pl.setPickingListNum(pl.getPickingListNum() + (number*fqty));
                         } else {
-                            pl.setPickingListNum(pl.getPickingListNum() + 1);
+                            pl.setPickingListNum(pl.getPickingListNum() + fqty);
                         }
                         pl.setBatchNo(bt.getBatchCode());
                         pl.setSnNo(bt.getSnCode());
@@ -714,7 +727,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                         return;
                     }
                 } else {
-                    pl.setPickingListNum(1);
+                    pl.setPickingListNum(fqty);
                     pl.setBatchNo(bt.getBatchCode());
                     pl.setSnNo(bt.getSnCode());
                 }
@@ -1035,7 +1048,7 @@ public class Sal_PickingListActivity extends BaseActivity {
      */
     private void getUserInfo() {
         if(user == null) {
-            user = showObjectToXml(User.class, getResStr(R.string.saveUser));
+            user = showUserByXml();
         }
     }
 

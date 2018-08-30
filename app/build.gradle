@@ -46,9 +46,6 @@ dependencies {
     implementation 'com.squareup.okio:okio:1.11.0'
     implementation 'com.solidfire.code.gson:gson-parent:2.6.2'
     implementation 'com.solidfire.code.gson:gson:2.6.2'
-    implementation files('src/main/libs/bluetooth.jar')
-    implementation files('src/main/libs/ethernet.jar')
-    implementation files('src/main/libs/ksoap2-android-assembly-3.5.0-jar-with-dependencies.jar')
     implementation files('src/main/libs/gprintersdkv1.jar')
     implementation 'com.android.support:design:27.1.1'
 }

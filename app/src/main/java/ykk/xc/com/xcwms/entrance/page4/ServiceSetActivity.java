@@ -67,6 +67,8 @@ public class ServiceSetActivity extends BaseActivity {
                 Consts.setPort(port);
                 hideKeyboard(view);
 
+                context.finish();
+
                 break;
         }
     }
