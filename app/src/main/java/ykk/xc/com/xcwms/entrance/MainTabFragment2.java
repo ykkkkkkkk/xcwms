@@ -9,7 +9,7 @@ import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Prod_InActivity;
-import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
+import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentsActivity;
 
 public class MainTabFragment2 extends BaseFragment {
 
@@ -25,7 +25,7 @@ public class MainTabFragment2 extends BaseFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.relative1: // 生产装箱
-                show(Pur_ProdBoxFragmentActivity.class, null);
+                show(Pur_ProdBoxFragmentsActivity.class, null);
 
                 break;
             case R.id.relative2: // 生产入库

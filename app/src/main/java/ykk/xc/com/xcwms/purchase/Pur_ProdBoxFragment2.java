@@ -56,10 +56,12 @@ import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxUnBatchFragment2Adapter;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
-
-public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
+/**
+ * 生产装箱--无批次
+ */
+public class Pur_ProdBoxFragment2 extends BaseFragment {
 
     @BindView(R.id.lin_box)
     LinearLayout linBox;
@@ -96,9 +98,9 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     @BindView(R.id.rb_type2)
     RadioButton rbType2;
 
-    public Pur_ProdBoxUnBatchFragment2() {}
+    public Pur_ProdBoxFragment2() {}
 
-    private Pur_ProdBoxUnBatchFragment2 mFragment = this;
+    private Pur_ProdBoxFragment2 mFragment = this;
     private Activity mContext;
     private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
@@ -106,7 +108,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     private Customer customer; // 客户
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
-    private Pur_ProdBoxUnBatchFragment2Adapter mAdapter;
+    private Pur_ProdBoxFragment2Adapter mAdapter;
     private String strBoxBarcode, strMtlBarcode, strMtlBarcode_del; // 对应的条码号
     private List<MaterialBinningRecord> listMbr = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
@@ -123,16 +125,16 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
-    private Pur_ProdBoxUnBatchFragment2.MyHandler mHandler = new Pur_ProdBoxUnBatchFragment2.MyHandler(this);
+    private Pur_ProdBoxFragment2.MyHandler mHandler = new Pur_ProdBoxFragment2.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_ProdBoxUnBatchFragment2> mActivity;
+        private final WeakReference<Pur_ProdBoxFragment2> mActivity;
 
-        public MyHandler(Pur_ProdBoxUnBatchFragment2 activity) {
-            mActivity = new WeakReference<Pur_ProdBoxUnBatchFragment2>(activity);
+        public MyHandler(Pur_ProdBoxFragment2 activity) {
+            mActivity = new WeakReference<Pur_ProdBoxFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_ProdBoxUnBatchFragment2 m = mActivity.get();
+            Pur_ProdBoxFragment2 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -297,7 +299,7 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_box_unbatch_fragment2, container, false);
+        return inflater.inflate(R.layout.pur_prod_box_fragment2, container, false);
     }
 
     @Override
@@ -305,10 +307,10 @@ public class Pur_ProdBoxUnBatchFragment2 extends BaseFragment {
         mContext = getActivity();
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Pur_ProdBoxUnBatchFragment2Adapter(mContext, listMbr);
+        mAdapter = new Pur_ProdBoxFragment2Adapter(mContext, listMbr);
         recyclerView.setAdapter(mAdapter);
 
-        mAdapter.setCallBack(new Pur_ProdBoxUnBatchFragment2Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Pur_ProdBoxFragment2Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);

@@ -16,9 +16,10 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.util.MyViewPager;
+import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
 
-public class Pur_ProdBoxFragmentActivity extends BaseActivity {
+public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View radio1;
@@ -32,7 +33,7 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
     MyViewPager viewPager;
     @BindView(R.id.tv_title)
     TextView tvTitle;
-    private Pur_ProdBoxFragmentActivity context = this;
+    private Pur_ProdBoxFragmentsActivity context = this;
     private View curRadio;
 //    private Customer customer; // 客户
 
@@ -52,16 +53,16 @@ public class Pur_ProdBoxFragmentActivity extends BaseActivity {
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
-        Pur_ProdBoxBatchFragment1 fragment1 = new Pur_ProdBoxBatchFragment1();
+        Pur_ProdBoxFragment1 fragment1 = new Pur_ProdBoxFragment1();
 //        fragment1.setArguments(bundle2); // 传参数
-        Pur_ProdBoxUnBatchFragment2 fragment2 = new Pur_ProdBoxUnBatchFragment2();
+        Pur_ProdBoxFragment2 fragment2 = new Pur_ProdBoxFragment2();
 //        fragment2.setArguments(bundle2); // 传参数
 
         listFragment.add(fragment2);
         listFragment.add(fragment1);
         viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
-        viewPager.setAdapter(new Pur_ProdBoxFragmentAdapter(getSupportFragmentManager(), listFragment));
+        viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
 

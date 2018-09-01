@@ -9,13 +9,11 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -51,12 +49,15 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.SecurityCode;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxBatchFragment1Adapter;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment1Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 import static android.app.Activity.RESULT_OK;
 
-public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
+/**
+ * 生产装箱--有批次
+ */
+public class Pur_ProdBoxFragment1 extends BaseFragment {
 
     @BindView(R.id.tv_deptSel)
     TextView tvDeptSel;
@@ -77,10 +78,10 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     @BindView(R.id.tv_countInfo)
     TextView tvCountInfo; // 合计的信息  记录箱数，件数
 
-    public Pur_ProdBoxBatchFragment1() {
+    public Pur_ProdBoxFragment1() {
     }
 
-    private Pur_ProdBoxBatchFragment1 mFragment = this;
+    private Pur_ProdBoxFragment1 mFragment = this;
     private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13, SEL_DELI = 14;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SAVE = 202, UNSAVE = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
@@ -90,7 +91,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     private Customer customer; // 客户
     private AssistInfo assist; // 辅助资料--发货方式
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Pur_ProdBoxBatchFragment1Adapter mAdapter;
+    private Pur_ProdBoxFragment1Adapter mAdapter;
     private List<MaterialBinningRecord> listMbr = new ArrayList<>();
     private Activity mContext;
     private User user;
@@ -101,14 +102,14 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
     // 消息处理
     private MyHandler mHandler = new MyHandler(mFragment);
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_ProdBoxBatchFragment1> mFrag;
+        private final WeakReference<Pur_ProdBoxFragment1> mFrag;
 
-        public MyHandler(Pur_ProdBoxBatchFragment1 activity) {
-            mFrag = new WeakReference<Pur_ProdBoxBatchFragment1>(activity);
+        public MyHandler(Pur_ProdBoxFragment1 activity) {
+            mFrag = new WeakReference<Pur_ProdBoxFragment1>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_ProdBoxBatchFragment1 m = mFrag.get();
+            Pur_ProdBoxFragment1 m = mFrag.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -160,7 +161,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_box_batch_fragment1, container, false);
+        return inflater.inflate(R.layout.pur_prod_box_fragment1, container, false);
     }
 
     @Override
@@ -168,7 +169,7 @@ public class Pur_ProdBoxBatchFragment1 extends BaseFragment {
         mContext = getActivity();
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Pur_ProdBoxBatchFragment1Adapter(mContext, listMbr);
+        mAdapter = new Pur_ProdBoxFragment1Adapter(mContext, listMbr);
         recyclerView.setAdapter(mAdapter);
     }
 

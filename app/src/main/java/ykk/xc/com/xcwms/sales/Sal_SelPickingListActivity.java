@@ -37,6 +37,7 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_SelPickingListAdapter;
@@ -58,6 +59,8 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Sal_SelPickingListAdapter mAdapter;
     private List<PickingList> listDatas = new ArrayList<>();
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -79,6 +82,14 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
                         List<PickingList> list = JsonUtil.strToList2((String) msg.obj, PickingList.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
+
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -132,7 +143,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
     @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -174,11 +185,16 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
 
                 break;
             case R.id.btn_search:
-                listDatas.clear();
-                run_okhttpDatas();
+                initLoadDatas();
 
                 break;
         }
+    }
+
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
     }
 
     /**
@@ -189,8 +205,8 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
         String mUrl = Consts.getURL("pickingList/findAll2");
         FormBody formBody = new FormBody.Builder()
                 .add("pickingListNo_fbillno", getValues(etSearch).trim())
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -214,6 +230,8 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Sal_SelOrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
@@ -223,18 +241,17 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
 
     @Override
     public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
     }
 
     @Override
     public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override

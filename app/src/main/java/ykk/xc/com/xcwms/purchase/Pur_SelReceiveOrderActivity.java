@@ -35,10 +35,12 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Supplier;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.model.pur.PurReceiveOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelReceiveOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
 public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
@@ -61,6 +63,8 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
     private Pur_SelReceiveOrderAdapter mAdapter;
     private List<PurReceiveOrder> listDatas = new ArrayList<>();
     private List<PurReceiveOrder> sourceList; // 上个界面传来的数据列表
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -81,8 +85,15 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
                     case SUCC1: // 成功
                         List<PurReceiveOrder> list = JsonUtil.strToList2((String) msg.obj, PurReceiveOrder.class);
                         m.listDatas.addAll(list);
-//                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<PO_list>>(){}.getType());
                         m.mAdapter.notifyDataSetChanged();
+
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -108,14 +119,28 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
-        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+
+        mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
+                PurReceiveOrder m = listDatas.get(pos-1);
+                int check = m.getIsCheck();
+                if (check == 1) {
+                    m.setIsCheck(0);
+                } else {
+                    m.setIsCheck(1);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -204,6 +229,12 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
         mAdapter.notifyDataSetChanged();
     }
 
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
+    }
+
     /**
      * 通过okhttp加载数据
      */
@@ -214,13 +245,8 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
 //                .add("fbillno", getValues(etFbillno).trim())
                 .add("supplierId", String.valueOf(supplier.getFsupplierid()))
                 .add("isDefaultStock", "1") // 查询默认仓库和库位
-//                .add("supplierName", supplier.)
-//                .add("mtlFnumber", getValues(etMtlFnumber).trim())
-//                .add("mtlFname", getValues(etMtlFname).trim())
-//                .add("poFdateBeg", getValues(tvBegDate))
-//                .add("poFdateEnd", getValues(tvEndDate))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -244,6 +270,8 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Pur_SelReceiveOrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
@@ -253,18 +281,17 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
 
     @Override
     public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
     }
 
     @Override
     public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override

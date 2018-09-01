@@ -22,6 +22,7 @@ import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
 import ykk.xc.com.xcwms.comm.ActivityCollector;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
 
 public class MainTabFragmentActivity extends BaseActivity {
@@ -90,7 +91,7 @@ public class MainTabFragmentActivity extends BaseActivity {
         listFragment.add(new MainTabFragment4());
         listFragment.add(new MainTabFragment5());
         //ViewPager设置适配器
-        viewPager.setAdapter(new MainTabFragmentAdapter(getSupportFragmentManager(), listFragment));
+        viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
         //ViewPager页面切换监听

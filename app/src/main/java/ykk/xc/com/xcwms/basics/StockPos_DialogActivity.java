@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,19 +30,20 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.adapter.StockPos_DialogAdapter;
 import ykk.xc.com.xcwms.comm.BaseDialogActivity;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.comm.OnItemClickListener2;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
+import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
 /**
  * 选择库位dialog
  */
-public class StockPos_DialogActivity extends BaseDialogActivity {
+public class StockPos_DialogActivity extends BaseDialogActivity implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.btn_close)
     Button btnClose;
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
+    @BindView(R.id.xRecyclerView)
+    XRecyclerView xRecyclerView;
     @BindView(R.id.et_search)
     EditText etSearch;
     @BindView(R.id.btn_search)
@@ -55,6 +55,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int stockId; // 仓库id
     private int areaId; // 库区id
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -71,9 +73,17 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
                 m.hideLoadDialog();
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        List<StockPosition> list = JsonUtil.strToList((String) msg.obj, StockPosition.class);
+                        List<StockPosition> list = JsonUtil.strToList2((String) msg.obj, StockPosition.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
+
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -94,17 +104,21 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
 
     @Override
     public void initView() {
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
         mAdapter = new StockPos_DialogAdapter(context, listDatas);
-        recyclerView.setAdapter(mAdapter);
+        xRecyclerView.setAdapter(mAdapter);
+        xRecyclerView.setLoadingListener(context);
 
-        mAdapter.setOnItemClickListener(new OnItemClickListener2() {
+        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+
+        mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int pos) {
-                StockPosition supplier = listDatas.get(pos);
+            public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
+                StockPosition m = listDatas.get(pos-1);
                 Intent intent = new Intent();
-                intent.putExtra("obj", supplier);
+                intent.putExtra("obj", m);
                 context.setResult(RESULT_OK, intent);
                 context.finish();
             }
@@ -114,7 +128,7 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
     @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -135,11 +149,16 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
 
                 break;
             case R.id.btn_search:
-                listDatas.clear();
-                run_okhttpDatas();
+                initLoadDatas();
 
                 break;
         }
+    }
+
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
     }
 
     /**
@@ -152,8 +171,8 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
                 .add("fNumberAndName", getValues(etSearch).trim())
                 .add("stockId", String.valueOf(stockId))
 //                .add("areaId", String.valueOf(areaId))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -177,11 +196,28 @@ public class StockPos_DialogActivity extends BaseDialogActivity {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("StockPos_DialogActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
+    }
+
+    @Override
+    public void onLoadMore() {
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override

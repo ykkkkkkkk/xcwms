@@ -7,7 +7,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -18,9 +17,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
-import ykk.xc.com.xcwms.entrance.MainTabFragmentAdapter;
 import ykk.xc.com.xcwms.model.Customer;
-import ykk.xc.com.xcwms.sales.adapter.SelSourceFragmentAdapter;
+import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
 
 public class Sal_SelSourceFragmentActivity extends BaseActivity {
@@ -69,7 +67,7 @@ public class Sal_SelSourceFragmentActivity extends BaseActivity {
         listFragment.add(fragment1);
         listFragment.add(fragment2);
         //ViewPager设置适配器
-        viewPager.setAdapter(new SelSourceFragmentAdapter(getSupportFragmentManager(), listFragment));
+        viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
 

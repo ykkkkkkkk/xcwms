@@ -132,7 +132,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
-            android:name=".purchase.Pur_ProdBoxFragmentActivity"
+            android:name=".purchase.Pur_ProdBoxFragmentsActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Pur_SelProdOrderActivity"

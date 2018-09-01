@@ -15,7 +15,7 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Prod_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_InFragmentsActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
-import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentActivity;
+import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentsActivity;
 
 public class MainTabFragment1 extends BaseFragment {
 
@@ -60,7 +60,7 @@ public class MainTabFragment1 extends BaseFragment {
 
                 break;
             case R.id.relative4: // 生产装箱
-                show(Pur_ProdBoxFragmentActivity.class, null);
+                show(Pur_ProdBoxFragmentsActivity.class, null);
 
                 break;
         }

@@ -13,19 +13,15 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -38,14 +34,8 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.comm.OnItemClickListener2;
-import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
-import ykk.xc.com.xcwms.model.Material;
-import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelProdOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
@@ -67,6 +57,8 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
     private Pur_SelProdOrderAdapter mAdapter;
     private List<ProdOrder> listDatas = new ArrayList<>();
     private String fbillno; // 单号
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -88,6 +80,14 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
                         List<ProdOrder> list = JsonUtil.strToList2((String) msg.obj, ProdOrder.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
+
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -112,8 +112,8 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
-        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
 
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -135,7 +135,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
     @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -158,8 +158,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
 
                 break;
             case R.id.btn_search:
-                listDatas.clear();
-                run_okhttpDatas();
+                initLoadDatas();
 
                 break;
             case R.id.btn_confirm: // 确认
@@ -208,6 +207,12 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
         window.setGravity(Gravity.CENTER);
     }
 
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
+    }
+
     /**
      * 通过okhttp加载数据
      */
@@ -218,13 +223,8 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
                 .add("fbillno", getValues(etSearch).trim())
                 .add("deptId", String.valueOf(department.getFitemID()))
                 .add("isDefaultStock", "1") // 查询默认仓库和库位
-//                .add("supplierName", supplier.)
-//                .add("mtlFnumber", getValues(etMtlFnumber).trim())
-//                .add("mtlFname", getValues(etMtlFname).trim())
-//                .add("poFdateBeg", getValues(tvBegDate))
-//                .add("poFdateEnd", getValues(tvEndDate))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -248,6 +248,8 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Ware_Pur_OrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
@@ -257,18 +259,17 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
 
     @Override
     public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
     }
 
     @Override
     public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override

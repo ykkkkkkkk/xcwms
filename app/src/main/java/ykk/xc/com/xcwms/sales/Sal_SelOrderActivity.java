@@ -34,9 +34,13 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Customer;
+import ykk.xc.com.xcwms.model.Supplier;
+import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
+import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
 import ykk.xc.com.xcwms.sales.adapter.Sal_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
 public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
@@ -57,7 +61,9 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
     private Customer customer; // 客户
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Sal_SelOrderAdapter mAdapter;
-    private List<SalOrder> listDatas;
+    private List<SalOrder> listDatas = new ArrayList<>();
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -76,10 +82,17 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
 
                 switch (msg.what) {
                     case SUCC1: // 成功
-                        m.listDatas = JsonUtil.strToList2((String) msg.obj, SalOrder.class);
-//                        m.listDatas = m.gGson().fromJson((String) msg.obj, new TypeToken<List<PO_list>>(){}.getType());
+                        List<SalOrder> list = JsonUtil.strToList2((String) msg.obj, SalOrder.class);
+                        m.listDatas.addAll(list);
+                        m.mAdapter.notifyDataSetChanged();
 
-                        m.updateUI();
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -98,9 +111,35 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
     }
 
     @Override
+    public void initView() {
+        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new Sal_SelOrderAdapter(context, listDatas);
+        xRecyclerView.setAdapter(mAdapter);
+        xRecyclerView.setLoadingListener(context);
+
+//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+
+        mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
+                SalOrder m = listDatas.get(pos-1);
+                int check = m.getIsCheck();
+                if (check == 1) {
+                    m.setIsCheck(0);
+                } else {
+                    m.setIsCheck(1);
+                }
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
     public void initData() {
         bundle();
-        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -165,6 +204,12 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
         mAdapter.notifyDataSetChanged();
     }
 
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
+    }
+
     /**
      * 通过okhttp加载数据
      */
@@ -173,8 +218,8 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
         String mUrl = Consts.getURL("findSalOrderList");
         FormBody formBody = new FormBody.Builder()
                 .add("custId", String.valueOf(customer.getFcustId()))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -198,6 +243,8 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Sal_SelOrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
@@ -205,38 +252,19 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
         });
     }
 
-    /**
-     * 更新UI
-     */
-    private void updateUI() {
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
-//        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        xRecyclerView.setLayoutManager(layoutManager);
-        xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Sal_SelOrderAdapter(context, listDatas);
-        xRecyclerView.setAdapter(mAdapter);
-        xRecyclerView.setLoadingListener(context);
-
-        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
-    }
-
-
     @Override
     public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
     }
 
     @Override
     public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
     }
 
     @Override
