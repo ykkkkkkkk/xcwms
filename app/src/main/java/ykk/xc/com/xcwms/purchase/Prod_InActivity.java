@@ -716,8 +716,8 @@ public class Prod_InActivity extends BaseActivity {
     /**
      * 得到物料数据之后，判断库位是否为空
      */
-    private boolean getMtlAfter(BarCodeTable barCodeTable) {
-        Material mtl = barCodeTable.getMtl();
+    private boolean getMtlAfter(BarCodeTable bt) {
+        Material mtl = bt.getMtl();
         if(defaultStockVal == '1' && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();

@@ -45,6 +45,7 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.CombineSalOrderEntry;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
@@ -107,7 +108,7 @@ public class Sal_OutActivity extends BaseActivity {
 
     private Sal_OutActivity context = this;
     private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, SUCC3B = 203, UNSUCC3B = 503;
     private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
     private Customer cust; // 客户
     private Stock stock; // 仓库
@@ -125,6 +126,7 @@ public class Sal_OutActivity extends BaseActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private char defaultStockVal; // 默认仓库的值
+    private int codes, unCodes;
 
     // 消息处理
     private Sal_OutActivity.MyHandler mHandler = new Sal_OutActivity.MyHandler(this);
@@ -224,25 +226,40 @@ public class Sal_OutActivity extends BaseActivity {
 
                         break;
                     case SUCC3: // 判断是否存在返回
-                        String strBarcode = JsonUtil.strToString((String) msg.obj);
-                        String[] barcodeArr = strBarcode.split(",");
-                        boolean isNext = true; // 是否下一步
-                        for (int i = 0, len = barcodeArr.length; i < len; i++) {
-                            for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
-                                ScanningRecord2 sr2 = m.checkDatas.get(j);
-                                Material mtl = sr2.getMtl();
-                                // 判断扫码表和当前扫的码对比是否一样
-                                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
-                                    Comm.showWarnDialog(m.context,"第" + (i + 1) + "行已出库，不能重复操作！");
-                                    isNext = false;
-                                    return;
-                                }
-                            }
-                        }
-                        if(isNext) m.run_addScanningRecord();
+                        String result = (String) msg.obj;
+                        String strBarcode = JsonUtil.strToString(result);
+                        if(m.isNULLS(strBarcode).length() > 0) m.isRepeatSave(strBarcode);
 
                         break;
                     case UNSUCC3: // 判断是否存在返回
+                        m.run_addScanningRecord();
+
+                        break;
+                    case SUCC3B: // 判断是否存在返回
+                        String result2 = (String) msg.obj;
+                        String strBarcode2 = JsonUtil.strToString(result2);
+                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
+                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
+                        int count = 0; // 统计
+                        if(list != null && list.size() > 0) {
+                            int size = list.size();
+                            for(int i=0; i<size; i++) {
+                                CombineSalOrderEntry parent = list.get(i);
+                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
+                                    ScanningRecord2 son = m.checkDatas.get(j);
+                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
+                                        count += 1;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(size > count) {
+                                Comm.showWarnDialog(m.context,"当前操作的数据存在拼单发货，请检查拼单的数据！");
+                            }
+                        }
+
+                        break;
+                    case UNSUCC3B: // 判断是否存在返回
                         m.run_addScanningRecord();
 
                         break;
@@ -255,6 +272,31 @@ public class Sal_OutActivity extends BaseActivity {
                 }
             }
         }
+    }
+
+    /**
+     * 判断是否有重复的保存
+     * @param strBarcode
+     * @return
+     */
+    private boolean isRepeatSave(String strBarcode) {
+        String[] barcodeArr = strBarcode.split(",");
+        boolean isNext = true; // 是否下一步
+        for (int i = 0, len = barcodeArr.length; i < len; i++) {
+            for (int j = 0, size = checkDatas.size(); j < size; j++) {
+                ScanningRecord2 sr2 = checkDatas.get(j);
+                Material mtl = sr2.getMtl();
+                // 判断扫码表和当前扫的码对比是否一样
+                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(checkDatas.get(j).getBarcode())) {
+                    Comm.showWarnDialog(context,"第" + (i + 1) + "行已出库，不能重复操作！");
+                    isNext = false;
+                    return false;
+                }
+            }
+        }
+        if(isNext) run_addScanningRecord();
+
+        return true;
     }
 
     @Override
@@ -893,7 +935,7 @@ public class Sal_OutActivity extends BaseActivity {
         cust.setCustomerName(salOrder.getCustName());
 
         tvCustSel.setText("客户："+salOrder.getCustName());
-        Material mtl = null;
+        Material mtl = bt.getMtl();
         sr2.setMtl(mtl);
         sr2.setMtlFnumber(mtl.getfNumber());
         sr2.setUnitFnumber(mtl.getUnit().getUnitNumber());
@@ -1382,17 +1424,38 @@ public class Sal_OutActivity extends BaseActivity {
     private void run_findMatIsExistList2() {
         showLoadDialog("加载中...");
         StringBuilder strBarcode = new StringBuilder();
+        StringBuilder strFid = new StringBuilder();
+        StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             if(isNULLS(sr2.getBarcode()).length() > 0) {
-                if((i+1) == size) strBarcode.append(sr2.getBarcode());
-                else strBarcode.append(sr2.getBarcode() + ",");
+                if((i+1) == size) {
+                    strBarcode.append(sr2.getBarcode());
+                    strFid.append(sr2.getPoFid());
+                    strEntryId.append(sr2.getEntryId());
+
+                } else {
+                    strBarcode.append(sr2.getBarcode() + ",");
+                    strFid.append(sr2.getPoFid() + ",");
+                    strEntryId.append(sr2.getEntryId() + ",");
+                }
             }
         }
-        String mUrl = Consts.getURL("findMatIsExistList2");
+        String mUrl = null;
+        if(dataType == '1') {
+            codes = SUCC3B;
+            unCodes = UNSUCC3B;
+            mUrl = Consts.getURL("findMatIsExistList3");
+        } else {
+            codes = SUCC3;
+            unCodes = UNSUCC3;
+            mUrl = Consts.getURL("findMatIsExistList2");
+        }
         FormBody formBody = new FormBody.Builder()
                 .add("orderType", "XS") // 单据类型CG代表采购订单，XS销售订单,生产PD
                 .add("strBarcode", strBarcode.toString())
+                .add("strFid", strFid.toString())
+                .add("strEntryId", strEntryId.toString())
                 .build();
 
         Request request = new Request.Builder()
@@ -1405,7 +1468,7 @@ public class Sal_OutActivity extends BaseActivity {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC3);
+                mHandler.sendEmptyMessage(unCodes);
             }
 
             @Override
@@ -1413,10 +1476,10 @@ public class Sal_OutActivity extends BaseActivity {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC3);
+                    mHandler.sendEmptyMessage(unCodes);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC3, result);
+                Message msg = mHandler.obtainMessage(codes, result);
                 Log.e("run_findMatIsExistList2 --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
