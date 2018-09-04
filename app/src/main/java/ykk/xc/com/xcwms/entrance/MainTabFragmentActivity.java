@@ -18,7 +18,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.ActivityCollector;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.model.User;
@@ -169,7 +169,7 @@ public class MainTabFragmentActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印
-                show(PrintFragmentsActivity.class, null);
+                show(PrintMainActivity.class, null);
                 break;
             case R.id.relative1:
                 tabSelected(tab1, radio1);

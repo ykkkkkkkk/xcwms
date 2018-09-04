@@ -2,46 +2,88 @@ package ykk.xc.com.xcwms.purchase;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.OnFocusChange;
+import butterknife.OnLongClick;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
+import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
+import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
+import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.comm.Comm;
+import ykk.xc.com.xcwms.comm.Consts;
+import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.Department;
+import ykk.xc.com.xcwms.model.EnumDict;
+import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.MaterialBinningRecord;
+import ykk.xc.com.xcwms.model.Organization;
+import ykk.xc.com.xcwms.model.ScanningRecord;
+import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.Stock;
+import ykk.xc.com.xcwms.model.StockPosition;
+import ykk.xc.com.xcwms.model.Supplier;
+import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.pur.ProdOrder;
+import ykk.xc.com.xcwms.purchase.adapter.Prod_InAdapter;
+import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
-public class Pur_InFragmentsActivity extends BaseActivity {
+public class Prod_InMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
-    @BindView(R.id.viewRadio3)
-    View viewRadio3;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
     MyViewPager viewPager;
     @BindView(R.id.tv_title)
     TextView tvTitle;
-    private Pur_InFragmentsActivity context = this;
+    private Prod_InMainActivity context = this;
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
 //    private Customer customer; // 客户
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_in_fragments;
+        return R.layout.pur_prod_in_main;
     }
 
     @Override
@@ -57,48 +99,47 @@ public class Pur_InFragmentsActivity extends BaseActivity {
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Pur_InFragment1 fragment1 = new Pur_InFragment1();
-        Pur_InFragment2 fragment2 = new Pur_InFragment2();
-        Pur_InFragment3 fragment3 = new Pur_InFragment3();
+        Prod_InFragment1 fragment1 = new Prod_InFragment1();
+        Prod_InFragment2 fragment2 = new Prod_InFragment2();
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);
-        listFragment.add(fragment3);
-        viewPager.setScanScroll(false); // 禁止左右滑动
+//        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
 
-
         //ViewPager页面切换监听
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                switch (position) {
-//                    case 0:
-//                        tabSelected(radio1);
-//                        tvTitle.setText("生产装箱-批量");
-//                        viewPager.setCurrentItem(0, false);
-//                        break;
-//                    case 1:
-//                        tabSelected(radio2);
-//                        tvTitle.setText("生产装箱-非批量");
-//                        viewPager.setCurrentItem(1, false);
-//                        break;
-//                }
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        tabSelected(viewRadio1);
+                        tvTitle.setText("生产入库--生产订单");
+                        viewPager.setCurrentItem(0, false);
+
+                        break;
+                    case 1:
+                        tabSelected(viewRadio2);
+                        tvTitle.setText("生产入库--箱码");
+                        viewPager.setCurrentItem(1, false);
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void bundle() {
@@ -117,7 +158,7 @@ public class Pur_InFragmentsActivity extends BaseActivity {
         curRadio = v;
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -133,7 +174,7 @@ public class Pur_InFragmentsActivity extends BaseActivity {
                     build.setPositiveButton("是", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                        context.finish();
+                            context.finish();
                         }
                     });
                     build.setNegativeButton("否", null);
@@ -145,25 +186,19 @@ public class Pur_InFragmentsActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印
-                show(PrintFragmentsActivity.class,null);
+                show(PrintMainActivity.class,null);
 
                 break;
             case R.id.lin_tab1:
                 tabSelected(viewRadio1);
-                tvTitle.setText("物料入库");
+                tvTitle.setText("生产入库--生产订单");
                 viewPager.setCurrentItem(0, false);
 
                 break;
             case R.id.lin_tab2:
                 tabSelected(viewRadio2);
-                tvTitle.setText("采购订单入库");
+                tvTitle.setText("生产入库--箱码");
                 viewPager.setCurrentItem(1, false);
-
-                break;
-            case R.id.lin_tab3:
-                tabSelected(viewRadio3);
-                tvTitle.setText("收料订单入库");
-                viewPager.setCurrentItem(2, false);
 
                 break;
         }

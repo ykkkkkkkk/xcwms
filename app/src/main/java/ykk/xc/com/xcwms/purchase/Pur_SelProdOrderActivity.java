@@ -86,7 +86,6 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
                         } else if (m.isLoadMore) {
                             m.xRecyclerView.loadMoreComplete(true);
                         }
-
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;

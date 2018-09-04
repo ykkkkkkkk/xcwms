@@ -36,7 +36,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Box_DialogActivity;
 import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
@@ -48,9 +48,7 @@ import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
-import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
-import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_RecombinationAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -230,7 +228,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印条码界面
-                show(PrintFragmentsActivity.class, null);
+                show(PrintMainActivity.class, null);
 
                 break;
             case R.id.tv_custSel: // 选择客户

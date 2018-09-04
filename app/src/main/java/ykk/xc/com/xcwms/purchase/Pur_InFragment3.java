@@ -123,7 +123,7 @@ public class Pur_InFragment3 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private Activity mContext;
-    private Pur_InFragmentsActivity parent;
+    private Pur_InMainActivity parent;
     private char defaultStockVal; // 默认仓库的值
 
     // 消息处理
@@ -268,7 +268,7 @@ public class Pur_InFragment3 extends BaseFragment {
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Pur_InFragmentsActivity) mContext;
+        parent = (Pur_InMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -834,6 +834,7 @@ public class Pur_InFragment3 extends BaseFragment {
             sr2.setMtlFnumber(p.getMtl().getfNumber());
             sr2.setUnitFnumber(p.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(p.getfId());
+            sr2.setEntryId(p.getEntryId());
             sr2.setPoFbillno(p.getFbillno());
             sr2.setPoFmustqty(p.getUsableFqty());
 
@@ -861,6 +862,7 @@ public class Pur_InFragment3 extends BaseFragment {
             sr2.setSupplierFnumber(supplier.getfNumber());
             if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
+                sr2.setDepartmentFnumber(department.getDepartmentNumber());
             }
             // 收料组织
             if(receiveOrg == null) receiveOrg = new Organization();

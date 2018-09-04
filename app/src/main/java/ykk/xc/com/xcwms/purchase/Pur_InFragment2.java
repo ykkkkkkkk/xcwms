@@ -123,7 +123,7 @@ public class Pur_InFragment2 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private Activity mContext;
-    private Pur_InFragmentsActivity parent;
+    private Pur_InMainActivity parent;
     private char defaultStockVal; // 默认仓库的值
 
     // 消息处理
@@ -267,7 +267,7 @@ public class Pur_InFragment2 extends BaseFragment {
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Pur_InFragmentsActivity) mContext;
+        parent = (Pur_InMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -825,7 +825,6 @@ public class Pur_InFragment2 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             PurOrder p = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
-            sr2.setType(1);
             sr2.setSourceFinterId(p.getfId());
             sr2.setSourceFnumber(p.getFbillno());
             sr2.setFitemId(p.getMtl().getfMaterialId());
@@ -833,6 +832,7 @@ public class Pur_InFragment2 extends BaseFragment {
             sr2.setMtlFnumber(p.getMtl().getfNumber());
             sr2.setUnitFnumber(p.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(p.getfId());
+            sr2.setEntryId(p.getEntryId());
             sr2.setPoFbillno(p.getFbillno());
             sr2.setPoFmustqty(p.getUsableFqty());
 
@@ -863,6 +863,7 @@ public class Pur_InFragment2 extends BaseFragment {
             sr2.setSupplierFnumber(supplier.getfNumber());
             if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
+                sr2.setDepartmentFnumber(department.getDepartmentNumber());
             }
             receiveOrg = p.getReceiveOrg();
             if(receiveOrg != null) { // 收料组织
@@ -1036,12 +1037,12 @@ public class Pur_InFragment2 extends BaseFragment {
             sr2.setEmpId(department.getFitemID());
             sr2.setDepartmentFnumber(department.getDepartmentNumber());
         }
-        sr2.setFqty(purOrder.getPoFqty());
+        sr2.setFqty(purOrder.getUsableFqty());
         sr2.setStockqty(0);
         sr2.setPoFid(purOrder.getfId());
         sr2.setEntryId(purOrder.getEntryId());
         sr2.setPoFbillno(purOrder.getFbillno());
-        sr2.setPoFmustqty(purOrder.getPoFqty());
+        sr2.setPoFmustqty(purOrder.getUsableFqty());
         sr2.setBarcode(bt.getBarcode());
 
         checkDatas.add(sr2);

@@ -87,7 +87,7 @@
             android:name=".basics.Material_ListActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".basics.PrintFragmentsActivity"
+            android:name=".basics.PrintMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
@@ -119,7 +119,7 @@
 
         <!-- 采购模块 -->
         <activity
-            android:name=".purchase.Pur_InFragmentsActivity"
+            android:name=".purchase.Pur_InMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
         android:name=".purchase.Pur_SelOrderActivity"
@@ -132,13 +132,16 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
-            android:name=".purchase.Pur_ProdBoxFragmentsActivity"
+            android:name=".purchase.Pur_ProdBoxMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Pur_SelProdOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".purchase.Prod_InActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".purchase.Prod_InMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
 

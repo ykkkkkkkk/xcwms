@@ -2,6 +2,7 @@ package ykk.xc.com.xcwms.purchase;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -13,13 +14,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
 
-public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
+public class Pur_ProdBoxMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View radio1;
@@ -33,13 +34,13 @@ public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
     MyViewPager viewPager;
     @BindView(R.id.tv_title)
     TextView tvTitle;
-    private Pur_ProdBoxFragmentsActivity context = this;
+    private Pur_ProdBoxMainActivity context = this;
     private View curRadio;
 //    private Customer customer; // 客户
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_prod_box;
+        return R.layout.pur_prod_box_main;
     }
 
     @Override
@@ -53,14 +54,13 @@ public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
-        Pur_ProdBoxFragment1 fragment1 = new Pur_ProdBoxFragment1();
 //        fragment1.setArguments(bundle2); // 传参数
+        Pur_ProdBoxFragment1 fragment1 = new Pur_ProdBoxFragment1();
         Pur_ProdBoxFragment2 fragment2 = new Pur_ProdBoxFragment2();
-//        fragment2.setArguments(bundle2); // 传参数
 
-        listFragment.add(fragment2);
         listFragment.add(fragment1);
-        viewPager.setScanScroll(false); // 禁止左右滑动
+        listFragment.add(fragment2);
+//        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
@@ -68,33 +68,35 @@ public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
 
 
         //ViewPager页面切换监听
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                switch (position) {
-//                    case 0:
-//                        tabSelected(radio1);
-//                        tvTitle.setText("生产装箱-批量");
-//                        viewPager.setCurrentItem(0, false);
-//                        break;
-//                    case 1:
-//                        tabSelected(radio2);
-//                        tvTitle.setText("生产装箱-非批量");
-//                        viewPager.setCurrentItem(1, false);
-//                        break;
-//                }
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        tabSelected(radio1);
+                        tvTitle.setText("生产装箱-非批量");
+                        viewPager.setCurrentItem(0, false);
+
+                        break;
+                    case 1:
+                        tabSelected(radio2);
+                        tvTitle.setText("生产装箱-批量");
+                        viewPager.setCurrentItem(1, false);
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void bundle() {
@@ -125,13 +127,7 @@ public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印
-                show(PrintFragmentsActivity.class,null);
-
-                break;
-            case R.id.lin_tab2:
-                tabSelected(radio2);
-                tvTitle.setText("生产装箱-批量");
-                viewPager.setCurrentItem(1, false);
+                show(PrintMainActivity.class,null);
 
                 break;
             case R.id.lin_tab1:
@@ -140,6 +136,13 @@ public class Pur_ProdBoxFragmentsActivity extends BaseActivity {
                 viewPager.setCurrentItem(0, false);
 
                 break;
+            case R.id.lin_tab2:
+                tabSelected(radio2);
+                tvTitle.setText("生产装箱-批量");
+                viewPager.setCurrentItem(1, false);
+
+                break;
+
         }
     }
 

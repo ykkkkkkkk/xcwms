@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
-import ykk.xc.com.xcwms.purchase.Prod_InActivity;
-import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentsActivity;
+import ykk.xc.com.xcwms.purchase.Prod_InMainActivity;
+import ykk.xc.com.xcwms.purchase.Pur_ProdBoxMainActivity;
 
 public class MainTabFragment2 extends BaseFragment {
 
@@ -25,11 +25,11 @@ public class MainTabFragment2 extends BaseFragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.relative1: // 生产装箱
-                show(Pur_ProdBoxFragmentsActivity.class, null);
+                show(Pur_ProdBoxMainActivity.class, null);
 
                 break;
             case R.id.relative2: // 生产入库
-                show(Prod_InActivity.class,null);
+                show(Prod_InMainActivity.class,null);
 
                 break;
             case R.id.relative3: //

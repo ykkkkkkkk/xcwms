@@ -13,9 +13,9 @@ import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.purchase.Prod_InActivity;
-import ykk.xc.com.xcwms.purchase.Pur_InFragmentsActivity;
+import ykk.xc.com.xcwms.purchase.Pur_InMainActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
-import ykk.xc.com.xcwms.purchase.Pur_ProdBoxFragmentsActivity;
+import ykk.xc.com.xcwms.purchase.Pur_ProdBoxMainActivity;
 
 public class MainTabFragment1 extends BaseFragment {
 
@@ -51,16 +51,15 @@ public class MainTabFragment1 extends BaseFragment {
 
                 break;
             case R.id.relative2: // 采购入库
-//                show(Pur_InActivity.class, null);
-                show(Pur_InFragmentsActivity.class, null);
+                show(Pur_InMainActivity.class, null);
 
                 break;
             case R.id.relative3: // 生产入库
-                show(Prod_InActivity.class,null);
+//                show(Prod_InActivity.class,null);
 
                 break;
             case R.id.relative4: // 生产装箱
-                show(Pur_ProdBoxFragmentsActivity.class, null);
+//                show(Pur_ProdBoxMainActivity.class, null);
 
                 break;
         }

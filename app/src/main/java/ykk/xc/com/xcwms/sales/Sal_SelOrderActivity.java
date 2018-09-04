@@ -91,7 +91,6 @@ public class Sal_SelOrderActivity extends BaseActivity implements XRecyclerView.
                         } else if (m.isLoadMore) {
                             m.xRecyclerView.loadMoreComplete(true);
                         }
-
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;

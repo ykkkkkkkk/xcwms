@@ -88,7 +88,6 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
                         } else if (m.isLoadMore) {
                             m.xRecyclerView.loadMoreComplete(true);
                         }
-
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;

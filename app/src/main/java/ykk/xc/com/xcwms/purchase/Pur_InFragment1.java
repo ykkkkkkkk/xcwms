@@ -118,7 +118,7 @@ public class Pur_InFragment1 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private Activity mContext;
-    private Pur_InFragmentsActivity parent;
+    private Pur_InMainActivity parent;
     private char defaultStockVal; // 默认仓库的值
 
     // 消息处理
@@ -250,7 +250,7 @@ public class Pur_InFragment1 extends BaseFragment {
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Pur_InFragmentsActivity) mContext;
+        parent = (Pur_InMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));

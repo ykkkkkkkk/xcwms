@@ -2,7 +2,6 @@ package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
@@ -55,7 +54,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     private int caseId = 34; // （34：生产订单）
     private String barcode; // 对应的条码号
     private Activity mContext;
-    private PrintFragmentsActivity parent;
+    private PrintMainActivity parent;
     private BarCodeTable bt;
     private ProdOrder prodOrder;
     private int tabFormat = 1;
@@ -97,7 +96,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        parent = (PrintFragmentsActivity) context;
+        parent = (PrintMainActivity) context;
         parent.setFragmentKeyeventListener(this);
     }
 
@@ -117,7 +116,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (PrintFragmentsActivity) mContext;
+        parent = (PrintMainActivity) mContext;
         curBtn = btnBig;
     }
 

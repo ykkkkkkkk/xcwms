@@ -1,8 +1,6 @@
 package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
-import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
@@ -54,7 +52,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private PrintFragment1Adapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Activity mContext;
-    private PrintFragmentsActivity parent;
+    private PrintMainActivity parent;
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
     private String barcode; // 保存条码的
@@ -108,7 +106,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (PrintFragmentsActivity) mContext;
+        parent = (PrintMainActivity) mContext;
 
         xRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));

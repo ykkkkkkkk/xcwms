@@ -20,7 +20,6 @@ import android.widget.TextView;
 import com.gprinter.command.EscCommand;
 import com.gprinter.command.LabelCommand;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -47,7 +46,7 @@ import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static ykk.xc.com.xcwms.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
-public class PrintFragmentsActivity extends BaseActivity {
+public class PrintMainActivity extends BaseActivity {
 
     @BindView(R.id.viewPager)
     MyViewPager viewPager;
@@ -57,7 +56,7 @@ public class PrintFragmentsActivity extends BaseActivity {
     TextView tv1;
     @BindView(R.id.tv_2)
     TextView tv2;
-    private PrintFragmentsActivity context = this;
+    private PrintMainActivity context = this;
     private static final String TAG = "PrintFragmentsActivity";
     private TextView curText;
     private IFragmentKeyeventListener fragment2Listener;
@@ -80,7 +79,7 @@ public class PrintFragmentsActivity extends BaseActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.ab_print_fragments;
+        return R.layout.ab_print_main;
     }
 
     @Override

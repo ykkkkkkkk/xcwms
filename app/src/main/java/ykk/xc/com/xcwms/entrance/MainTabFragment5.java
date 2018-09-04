@@ -36,7 +36,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.ActivityCollector;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
@@ -138,7 +138,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
 
                 break;
             case R.id.lin_item5: // 打印
-                show(PrintFragmentsActivity.class, null);
+                show(PrintMainActivity.class, null);
 
                 break;
             case R.id.lin_item6: // 退出

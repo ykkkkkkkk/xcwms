@@ -37,7 +37,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
-import ykk.xc.com.xcwms.basics.PrintFragmentsActivity;
+import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
@@ -293,7 +293,7 @@ public class Sal_PickingListActivity extends BaseActivity {
 
                 break;
             case R.id.btn_print: // 打印条码界面
-                show(PrintFragmentsActivity.class, null);
+                show(PrintMainActivity.class, null);
 
                 break;
             case R.id.btn_stock: // 选择仓库

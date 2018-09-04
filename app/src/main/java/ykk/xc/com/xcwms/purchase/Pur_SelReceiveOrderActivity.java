@@ -92,7 +92,6 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
                         } else if (m.isLoadMore) {
                             m.xRecyclerView.loadMoreComplete(true);
                         }
-
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;

@@ -91,7 +91,6 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                         } else if (m.isLoadMore) {
                             m.xRecyclerView.loadMoreComplete(true);
                         }
-
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
@@ -272,7 +271,7 @@ public class Pur_SelOrderActivity extends BaseActivity implements XRecyclerView.
                 isNextPage = JsonUtil.isNextPage(result, limit);
 
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Ware_Pur_OrderActivity --> onResponse", result);
+                Log.e("Pur_OrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
