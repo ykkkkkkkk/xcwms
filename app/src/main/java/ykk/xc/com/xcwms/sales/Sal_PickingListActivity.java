@@ -390,7 +390,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 return false;
             }
             if (pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
-                Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）不能大于（发货数）！");
+                Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）不能大于（订单数）！");
                 return false;
             }
             // 启用批次号
@@ -721,9 +721,9 @@ public class Sal_PickingListActivity extends BaseActivity {
                         }
                         pl.setBatchNo(bt.getBatchCode());
                         pl.setSnNo(bt.getSnCode());
-                    } else {
+                    } else if (pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                         // 数量已满
-                        Comm.showWarnDialog(context, "第" + (i + 1) + "行！，拣货数不能大于发货数！");
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行！，（拣货数）不能大于（订单数）！");
                         return;
                     }
                 } else {

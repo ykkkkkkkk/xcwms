@@ -22,7 +22,7 @@ public class Pur_ProdBoxFragment2Adapter extends BaseArrayRecyclerAdapter<Materi
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_prod_box_fragment1_item;
+        return R.layout.pur_prod_box_fragment2_item;
     }
 
     @Override

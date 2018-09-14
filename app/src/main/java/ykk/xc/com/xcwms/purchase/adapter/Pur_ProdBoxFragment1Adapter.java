@@ -1,6 +1,7 @@
 package ykk.xc.com.xcwms.purchase.adapter;
 
 import android.app.Activity;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,7 +25,7 @@ public class Pur_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<Materi
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_prod_box_fragment2_item;
+        return R.layout.pur_prod_box_fragment1_item;
     }
 
     @Override
@@ -33,26 +34,26 @@ public class Pur_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<Materi
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_mats = holder.obtainView(R.id.tv_mats);
         TextView tv_deliWay = holder.obtainView(R.id.tv_deliWay);
-        TextView tv_num = holder.obtainView(R.id.tv_num);
+        TextView tv_nums = holder.obtainView(R.id.tv_nums);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
         String deliWay = Comm.isNULLS(entity.getDeliveryWay());
         tv_deliWay.setText(deliWay);
         // 是否启用批次管理和序列号管理
-        tv_num.setText(df.format(entity.getNumber()));
+        tv_nums.setText(Html.fromHtml(df.format(entity.getRelationBillFQTY())+"<br><font color='#009900'>"+df.format(entity.getNumber())+"</font>"));
         if(entity.getMtl().getIsSnManager() == 1) {
-            tv_num.setBackgroundResource(R.drawable.back_style_gray2a);
-            tv_num.setEnabled(false);
+            tv_nums.setBackgroundResource(R.drawable.back_style_gray2a);
+            tv_nums.setEnabled(false);
         } else {
-            tv_num.setBackgroundResource(R.drawable.back_style_blue2);
-            tv_num.setEnabled(true);
+            tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
+            tv_nums.setEnabled(true);
         }
         View.OnClickListener click = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switch (v.getId()){
-                    case R.id.tv_num: // 数量
+                    case R.id.tv_nums: // 数量
                         if(callBack != null) {
                             callBack.onClick_num(v, entity, pos);
                         }
@@ -61,7 +62,7 @@ public class Pur_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<Materi
                 }
             }
         };
-        tv_num.setOnClickListener(click);
+        tv_nums.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {

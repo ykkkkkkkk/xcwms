@@ -317,6 +317,8 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
+                if(status == 2) return;
+
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getNumber()), "0", SEL_NUM);
             }
@@ -669,8 +671,12 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     if (bundle != null) {
                         String value = bundle.getString("resultValue", "");
                         double number = parseDouble(value);
-                        int id = listMbr.get(curPos).getId();
-
+                        MaterialBinningRecord mbr = listMbr.get(curPos);
+                        if(number > mbr.getRelationBillFQTY()) {
+                            Comm.showWarnDialog(mContext,"第"+(curPos+1)+"行装箱数不能大于订单数！");
+                            return;
+                        }
+                        int id = mbr.getId();
                         run_modifyNumber2(id, number);
                     }
                 }
@@ -780,7 +786,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 mtl2 = listMbr.get(0);
             }
 
-            // 得到销售订单
+            // 得到生产订单
             if(barCodeTable.getRelationObj() != null && barCodeTable.getRelationObj().length() > 0) {
                 // 判断来源单是否所属同一类型，销售订单，或者发货通知单
                 if(mtl2 != null && mtl2.getCaseId() != barCodeTable.getCaseId()) { // 是否为相同订单
@@ -826,6 +832,10 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     if(prodOrderNotnull && prodOrder.getfId() == forMtl.getRelationBillId() && prodOrder.getMtlId() == forMtl.getMaterialId()) {
                         if(forMtl.getMtl().getIsSnManager() == 0) {
                             tmpMtl = forMtl;
+                            if((tmpMtl.getNumber()+1) > tmpMtl.getRelationBillFQTY()) {
+                                Comm.showWarnDialog(mContext,"第"+(i+1)+"行装箱数不能大于订单数！");
+                                return;
+                            }
                         }
                     }  else {
                         if(binningType == '1') {
@@ -843,7 +853,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 tmpMtl.setMaterialId(barCodeTable.getMaterialId());
                 tmpMtl.setRelationBillId(barCodeTable.getRelationBillId());
                 tmpMtl.setRelationBillNumber(barCodeTable.getRelationBillNumber());
-                tmpMtl.setCustomerId(prodOrder.getCustId());
+                tmpMtl.setCustomerId(customer.getFcustId());
                 if(assist != null) {
                     tmpMtl.setDeliveryWay(assist.getfName());
                 }
