@@ -25,7 +25,7 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_prod_in_item;
+        return R.layout.pur_prod_in_fragment2_item;
     }
 
     @Override

@@ -12,10 +12,8 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
-import ykk.xc.com.xcwms.purchase.Prod_InActivity;
 import ykk.xc.com.xcwms.purchase.Pur_InMainActivity;
 import ykk.xc.com.xcwms.purchase.Pur_OrderSearchActivity;
-import ykk.xc.com.xcwms.purchase.Pur_ProdBoxMainActivity;
 
 public class MainTabFragment1 extends BaseFragment {
 

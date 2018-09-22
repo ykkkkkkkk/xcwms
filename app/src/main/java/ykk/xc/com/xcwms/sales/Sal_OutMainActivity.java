@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.sales;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,28 +23,26 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
-public class Pur_InMainActivity extends BaseActivity {
+public class Sal_OutMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
-    @BindView(R.id.viewRadio3)
-    View viewRadio3;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
     MyViewPager viewPager;
     @BindView(R.id.tv_title)
     TextView tvTitle;
-    private Pur_InMainActivity context = this;
+    private Sal_OutMainActivity context = this;
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
 //    private Customer customer; // 客户
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_in_main;
+        return R.layout.sal_out_main;
     }
 
     @Override
@@ -58,19 +58,16 @@ public class Pur_InMainActivity extends BaseActivity {
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Pur_InFragment1 fragment1 = new Pur_InFragment1();
-        Pur_InFragment2 fragment2 = new Pur_InFragment2();
-        Pur_InFragment3 fragment3 = new Pur_InFragment3();
+        Sal_OutFragment1 fragment1 = new Sal_OutFragment1();
+        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);
-        listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
         viewPager.setCurrentItem(0);
-
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -83,15 +80,11 @@ public class Pur_InMainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        tabChange(viewRadio1,"物料入库",0);
+                        tabChange(viewRadio1, "销售出库--销售订单", 0);
 
                         break;
                     case 1:
-                        tabChange(viewRadio2,"采购订单入库",1);
-
-                        break;
-                    case 2:
-                        tabChange(viewRadio3,"收料订单入库",2);
+                        tabChange(viewRadio2, "销售出库--箱码", 1);
 
                         break;
                 }
@@ -111,7 +104,7 @@ public class Pur_InMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -119,23 +112,23 @@ public class Pur_InMainActivity extends BaseActivity {
 
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
-                if(isChange) {
-                    AlertDialog.Builder build = new AlertDialog.Builder(context);
-                    build.setIcon(R.drawable.caution);
-                    build.setTitle("系统提示");
-                    build.setMessage("您有未保存的数据，继续关闭吗？");
-                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        context.finish();
-                        }
-                    });
-                    build.setNegativeButton("否", null);
-                    build.setCancelable(false);
-                    build.show();
-                } else {
+//                if(isChange) {
+//                    AlertDialog.Builder build = new AlertDialog.Builder(context);
+//                    build.setIcon(R.drawable.caution);
+//                    build.setTitle("系统提示");
+//                    build.setMessage("您有未保存的数据，继续关闭吗？");
+//                    build.setPositiveButton("是", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            context.finish();
+//                        }
+//                    });
+//                    build.setNegativeButton("否", null);
+//                    build.setCancelable(false);
+//                    build.show();
+//                } else {
                     context.finish();
-                }
+//                }
 
                 break;
             case R.id.btn_print: // 打印
@@ -143,15 +136,11 @@ public class Pur_InMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab1:
-                tabChange(viewRadio1,"物料入库",0);
+                tabChange(viewRadio1, "销售出库--销售订单", 0);
 
                 break;
             case R.id.lin_tab2:
-                tabChange(viewRadio2,"采购订单入库",1);
-
-                break;
-            case R.id.lin_tab3:
-                tabChange(viewRadio3,"收料订单入库",2);
+                tabChange(viewRadio2, "销售出库--箱码", 1);
 
                 break;
         }
@@ -188,4 +177,5 @@ public class Pur_InMainActivity extends BaseActivity {
         }
         return false;
     }
+
 }

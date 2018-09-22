@@ -332,6 +332,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         hideSoftInputMode(mContext, etMtlCode);
         getUserInfo();
     }
+
     private void initDataSon(boolean enable) {
         if(enable) {
             setEnables(etMtlCode, R.drawable.back_style_blue, true);

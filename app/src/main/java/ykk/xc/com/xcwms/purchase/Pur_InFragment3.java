@@ -1169,6 +1169,12 @@ public class Pur_InFragment3 extends BaseFragment {
             record.setCreateUserId(user.getId());
             record.setCreateUserName(user.getUsername());
             record.setK3UserFnumber(user.getKdUserNumber());
+            record.setSourceType('3');
+//            record.setTempId(ism.getId());
+//            record.setRelationObj(JsonUtil.objectToString(ism));
+            record.setFsrcBillTypeId("PUR_ReceiveBill");
+            record.setfRuleId("PUR_ReceiveBill-STK_InStock");
+            record.setFsTableName("T_PUR_ReceiveEntry");
 
             list.add(record);
         }

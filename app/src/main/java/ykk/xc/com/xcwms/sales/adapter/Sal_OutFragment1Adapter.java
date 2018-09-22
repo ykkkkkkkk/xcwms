@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase.adapter;
+package ykk.xc.com.xcwms.sales.adapter;
 
 import android.app.Activity;
 import android.text.Html;
@@ -13,19 +13,19 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
+public class Sal_OutFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Pur_InAdapter(Activity context, List<ScanningRecord2> datas) {
+    public Sal_OutFragment1Adapter(Activity context, List<ScanningRecord2> datas) {
         super(datas);
         this.context = context;
     }
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_in_item;
+        return R.layout.sal_out_fragment1_item;
     }
 
     @Override
@@ -54,9 +54,12 @@ public class Pur_InAdapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
         seqNo = seqNo.length() == 0 ? "无" : seqNo;
         tv_batch_seqNo.setText(batchNo+"\n"+seqNo);
         double stockqty = entity.getStockqty();
-//        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+(stockqty > 0 ? df.format(stockqty) : "")+"</font>"));
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
-        tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPName());
+        if(entity.getStockPos() != null) {
+            tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPos().getFnumber());
+        } else {
+            tv_stockAP.setText(entity.getStock().getfName());
+        }
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override

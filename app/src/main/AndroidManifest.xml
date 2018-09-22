@@ -138,16 +138,16 @@
             android:name=".purchase.Pur_SelProdOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Prod_InActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity
             android:name=".purchase.Prod_InMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
 
         <!-- 销售模块 -->
         <activity
-            android:name=".sales.Sal_OutActivity"
+        android:name=".sales.Sal_OutActivity"
+        android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Sal_OutMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_SelOrderActivity"

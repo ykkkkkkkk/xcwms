@@ -57,7 +57,6 @@ import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Prod_InAdapter;
 import ykk.xc.com.xcwms.purchase.adapter.Prod_InFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -252,7 +251,12 @@ public class Prod_InFragment2 extends BaseFragment {
         hideSoftInputMode(mContext, etStockPos);
         getUserInfo();
         tvProdDate.setText(Comm.getSysDate(7));
-        setFocusable(etMatNo); // 物料代码获取焦点
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setFocusable(etMatNo); // 物料代码获取焦点
+            }
+        },200);
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);

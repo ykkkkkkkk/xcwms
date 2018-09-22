@@ -248,7 +248,12 @@ public class Prod_InFragment1 extends BaseFragment {
         hideSoftInputMode(mContext, etStockPos);
         getUserInfo();
         tvProdDate.setText(Comm.getSysDate(7));
-        setFocusable(etMatNo); // 物料代码获取焦点
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setFocusable(etMatNo); // 物料代码获取焦点
+            }
+        },200);
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
@@ -876,6 +881,12 @@ public class Prod_InFragment1 extends BaseFragment {
             record.setCreateUserId(user.getId());
             record.setCreateUserName(user.getUsername());
             record.setK3UserFnumber(user.getKdUserNumber());
+            record.setSourceType('4');
+//            record.setTempId(ism.getId());
+//            record.setRelationObj(JsonUtil.objectToString(ism));
+//            record.setFsrcBillTypeId("PUR_PurchaseOrder");
+//            record.setfRuleId("PUR_PurchaseOrder-STK_InStock");
+//            record.setFsTableName("T_PUR_POOrderEntry");
 
             list.add(record);
         }

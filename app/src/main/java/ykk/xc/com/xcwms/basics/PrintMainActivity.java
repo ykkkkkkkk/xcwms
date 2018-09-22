@@ -113,12 +113,10 @@ public class PrintMainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        tabSelected(tv1);
-                        viewPager.setCurrentItem(0, false);
+                        tabChange(tv1,0);
                         break;
                     case 1:
-                        tabSelected(tv2);
-                        viewPager.setCurrentItem(1, false);
+                        tabChange(tv2,1);
                         break;
                 }
             }
@@ -137,6 +135,28 @@ public class PrintMainActivity extends BaseActivity {
         }
     }
 
+    @OnClick({R.id.btn_close, R.id.tv_1, R.id.tv_2})
+    public void onViewClicked(View view) {
+        // setCurrentItem第二个参数控制页面切换动画
+        //  true:打开/false:关闭
+        //  viewPager.setCurrentItem(0, false);
+
+        switch (view.getId()) {
+            case R.id.btn_close: // 关闭
+                context.finish();
+
+                break;
+            case R.id.tv_1: // 物料
+                tabChange(tv1,0);
+
+                break;
+            case R.id.tv_2: // 扫码打印
+                tabChange(tv2,1);
+
+                break;
+        }
+    }
+
     /**
      * 选中之后改变样式
      */
@@ -151,28 +171,9 @@ public class PrintMainActivity extends BaseActivity {
         curText = tv;
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_1, R.id.tv_2})
-    public void onViewClicked(View view) {
-        // setCurrentItem第二个参数控制页面切换动画
-        //  true:打开/false:关闭
-        //  viewPager.setCurrentItem(0, false);
-
-        switch (view.getId()) {
-            case R.id.btn_close: // 关闭
-                context.finish();
-
-                break;
-            case R.id.tv_1: // 物料
-                tabSelected(tv1);
-                viewPager.setCurrentItem(0, false);
-
-                break;
-            case R.id.tv_2: // 扫码打印
-                tabSelected(tv2);
-                viewPager.setCurrentItem(1, false);
-
-                break;
-        }
+    private void tabChange(TextView tv, int page) {
+        tabSelected(tv);
+        viewPager.setCurrentItem(page, false);
     }
 
     /**

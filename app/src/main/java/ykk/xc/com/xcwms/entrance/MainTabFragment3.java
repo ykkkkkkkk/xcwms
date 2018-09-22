@@ -15,6 +15,7 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.sales.Sal_BoxActivity;
 import ykk.xc.com.xcwms.sales.Sal_OrderSearchActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutActivity;
+import ykk.xc.com.xcwms.sales.Sal_OutMainActivity;
 import ykk.xc.com.xcwms.sales.Sal_PickingListActivity;
 import ykk.xc.com.xcwms.sales.Sal_RecombinationActivity;
 
@@ -78,7 +79,7 @@ public class MainTabFragment3 extends BaseFragment {
 
                 break;
             case R.id.relative2: // 销售出库
-                show(Sal_OutActivity.class, null);
+                show(Sal_OutMainActivity.class, null);
 
                 break;
             case R.id.relative3: // 单据下推
