@@ -89,12 +89,10 @@
         <activity
             android:name=".basics.PrintMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-
         <activity
             android:name=".basics.PublicInputDialog"
             android:theme="@style/dialogStyle"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-
         <activity
             android:name=".basics.PublicInputDialog2"
             android:theme="@style/dialogStyle"
@@ -109,6 +107,10 @@
             android:theme="@style/dialogStyle" />
         <activity
             android:name=".basics.Box_DialogActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:theme="@style/dialogStyle" />
+        <activity
+            android:name=".basics.Express_DialogActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/dialogStyle" />
 

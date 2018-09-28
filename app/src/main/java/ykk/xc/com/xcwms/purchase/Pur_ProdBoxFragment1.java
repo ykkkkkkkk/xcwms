@@ -102,9 +102,9 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
     private Pur_ProdBoxFragment1 mFragment = this;
     private Activity mContext;
-    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14;
+    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, RESET = 15;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
-    private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
+    private static final int CODE1 = 1, CODE2 = 2;
     private Customer customer; // 客户
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
@@ -120,7 +120,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     private CheckBox checkClose;
     private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
     private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
-    private char binningType = '1'; // 1.单色装，2.混色装
+    private char binningType = '2'; // 1.单色装，2.混色装
     private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
 
@@ -149,6 +149,10 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 break;
                             case '2': // 物料扫码   返回
                                 BarCodeTable barCodeTable = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
+                                if(!barCodeTable.getIsLocalCust()) {
+                                    Comm.showWarnDialog(m.mContext,"客户信息未同步，请前往PC端同步！");
+                                    return;
+                                }
                                 // 是否启用序列号，是否装过箱
                                 if(barCodeTable.getMtl() != null && barCodeTable.getMbr() != null && barCodeTable.getMtl().getIsSnManager() > 0 && barCodeTable.getMbr().getId() > 0) {
                                     m.setTexts(m.etMtlCode, m.strMtlBarcode);
@@ -168,7 +172,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
                         break;
                     case UNSUCC1:
-                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
+                        m.mHandler.sendEmptyMessageDelayed(RESET, 200);
                         Comm.showWarnDialog(m.mContext, "很抱歉，没能找到数据！");
 
 
@@ -183,7 +187,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
                         break;
                     case UNSAVE: // 扫描后的保存 失败
-                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
+                        m.mHandler.sendEmptyMessageDelayed(RESET, 200);
                         m.mAdapter.notifyDataSetChanged();
                         Comm.showWarnDialog(m.mContext,"保存到装箱失败，请检查！");
 
@@ -281,7 +285,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         m.setFocusable(m.etMtlCode2);
 
                         break;
-                    case CODE60: // 没有得到数据，就把回车的去掉，恢复正常数据
+                    case RESET: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
                             case '1': // 箱码扫码
                                 m.setTexts(m.etBoxCode, m.strBoxBarcode);
@@ -536,7 +540,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             isCloseDelDialog = true;
         } else {
             isCloseDelDialog = false;
-            mHandler.sendEmptyMessageDelayed(CODE60, 200);
+            mHandler.sendEmptyMessageDelayed(RESET, 200);
         }
     }
 
@@ -560,6 +564,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 } else {
                                     strBoxBarcode = boxCode.replace("\n", "");
                                 }
+                                mHandler.sendEmptyMessage(RESET);
                                 curViewFlag = '1';
                                 // 执行查询方法
                                 run_smGetDatas();
@@ -569,11 +574,11 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         case R.id.et_mtlCode: // 物料
                             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                                 String mtlCode = getValues(etMtlCode).trim();
-                                if (!smMtlBefore()) {
-                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                    return false;
-                                }
                                 if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                                    if (!smMtlBefore()) {
+                                        mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                        return false;
+                                    }
                                     if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
                                         if (strMtlBarcode.equals(mtlCode)) {
                                             strMtlBarcode = mtlCode;
@@ -584,6 +589,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                     } else {
                                         strMtlBarcode = mtlCode.replace("\n", "");
                                     }
+                                    mHandler.sendEmptyMessage(RESET);
                                     curViewFlag = '2';
                                     // 执行查询方法
                                     run_smGetDatas();
@@ -692,7 +698,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     private void getBox() {
         if(boxBarCode != null) {
             listMbr.clear();
-            setTexts(etBoxCode, strBoxBarcode);
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
                 linBox.setVisibility(View.VISIBLE);
@@ -773,7 +778,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
      */
     private void getBarCodeTable2(BarCodeTable barCodeTable) {
         if (barCodeTable != null) {
-            setTexts(etMtlCode, strMtlBarcode);
             int size = listMbr.size();
             tvCount.setText("物料数量："+size);
             getUserInfo();
@@ -894,8 +898,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
      */
     private void getBarCodeTable_delete(BarCodeTable barCodeTable) {
         if (barCodeTable != null) {
-            setTexts(etMtlCode, strMtlBarcode);
-
             int size = listMbr.size();
             MaterialBinningRecord tmpMtl = null;
             // 已装箱的物料

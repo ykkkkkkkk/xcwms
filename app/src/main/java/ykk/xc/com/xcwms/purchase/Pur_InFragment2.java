@@ -556,11 +556,11 @@ public class Pur_InFragment2 extends BaseFragment {
                             break;
                         case R.id.et_sourceNo: // 来源单号
                             String sourceNo = getValues(etSourceNo).trim();
-                            if (!smBefore('0')) { // 扫码之前的判断
-                                mHandler.sendEmptyMessageDelayed(CLEAR1, 200);
-                                return false;
-                            }
                             if (isKeyDownEnter(sourceNo, keyCode)) {
+                                if (!smBefore('0')) { // 扫码之前的判断
+                                    mHandler.sendEmptyMessageDelayed(CLEAR1, 200);
+                                    return false;
+                                }
                                 if (sourceBarcode != null && sourceBarcode.length() > 0) {
                                     String tmp = sourceNo.replaceFirst(sourceBarcode, "");
                                     sourceBarcode = tmp.replace("\n", "");
@@ -575,12 +575,12 @@ public class Pur_InFragment2 extends BaseFragment {
                             break;
                         case R.id.et_mtlNo: // 物料
                             String matNo = getValues(etMtlNo).trim();
-                            if (checkDatas.size() == 0) { // 扫码之前的判断
-                                Comm.showWarnDialog(mContext, "请选择或扫描来源单！");
-                                mHandler.sendEmptyMessageDelayed(CLEAR2, 200);
-                                return false;
-                            }
                             if (isKeyDownEnter(matNo, keyCode)) {
+                                if (checkDatas.size() == 0) { // 扫码之前的判断
+                                    Comm.showWarnDialog(mContext, "请选择或扫描来源单！");
+                                    mHandler.sendEmptyMessageDelayed(CLEAR2, 200);
+                                    return false;
+                                }
                                 if (mtlBarcode != null && mtlBarcode.length() > 0) {
                                     if(mtlBarcode.equals(matNo)) {
                                         mtlBarcode = matNo;

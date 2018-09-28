@@ -258,6 +258,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
         // 条码号
         FormBody formBody = new FormBody.Builder()
 //                .add("caseId", String.valueOf(caseId))
+//                .add("createCodeStatus", "0")
                 .add("prodSeqNumber", barcode)
                 .build();
 

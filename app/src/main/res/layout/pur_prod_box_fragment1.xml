@@ -336,10 +336,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/btn_radio_left_selector"
                 android:button="@null"
-                android:checked="true"
+                android:checked="false"
                 android:gravity="center"
                 android:text="单色装"
-                android:textColor="@color/white"
+                android:textColor="@color/c_666666"
                 android:textSize="@dimen/_14sp" />
 
             <RadioButton
@@ -349,10 +349,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/btn_radio_right_selector"
                 android:button="@null"
-                android:checked="false"
+                android:checked="true"
                 android:gravity="center"
                 android:text="混色装"
-                android:textColor="@color/c_666666"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_14sp" />
 
         </RadioGroup>

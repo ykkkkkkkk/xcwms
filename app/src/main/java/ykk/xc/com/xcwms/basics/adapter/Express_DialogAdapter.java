@@ -6,16 +6,17 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.Customer;
+import ykk.xc.com.xcwms.model.ExpressCompany;
+import ykk.xc.com.xcwms.model.ExpressCompany;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Cust_DialogAdapter extends BaseArrayRecyclerAdapter<Customer> {
+public class Express_DialogAdapter extends BaseArrayRecyclerAdapter<ExpressCompany> {
 
     private Activity context;
     private MyCallBack callBack;
-    private List<Customer> datas;
+    private List<ExpressCompany> datas;
 
-    public Cust_DialogAdapter(Activity context, List<Customer> datas) {
+    public Express_DialogAdapter(Activity context, List<ExpressCompany> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;
@@ -23,19 +24,19 @@ public class Cust_DialogAdapter extends BaseArrayRecyclerAdapter<Customer> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.ab_cust_dialog_item;
+        return R.layout.ab_express_dialog_item;
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, Customer entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, ExpressCompany entity, final int pos) {
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
         TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
         TextView tv_fname = holder.obtainView(R.id.tv_fname);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
-        tv_fnumber.setText(entity.getCustomerCode());
-        tv_fname.setText(entity.getCustomerName());
+        tv_fnumber.setText(entity.getExpressNumber());
+        tv_fname.setText(entity.getExpressName());
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -43,7 +44,7 @@ public class Cust_DialogAdapter extends BaseArrayRecyclerAdapter<Customer> {
     }
 
     public interface MyCallBack {
-        void onClick(Customer entity, int position);
+        void onClick(ExpressCompany entity, int position);
     }
 
 

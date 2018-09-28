@@ -233,11 +233,11 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
                         case R.id.et_boxCode: // 箱子的防伪码
 
                             String mtlCode = getValues(etBoxCode).trim();
-                            if (!smBefore()) {
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                return false;
-                            }
                             if (isKeyDownEnter(mtlCode, event, keyCode)) {
+                                if (!smBefore()) {
+                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                    return false;
+                                }
                                 if (strBarcode != null && strBarcode.length() > 0) {
                                     if (strBarcode.equals(mtlCode)) {
                                         strBarcode = mtlCode;

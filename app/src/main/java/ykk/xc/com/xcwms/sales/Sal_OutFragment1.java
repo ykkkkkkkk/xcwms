@@ -119,7 +119,6 @@ public class Sal_OutFragment1 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private char defaultStockVal; // 默认仓库的值
-    private int codes, unCodes;
     private Activity mContext;
     private Sal_OutMainActivity parent;
 
@@ -495,7 +494,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                     switch (v.getId()) {
                         case R.id.et_stock: // 仓库
                             String whName = getValues(etStock).trim();
-                            if (isKeyDownEnter(whName, event, keyCode)) {
+                            if (isKeyDownEnter(whName, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
                                     if (stockBarcode.equals(whName)) {
                                         stockBarcode = whName;
@@ -514,7 +513,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                             break;
                         case R.id.et_stockPos: // 库位
                             String whPos = getValues(etStockPos).trim();
-                            if (isKeyDownEnter(whPos, event, keyCode)) {
+                            if (isKeyDownEnter(whPos, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
                                     if (stockPBarcode.equals(whPos)) {
                                         stockPBarcode = whPos;
@@ -533,7 +532,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                             break;
                         case R.id.et_matNo: // 物料
                             String matNo = getValues(etMatNo).trim();
-                            if (isKeyDownEnter(matNo, event, keyCode)) {
+                            if (isKeyDownEnter(matNo, keyCode)) {
                                 if (mtlBarcode != null && mtlBarcode.length() > 0) {
                                     if (mtlBarcode.equals(matNo)) {
                                         mtlBarcode = matNo;
@@ -563,7 +562,7 @@ public class Sal_OutFragment1 extends BaseFragment {
     /**
      * 是否按了回车键
      */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
+    private boolean isKeyDownEnter(String val, int keyCode) {
         if (keyCode == KeyEvent.KEYCODE_ENTER) {
             if (val.length() == 0) {
                 Comm.showWarnDialog(mContext, "请扫码条码！");
@@ -989,6 +988,12 @@ public class Sal_OutFragment1 extends BaseFragment {
             record.setCreateUserId(user.getId());
             record.setCreateUserName(user.getUsername());
             record.setK3UserFnumber(user.getKdUserNumber());
+            record.setSourceType('5');
+//            record.setTempId(ism.getId());
+//            record.setRelationObj(JsonUtil.objectToString(ism));
+            record.setFsrcBillTypeId("SAL_SALEORDER");
+            record.setfRuleId("SAL_SALEORDER-SAL_OUTSTOCK");
+            record.setFsTableName("T_SAL_ORDERENTRY");
 
             list.add(record);
         }
@@ -1109,8 +1114,6 @@ public class Sal_OutFragment1 extends BaseFragment {
             }
         }
         String mUrl = null;
-        codes = SUCC3B;
-        unCodes = UNSUCC3B;
         mUrl = Consts.getURL("findMatIsExistList3");
         FormBody formBody = new FormBody.Builder()
                 .add("orderType", "XS") // 单据类型CG代表采购订单，XS销售订单,生产PD
@@ -1129,7 +1132,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(unCodes);
+                mHandler.sendEmptyMessage(UNSUCC3B);
             }
 
             @Override
@@ -1137,10 +1140,10 @@ public class Sal_OutFragment1 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(unCodes);
+                    mHandler.sendEmptyMessage(UNSUCC3B);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(codes, result);
+                Message msg = mHandler.obtainMessage(SUCC3B, result);
                 Log.e("run_findMatIsExistList2 --> onResponse", result);
                 mHandler.sendMessage(msg);
             }

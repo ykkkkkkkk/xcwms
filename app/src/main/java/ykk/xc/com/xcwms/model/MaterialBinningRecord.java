@@ -65,6 +65,8 @@ public class MaterialBinningRecord implements Serializable {
 	 * 33代表发货通知单
 	 * 34代表生产任务单
 	 * 35代码采购装箱
+	 * 36代表采购收料通知单
+	 * 37代表复核单
 	 */
 	private int caseId;
 	/* 创建日期  */

@@ -38,6 +38,7 @@ public class Sal_OutMainActivity extends BaseActivity {
     private Sal_OutMainActivity context = this;
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
+    public boolean isKeyboard; // 是否使用软键盘
 //    private Customer customer; // 客户
 
     @Override
@@ -164,7 +165,7 @@ public class Sal_OutMainActivity extends BaseActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // 按了删除键，回退键
-        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+        if(!isKeyboard && (event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL)) {
             return false;
         }
         return super.dispatchKeyEvent(event);

@@ -36,6 +36,12 @@ public class DeliOrder implements Serializable{
 	/*对应k3单据分录号字段*/
 	private int entryId;
 	private int isCheck; // 新加的是否选中
+	private String salOrderNo; // 销售订单号
+	private Integer salOrderEntryId;//销售订单分录entryId
+	private String billCloseStatus;//发货通知单单据头关闭状态 ( A:未关闭 B:已关闭 )
+	private String entryCloseStatus;//发货通知单单据体关闭状态 ( A:未关闭 B:已关闭 )
+	// 临时使用的字段
+	private double number;
 
 	public DeliOrder() {
 		super();
@@ -225,15 +231,43 @@ public class DeliOrder implements Serializable{
 		this.isCheck = isCheck;
 	}
 
-	@Override
-	public String toString() {
-		return "DeliOrder [fId=" + fId + ", fbillno=" + fbillno + ", deliDate=" + deliDate + ", custId=" + custId
-				+ ", custNumber=" + custNumber + ", custName=" + custName + ", deliOrgId=" + deliOrgId
-				+ ", deliOrgNumber=" + deliOrgNumber + ", deliOrgName=" + deliOrgName + ", deliOrg=" + deliOrg
-				+ ", mtlId=" + mtlId + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname
-				+ ", mtlUnitName=" + mtlUnitName + ", stockId=" + stockId + ", stockName=" + stockName + ", stock="
-				+ stock + ", deliFqty=" + deliFqty + ", deliFremainoutqty=" + deliFremainoutqty + ", deliveryWay="
-				+ deliveryWay + ", entryId=" + entryId + ", isCheck=" + isCheck + "]";
+	public String getSalOrderNo() {
+		return salOrderNo;
 	}
 
+	public void setSalOrderNo(String salOrderNo) {
+		this.salOrderNo = salOrderNo;
+	}
+
+	public Integer getSalOrderEntryId() {
+		return salOrderEntryId;
+	}
+
+	public void setSalOrderEntryId(Integer salOrderEntryId) {
+		this.salOrderEntryId = salOrderEntryId;
+	}
+
+	public double getNumber() {
+		return number;
+	}
+
+	public void setNumber(double number) {
+		this.number = number;
+	}
+
+	public String getBillCloseStatus() {
+		return billCloseStatus;
+	}
+
+	public void setBillCloseStatus(String billCloseStatus) {
+		this.billCloseStatus = billCloseStatus;
+	}
+
+	public String getEntryCloseStatus() {
+		return entryCloseStatus;
+	}
+
+	public void setEntryCloseStatus(String entryCloseStatus) {
+		this.entryCloseStatus = entryCloseStatus;
+	}
 }

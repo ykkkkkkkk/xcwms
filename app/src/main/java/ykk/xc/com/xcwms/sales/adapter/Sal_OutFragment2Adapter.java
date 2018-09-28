@@ -36,7 +36,6 @@ public class Sal_OutFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
         TextView tv_batch_seqNo = holder.obtainView(R.id.tv_batch_seqNo);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
-        TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName()+"\n"+entity.getMtl().getMaterialSize());
@@ -71,17 +70,10 @@ public class Sal_OutFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
                         }
 
                         break;
-                    case R.id.tv_delRow: // 删除行
-                        if(callBack != null) {
-                            callBack.onClick_del(entity, pos);
-                        }
-
-                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
-        tv_delRow.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {

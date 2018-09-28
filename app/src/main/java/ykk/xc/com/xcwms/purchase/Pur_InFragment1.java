@@ -543,11 +543,11 @@ public class Pur_InFragment1 extends BaseFragment {
                             break;
                         case R.id.et_mtlNo: // 物料
                             String matNo = getValues(etMtlNo).trim();
-                            if (!smBefore('0')) { // 扫码之前的判断
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                return false;
-                            }
                             if (isKeyDownEnter(matNo, keyCode)) {
+                                if (!smBefore('0')) { // 扫码之前的判断
+                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                    return false;
+                                }
                                 if (mtlBarcode != null && mtlBarcode.length() > 0) {
                                     if(mtlBarcode.equals(matNo)) {
                                         mtlBarcode = matNo;
