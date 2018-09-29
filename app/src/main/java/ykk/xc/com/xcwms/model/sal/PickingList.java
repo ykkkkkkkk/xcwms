@@ -44,6 +44,7 @@ public class PickingList implements Serializable{
 	private String createDate;
 	/* 可用的数量(未存表)  */
 	private double usableFqty;
+	private char pickingType; // 拣货类型：1.拣货装箱，2.拣货装车
 	private int isCheck; // 新加的，用于前台临时用判断是否选中
 
 	public PickingList() {
@@ -330,19 +331,12 @@ public class PickingList implements Serializable{
 		this.usableFqty = usableFqty;
 	}
 
-	@Override
-	public String toString() {
-		return "PickingList [id=" + id + ", pickingListNo=" + pickingListNo + ", pickingListNum=" + pickingListNum
-				+ ", fId=" + fId + ", fbillno=" + fbillno + ", deliDate=" + deliDate + ", custId=" + custId
-				+ ", custNumber=" + custNumber + ", custName=" + custName + ", deliOrgId=" + deliOrgId
-				+ ", deliOrgNumber=" + deliOrgNumber + ", deliOrgName=" + deliOrgName + ", mtlId=" + mtlId + ", mtl="
-				+ mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlUnitName=" + mtlUnitName
-				+ ", stockId=" + stockId + ", stockNumber=" + stockNumber + ", stockName=" + stockName
-				+ ", stockPositionId=" + stockPositionId + ", stockPositionNumber=" + stockPositionNumber
-				+ ", stockPositionName=" + stockPositionName + ", deliFqty=" + deliFqty + ", deliFremainoutqty="
-				+ deliFremainoutqty + ", deliveryWay=" + deliveryWay + ", entryId=" + entryId + ", batchNo=" + batchNo
-				+ ", snNo=" + snNo + ", barcode=" + barcode + ", createUserId=" + createUserId + ", createUserName="
-				+ createUserName + ", createDate=" + createDate + ", usableFqty=" + usableFqty + ", isCheck=" + isCheck
-				+ "]";
+	public char getPickingType() {
+		return pickingType;
 	}
+
+	public void setPickingType(char pickingType) {
+		this.pickingType = pickingType;
+	}
+
 }

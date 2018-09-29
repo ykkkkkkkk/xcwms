@@ -36,8 +36,7 @@ public class Sal_PickingListAdapter extends BaseArrayRecyclerAdapter<PickingList
         TextView tv_mats = holder.obtainView(R.id.tv_mats);
 //        TextView tv_batch_seqNo = holder.obtainView(R.id.tv_batch_seqNo);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
-//        TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
-        TextView tv_delRow = holder.obtainView(R.id.tv_delRow);
+        TextView tv_stockAP = holder.obtainView(R.id.tv_stockAP);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
         tv_deliNo.setText(entity.getFbillno());
@@ -57,7 +56,11 @@ public class Sal_PickingListAdapter extends BaseArrayRecyclerAdapter<PickingList
 //        tv_batch_seqNo.setText(batchNo+"\n"+seqNo);
         double deliNum = entity.getDeliFremainoutqty();
         tv_nums.setText(Html.fromHtml(df.format(deliNum)+"<br><font color='#009900'>"+df.format(entity.getPickingListNum())+"</font>"));
-//        tv_stockAP.setText(entity.getStockName()+"\n"+entity.getStockPositionName());
+        if(entity.getStockPositionId() > 0) {
+            tv_stockAP.setText(entity.getStockName()+"\n"+entity.getStockPositionNumber());
+        } else {
+            tv_stockAP.setText(entity.getStockName());
+        }
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override
@@ -69,17 +72,10 @@ public class Sal_PickingListAdapter extends BaseArrayRecyclerAdapter<PickingList
                         }
 
                         break;
-                    case R.id.tv_delRow: // 删除行
-                        if(callBack != null) {
-                            callBack.onClick_del(entity, pos);
-                        }
-
-                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
-        tv_delRow.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -88,7 +84,6 @@ public class Sal_PickingListAdapter extends BaseArrayRecyclerAdapter<PickingList
 
     public interface MyCallBack {
         void onClick_num(View v, PickingList entity, int position);
-        void onClick_del(PickingList entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

@@ -3,6 +3,7 @@ package ykk.xc.com.xcwms.sales;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -79,6 +82,12 @@ public class Sal_PickingListActivity extends BaseActivity {
     TextView tvDeliverSel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.lin_stock)
+    LinearLayout linStock;
+    @BindView(R.id.rb_type1)
+    RadioButton rbType1;
+    @BindView(R.id.rb_type2)
+    RadioButton rbType2;
 
     private Sal_PickingListActivity context = this;
     private static final int SEL_STOCK = 10, SEL_STOCKP = 11, SEL_DELI = 12;
@@ -97,6 +106,7 @@ public class Sal_PickingListActivity extends BaseActivity {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private char defaultStockVal; // 默认仓库的值
+    private char pickingType = '1'; // 拣货类型：1.拣货装箱，2.拣货装车
 
     // 消息处理
     private Sal_PickingListActivity.MyHandler mHandler = new Sal_PickingListActivity.MyHandler(this);
@@ -242,16 +252,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0", CODE2);
             }
-
-            @Override
-            public void onClick_del(PickingList entity, int position) {
-                Log.e("del", "行：" + position);
-                checkDatas.remove(position);
-                if(checkDatas.size() == 0) {
-                    getBarCodeTableAfter2(true);
-                }
-                mAdapter.notifyDataSetChanged();
-            }
         });
     }
 
@@ -283,7 +283,7 @@ public class Sal_PickingListActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone, R.id.rb_type1, R.id.rb_type2})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -347,7 +347,33 @@ public class Sal_PickingListActivity extends BaseActivity {
                 }
 
                 break;
+            case R.id.rb_type1: // 拣货类型--拣货装箱
+                pickingType = '1';
+                clickRadioChange();
+                for(int i=0; i<checkDatas.size(); i++) {
+                    checkDatas.get(i).setPickingType('1');
+                }
+                mAdapter.notifyDataSetChanged();
+
+                break;
+            case R.id.rb_type2: // 拣货类型--拣货装车
+                pickingType = '2';
+                clickRadioChange();
+                for(int i=0; i<checkDatas.size(); i++) {
+                    checkDatas.get(i).setPickingType('2');
+                }
+                mAdapter.notifyDataSetChanged();
+
+                break;
         }
+    }
+
+    /**
+     * 点击装箱类型后改变的
+     */
+    private void clickRadioChange() {
+        rbType1.setTextColor(Color.parseColor(rbType1.isChecked() ? "#FFFFFF" : "#666666"));
+        rbType2.setTextColor(Color.parseColor(rbType2.isChecked() ? "#FFFFFF" : "#666666"));
     }
 
     /**
@@ -558,7 +584,7 @@ public class Sal_PickingListActivity extends BaseActivity {
         // 清空物料信息
         etDeliCode.setText("");
         etMtlCode.setText(""); // 物料代码
-        tvCustSel.setText("");
+        tvCustSel.setText("客户：");
         cust = null;
         deliBarcode = null;
         mtlBarcode = null;
@@ -573,8 +599,12 @@ public class Sal_PickingListActivity extends BaseActivity {
         reset('0');
         etStock.setText("");
         etStockPos.setText("");
-        tvCustSel.setText("");
+        tvCustSel.setText("客户：");
         tvDeliverSel.setText("");
+        rbType1.setEnabled(true);
+        rbType2.setEnabled(true);
+        rbType1.setChecked(true);
+        pickingType = '1';
         stock = null;
         stockP = null;
         assist = null;
@@ -584,6 +614,7 @@ public class Sal_PickingListActivity extends BaseActivity {
         stockPBarcode = null;
         deliBarcode = null;
         mtlBarcode = null;
+
     }
 
     @Override
@@ -736,7 +767,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             }
         }
         if(!isFlag) {
-            Comm.showWarnDialog(context, "扫的物料在订单不存在！");
+            Comm.showWarnDialog(context, "该物料与订单不匹配！");
         }
     }
 
@@ -782,7 +813,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             cust.setFcustId(deliOrder.getCustId());
             cust.setCustomerCode(deliOrder.getCustNumber());
             cust.setCustomerName(deliOrder.getCustName());
-            tvCustSel.setText(deliOrder.getCustName());
+            tvCustSel.setText("客户："+deliOrder.getCustName());
             // 显示交货方式
             if(assist == null && isNULLS(deliOrder.getDeliveryWay()).length() > 0) {
                 assist = new AssistInfo();
@@ -799,6 +830,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setPickingListNum(0);
             pl.setCreateUserId(user.getId());
             pl.setCreateUserName(user.getUsername());
+            pl.setPickingType(pickingType);
 
             checkDatas.add(pl);
         }

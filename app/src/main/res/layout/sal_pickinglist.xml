@@ -83,9 +83,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/lin_stock"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:layout_margin="@dimen/_6dp"
+        android:layout_marginTop="@dimen/_6dp"
+        android:layout_marginLeft="@dimen/_6dp"
+        android:layout_marginRight="@dimen/_6dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -165,6 +168,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="38dp"
+        android:layout_marginTop="@dimen/_6dp"
         android:layout_marginLeft="@dimen/_6dp"
         android:layout_marginRight="@dimen/_6dp"
         android:gravity="center"
@@ -174,27 +178,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:ems="2"
-            android:gravity="center"
-            android:text="客户"
-            android:textColor="#000000"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_custSel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/back_style_blue"
-            android:drawableRight="@drawable/xiala3"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_14sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:ems="2"
-            android:layout_marginLeft="@dimen/_2dp"
             android:gravity="center"
             android:text="发货方式"
             android:textColor="#000000"
@@ -211,7 +194,64 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_14sp" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:ems="2"
+            android:gravity="center"
+            android:layout_marginLeft="@dimen/_3dp"
+            android:text="拣货类型"
+            android:textColor="#000000"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/back_style_blue"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_type1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/btn_radio_left_selector"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:text="拣货装箱"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_14sp" />
+
+            <RadioButton
+                android:id="@+id/rb_type2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/btn_radio_right_selector"
+                android:button="@null"
+                android:checked="false"
+                android:gravity="center"
+                android:text="拣货装车"
+                android:textColor="@color/c_666666"
+                android:textSize="@dimen/_14sp" />
+
+        </RadioGroup>
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_custSel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="@dimen/_6dp"
+        android:text="客户："
+        android:textColor="@color/c_FF6600"
+        android:textSize="@dimen/_14sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -254,7 +294,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:ems="2"
-            android:layout_marginLeft="@dimen/_2dp"
+            android:layout_marginLeft="@dimen/_3dp"
             android:gravity="center"
             android:text="物料条码"
             android:textColor="#000000"
@@ -290,7 +330,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.7"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="发货单号"
             android:textColor="#000000"
@@ -299,7 +339,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:text="物料代码/名称"
             android:textColor="#000000"
@@ -314,12 +354,13 @@
             android:textSize="12sp" />
 
         <TextView
-            android:layout_width="@dimen/_42dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center"
-            android:text="删除行"
+            android:text="仓库\n库位"
             android:textColor="#000000"
-            android:textSize="@dimen/_10sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
