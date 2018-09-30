@@ -29,6 +29,8 @@ public class Sal_OutMainActivity extends BaseActivity {
     View viewRadio1;
     @BindView(R.id.viewRadio2)
     View viewRadio2;
+    @BindView(R.id.viewRadio3)
+    View viewRadio3;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
@@ -61,9 +63,11 @@ public class Sal_OutMainActivity extends BaseActivity {
 //        fragment2.setArguments(bundle2); // 传参数
         Sal_OutFragment1 fragment1 = new Sal_OutFragment1();
         Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
+        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);
+        listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
@@ -86,6 +90,10 @@ public class Sal_OutMainActivity extends BaseActivity {
                         break;
                     case 1:
                         tabChange(viewRadio2, "销售出库--箱码", 1);
+
+                        break;
+                    case 2:
+                        tabChange(viewRadio3, "销售出库--拣货单", 2);
 
                         break;
                 }
@@ -142,6 +150,10 @@ public class Sal_OutMainActivity extends BaseActivity {
                 break;
             case R.id.lin_tab2:
                 tabChange(viewRadio2, "销售出库--箱码", 1);
+
+                break;
+            case R.id.lin_tab3:
+                tabChange(viewRadio3, "销售出库--箱码", 1);
 
                 break;
         }
