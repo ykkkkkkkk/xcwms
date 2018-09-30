@@ -61,6 +61,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
     private List<PickingList> listDatas = new ArrayList<>();
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
+    private String pickingType;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -148,6 +149,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
+            pickingType = bundle.getString("pickingType","");
         }
     }
 
@@ -204,6 +206,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
         String mUrl = Consts.getURL("pickingList/findAll2");
         FormBody formBody = new FormBody.Builder()
                 .add("pickingListNo_fbillno", getValues(etSearch).trim())
+                .add("pickingType", pickingType)
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();

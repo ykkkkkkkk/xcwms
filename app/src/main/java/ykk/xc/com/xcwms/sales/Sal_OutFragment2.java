@@ -743,6 +743,7 @@ public class Sal_OutFragment2 extends BaseFragment {
         tvExpressCompany.setText("");
         etExpressNo.setText("");
         expressCompany = null;
+        linTop.setVisibility(View.VISIBLE);
     }
 
     private void resetSon() {

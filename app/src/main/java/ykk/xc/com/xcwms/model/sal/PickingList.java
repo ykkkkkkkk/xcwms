@@ -3,6 +3,8 @@ package ykk.xc.com.xcwms.model.sal;
 import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.Stock;
+import ykk.xc.com.xcwms.model.StockPosition;
 
 /*
  * 拣货单
@@ -46,6 +48,8 @@ public class PickingList implements Serializable{
 	private double usableFqty;
 	private char pickingType; // 拣货类型：1.拣货装箱，2.拣货装车
 	private int isCheck; // 新加的，用于前台临时用判断是否选中
+	private Stock stock;
+	private StockPosition stockPosition;
 
 	public PickingList() {
 		super();
@@ -337,6 +341,22 @@ public class PickingList implements Serializable{
 
 	public void setPickingType(char pickingType) {
 		this.pickingType = pickingType;
+	}
+
+	public Stock getStock() {
+		return stock;
+	}
+
+	public void setStock(Stock stock) {
+		this.stock = stock;
+	}
+
+	public StockPosition getStockPosition() {
+		return stockPosition;
+	}
+
+	public void setStockPosition(StockPosition stockPosition) {
+		this.stockPosition = stockPosition;
 	}
 
 }

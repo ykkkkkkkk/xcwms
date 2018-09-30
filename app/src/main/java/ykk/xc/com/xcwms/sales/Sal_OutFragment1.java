@@ -100,6 +100,8 @@ public class Sal_OutFragment1 extends BaseFragment {
     TextView tvSalDate;
     @BindView(R.id.tv_salMan)
     TextView tvSalMan;
+    @BindView(R.id.lin_top)
+    LinearLayout linTop;
 
     private Sal_OutFragment1 context = this;
     private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
@@ -336,7 +338,7 @@ public class Sal_OutFragment1 extends BaseFragment {
     }
 
     @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
-            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan})
+            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -406,6 +408,14 @@ public class Sal_OutFragment1 extends BaseFragment {
                     return;
                 } else {
                     resetSon();
+                }
+
+                break;
+            case R.id.lin_rowTitle: // 点击行标题头
+                if(linTop.getVisibility() == View.VISIBLE) {
+                    linTop.setVisibility(View.GONE);
+                } else {
+                    linTop.setVisibility(View.VISIBLE);
                 }
 
                 break;
@@ -585,6 +595,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         cust = null;
         setEnables(tvReceiveOrg, R.drawable.back_style_blue, true);
         setEnables(tvSalOrg, R.drawable.back_style_blue, true);
+        linTop.setVisibility(View.VISIBLE);
     }
 
     private void resetSon() {

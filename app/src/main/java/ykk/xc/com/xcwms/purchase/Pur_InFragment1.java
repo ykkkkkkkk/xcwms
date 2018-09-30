@@ -703,6 +703,7 @@ public class Pur_InFragment1 extends BaseFragment {
                     sr2.setStockFnumber(stock2.getfNumber());
 
                     sr2.setStockPositionId(stockP2.getId());
+                    sr2.setStockPos(stockP2);
                     sr2.setStockPName(stockP2.getFname());
                     mAdapter.notifyDataSetChanged();
                 }

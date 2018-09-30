@@ -256,7 +256,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     Comm.showWarnDialog(context, "请扫箱码！");
                     return;
                 }
-                showForResult(Sal_SelPickingListActivity.class, SEL_PICKINGLIST, null);
+                bundle = new Bundle();
+                bundle.putString("pickingType","1");
+                showForResult(Sal_SelPickingListActivity.class, SEL_PICKINGLIST, bundle);
 
                 break;
             case R.id.btn_save: // 保存

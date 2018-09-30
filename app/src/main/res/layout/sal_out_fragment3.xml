@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -18,11 +19,32 @@
             android:gravity="center"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:ems="2"
+                android:gravity="center"
+                android:text="拣货单"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_pickingListSel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/back_style_blue"
+                android:drawableRight="@drawable/xiala3"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14sp" />
+
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:ems="2"
+                android:layout_marginLeft="@dimen/_3dp"
                 android:gravity="center"
                 android:text="单据类型"
                 android:textColor="#000000"
@@ -39,142 +61,6 @@
                 android:text="标准销售出库"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_3dp"
-                android:ems="2"
-                android:gravity="center"
-                android:text="日期"
-                android:textColor="#000000"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_salDate"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/back_style_blue"
-                android:drawableRight="@drawable/xiala3"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_14sp" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
-            android:layout_margin="@dimen/_6dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:ems="2"
-                android:gravity="center"
-                android:text="仓库"
-                android:textColor="#000000"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/et_stock"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/back_style_blue4"
-                    android:focusableInTouchMode="false"
-                    android:inputType="none"
-                    android:paddingLeft="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12sp" />
-
-                <Button
-                    android:id="@+id/btn_stock"
-                    android:layout_width="@dimen/_38dp"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/btn_blue3_selector"
-                    android:text="▼"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_3dp"
-                android:ems="2"
-                android:gravity="center"
-                android:text="库位"
-                android:textColor="#000000"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/et_stockPos"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@drawable/back_style_blue4"
-                    android:focusableInTouchMode="false"
-                    android:inputType="none"
-                    android:paddingLeft="2dp"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/_12sp" />
-
-                <Button
-                    android:id="@+id/btn_stockPos"
-                    android:layout_width="@dimen/_38dp"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/btn_blue3_selector"
-                    android:text="▼"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
-            android:layout_marginLeft="@dimen/_6dp"
-            android:layout_marginRight="@dimen/_6dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:ems="2"
-                android:gravity="center"
-                android:text="订单条码"
-                android:textColor="#000000"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/et_matNo"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
-                android:layout_weight="1"
-                android:background="@drawable/back_style_blue"
-                android:hint="销售订单扫码区"
-                android:inputType="none"
-                android:paddingLeft="@dimen/_2dp"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_12sp" />
 
         </LinearLayout>
 
@@ -211,8 +97,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="2dp"
                 android:layout_weight="1"
-                android:background="@drawable/back_style_blue"
-                android:drawableRight="@drawable/xiala3"
+                android:enabled="false"
+                android:background="@drawable/back_style_gray3"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
@@ -233,8 +119,8 @@
                 android:layout_height="match_parent"
                 android:layout_marginLeft="2dp"
                 android:layout_weight="1"
-                android:background="@drawable/back_style_blue"
-                android:drawableRight="@drawable/xiala3"
+                android:enabled="false"
+                android:background="@drawable/back_style_gray3"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
@@ -294,6 +180,58 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginLeft="@dimen/_6dp"
+            android:layout_marginRight="@dimen/_6dp"
+            android:layout_marginTop="@dimen/_6dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:ems="2"
+                android:gravity="center"
+                android:text="物流公司"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_expressCompany"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/back_style_blue"
+                android:drawableRight="@drawable/xiala3"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                android:ems="2"
+                android:gravity="center"
+                android:text="运单号"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_expressNo"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/back_style_blue"
+                android:inputType="none"
+                android:paddingLeft="2dp"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12sp" />
+
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -320,7 +258,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.2"
+            android:layout_weight="1.5"
             android:gravity="center"
             android:text="物料代码\n名称/规格"
             android:textColor="#000000"
@@ -351,13 +289,13 @@
             android:textColor="#000000"
             android:textSize="12sp" />
 
-        <TextView
+        <!--<TextView
             android:layout_width="@dimen/_42dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="删除行"
             android:textColor="#000000"
-            android:textSize="@dimen/_10sp" />
+            android:textSize="@dimen/_10sp" />-->
 
     </LinearLayout>
 

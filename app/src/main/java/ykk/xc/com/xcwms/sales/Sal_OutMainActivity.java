@@ -113,7 +113,7 @@ public class Sal_OutMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -153,7 +153,7 @@ public class Sal_OutMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab3:
-                tabChange(viewRadio3, "销售出库--箱码", 1);
+                tabChange(viewRadio3, "销售出库--拣货单", 2);
 
                 break;
         }

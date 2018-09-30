@@ -1,5 +1,6 @@
 package ykk.xc.com.xcwms.sales;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -51,6 +52,7 @@ import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -64,14 +66,6 @@ import ykk.xc.com.xcwms.util.JsonUtil;
  */
 public class Sal_PickingListActivity extends BaseActivity {
 
-    @BindView(R.id.et_stock)
-    EditText etStock;
-    @BindView(R.id.btn_stock)
-    Button btnStock;
-    @BindView(R.id.et_stockPos)
-    EditText etStockPos;
-    @BindView(R.id.btn_stockPos)
-    Button btnStockPos;
     @BindView(R.id.et_deliCode)
     EditText etDeliCode;
     @BindView(R.id.et_mtlCode)
@@ -82,20 +76,18 @@ public class Sal_PickingListActivity extends BaseActivity {
     TextView tvDeliverSel;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @BindView(R.id.lin_stock)
-    LinearLayout linStock;
     @BindView(R.id.rb_type1)
     RadioButton rbType1;
     @BindView(R.id.rb_type2)
     RadioButton rbType2;
 
     private Sal_PickingListActivity context = this;
-    private static final int SEL_STOCK = 10, SEL_STOCKP = 11, SEL_DELI = 12;
+    private static final int SEL_DELI = 11, SEL_STOCK2 = 12, SEL_STOCKP2 = 13;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
     private Customer cust; // 客户
-    private Stock stock; // 仓库
-    private StockPosition stockP; // 库位
+    private Stock stock, stock2; // 仓库
+    private StockPosition stockP, stockP2; // 库位
     private AssistInfo assist; // 辅助资料--发货方式
     private Sal_PickingListAdapter mAdapter;
     private List<PickingList> checkDatas = new ArrayList<>();
@@ -127,7 +119,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                         m.reset('0');
 
                         m.checkDatas.clear();
-                        m.getBarCodeTableAfter2(true);
                         m.mAdapter.notifyDataSetChanged();
                         Comm.showWarnDialog(m.context,"保存成功");
 
@@ -139,19 +130,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                     case SUCC2: // 扫码成功后进入
                         BarCodeTable bt = null;
                         switch (m.curViewFlag) {
-                            case '1': // 仓库
-                                m.stock = JsonUtil.strToObject((String) msg.obj, Stock.class);
-                                bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
-                                m.stock = JsonUtil.stringToObject(bt.getRelationObj(), Stock.class);
-                                m.getStockAfter();
-
-                                break;
-                            case '2': // 库位
-                                bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
-                                m.stockP = JsonUtil.stringToObject(bt.getRelationObj(), StockPosition.class);
-                                m.getStockPAfter();
-
-                                break;
                             case '3': // 发货订单
                                 List<DeliOrder> list = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
                                 Material tmpMtl = null;
@@ -164,7 +142,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                                 }
                                 m.setTexts(m.etDeliCode, m.deliBarcode);
                                 if(!m.smAfterCheck(tmpMtl)) return;
-                                m.getBarCodeTableAfter2(false);
                                 m.getDeliOrderAfter(list);
 
                                 break;
@@ -183,12 +160,12 @@ public class Sal_PickingListActivity extends BaseActivity {
                         break;
                     case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
-                            case '1': // 仓库
-                                m.setTexts(m.etStock, m.stockBarcode);
-                                break;
-                            case '2': // 库位
-                                m.setTexts(m.etStockPos, m.stockPBarcode);
-                                break;
+//                            case '1': // 仓库
+//                                m.setTexts(m.etStock, m.stockBarcode);
+//                                break;
+//                            case '2': // 库位
+//                                m.setTexts(m.etStockPos, m.stockPBarcode);
+//                                break;
                             case '3': // 发货订单
                                 m.setTexts(m.etDeliCode, m.deliBarcode);
                                 break;
@@ -252,15 +229,22 @@ public class Sal_PickingListActivity extends BaseActivity {
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0", CODE2);
             }
+
+            @Override
+            public void onClick_selStock(View v, PickingList entity, int position) {
+                Log.e("selStock", "行：" + position);
+                curPos = position;
+
+                showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
+            }
         });
+
     }
 
     @Override
     public void initData() {
         hideSoftInputMode(etDeliCode);
         hideSoftInputMode(etMtlCode);
-        hideSoftInputMode(etStock);
-        hideSoftInputMode(etStockPos);
         getUserInfo();
         setFocusable(etDeliCode); // 物料代码获取焦点
 //        setFocusable(etMtlCode); // 物料代码获取焦点
@@ -271,19 +255,17 @@ public class Sal_PickingListActivity extends BaseActivity {
 
             if(user.getStock() != null) {
                 stock = user.getStock();
-                setTexts(etStock, stock.getfName());
                 stockBarcode = stock.getfName();
             }
 
             if(user.getStockPos() != null) {
                 stockP = user.getStockPos();
-                setTexts(etStockPos, stockP.getFnumber());
                 stockPBarcode = stockP.getFnumber();
             }
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.btn_stock, R.id.btn_stockPos, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone, R.id.rb_type1, R.id.rb_type2})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.tv_deliverSel, R.id.btn_save, R.id.btn_clone, R.id.rb_type1, R.id.rb_type2})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -294,22 +276,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                 break;
             case R.id.btn_print: // 打印条码界面
                 show(PrintMainActivity.class, null);
-
-                break;
-            case R.id.btn_stock: // 选择仓库
-                isStockLong = false;
-                showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
-
-                break;
-            case R.id.btn_stockPos: // 选择库位
-                if (stock == null) {
-                    Comm.showWarnDialog(context,"请选择仓库！");
-                    return;
-                }
-                bundle = new Bundle();
-//                bundle.putInt("areaId", stockA.getId());
-                bundle.putInt("stockId", stock.getfStockid());
-                showForResult(StockPos_DialogActivity.class, SEL_STOCKP, bundle);
 
                 break;
             case R.id.tv_deliverSel: // 发货方式
@@ -377,25 +343,6 @@ public class Sal_PickingListActivity extends BaseActivity {
     }
 
     /**
-     * 选择来源单之前的判断
-     */
-    private boolean smBefore(char flag) {
-        if (flag == '1' && stock == null) {
-            Comm.showWarnDialog(context,"请选择仓库！");
-            return false;
-        }
-        if (flag == '1' && stock.isStorageLocation() && stockP == null) {
-            Comm.showWarnDialog(context,"请选择库位！");
-            return false;
-        }
-//        if (flag == '1' && assist == null) {
-//            Comm.showWarnDialog(context,"请选择发货方式！");
-//            return false;
-//        }
-        return true;
-    }
-
-    /**
      * 选择保存之前的判断
      */
     private boolean saveBefore() {
@@ -425,26 +372,17 @@ public class Sal_PickingListActivity extends BaseActivity {
                 writeBatchDialog();
                 return false;
             }
+            if(pl.getStock() == null) {
+                Comm.showWarnDialog(context,"第"+(i+1)+"行请选择仓库！");
+                return false;
+            }
         }
         return true;
     }
 
-    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_deliCode, R.id.et_mtlCode})
+    @OnFocusChange({R.id.et_deliCode, R.id.et_mtlCode})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
-    }
-
-    @OnLongClick({R.id.btn_stock})
-    public boolean onViewLongClicked(View view) {
-        Bundle bundle = null;
-        switch (view.getId()) {
-            case R.id.btn_stock: // 长按选择仓库
-                isStockLong = true;
-                showForResult(Stock_DialogActivity.class, SEL_STOCK, null);
-
-                break;
-        }
-        return true;
     }
 
     @Override
@@ -463,45 +401,6 @@ public class Sal_PickingListActivity extends BaseActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
-                        case R.id.et_stock: // 仓库
-                            curViewFlag = '1';
-                            String whName = getValues(etStock).trim();
-                            if (isKeyDownEnter(whName, event, keyCode)) {
-                                if (stockBarcode != null && stockBarcode.length() > 0) {
-                                    if (stockBarcode.equals(whName)) {
-                                        stockBarcode = whName;
-                                    } else {
-                                        String tmp = whName.replaceFirst(stockBarcode, "");
-                                        stockBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    stockBarcode = whName.replace("\n", "");
-                                }
-                                // 执行查询方法
-                                run_smGetDatas();
-                            }
-
-                            break;
-                        case R.id.et_stockPos: // 库位
-                            curViewFlag = '2';
-                            String whPos = getValues(etStockPos).trim();
-                            if (isKeyDownEnter(whPos, event, keyCode)) {
-                                if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                    if (stockPBarcode.equals(whPos)) {
-                                        stockPBarcode = whPos;
-                                    } else {
-                                        String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                        stockPBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    stockPBarcode = whPos.replace("\n", "");
-                                }
-
-                                // 执行查询方法
-                                run_smGetDatas();
-                            }
-
-                            break;
                         case R.id.et_deliCode: // 来源单号
                             curViewFlag = '3';
                             String sourceNo = getValues(etDeliCode).trim();
@@ -555,8 +454,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                 return false;
             }
         };
-        etStock.setOnKeyListener(keyListener);
-        etStockPos.setOnKeyListener(keyListener);
         etDeliCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
     }
@@ -593,12 +490,9 @@ public class Sal_PickingListActivity extends BaseActivity {
     }
 
     private void resetSon() {
-        getBarCodeTableAfter2(true);
         checkDatas.clear();
         mAdapter.notifyDataSetChanged();
         reset('0');
-        etStock.setText("");
-        etStockPos.setText("");
         tvCustSel.setText("客户：");
         tvDeliverSel.setText("");
         rbType1.setEnabled(true);
@@ -621,32 +515,6 @@ public class Sal_PickingListActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case SEL_STOCK: //查询仓库	返回
-                if (resultCode == RESULT_OK) {
-                    Stock stock = (Stock) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCK", stock.getfName());
-                    if (this.stock != null && stock != null && stock.getId() == this.stock.getId()) {
-                        // 长按了，并且启用了库区管理
-                        if (isStockLong && stock.isStorageLocation()) {
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("stockId", stock.getfStockid());
-                            showForResult(StockPos_DialogActivity.class, SEL_STOCKP, bundle);
-                        }
-                        return;
-                    }
-                    this.stock = stock;
-                    getStockAfter();
-                }
-
-                break;
-            case SEL_STOCKP: //查询库位	返回
-                if (resultCode == RESULT_OK) {
-                    stockP = (StockPosition) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCKP", stockP.getFname());
-                    getStockPAfter();
-                }
-
-                break;
             case SEL_DELI: //查询发货方式	返回
                 if (resultCode == RESULT_OK) {
                     assist = (AssistInfo) data.getSerializableExtra("obj");
@@ -678,6 +546,44 @@ public class Sal_PickingListActivity extends BaseActivity {
                 }
 
                 break;
+            case SEL_STOCK2: //行事件选择仓库	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stock2 = (Stock) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
+                    // 启用了库位管理
+                    if (stock2.isStorageLocation()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("stockId", stock2.getfStockid());
+                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
+                    } else {
+                        PickingList pk = checkDatas.get(curPos);
+                        pk.setStockId(stock2.getfStockid());
+                        pk.setStockNumber(stock2.getfNumber());
+                        pk.setStockName(stock2.getfName());
+                        pk.setStock(stock2);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                break;
+            case SEL_STOCKP2: //行事件选择库位	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stockP2 = (StockPosition) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    PickingList pk = checkDatas.get(curPos);
+                    pk.setStockId(stock2.getfStockid());
+                    pk.setStockNumber(stock2.getfNumber());
+                    pk.setStockName(stock2.getfName());
+                    pk.setStock(stock2);
+
+                    pk.setStockPositionId(stockP2.getId());
+                    pk.setStockPositionNumber(stockP2.getFnumber());
+                    pk.setStockPositionName(stockP2.getFname());
+                    pk.setStockPosition(stockP2);
+                    mAdapter.notifyDataSetChanged();
+                }
+
+                break;
         }
     }
 
@@ -688,34 +594,10 @@ public class Sal_PickingListActivity extends BaseActivity {
         if(defaultStockVal == '1' && mtl != null && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();
-            setTexts(etStock, stock.getfName());
-            stockBarcode = stock.getfName();
-            setTexts(etStockPos, stockP.getFnumber());
-            stockPBarcode = stockP.getFnumber();
         } else {
             setTexts(etDeliCode, deliBarcode);
-            return smBefore('1');
         }
         return true;
-    }
-
-    /**
-     * 得到条码表的数据
-     */
-    private void getBarCodeTableAfter2(boolean isEnable) {
-        btnStock.setEnabled(isEnable);
-        btnStockPos.setEnabled(isEnable);
-        if(isEnable) {
-            setEnables(etStock, R.drawable.back_style_blue4, true);
-            setEnables(etStockPos, R.drawable.back_style_blue4, true);
-            setEnables(tvCustSel, R.drawable.back_style_blue, true);
-//            setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
-        } else {
-            setEnables(etStock, R.drawable.back_style_gray5, false);
-            setEnables(etStockPos, R.drawable.back_style_gray5, false);
-            setEnables(tvCustSel, R.drawable.back_style_gray3, false);
-//            setEnables(tvDeliverSel, R.drawable.back_style_gray3, false);
-        }
     }
 
     /**
@@ -795,12 +677,18 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setMtlFnumber(deliOrder.getMtlFnumber());
             pl.setMtlFname(deliOrder.getMtlFname());
             pl.setMtlUnitName(deliOrder.getMtlUnitName());
-            pl.setStockId(stock.getfStockid());
-            pl.setStockNumber(stock.getfNumber());
-            pl.setStockName(stock.getfNumber());
-            pl.setStockPositionId(stockP.getId());
-            pl.setStockPositionNumber(stockP.getFnumber());
-            pl.setStockPositionName(stockP.getFname());
+            if(stock != null) {
+                pl.setStockId(stock.getfStockid());
+                pl.setStockNumber(stock.getfNumber());
+                pl.setStockName(stock.getfNumber());
+                pl.setStock(stock);
+            }
+            if(stockP != null) {
+                pl.setStockPositionId(stockP.getId());
+                pl.setStockPositionNumber(stockP.getFnumber());
+                pl.setStockPositionName(stockP.getFname());
+                pl.setStockPosition(stockP);
+            }
             pl.setDeliFqty(deliOrder.getDeliFqty());
             pl.setDeliFremainoutqty(deliOrder.getDeliFremainoutqty());
 //            pl.setDeliveryWay(deliOrder.getDeliveryWay());
@@ -837,45 +725,6 @@ public class Sal_PickingListActivity extends BaseActivity {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * 选择（仓库）返回的值
-     */
-    private void getStockAfter() {
-        if (stock != null) {
-            setTexts(etStock, stock.getfName());
-            stockBarcode = stock.getfName();
-            stockP = null;
-            etStockPos.setText("");
-            // 启用库位
-            if (stock.isStorageLocation()) {
-                setEnables(etStockPos, R.drawable.back_style_blue4, true);
-                setEnables(btnStockPos, R.drawable.btn_blue3_selector, true);
-            } else {
-                stockP = null;
-                etStockPos.setText("");
-                setEnables(etStockPos, R.drawable.back_style_gray5, false);
-                setEnables(btnStockPos, R.drawable.back_style_gray6, false);
-            }
-            // 长按了，并且启用了库位管理
-            if (isStockLong && stock.isStorageLocation()) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("stockId", stock.getfStockid());
-                showForResult(StockPos_DialogActivity.class, SEL_STOCKP, bundle);
-            }
-        }
-    }
-
-    /**
-     * 选择（库位）返回的值
-     */
-    private void getStockPAfter() {
-        if (stockP != null) {
-            setTexts(etStockPos, stockP.getFnumber());
-            stockPBarcode = stockP.getFnumber();
-            setFocusable(etDeliCode);
-        }
     }
 
     /**
