@@ -472,11 +472,11 @@ public class Prod_InFragment2 extends BaseFragment {
                             break;
                         case R.id.et_matNo: // 物料
                             String matNo = getValues(etMatNo).trim();
-//                            if (!smBefore()) { // 扫码之前的判断
-//                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-//                                return false;
-//                            }
                             if (isKeyDownEnter(matNo, event, keyCode)) {
+                                if (!smBefore()) { // 扫码之前的判断
+                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                    return false;
+                                }
                                 if (boxBarcode != null && boxBarcode.length() > 0) {
                                     if(boxBarcode.equals(matNo)) {
                                         boxBarcode = matNo;
@@ -621,7 +621,7 @@ public class Prod_InFragment2 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setStockqty(num);
-                        checkDatas.get(curPos).setFqty(num);
+//                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
                     }
                 }
@@ -733,9 +733,7 @@ public class Prod_InFragment2 extends BaseFragment {
 
             checkDatas.add(sr2);
         }
-        String poNumber = list.get(0).getRelationBillNumber();
-        setTexts(etMatNo, poNumber);
-        boxBarcode = poNumber;
+        setTexts(etMatNo, boxBarcode);
         setFocusable(etMatNo); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();

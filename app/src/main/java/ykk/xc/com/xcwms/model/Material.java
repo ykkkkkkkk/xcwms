@@ -103,6 +103,9 @@ public class Material implements Serializable {
 	private BarCodeTable barcodeTable;
 	/*计量单位数量*/
 	private double calculateFqty;
+	// 临时用的变量
+	private MaterialPack mtlPack; // 物料包装
+
 
 	/**
 	 * 构造方法
@@ -365,7 +368,6 @@ public class Material implements Serializable {
 	public void setReceiveMinScale(double receiveMinScale) {
 		this.receiveMinScale = receiveMinScale;
 	}
-
 	public String getOldNumber() {
 		return oldNumber;
 	}
@@ -396,34 +398,17 @@ public class Material implements Serializable {
 	public void setBarcodeTable(BarCodeTable barcodeTable) {
 		this.barcodeTable = barcodeTable;
 	}
-
 	public double getCalculateFqty() {
 		return calculateFqty;
 	}
 	public void setCalculateFqty(double calculateFqty) {
 		this.calculateFqty = calculateFqty;
 	}
-
-	@Override
-	public String toString() {
-		return "Material [id=" + id + ", fMaterialId=" + fMaterialId + ", fNumber=" + fNumber + ", fName=" + fName
-				+ ", userOrgId=" + userOrgId + ", organization=" + organization + ", simpleName=" + simpleName
-				+ ", basicUnitId=" + basicUnitId + ", unit=" + unit + ", barcode=" + barcode + ", ownerName="
-				+ ownerName + ", materialGrade=" + materialGrade + ", materialSize=" + materialSize
-				+ ", materialTypeId=" + materialTypeId + ", materialType=" + materialType + ", validityDate="
-				+ validityDate + ", shelfDate=" + shelfDate + ", safetyStock=" + safetyStock + ", minLackStock="
-				+ minLackStock + ", fixScatteredStockId=" + fixScatteredStockId + ", fixScatteredStockPositionId="
-				+ fixScatteredStockPositionId + ", fixWholeStockId=" + fixWholeStockId + ", fixWholeStockPositionId="
-				+ fixWholeStockPositionId + ", baleBoxNumber=" + baleBoxNumber + ", lastSyncDate=" + lastSyncDate
-				+ ", lastUpdateDate=" + lastUpdateDate + ", remarks=" + remarks + ", isBatchManager=" + isBatchManager
-				+ ", batchRuleId=" + batchRuleId + ", isSnManager=" + isSnManager + ", snRuleId=" + snRuleId
-				+ ", snUnitId=" + snUnitId + ", snManagerTypeId=" + snManagerTypeId + ", isQualityPeriodManager="
-				+ isQualityPeriodManager + ", qualityPeriodUnitId=" + qualityPeriodUnitId + ", qualityPeriod="
-				+ qualityPeriod + ", dataStatus=" + dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled
-				+ ", isOvercharge=" + isOvercharge + ", receiveMaxScale=" + receiveMaxScale + ", receiveMinScale="
-				+ receiveMinScale + ", oldNumber=" + oldNumber + ", oldName=" + oldName + ", stock=" + stock
-				+ ", stockPos=" + stockPos + ", barcodeTable=" + barcodeTable + ", calculateFqty=" + calculateFqty
-				+ "]";
+	public MaterialPack getMtlPack() {
+		return mtlPack;
+	}
+	public void setMtlPack(MaterialPack mtlPack) {
+		this.mtlPack = mtlPack;
 	}
 
 }

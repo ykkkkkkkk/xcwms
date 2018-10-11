@@ -10,13 +10,13 @@ import java.io.Serializable;
 public class MaterialPack implements Serializable {
 
 	/*物料包装id*/
-	private Integer id;
+	private int id;
 	/*箱子id*/
-	private Integer boxId;
+	private int boxId;
 	/*箱子*/
 	private Box box;
 	/*物料id*/
-	private Integer materialId;
+	private int materialId;
 	/*物料*/
 	private Material material;
 	/*物料包装名称*/
@@ -29,26 +29,28 @@ public class MaterialPack implements Serializable {
 	private double number;
 	/*包装物装入物料后的总重量*/
 	private double materialPackWeight;
-	/*是否基本包装 0是，1不是*/
-	private Integer isBasicPack;
-	/*是否默认包装 0是，1不是*/
-	private Integer isFixPack;
+	/*是否基本包装 0不是，1是*/
+	private int isBasicPack;
+	/*是否默认包装 0不是，1是*/
+	private int isFixPack;
+	/*是否最小包装数量 0不是，1是*/
+	private int isMinNumberPack;
 	/*wms非物理删除标识*/
 	private String isDelete;
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public Integer getBoxId() {
+	public int getBoxId() {
 		return boxId;
 	}
 
-	public void setBoxId(Integer boxId) {
+	public void setBoxId(int boxId) {
 		this.boxId = boxId;
 	}
 
@@ -60,11 +62,11 @@ public class MaterialPack implements Serializable {
 		this.box = box;
 	}
 
-	public Integer getMaterialId() {
+	public int getMaterialId() {
 		return materialId;
 	}
 
-	public void setMaterialId(Integer materialId) {
+	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
 	}
 
@@ -116,19 +118,19 @@ public class MaterialPack implements Serializable {
 		this.materialPackWeight = materialPackWeight;
 	}
 
-	public Integer getIsBasicPack() {
+	public int getIsBasicPack() {
 		return isBasicPack;
 	}
 
-	public void setIsBasicPack(Integer isBasicPack) {
+	public void setIsBasicPack(int isBasicPack) {
 		this.isBasicPack = isBasicPack;
 	}
 
-	public Integer getIsFixPack() {
+	public int getIsFixPack() {
 		return isFixPack;
 	}
 
-	public void setIsFixPack(Integer isFixPack) {
+	public void setIsFixPack(int isFixPack) {
 		this.isFixPack = isFixPack;
 	}
 
@@ -140,13 +142,12 @@ public class MaterialPack implements Serializable {
 		this.isDelete = isDelete;
 	}
 
-	@Override
-	public String toString() {
-		return "MaterialPack [id=" + id + ", boxId=" + boxId + ", box=" + box + ", materialId=" + materialId
-				+ ", material=" + material + ", materialPackName=" + materialPackName + ", materialPackSize="
-				+ materialPackSize + ", barcode=" + barcode + ", number=" + number + ", materialPackWeight="
-				+ materialPackWeight + ", isBasicPack=" + isBasicPack + ", isFixPack=" + isFixPack + ", isDelete="
-				+ isDelete + "]";
+	public int getIsMinNumberPack() {
+		return isMinNumberPack;
+	}
+
+	public void setIsMinNumberPack(int isMinNumberPack) {
+		this.isMinNumberPack = isMinNumberPack;
 	}
 
 	public MaterialPack() {

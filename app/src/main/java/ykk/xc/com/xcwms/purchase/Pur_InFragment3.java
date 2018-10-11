@@ -279,7 +279,7 @@ public class Pur_InFragment3 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", NUM_RESULT);
+                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0.0", NUM_RESULT);
             }
 
             @Override
@@ -809,7 +809,7 @@ public class Pur_InFragment3 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setStockqty(num);
-                        checkDatas.get(curPos).setPoFmustqty(num);
+//                        checkDatas.get(curPos).setPoFmustqty(num);
 //                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
                     }

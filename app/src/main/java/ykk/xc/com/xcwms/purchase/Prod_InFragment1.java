@@ -229,7 +229,7 @@ public class Prod_InFragment1 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
+                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0.0", CODE2);
             }
 
             @Override
@@ -618,7 +618,7 @@ public class Prod_InFragment1 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setStockqty(num);
-                        checkDatas.get(curPos).setFqty(num);
+//                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
                     }
                 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -27,12 +27,22 @@
             android:id="@+id/btn_print"
             android:layout_width="42dp"
             android:layout_height="match_parent"
-            android:background="@drawable/aa_ico5a_5b"
             android:layout_marginLeft="@dimen/_4dp"
             android:layout_marginRight="@dimen/_4dp"
+            android:background="@drawable/aa_ico5a_5b"
             android:textColor="#ffffff"
             android:textSize="14sp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_connState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/_2dp"
+        android:text="@string/str_conn_state_disconnect"
+        android:textColor="@color/c_666666"
+        android:textSize="12sp" />
 
     <LinearLayout
         android:id="@+id/lin_box"

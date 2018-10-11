@@ -37,6 +37,8 @@ public class MaterialBinningRecord implements Serializable {
 	private String relationBillNumber;
 	/*客户id*/
 	private int customerId;
+	/*客户代码*/
+	private String customerNumber;
 	/*客户*/
 	private Customer customer;
 	/**物流方式
@@ -87,7 +89,6 @@ public class MaterialBinningRecord implements Serializable {
 	private double usableFqty;
 	/* 关联单据Json对象 */
 	private String relationObj;
-
 
 	public MaterialBinningRecord() {
 		super();
@@ -325,17 +326,13 @@ public class MaterialBinningRecord implements Serializable {
 		this.usableFqty = usableFqty;
 	}
 
-	@Override
-	public String toString() {
-		return "MaterialBinningRecord [id=" + id + ", fbillType=" + fbillType + ", boxBarCodeId=" + boxBarCodeId
-				+ ", boxBarCode=" + boxBarCode + ", materialId=" + materialId + ", barcode=" + barcode
-				+ ", barcodeSource=" + barcodeSource + ", batchCode=" + batchCode + ", snCode=" + snCode + ", mtl="
-				+ mtl + ", number=" + number + ", relationBillId=" + relationBillId + ", relationBillNumber="
-				+ relationBillNumber + ", customerId=" + customerId + ", customer=" + customer + ", expressType="
-				+ expressType + ", deliveryWay=" + deliveryWay + ", packageWorkType=" + packageWorkType
-				+ ", binningType=" + binningType + ", caseId=" + caseId + ", createDate=" + createDate
-				+ ", createUserId=" + createUserId + ", createUserName=" + createUserName + ", modifyDate=" + modifyDate
-				+ ", modifyUserId=" + modifyUserId + ", modifyUserName=" + modifyUserName + ", relationBillFQTY="
-				+ relationBillFQTY + ", usableFqty=" + usableFqty + ", relationObj=" + relationObj + "]";
+	public String getCustomerNumber() {
+		return customerNumber;
 	}
+
+	public void setCustomerNumber(String customerNumber) {
+		this.customerNumber = customerNumber;
+	}
+
+
 }

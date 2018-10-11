@@ -320,14 +320,14 @@ public class Sal_OutFragment3 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
-            if (sr2.getStockqty() > sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）不能大于（应发数）！");
-                return false;
-            }
-            if (sr2.getStockqty() < sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须等于（应发数）！");
-                return false;
-            }
+//            if (sr2.getStockqty() > sr2.getFqty()) {
+//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）不能大于（应发数）！");
+//                return false;
+//            }
+//            if (sr2.getStockqty() < sr2.getFqty()) {
+//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须等于（应发数）！");
+//                return false;
+//            }
         }
         return true;
     }
@@ -472,7 +472,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double num = parseDouble(value);
                         checkDatas.get(curPos).setStockqty(num);
-                        checkDatas.get(curPos).setFqty(num);
+//                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
                     }
                 }

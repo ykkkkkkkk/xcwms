@@ -227,7 +227,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             public void onClick_num(View v, PickingList entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0", CODE2);
+                showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0.0", CODE2);
             }
 
             @Override
@@ -362,7 +362,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）必须大于0！");
                 return false;
             }
-            if (pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
+            if ((pl.getMtl().getMtlPack() == null || pl.getMtl().getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                 Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）不能大于（订单数）！");
                 return false;
             }
@@ -498,6 +498,7 @@ public class Sal_PickingListActivity extends BaseActivity {
         rbType1.setEnabled(true);
         rbType2.setEnabled(true);
         rbType1.setChecked(true);
+        clickRadioChange();
         pickingType = '1';
         stock = null;
         stockP = null;
@@ -542,6 +543,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                         checkDatas.get(curPos).setPickingListNum(num);
 //                        checkDatas.get(curPos).setDeliFremainoutqty(num);
                         mAdapter.notifyDataSetChanged();
+                        isPickingEnd();
                     }
                 }
 
@@ -634,7 +636,20 @@ public class Sal_PickingListActivity extends BaseActivity {
                         }
                         pl.setBatchNo(bt.getBatchCode());
                         pl.setSnNo(bt.getSnCode());
-                    } else if (pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
+
+                    // 启用了最小包装
+                    } else if(pl.getMtl().getMtlPack() != null && pl.getMtl().getMtlPack().getIsMinNumberPack() == 1) {
+                        if(mtl2.getMtlPack().getIsMinNumberPack() == 1) {
+                            // 如果拣货数小于订单数，就加数量
+                            if(pl.getPickingListNum() < pl.getDeliFremainoutqty()) {
+                                pl.setPickingListNum(pl.getPickingListNum() + fqty);
+                            } else {
+                                Comm.showWarnDialog(context, "第" + (i + 1) + "行！，已经达到最小包装发货数量！");
+                                return;
+                            }
+                        }
+
+                    } else if ((pl.getMtl().getMtlPack() == null || pl.getMtl().getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                         // 数量已满
                         Comm.showWarnDialog(context, "第" + (i + 1) + "行！，（拣货数）不能大于（订单数）！");
                         return;
@@ -645,11 +660,29 @@ public class Sal_PickingListActivity extends BaseActivity {
                     pl.setSnNo(bt.getSnCode());
                 }
                 mAdapter.notifyDataSetChanged();
+                isPickingEnd();
                 break;
             }
         }
         if(!isFlag) {
             Comm.showWarnDialog(context, "该物料与订单不匹配！");
+        }
+    }
+
+    /**
+     * 是否已经捡完货
+     */
+    private void isPickingEnd() {
+        int size = checkDatas.size();
+        int count = 0; // 计数器
+        for(int i=0; i<size; i++) {
+            PickingList p = checkDatas.get(0);
+            if(p.getPickingListNum() >= p.getDeliFremainoutqty()) {
+                count += 1;
+            }
+        }
+        if(count == size) {
+            toasts("已经捡完货了，请保存！");
         }
     }
 

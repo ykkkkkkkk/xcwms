@@ -1,8 +1,14 @@
 package ykk.xc.com.xcwms.sales;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,14 +23,19 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gprinter.command.EscCommand;
+import com.gprinter.command.LabelCommand;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -51,6 +62,15 @@ import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_RecombinationAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.blueTooth.BluetoothDeviceListDialog;
+import ykk.xc.com.xcwms.util.blueTooth.Constant;
+import ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager;
+import ykk.xc.com.xcwms.util.blueTooth.ThreadPool;
+import ykk.xc.com.xcwms.util.blueTooth.Utils;
+
+import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
+import static ykk.xc.com.xcwms.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
+import static ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
 public class Sal_RecombinationActivity extends BaseActivity {
 
@@ -86,8 +106,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
     TextView tvCount;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.tv_connState)
+    TextView tvConnState;
 
-    
     private Sal_RecombinationActivity context = this;
     private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, SEL_PICKINGLIST = 15;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
@@ -98,6 +119,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private Sal_RecombinationAdapter mAdapter;
     private String strBoxBarcode, strMtlBarcode; // 对应的条码号
     private List<MaterialBinningRecord> mbrList = new ArrayList<>();
+    private List<PickingList> plList = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
     private DecimalFormat df = new DecimalFormat("#.####");
     private int curPos; // 当前行
@@ -105,6 +127,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
     private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
+    private int id = 0; // 设备id
+    private ThreadPool threadPool;
+    private boolean isConnected, isPair; // 蓝牙是否连接标识
+    private static final int CONN_STATE_DISCONN = 0x007; // 连接状态断开
+    private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
+    private static final int CONN_PRINTER = 0x12;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -116,7 +144,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
         }
 
         public void handleMessage(Message msg) {
-            Sal_RecombinationActivity m = mActivity.get();
+            final Sal_RecombinationActivity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -143,13 +171,20 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
 
-
                         break;
                     case SAVE: // 保存 成功
-                        m.status = '1';
-                        m.mbrList.clear();
-                        m.reset();
-                        Comm.showWarnDialog(m.context,"保存成功√");
+//                        m.status = '1';
+//                        m.mbrList.clear();
+//                        m.plList.clear();
+//                        m.reset();
+//                        Comm.showWarnDialog(m.context,"保存成功√");
+                        m.toasts("保存成功，现在打印装箱清单...");
+                        if(m.isConnected) {
+                            m.sendLabel();
+                        } else {
+                            // 打开蓝牙配对页面
+                            m.startActivityForResult(new Intent(m.context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+                        }
 
                         break;
                     case UNMODIFY2: // 修改发货方式 失败
@@ -185,9 +220,52 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         }
 
                         break;
+
+                    // 蓝牙打印模块的
+                    case CONN_STATE_DISCONN:
+                        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[m.id] != null) {
+                            DeviceConnFactoryManager.getDeviceConnFactoryManagers()[m.id].closePort(m.id);
+                        }
+                        break;
+                    case PRINTER_COMMAND_ERROR:
+                        Utils.toast(m.context, m.getString(R.string.str_choice_printer_command));
+                        break;
+                    case CONN_PRINTER:
+                        Utils.toast(m.context, m.getString(R.string.str_cann_printer));
+                        break;
+                    case MESSAGE_UPDATE_PARAMETER:
+                        String strIp = msg.getData().getString("Ip");
+                        String strPort = msg.getData().getString("Port");
+                        //初始化端口信息
+                        new DeviceConnFactoryManager.Build()
+                                //设置端口连接方式
+                                .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.WIFI)
+                                //设置端口IP地址
+                                .setIp(strIp)
+                                //设置端口ID（主要用于连接多设备）
+                                .setId(m.id)
+                                //设置连接的热点端口号
+                                .setPort(Integer.parseInt(strPort))
+                                .build();
+                        m.threadPool = ThreadPool.getInstantiation();
+                        m.threadPool.addTask(new Runnable() {
+                            @Override
+                            public void run() {
+                                DeviceConnFactoryManager.getDeviceConnFactoryManagers()[m.id].openPort();
+                            }
+                        });
+                        break;
                 }
             }
         }
+    }
+
+    private void saveAfter() {
+        status = '1';
+        mbrList.clear();
+        plList.clear();
+        reset();
+        Comm.showWarnDialog(context,"保存成功√");
     }
 
     @Override
@@ -206,7 +284,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getNumber()), "0", SEL_NUM);
+                showInputDialog("数量", String.valueOf(entity.getNumber()), "0.0", SEL_NUM);
             }
         });
     }
@@ -216,6 +294,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
         hideSoftInputMode(etBoxCode);
         hideSoftInputMode(etMtlCode);
         getUserInfo();
+
     }
 
     @OnClick({R.id.btn_close, R.id.btn_print, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.tv_pickingListSel, R.id.btn_save, R.id.tv_box})
@@ -307,6 +386,22 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
                 break;
         }
+    }
+
+    @OnLongClick({R.id.btn_close})
+    public boolean onViewLongClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_close: // 测试打印
+                if(isConnected) {
+                    sendLabel();
+                } else {
+                    // 打开蓝牙配对页面
+                    startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+                }
+
+                break;
+        }
+        return true;
     }
 
     /**
@@ -521,7 +616,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
             case SEL_PICKINGLIST: //查询拣货单	返回
                 if (resultCode == RESULT_OK) {
                     mbrList.clear();
+                    plList.clear();
                     List<PickingList> list = (List<PickingList>) data.getSerializableExtra("checkDatas");
+                    plList.addAll(list);
 
                     PickingList p = list.get(0);
                     tvPickingListSel.setText(p.getFbillno());
@@ -535,6 +632,35 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 }
 
                 break;
+            /*蓝牙连接*/
+            case Constant.BLUETOOTH_REQUEST_CODE: {
+                if (resultCode == RESULT_OK) {
+                    isPair = true;
+                    /*获取蓝牙mac地址*/
+                    String macAddress = data.getStringExtra(BluetoothDeviceListDialog.EXTRA_DEVICE_ADDRESS);
+                    //初始化话DeviceConnFactoryManager
+                    new DeviceConnFactoryManager.Build()
+                            .setId(id)
+                            //设置连接方式
+                            .setConnMethod(DeviceConnFactoryManager.CONN_METHOD.BLUETOOTH)
+                            //设置连接的蓝牙mac地址
+                            .setMacAddress(macAddress)
+                            .build();
+                    //打开端口
+                    DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
+                }
+                if(!isPair) {
+                    // 打开蓝牙配对页面
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+                        }
+                    },500);
+
+                }
+                break;
+            }
         }
     }
 
@@ -636,6 +762,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setRelationBillId(pl.getfId());
             mbr.setRelationBillNumber(pl.getFbillno());
             mbr.setCustomerId(pl.getCustId());
+            mbr.setCustomerNumber(pl.getCustNumber());
             mbr.setDeliveryWay(pl.getDeliveryWay());
             mbr.setPackageWorkType(2);
             mbr.setBinningType('3');
@@ -1024,10 +1151,168 @@ public class Sal_RecombinationActivity extends BaseActivity {
         return false;
     }
 
+    /**
+     * 设置生产订单打码格式（大标签）
+     * @param tsc
+     */
+    private void setPrintFormat(LabelCommand tsc) {
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 20; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 30; // 每行之间的距离
+        String date = Comm.getSysDate(7);
+
+        PickingList pl = plList.get(0);
+        // 绘制箱子条码
+        rowHigthSum = beginYPos + 20;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱码： \n");
+        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, strBoxBarcode);
+        rowHigthSum = beginYPos + 106;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(pl.getCustName())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getFbillno())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(pl.getDeliDate()).substring(0,10)+" \n");
+        rowHigthSum = rowHigthSum + 20;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"----------------------------------------- \n");
+        for(int i=0; i<plList.size(); i++) {
+            PickingList pl2 = plList.get(i);
+            MaterialBinningRecord mbr2 = mbrList.get(i);
+            rowHigthSum = rowHigthSum + rowSpacing;
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料代码："+isNULLS(pl2.getMtlFnumber())+" \n");
+            rowHigthSum = rowHigthSum + rowSpacing;
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(pl2.getMtlFname())+" \n");
+            rowHigthSum = rowHigthSum + rowSpacing;
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+mbr2.getNumber()+" \n");
+            tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(pl2.getMtlUnitName())+" \n");
+            rowHigthSum = rowHigthSum + 20;
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"----------------------------------------- \n");
+        }
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
+    }
+
+    /**
+     * 发送标签
+     */
+    private void sendLabel() {
+        isPair = false;
+        LabelCommand tsc = new LabelCommand();
+        // 设置标签尺寸，按照实际尺寸设置
+        int height = plList.size() * 40;
+        height = height > 60 ? height : 60;
+        tsc.addSize(76, height);
+        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
+        tsc.addGap(10);
+        // 设置打印方向
+        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+        // 开启带Response的打印，用于连续打印
+        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+        // 设置原点坐标
+        tsc.addReference(0, 0);
+        // 撕纸模式开启
+        tsc.addTear(EscCommand.ENABLE.ON);
+        // 清除打印缓冲区
+        tsc.addCls();
+        // 绘制简体中文
+        // --------------- 大标签打印 ------------------
+        setPrintFormat(tsc);
+//        tsc.addText(20, 250, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"【物料条码】");
+//        tsc.addText(20, 300, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+);
+//        // 绘制一维条码
+//        tsc.add1DBarcode(20, 250, LabelCommand.BARCODETYPE.CODE128, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, "SMARNET");
+        // 打印标签
+        tsc.addPrint(1, 1);
+        // 打印标签后 蜂鸣器响
+
+        tsc.addSound(2, 100);
+        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
+        Vector<Byte> datas = tsc.getCommand();
+        // 发送数据
+        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null) {
+            return;
+        }
+        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
+        // 保存之后清空页面
+        saveAfter();
+    }
+
+    /**
+     * 蓝牙监听广播
+     */
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (action) {
+                // 蓝牙连接断开广播
+                case ACTION_USB_DEVICE_DETACHED:
+                case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+                    mHandler.obtainMessage(CONN_STATE_DISCONN).sendToTarget();
+                    break;
+                case DeviceConnFactoryManager.ACTION_CONN_STATE:
+                    int state = intent.getIntExtra(DeviceConnFactoryManager.STATE, -1);
+                    int deviceId = intent.getIntExtra(DeviceConnFactoryManager.DEVICE_ID, -1);
+                    switch (state) {
+                        case DeviceConnFactoryManager.CONN_STATE_DISCONNECT:
+                            if (id == deviceId) {
+                                tvConnState.setText(getString(R.string.str_conn_state_disconnect));
+                                tvConnState.setTextColor(Color.parseColor("#666666")); // 未连接-灰色
+                                isConnected = false;
+                            }
+                            break;
+                        case DeviceConnFactoryManager.CONN_STATE_CONNECTING:
+                            tvConnState.setText(getString(R.string.str_conn_state_connecting));
+                            tvConnState.setTextColor(Color.parseColor("#6a5acd")); // 连接中-紫色
+                            isConnected = false;
+
+                            break;
+                        case DeviceConnFactoryManager.CONN_STATE_CONNECTED:
+//                            tvConnState.setText(getString(R.string.str_conn_state_connected) + "\n" + getConnDeviceInfo());
+                            tvConnState.setText(getString(R.string.str_conn_state_connected));
+                            tvConnState.setTextColor(Color.parseColor("#008800")); // 已连接-绿色
+                            sendLabel();
+                            isConnected = true;
+
+                            break;
+                        case CONN_STATE_FAILED:
+                            Utils.toast(context, getString(R.string.str_conn_fail));
+                            tvConnState.setText(getString(R.string.str_conn_state_disconnect));
+                            tvConnState.setTextColor(Color.parseColor("#666666")); // 未连接-灰色
+                            isConnected = false;
+
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+            }
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_DEVICE_DETACHED);
+        filter.addAction(DeviceConnFactoryManager.ACTION_CONN_STATE);
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
     @Override
     protected void onDestroy() {
         closeHandler(mHandler);
         super.onDestroy();
+        DeviceConnFactoryManager.closeAllPort();
+        if (threadPool != null) {
+            threadPool.stopThreadPool();
+        }
     }
 
 }
