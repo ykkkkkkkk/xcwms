@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -97,6 +98,8 @@ public class Pur_InFragment1 extends BaseFragment {
     TextView tvPurDate;
     @BindView(R.id.tv_purMan)
     TextView tvPurMan;
+    @BindView(R.id.lin_top)
+    LinearLayout linTop;
 
     private Pur_InFragment1 context = this;
     private static final int SEL_SUPPLIER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15, SEL_STOCK2 = 17, SEL_STOCKP2 = 18;
@@ -316,7 +319,7 @@ public class Pur_InFragment1 extends BaseFragment {
     }
 
     @OnClick({R.id.tv_supplierSel, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
-            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_purOrg, R.id.tv_purDate, R.id.tv_purMan, R.id.btn_deptName})
+            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_purOrg, R.id.tv_purDate, R.id.tv_purMan, R.id.btn_deptName, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -393,6 +396,14 @@ public class Pur_InFragment1 extends BaseFragment {
                     return;
                 } else {
                     resetSon();
+                }
+
+                break;
+            case R.id.lin_rowTitle: // 点击行标题头
+                if(linTop.getVisibility() == View.VISIBLE) {
+                    linTop.setVisibility(View.GONE);
+                } else {
+                    linTop.setVisibility(View.VISIBLE);
                 }
 
                 break;

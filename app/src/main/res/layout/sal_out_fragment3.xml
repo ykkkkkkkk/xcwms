@@ -183,9 +183,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="38dp"
-            android:layout_marginLeft="@dimen/_6dp"
-            android:layout_marginRight="@dimen/_6dp"
-            android:layout_marginTop="@dimen/_6dp"
+            android:layout_margin="@dimen/_6dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -229,17 +227,13 @@
                 android:paddingLeft="2dp"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_12sp" />
-
-
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/_6dp"
-            android:background="#BBBBBB" />
-
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#BBBBBB" />
 
     <LinearLayout
         android:id="@+id/lin_rowTitle"
@@ -324,11 +318,23 @@
 
         <Button
             android:id="@+id/btn_save"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="38dp"
+            android:layout_weight="1"
             android:background="@drawable/btn_blue2_selector"
             android:gravity="center"
             android:text="保存"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_pass"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_purple2_selector"
+            android:gravity="center"
+            android:text="审核"
             android:textColor="@color/white"
             android:textSize="16sp" />
 

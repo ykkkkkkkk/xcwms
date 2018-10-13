@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,7 +29,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 import butterknife.OnLongClick;
-import butterknife.OnTouch;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -43,15 +40,12 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
-import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
-import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
-import ykk.xc.com.xcwms.model.CombineSalOrderEntry;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
@@ -60,14 +54,13 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ShrinkOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
-import ykk.xc.com.xcwms.purchase.Prod_InMainActivity;
-import ykk.xc.com.xcwms.sales.adapter.Sal_OutAdapter;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment1Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -105,7 +98,7 @@ public class Sal_OutFragment1 extends BaseFragment {
 
     private Sal_OutFragment1 context = this;
     private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, SUCC3B = 203, UNSUCC3B = 503;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
     private Customer cust; // 客户
     private Stock stock; // 仓库
@@ -200,43 +193,58 @@ public class Sal_OutFragment1 extends BaseFragment {
 
                         break;
                     case SUCC3: // 判断是否存在返回
-                        String result = (String) msg.obj;
-                        String strBarcode = JsonUtil.strToString(result);
-                        if(m.isNULLS(strBarcode).length() > 0) m.isRepeatSave(strBarcode);
+                        List<ShrinkOrder> list = JsonUtil.strToList((String) msg.obj, ShrinkOrder.class);
+                        for (int i = 0, len = list.size(); i < len; i++) {
+                            ShrinkOrder so = list.get(i);
+                            for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                // 比对订单号和分录id
+                                if (so.getFbillno().equals(sr2.getPoFbillno()) && so.getEntryId() == sr2.getEntryId()) {
+                                    if((so.getFqty()+sr2.getStockqty()) > sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已出库数“"+so.getFqty()+"”，当前超出数“"+(so.getFqty()+sr2.getStockqty() - sr2.getFqty())+"”！");
+                                        return;
+                                    } else if(so.getFqty() == sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已全部出库，不能重复操作！");
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        m.run_addScanningRecord();
 
                         break;
                     case UNSUCC3: // 判断是否存在返回
                         m.run_addScanningRecord();
 
                         break;
-                    case SUCC3B: // 判断是否存在返回
-                        String result2 = (String) msg.obj;
-                        String strBarcode2 = JsonUtil.strToString(result2);
-                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
-                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
-                        int count = 0; // 统计
-                        if(list != null && list.size() > 0) {
-                            int size = list.size();
-                            for(int i=0; i<size; i++) {
-                                CombineSalOrderEntry parent = list.get(i);
-                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
-                                    ScanningRecord2 son = m.checkDatas.get(j);
-                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
-                                        count += 1;
-                                        break;
-                                    }
-                                }
-                            }
-                            if(size > count) {
-                                Comm.showWarnDialog(m.mContext,"当前操作的数据存在拼单发货，请检查拼单的数据！");
-                            }
-                        }
-
-                        break;
-                    case UNSUCC3B: // 判断是否存在返回
-                        m.run_addScanningRecord();
-
-                        break;
+//                    case SUCC3B: // 判断是否存在返回
+//                        String result2 = (String) msg.obj;
+//                        String strBarcode2 = JsonUtil.strToString(result2);
+//                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
+//                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
+//                        int count = 0; // 统计
+//                        if(list != null && list.size() > 0) {
+//                            int size = list.size();
+//                            for(int i=0; i<size; i++) {
+//                                CombineSalOrderEntry parent = list.get(i);
+//                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
+//                                    ScanningRecord2 son = m.checkDatas.get(j);
+//                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
+//                                        count += 1;
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                            if(size > count) {
+//                                Comm.showWarnDialog(m.mContext,"当前操作的数据存在拼单发货，请检查拼单的数据！");
+//                            }
+//                        }
+//
+//                        break;
+//                    case UNSUCC3B: // 判断是否存在返回
+//                        m.run_addScanningRecord();
+//
+//                        break;
                     case CODE1: // 清空数据
                         m.etMatNo.setText("");
                         m.mtlBarcode = "";
@@ -385,7 +393,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                 if(!saveBefore()) {
                     return;
                 }
-                run_findMatIsExistList2();
+                run_findInStockSum();
 //                run_addScanningRecord();
 
                 break;
@@ -469,7 +477,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
-            if (sr2.getStockqty() > sr2.getFqty()) {
+            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() > sr2.getFqty()) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）不能大于（应发数）！");
                 return false;
             }
@@ -1104,32 +1112,24 @@ public class Sal_OutFragment1 extends BaseFragment {
     /**
      * 判断表中存在该物料
      */
-    private void run_findMatIsExistList2() {
+    private void run_findInStockSum() {
         showLoadDialog("加载中...");
-        StringBuilder strBarcode = new StringBuilder();
-        StringBuilder strFid = new StringBuilder();
+        StringBuilder strFbillno = new StringBuilder();
         StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-            if(isNULLS(sr2.getBarcode()).length() > 0) {
-                if((i+1) == size) {
-                    strBarcode.append(sr2.getBarcode());
-                    strFid.append(sr2.getPoFid());
-                    strEntryId.append(sr2.getEntryId());
-
-                } else {
-                    strBarcode.append(sr2.getBarcode() + ",");
-                    strFid.append(sr2.getPoFid() + ",");
-                    strEntryId.append(sr2.getEntryId() + ",");
-                }
+            if((i+1) == size) {
+                strFbillno.append(sr2.getPoFbillno());
+                strEntryId.append(sr2.getEntryId());
+            } else {
+                strFbillno.append(sr2.getPoFbillno() + ",");
+                strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = null;
-        mUrl = Consts.getURL("findMatIsExistList3");
+        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
-                .add("orderType", "XS") // 单据类型CG代表采购订单，XS销售订单,生产PD
-                .add("strBarcode", strBarcode.toString())
-                .add("strFid", strFid.toString())
+                .add("fbillType", "4") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
+                .add("strFbillno", strFbillno.toString())
                 .add("strEntryId", strEntryId.toString())
                 .build();
 
@@ -1143,7 +1143,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC3B);
+                mHandler.sendEmptyMessage(UNSUCC3);
             }
 
             @Override
@@ -1151,11 +1151,11 @@ public class Sal_OutFragment1 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC3B);
+                    mHandler.sendEmptyMessage(UNSUCC3);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC3B, result);
-                Log.e("run_findMatIsExistList2 --> onResponse", result);
+                Message msg = mHandler.obtainMessage(SUCC3, result);
+                Log.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

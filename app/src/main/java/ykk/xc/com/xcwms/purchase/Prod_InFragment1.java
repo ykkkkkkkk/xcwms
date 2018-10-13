@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -51,6 +52,7 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ShrinkOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -82,6 +84,8 @@ public class Prod_InFragment1 extends BaseFragment {
     TextView tvProdDate;
     @BindView(R.id.tv_prodMan)
     TextView tvProdMan;
+    @BindView(R.id.lin_top)
+    LinearLayout linTop;
 
     private Prod_InFragment1 context = this;
     private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
@@ -178,22 +182,24 @@ public class Prod_InFragment1 extends BaseFragment {
 
                         break;
                     case SUCC3: // 判断是否存在返回
-                        String strBarcode = JsonUtil.strToString((String) msg.obj);
-                        String[] barcodeArr = strBarcode.split(",");
-                        boolean isNext = true; // 是否下一步
-                        for (int i = 0, len = barcodeArr.length; i < len; i++) {
+                        List<ShrinkOrder> list = JsonUtil.strToList((String) msg.obj, ShrinkOrder.class);
+                        for (int i = 0, len = list.size(); i < len; i++) {
+                            ShrinkOrder so = list.get(i);
                             for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
                                 ScanningRecord2 sr2 = m.checkDatas.get(j);
-                                Material mtl = sr2.getMtl();
-                                // 判断扫码表和当前扫的码对比是否一样
-                                if (mtl.getIsSnManager() == 1 && barcodeArr[i].equals(m.checkDatas.get(j).getBarcode())) {
-                                    Comm.showWarnDialog(m.mContext,"第" + (i + 1) + "行已入库，不能重复操作！");
-                                    isNext = false;
-                                    return;
+                                // 比对订单号和分录id
+                                if (so.getFbillno().equals(sr2.getPoFbillno()) && so.getEntryId() == sr2.getEntryId()) {
+                                    if((so.getFqty()+sr2.getStockqty()) > sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已入库数“"+so.getFqty()+"”，当前超出数“"+(so.getFqty()+sr2.getStockqty() - sr2.getFqty())+"”！");
+                                        return;
+                                    } else if(so.getFqty() == sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已全部入库，不能重复操作！");
+                                        return;
+                                    }
                                 }
                             }
                         }
-                        if(isNext) m.run_addScanningRecord();
+                        m.run_addScanningRecord();
 
                         break;
                     case UNSUCC3: // 判断是否存在返回
@@ -273,7 +279,7 @@ public class Prod_InFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_prodMan})
+    @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_prodMan, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -320,7 +326,7 @@ public class Prod_InFragment1 extends BaseFragment {
                 if(!saveBefore()) {
                     return;
                 }
-                run_findMatIsExistList2();
+                run_findInStockSum();
 //                run_addScanningRecord();
 
                 break;
@@ -343,6 +349,14 @@ public class Prod_InFragment1 extends BaseFragment {
                     return;
                 } else {
                     resetSon();
+                }
+
+                break;
+            case R.id.lin_rowTitle: // 点击行标题头
+                if(linTop.getVisibility() == View.VISIBLE) {
+                    linTop.setVisibility(View.GONE);
+                } else {
+                    linTop.setVisibility(View.VISIBLE);
                 }
 
                 break;
@@ -986,20 +1000,25 @@ public class Prod_InFragment1 extends BaseFragment {
     /**
      * 判断表中存在该物料
      */
-    private void run_findMatIsExistList2() {
+    private void run_findInStockSum() {
         showLoadDialog("加载中...");
-        StringBuilder strBarcode = new StringBuilder();
+        StringBuilder strFbillno = new StringBuilder();
+        StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-            if(isNULLS(sr2.getBarcode()).length() > 0) {
-                if((i+1) == size) strBarcode.append(sr2.getBarcode());
-                else strBarcode.append(sr2.getBarcode() + ",");
+            if((i+1) == size) {
+                strFbillno.append(sr2.getPoFbillno());
+                strEntryId.append(sr2.getEntryId());
+            } else {
+                strFbillno.append(sr2.getPoFbillno() + ",");
+                strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = Consts.getURL("findMatIsExistList2");
+        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
-                .add("orderType", "PD") // 单据类型CG代表采购订单，XS销售订单,生产PD
-                .add("strBarcode", strBarcode.toString())
+                .add("fbillType", "3") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
+                .add("strFbillno", strFbillno.toString())
+                .add("strEntryId", strEntryId.toString())
                 .build();
 
         Request request = new Request.Builder()
@@ -1024,7 +1043,7 @@ public class Prod_InFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC3, result);
-                Log.e("run_findMatIsExistList2 --> onResponse", result);
+                Log.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

@@ -41,13 +41,12 @@ import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.model.CombineSalOrderEntry;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.ExpressCompany;
-import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ShrinkOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -124,9 +123,24 @@ public class Sal_OutFragment3 extends BaseFragment {
 
                         break;
                     case SUCC2: // 判断是否存在返回
-                        String result = (String) msg.obj;
-                        String strBarcode = JsonUtil.strToString(result);
-                        if(m.isNULLS(strBarcode).length() > 0) m.isRepeatSave(strBarcode);
+                        List<ShrinkOrder> list = JsonUtil.strToList((String) msg.obj, ShrinkOrder.class);
+                        for (int i = 0, len = list.size(); i < len; i++) {
+                            ShrinkOrder so = list.get(i);
+                            for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                // 比对订单号和分录id
+                                if (so.getFbillno().equals(sr2.getPoFbillno()) && so.getEntryId() == sr2.getEntryId()) {
+                                    if((so.getFqty()+sr2.getStockqty()) > sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已出库数“"+so.getFqty()+"”，当前超出数“"+(so.getFqty()+sr2.getStockqty() - sr2.getFqty())+"”！");
+                                        return;
+                                    } else if(so.getFqty() == sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已全部出库，不能重复操作！");
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        m.run_addScanningRecord();
 
                         break;
                     case UNSUCC2: // 判断是否存在返回
@@ -237,7 +251,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                 if(!saveBefore()) {
                     return;
                 }
-                run_findMatIsExistList5();
+                run_findInStockSum();
 //                run_addScanningRecord();
 
                 break;
@@ -684,21 +698,25 @@ public class Sal_OutFragment3 extends BaseFragment {
     /**
      * 判断表中存在该物料
      */
-    private void run_findMatIsExistList5() {
+    private void run_findInStockSum() {
         showLoadDialog("加载中...");
-        StringBuilder strSourceFinterId = new StringBuilder();
+        StringBuilder strFbillno = new StringBuilder();
+        StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
             if((i+1) == size) {
-                strSourceFinterId.append(sr2.getSourceFinterId());
+                strFbillno.append(sr2.getPoFbillno());
+                strEntryId.append(sr2.getEntryId());
             } else {
-                strSourceFinterId.append(sr2.getSourceFinterId() + ",");
+                strFbillno.append(sr2.getPoFbillno() + ",");
+                strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = null;
-        mUrl = Consts.getURL("findMatIsExistList5");
+        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
-                .add("strSourceFinterId", strSourceFinterId.toString())
+                .add("fbillType", "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
+                .add("strFbillno", strFbillno.toString())
+                .add("strEntryId", strEntryId.toString())
                 .build();
 
         Request request = new Request.Builder()
@@ -723,7 +741,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);
-                Log.e("run_findMatIsExistList5 --> onResponse", result);
+                Log.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

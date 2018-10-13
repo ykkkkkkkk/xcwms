@@ -89,6 +89,8 @@ public class MaterialBinningRecord implements Serializable {
 	private double usableFqty;
 	/* 关联单据Json对象 */
 	private String relationObj;
+	/* 关联单据分录id */
+	private int entryId;
 
 	public MaterialBinningRecord() {
 		super();
@@ -332,6 +334,14 @@ public class MaterialBinningRecord implements Serializable {
 
 	public void setCustomerNumber(String customerNumber) {
 		this.customerNumber = customerNumber;
+	}
+
+	public int getEntryId() {
+		return entryId;
+	}
+
+	public void setEntryId(int entryId) {
+		this.entryId = entryId;
 	}
 
 

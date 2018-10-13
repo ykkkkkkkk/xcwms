@@ -60,7 +60,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="物料✔"
-            android:textColor="#FF3300"
+            android:textColor="#666666"
             android:textSize="14sp" />
 
         <View
@@ -74,8 +74,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="扫码打印"
-            android:textColor="#666666"
+            android:text="扫码打印✔"
+            android:textColor="#FF3300"
             android:textSize="14sp" />
 
 

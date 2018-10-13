@@ -676,7 +676,7 @@ public class Sal_PickingListActivity extends BaseActivity {
         int size = checkDatas.size();
         int count = 0; // 计数器
         for(int i=0; i<size; i++) {
-            PickingList p = checkDatas.get(0);
+            PickingList p = checkDatas.get(i);
             if(p.getPickingListNum() >= p.getDeliFremainoutqty()) {
                 count += 1;
             }
@@ -752,6 +752,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setCreateUserId(user.getId());
             pl.setCreateUserName(user.getUsername());
             pl.setPickingType(pickingType);
+            pl.setSalOrderNo(deliOrder.getSalOrderNo());
 
             checkDatas.add(pl);
         }

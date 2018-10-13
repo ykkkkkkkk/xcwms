@@ -57,7 +57,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     private PrintMainActivity parent;
     private BarCodeTable bt;
     private ProdOrder prodOrder;
-    private int tabFormat = 1;
+    private int tabFormat = 2; // 1：大标签，2：小标签
     private Button curBtn;
 
     // 消息处理
@@ -117,7 +117,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     public void initView() {
         mContext = getActivity();
         parent = (PrintMainActivity) mContext;
-        curBtn = btnBig;
+        curBtn = btnSmall;
     }
 
     @Override

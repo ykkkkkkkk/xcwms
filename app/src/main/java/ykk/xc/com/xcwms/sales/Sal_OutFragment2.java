@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -60,6 +59,7 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ShrinkOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -236,43 +236,58 @@ public class Sal_OutFragment2 extends BaseFragment {
 
                         break;
                     case SUCC3: // 判断是否存在返回
-                        String result = (String) msg.obj;
-                        String strBarcode = JsonUtil.strToString(result);
-                        if(m.isNULLS(strBarcode).length() > 0) m.isRepeatSave(strBarcode);
+                        List<ShrinkOrder> list = JsonUtil.strToList((String) msg.obj, ShrinkOrder.class);
+                        for (int i = 0, len = list.size(); i < len; i++) {
+                            ShrinkOrder so = list.get(i);
+                            for (int j = 0, size = m.checkDatas.size(); j < size; j++) {
+                                ScanningRecord2 sr2 = m.checkDatas.get(j);
+                                // 比对订单号和分录id
+                                if (so.getFbillno().equals(sr2.getPoFbillno()) && so.getEntryId() == sr2.getEntryId()) {
+                                    if((so.getFqty()+sr2.getStockqty()) > sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已出库数“"+so.getFqty()+"”，当前超出数“"+(so.getFqty()+sr2.getStockqty() - sr2.getFqty())+"”！");
+                                        return;
+                                    } else if(so.getFqty() == sr2.getFqty()) {
+                                        Comm.showWarnDialog(m.mContext,"第" + (j + 1) + "行已全部出库，不能重复操作！");
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        m.run_addScanningRecord();
 
                         break;
                     case UNSUCC3: // 判断是否存在返回
                         m.run_addScanningRecord();
 
                         break;
-                    case SUCC3B: // 判断是否存在返回
-                        String result2 = (String) msg.obj;
-                        String strBarcode2 = JsonUtil.strToString(result2);
-                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
-                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
-                        int count = 0; // 统计
-                        if(list != null && list.size() > 0) {
-                            int size = list.size();
-                            for(int i=0; i<size; i++) {
-                                CombineSalOrderEntry parent = list.get(i);
-                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
-                                    ScanningRecord2 son = m.checkDatas.get(j);
-                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
-                                        count += 1;
-                                        break;
-                                    }
-                                }
-                            }
-//                            if(size > count) {
-//                                Comm.showWarnDialog(m.mContext,"当前操作的数据与发货单不一致，请检查数据！");
+//                    case SUCC3B: // 判断是否存在返回
+//                        String result2 = (String) msg.obj;
+//                        String strBarcode2 = JsonUtil.strToString(result2);
+//                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
+//                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
+//                        int count = 0; // 统计
+//                        if(list != null && list.size() > 0) {
+//                            int size = list.size();
+//                            for(int i=0; i<size; i++) {
+//                                CombineSalOrderEntry parent = list.get(i);
+//                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
+//                                    ScanningRecord2 son = m.checkDatas.get(j);
+//                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
+//                                        count += 1;
+//                                        break;
+//                                    }
+//                                }
 //                            }
-                        }
-
-                        break;
-                    case UNSUCC3B: // 判断是否存在返回
-                        m.run_addScanningRecord();
-
-                        break;
+////                            if(size > count) {
+////                                Comm.showWarnDialog(m.mContext,"当前操作的数据与发货单不一致，请检查数据！");
+////                            }
+//                        }
+//
+//                        break;
+//                    case UNSUCC3B: // 判断是否存在返回
+//                        m.run_addScanningRecord();
+//
+//                        break;
                     case SUCC4: // 查询发货通知单
                         List<DeliOrder> list2 = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
                         boolean isBool = false;
@@ -480,7 +495,7 @@ public class Sal_OutFragment2 extends BaseFragment {
                 if(!saveBefore()) {
                     return;
                 }
-                run_findMatIsExistList2();
+                run_findInStockSum();
 //                run_addScanningRecord();
 
                 break;
@@ -1467,32 +1482,24 @@ public class Sal_OutFragment2 extends BaseFragment {
     /**
      * 判断表中存在该物料
      */
-    private void run_findMatIsExistList2() {
+    private void run_findInStockSum() {
         showLoadDialog("加载中...");
-        StringBuilder strBarcode = new StringBuilder();
-        StringBuilder strFid = new StringBuilder();
+        StringBuilder strFbillno = new StringBuilder();
         StringBuilder strEntryId = new StringBuilder();
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-            if(isNULLS(sr2.getBarcode()).length() > 0) {
-                if((i+1) == size) {
-                    strBarcode.append(sr2.getBarcode());
-                    strFid.append(sr2.getPoFid());
-                    strEntryId.append(sr2.getEntryId());
-
-                } else {
-                    strBarcode.append(sr2.getBarcode() + ",");
-                    strFid.append(sr2.getPoFid() + ",");
-                    strEntryId.append(sr2.getEntryId() + ",");
-                }
+            if((i+1) == size) {
+                strFbillno.append(sr2.getPoFbillno());
+                strEntryId.append(sr2.getEntryId());
+            } else {
+                strFbillno.append(sr2.getPoFbillno() + ",");
+                strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = null;
-        mUrl = Consts.getURL("findMatIsExistList2");
+        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
-                .add("orderType", "XS") // 单据类型CG代表采购订单，XS销售订单,生产PD
-                .add("strBarcode", strBarcode.toString())
-                .add("strFid", strFid.toString())
+                .add("fbillType", "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
+                .add("strFbillno", strFbillno.toString())
                 .add("strEntryId", strEntryId.toString())
                 .build();
 
@@ -1518,7 +1525,7 @@ public class Sal_OutFragment2 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC3, result);
-                Log.e("run_findMatIsExistList2 --> onResponse", result);
+                Log.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

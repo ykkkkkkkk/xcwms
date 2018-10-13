@@ -79,7 +79,7 @@ public class PrintMainActivity extends BaseActivity {
     @Override
     public void initData() {
 
-        curText = tv1;
+        curText = tv2;
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
@@ -94,7 +94,7 @@ public class PrintMainActivity extends BaseActivity {
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(1);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -287,7 +287,7 @@ public class PrintMainActivity extends BaseActivity {
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"收货地址："+isNULLS(prodOrder.getReceiveAddress())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单号："+prodOrder.getFbillno()+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单号："+prodOrder.getSalOrderNo()+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"产品名称："+isNULLS(prodOrder.getMtlFname())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;

@@ -55,7 +55,7 @@ public class Sal_OutMainActivity extends BaseActivity {
 //            customer = (Customer) bundle.getSerializable("customer");
 //        }
 
-        curRadio = viewRadio1;
+        curRadio = viewRadio2;
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);

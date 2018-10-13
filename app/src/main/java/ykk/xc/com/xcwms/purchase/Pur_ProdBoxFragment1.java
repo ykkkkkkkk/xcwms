@@ -234,7 +234,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 m.setEnables(m.tvDeliverSel,R.drawable.back_style_gray3,false);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
                                 if(m.parseInt(count) > 0) {
-                                    Comm.showWarnDialog(m.mContext,"当前客户还有"+count+"个订单没有装箱，请注意！");
+                                    Comm.showWarnDialog(m.mContext,"当前客户还有"+count+"个物料没有装箱，请注意！");
                                 }
                                 break;
                         }
@@ -429,7 +429,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请先封箱，然后打印！");
                     return;
                 }
-                parent.setFragmentPrint1(0, listMbr, strBoxBarcode);
+                parent.setFragmentPrint1(0, listMbr, boxBarCode);
 
                 break;
             case R.id.btn_clone: // 新装
@@ -897,6 +897,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             tmpMbr.setBarcodeSource('1');
             tmpMbr.setNumber(1);
             tmpMbr.setRelationBillFQTY(prodOrder.getProdFqty());
+            tmpMbr.setEntryId(prodOrder.getEntryId());
             tmpMbr.setBarcode(barCodeTable.getBarcode());
             // 启用了批次号
             if(tmpMbr.getMtl() != null && tmpMbr.getMtl().getIsBatchManager() == 1) {
@@ -910,6 +911,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             tmpMbr.setCreateUserName(user.getUsername());
             tmpMbr.setModifyUserId(user.getId());
             tmpMbr.setModifyUserName(user.getUsername());
+
             // 把对象转成json字符串
             String strJson = JsonUtil.objectToString(tmpMbr);
             run_save(strJson);

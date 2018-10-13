@@ -31,6 +31,7 @@ import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.BoxBarCode;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
@@ -75,7 +76,7 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
     private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
     private static final int CONN_PRINTER = 0x12;
     private List<MaterialBinningRecord> mbrList;
-    private String barcode;
+    private BoxBarCode boxBarCode;
 //    private Customer customer; // 客户
 
     @Override
@@ -242,14 +243,14 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
     /**
      * Fragment打印回调
      */
-    public void setFragmentPrint1(int flag, List<MaterialBinningRecord> materialBinningRecords, String barcode) {
+    public void setFragmentPrint1(int flag, List<MaterialBinningRecord> materialBinningRecords, BoxBarCode boxBarCode) {
         tabFlag = flag;
         if(tabFlag != flag) {
 //            isConnected = false;
         }
         String date = Comm.getSysDate(7);
         mbrList = materialBinningRecords;
-        context.barcode = barcode;
+        context.boxBarCode = boxBarCode;
 
         if(isConnected) {
             sendLabel();
@@ -275,11 +276,11 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
         // 绘制箱子条码
         rowHigthSum = beginYPos + 20;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱码： \n");
-        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
         rowHigthSum = beginYPos + 106;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(mbr.getCustomer().getCustomerName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(prodOrder.getFbillno())+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(prodOrder.getSalOrderNo())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(prodOrder.getProdFdate()).substring(0,10)+" \n");
         rowHigthSum = rowHigthSum + 20;

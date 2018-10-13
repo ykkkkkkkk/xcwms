@@ -609,6 +609,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         double number = parseDouble(value);
                         mbrList.get(curPos).setNumber(number);
                         mAdapter.notifyDataSetChanged();
+                        isRecombinationEnd();
                     }
                 }
 
@@ -768,6 +769,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setBinningType('3');
             mbr.setCaseId(37);
             mbr.setRelationBillFQTY(pl.getPickingListNum());
+            mbr.setEntryId(pl.getEntryId());
             mbr.setUsableFqty(pl.getUsableFqty());
             mbr.setCreateUserId(user.getId());
             mbr.setCreateUserName(user.getUsername());
@@ -821,11 +823,29 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     mbr.setNumber(fqty);
                 }
                 mAdapter.notifyDataSetChanged();
+                isRecombinationEnd();
                 break;
             }
         }
         if(!isFlag) {
             Comm.showWarnDialog(context, "扫的物料与订单不匹配！");
+        }
+    }
+
+    /**
+     * 是否已经捡完货
+     */
+    private void isRecombinationEnd() {
+        int size = mbrList.size();
+        int count = 0; // 计数器
+        for(int i=0; i<size; i++) {
+            MaterialBinningRecord p = mbrList.get(i);
+            if(p.getNumber() >= p.getUsableFqty()) {
+                count += 1;
+            }
+        }
+        if(count == size) {
+            toasts("全部复核完了，请保存！");
         }
     }
 
@@ -1166,11 +1186,11 @@ public class Sal_RecombinationActivity extends BaseActivity {
         // 绘制箱子条码
         rowHigthSum = beginYPos + 20;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱码： \n");
-        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, strBoxBarcode);
+        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
         rowHigthSum = beginYPos + 106;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(pl.getCustName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getFbillno())+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getSalOrderNo())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(pl.getDeliDate()).substring(0,10)+" \n");
         rowHigthSum = rowHigthSum + 20;
