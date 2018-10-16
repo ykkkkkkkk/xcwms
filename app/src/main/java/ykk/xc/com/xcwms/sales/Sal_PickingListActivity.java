@@ -620,9 +620,9 @@ public class Sal_PickingListActivity extends BaseActivity {
 
                 double fqty = 1;
                 // 计量单位数量
-                if(mtl2.getCalculateFqty() > 0) fqty = mtl2.getCalculateFqty();
+                if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
                 // 未启用序列号
-                if (mtl2.getIsSnManager() == 0) {
+                if (mtl.getIsSnManager() == 0) {
                     // 发货数大于拣货数
                     if (pl.getDeliFremainoutqty() > pl.getPickingListNum()) {
                         // 如果扫的是物料包装条码，就显示个数
@@ -638,7 +638,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                         pl.setSnNo(bt.getSnCode());
 
                     // 启用了最小包装
-                    } else if(pl.getMtl().getMtlPack() != null && pl.getMtl().getMtlPack().getIsMinNumberPack() == 1) {
+                    } else if(mtl2.getMtlPack() != null && mtl2.getMtlPack().getIsMinNumberPack() == 1) {
                         if(mtl2.getMtlPack().getIsMinNumberPack() == 1) {
                             // 如果拣货数小于订单数，就加数量
                             if(pl.getPickingListNum() < pl.getDeliFremainoutqty()) {
@@ -649,7 +649,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                             }
                         }
 
-                    } else if ((pl.getMtl().getMtlPack() == null || pl.getMtl().getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
+                    } else if ((mtl2.getMtlPack() == null || mtl2.getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                         // 数量已满
                         Comm.showWarnDialog(context, "第" + (i + 1) + "行！，（拣货数）不能大于（订单数）！");
                         return;

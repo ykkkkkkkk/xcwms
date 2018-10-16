@@ -787,21 +787,20 @@ public class Sal_RecombinationActivity extends BaseActivity {
         if(bt != null) {
             setTexts(etMtlCode, strMtlBarcode);
         }
+        Material tmpMtl = bt.getMtl();
         int size = mbrList.size();
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
             MaterialBinningRecord mbr = mbrList.get(i);
-            Material mtl = mbr.getMtl();
-
             // 如果扫码相同
             if (bt.getMaterialId() == mbr.getMaterialId()) {
                 isFlag = true;
 
                 double fqty = 1;
                 // 计量单位数量
-                if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
+                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
-                if (mtl.getIsSnManager() == 0) {
+                if (tmpMtl.getIsSnManager() == 0) {
                     // 如果拣货数大于复核数
                     if (mbr.getRelationBillFQTY() > mbr.getNumber()) {
                         // 如果扫的是物料包装条码，就显示个数
@@ -1193,20 +1192,20 @@ public class Sal_RecombinationActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getSalOrderNo())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(pl.getDeliDate()).substring(0,10)+" \n");
-        rowHigthSum = rowHigthSum + 20;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"----------------------------------------- \n");
+        rowHigthSum = rowHigthSum + 30;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         for(int i=0; i<plList.size(); i++) {
             PickingList pl2 = plList.get(i);
             MaterialBinningRecord mbr2 = mbrList.get(i);
             rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料代码："+isNULLS(pl2.getMtlFnumber())+" \n");
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(pl2.getMtlFnumber())+" \n");
             rowHigthSum = rowHigthSum + rowSpacing;
             tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(pl2.getMtlFname())+" \n");
             rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+mbr2.getNumber()+" \n");
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr2.getNumber())+" \n");
             tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(pl2.getMtlUnitName())+" \n");
-            rowHigthSum = rowHigthSum + 20;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"----------------------------------------- \n");
+            rowHigthSum = rowHigthSum + 30;
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         }
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");

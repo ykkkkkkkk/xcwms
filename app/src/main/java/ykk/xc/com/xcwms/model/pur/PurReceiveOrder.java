@@ -42,6 +42,10 @@ public class PurReceiveOrder implements Serializable {
 	private String mtlFnumber; // 物料编码
 	private String mtlFname; // 物料名称
 	private String mtlType; // 规格型号
+	/*k3物料超收上限*/
+	private double receiveMaxScale;
+	/*k3物料超收下限*/
+	private double receiveMinScale;
 	private String unitFnumber; // 单位代码
 	private String unitFname; // 单位
 	private double factreceiveqty; // 送料数量
@@ -290,33 +294,27 @@ public class PurReceiveOrder implements Serializable {
 	public BarCodeTable getBct() {
 		return bct;
 	}
-
 	public void setBct(BarCodeTable bct) {
 		this.bct = bct;
 	}
 	public int getIsCheck() {
 		return isCheck;
 	}
-
 	public void setIsCheck(int isCheck) {
 		this.isCheck = isCheck;
 	}
-
-	@Override
-	public String toString() {
-		return "PurReceiveOrder [fId=" + fId + ", fbillno=" + fbillno + ", fbillType=" + fbillType + ", fbillStatus="
-				+ fbillStatus + ", recFdate=" + recFdate + ", supplierId=" + supplierId + ", supplierName="
-				+ supplierName + ", supplierNumber=" + supplierNumber + ", purOrgId=" + purOrgId + ", purOrgNumber="
-				+ purOrgNumber + ", purOrgName=" + purOrgName + ", recOrgId=" + recOrgId + ", recOrgNumber="
-				+ recOrgNumber + ", recOrgName=" + recOrgName + ", needOrgNumber=" + needOrgNumber + ", needOrgName="
-				+ needOrgName + ", recUserNumber=" + recUserNumber + ", recUserName=" + recUserName + ", purUserNumber="
-				+ purUserNumber + ", purUserName=" + purUserName + ", recDeptNumber=" + recDeptNumber + ", recDeptName="
-				+ recDeptName + ", purDeptNumber=" + purDeptNumber + ", purDeptName=" + purDeptName + ", mtlId=" + mtlId
-				+ ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname + ", mtlType=" + mtlType
-				+ ", unitFnumber=" + unitFnumber + ", unitFname=" + unitFname + ", factreceiveqty=" + factreceiveqty
-				+ ", finstockbaseqty=" + finstockbaseqty + ", usableFqty=" + usableFqty + ", stockId=" + stockId
-				+ ", stockNumber=" + stockNumber + ", stockName=" + stockName + ", entryId=" + entryId + ", isCheck="
-				+ isCheck + ", bct=" + bct + "]";
+	public double getReceiveMaxScale() {
+		return receiveMaxScale;
 	}
+	public void setReceiveMaxScale(double receiveMaxScale) {
+		this.receiveMaxScale = receiveMaxScale;
+	}
+	public double getReceiveMinScale() {
+		return receiveMinScale;
+	}
+	public void setReceiveMinScale(double receiveMinScale) {
+		this.receiveMinScale = receiveMinScale;
+	}
+
 
 }

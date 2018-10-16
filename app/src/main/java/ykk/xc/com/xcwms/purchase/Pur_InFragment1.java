@@ -807,6 +807,7 @@ public class Pur_InFragment1 extends BaseFragment {
      */
     private boolean getBarCodeTableAfterSon(BarCodeTable bt) {
         int size = checkDatas.size();
+        Material tmpMtl = bt.getMtl();
         // 判断重复
         if(size > 0) {
             for (int i = 0; i < size; i++) {
@@ -814,12 +815,12 @@ public class Pur_InFragment1 extends BaseFragment {
                 Material mtl = sr2.getMtl();
                 // 如果扫码相同
                 if (mtl.getfMaterialId() == bt.getMaterialId()) {
-                    if(sr2.getMtl().getIsSnManager() == 0) { // 未启用序列号
+                    if(tmpMtl.getIsSnManager() == 0) { // 未启用序列号
                         // 每包的数量
                         double number = bt.getMaterialCalculateNumber();
                         double fqty = 1;
                         // 计量单位数量
-                        if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
+                        if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
 
                         if(number > 0) {
                             sr2.setFqty(sr2.getStockqty() + (number*fqty));

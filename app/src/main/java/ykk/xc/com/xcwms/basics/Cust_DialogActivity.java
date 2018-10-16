@@ -82,6 +82,7 @@ public class Cust_DialogActivity extends BaseDialogActivity implements XRecycler
                             m.xRecyclerView.loadMoreComplete(true);
                         }
 
+                        m.xRecyclerView.setPullRefreshEnabled(true); // 上啦刷新开启
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
@@ -109,7 +110,7 @@ public class Cust_DialogActivity extends BaseDialogActivity implements XRecycler
         xRecyclerView.setLoadingListener(context);
 
         xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
 
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override

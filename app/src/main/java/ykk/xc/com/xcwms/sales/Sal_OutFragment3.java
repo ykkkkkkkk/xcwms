@@ -160,30 +160,6 @@ public class Sal_OutFragment3 extends BaseFragment {
         }
     }
 
-    /**
-     * 判断是否有重复的保存
-     * @param strBarcode
-     * @return
-     */
-    private boolean isRepeatSave(String strBarcode) {
-        String[] barcodeArr = strBarcode.split(",");
-        boolean isNext = true; // 是否下一步
-        for (int i = 0, len = barcodeArr.length; i < len; i++) {
-            for (int j = 0, size = checkDatas.size(); j < size; j++) {
-                ScanningRecord2 sr2 = checkDatas.get(j);
-                // 判断扫码表和当前扫的码对比是否一样
-                if (sr2.getSourceFinterId() == parseInt(barcodeArr[i])) {
-                    Comm.showWarnDialog(mContext,"第" + (i + 1) + "行已出库，不能重复操作！");
-                    isNext = false;
-                    return false;
-                }
-            }
-        }
-        if(isNext) run_addScanningRecord();
-
-        return true;
-    }
-
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
         return inflater.inflate(R.layout.sal_out_fragment3, container, false);

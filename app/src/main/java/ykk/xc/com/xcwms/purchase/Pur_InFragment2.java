@@ -23,6 +23,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +130,7 @@ public class Pur_InFragment2 extends BaseFragment {
     private Activity mContext;
     private Pur_InMainActivity parent;
     private char defaultStockVal; // 默认仓库的值
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Pur_InFragment2.MyHandler mHandler = new Pur_InFragment2.MyHandler(this);
@@ -473,12 +475,14 @@ public class Pur_InFragment2 extends BaseFragment {
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
+            Material mtl = sr2.getMtl();
             if (sr2.getStockqty() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）必须大于0！");
                 return false;
             }
-            if (sr2.getStockqty() > sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）不能大于（应收数）！");
+            double fqty = sr2.getFqty()*(1+mtl.getReceiveMaxScale()/100);
+            if (sr2.getStockqty() > fqty) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）不能大于（应收数）"+(mtl.getReceiveMaxScale() > 0 ? "；最大上限为（"+df.format(fqty)+"）" : "")+"！");
                 return false;
             }
         }
@@ -842,9 +846,12 @@ public class Pur_InFragment2 extends BaseFragment {
             sr2.setSourceFinterId(p.getfId());
             sr2.setSourceFnumber(p.getFbillno());
             sr2.setFitemId(p.getMtl().getfMaterialId());
-            sr2.setMtl(p.getMtl());
-            sr2.setMtlFnumber(p.getMtl().getfNumber());
-            sr2.setUnitFnumber(p.getMtl().getUnit().getUnitNumber());
+            Material mtl = p.getMtl();
+            mtl.setReceiveMaxScale(p.getReceiveMaxScale());
+            mtl.setReceiveMinScale(p.getReceiveMinScale());
+            sr2.setMtl(mtl);
+            sr2.setMtlFnumber(mtl.getfNumber());
+            sr2.setUnitFnumber(mtl.getUnit().getUnitNumber());
             sr2.setPoFid(p.getfId());
             sr2.setEntryId(p.getEntryId());
             sr2.setPoFbillno(p.getFbillno());
@@ -906,6 +913,7 @@ public class Pur_InFragment2 extends BaseFragment {
         if(bt != null) {
             setTexts(etMtlNo, mtlBarcode);
         }
+        Material tmpMtl = bt.getMtl();
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
@@ -917,12 +925,13 @@ public class Pur_InFragment2 extends BaseFragment {
 
                 double fqty = 1;
                 // 计量单位数量
-                if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
+                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
 
                 // 未启用序列号
-                if (sr2.getMtl().getIsSnManager() == 0) {
-                    // 如果应收数大于实收数
-                    if (sr2.getFqty() > sr2.getStockqty()) {
+                if (tmpMtl.getIsSnManager() == 0) {
+                    double fqty2 = sr2.getFqty()*(1+mtl.getReceiveMaxScale()/100);
+                    // 如果应收数大于实收数（加了超收上限计算）
+                    if (fqty2 > sr2.getStockqty()) {
                         double number = 0;
                         // 包装数量
                         if(bt != null) number = bt.getMaterialCalculateNumber();
@@ -934,7 +943,7 @@ public class Pur_InFragment2 extends BaseFragment {
                         }
                     } else {
                         // 数量已满
-                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行！，实收数不能大于应收数！");
+                        Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实收数）不能大于（应收数）"+(mtl.getReceiveMaxScale() > 0 ? "；最大上限为（"+df.format(fqty2)+"）" : "")+"！");
                         return;
                     }
 
@@ -995,7 +1004,7 @@ public class Pur_InFragment2 extends BaseFragment {
             PurOrder p2 = sourceList.get(i);
             // 是否有相同的行，就提示
             if (purOrder.getfId() == p2.getfId() && purOrder.getMtlId() == p2.getMtlId() && purOrder.getEntryId() == p2.getEntryId()) {
-                Comm.showWarnDialog(mContext, "第"+(i+1)+"行！，已有相同的数据！");
+                Comm.showWarnDialog(mContext, "第"+(i+1)+"行，已有相同的数据！");
                 return;
             }
         }

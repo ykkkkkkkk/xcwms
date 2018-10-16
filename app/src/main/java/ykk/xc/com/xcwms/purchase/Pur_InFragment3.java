@@ -912,6 +912,7 @@ public class Pur_InFragment3 extends BaseFragment {
             setTexts(etMtlNo, mtlBarcode);
         }
         int size = checkDatas.size();
+        Material tmpMtl = bt.getMtl();
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
@@ -922,9 +923,9 @@ public class Pur_InFragment3 extends BaseFragment {
 
                 double fqty = 1;
                 // 计量单位数量
-                if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
+                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
-                if (sr2.getMtl().getIsSnManager() == 0) {
+                if (tmpMtl.getIsSnManager() == 0) {
                     // 如果应收数大于实收数
                     if (sr2.getFqty() > sr2.getStockqty()) {
                         // 如果扫的是物料包装条码，就显示个数

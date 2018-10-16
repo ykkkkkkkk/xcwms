@@ -62,6 +62,10 @@ public class ProdOrder implements Serializable {
 	private String mtlSize;
 	/* 单据分录生码状态查询，0是默认值代表未生码，1代表已生码 */
 	private int createCodeStatus;
+	/*销售订单里的宽，用于打印装箱清单取值*/
+	private String width;
+	/*销售订单里的高，用于打印装箱清单取值*/
+	private String high;
 
 	public ProdOrder() {
 		super();
@@ -347,20 +351,22 @@ public class ProdOrder implements Serializable {
 		this.createCodeStatus = createCodeStatus;
 	}
 
-	@Override
-	public String toString() {
-		return "ProdOrder [fId=" + fId + ", fbillno=" + fbillno + ", fbillType=" + fbillType + ", prodFdate="
-				+ prodFdate + ", prodOrgId=" + prodOrgId + ", prodOrgNumber=" + prodOrgNumber + ", prodOrgName="
-				+ prodOrgName + ", deptId=" + deptId + ", deptNumber=" + deptNumber + ", deptName=" + deptName
-				+ ", mtlId=" + mtlId + ", mtl=" + mtl + ", mtlFnumber=" + mtlFnumber + ", mtlFname=" + mtlFname
-				+ ", unitFname=" + unitFname + ", prodFqty=" + prodFqty + ", custId=" + custId + ", custNumber="
-				+ custNumber + ", custName=" + custName + ", salOrderNo=" + salOrderNo + ", barcode=" + barcode
-				+ ", batchCode=" + batchCode + ", snCode=" + snCode + ", entryId=" + entryId + ", prodSeqNumber="
-				+ prodSeqNumber + ", receiveAddress=" + receiveAddress + ", receivePerson=" + receivePerson
-				+ ", receiveTel=" + receiveTel + ", deliveryCompanyName=" + deliveryCompanyName + ", remarks=" + remarks
-				+ ", planStartDate=" + planStartDate + ", leaf=" + leaf + ", leaf1=" + leaf1 + ", mtlSize=" + mtlSize
-				+ ", createCodeStatus=" + createCodeStatus + "]";
+	public String getWidth() {
+		return width;
 	}
+
+	public void setWidth(String width) {
+		this.width = width;
+	}
+
+	public String getHigh() {
+		return high;
+	}
+
+	public void setHigh(String high) {
+		this.high = high;
+	}
+
 
 
 }

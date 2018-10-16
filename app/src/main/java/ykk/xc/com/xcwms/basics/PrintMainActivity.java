@@ -79,7 +79,7 @@ public class PrintMainActivity extends BaseActivity {
     @Override
     public void initData() {
 
-        curText = tv2;
+        curText = tv1;
         List<Fragment> listFragment = new ArrayList<Fragment>();
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
@@ -94,7 +94,7 @@ public class PrintMainActivity extends BaseActivity {
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -120,7 +120,13 @@ public class PrintMainActivity extends BaseActivity {
 
             }
         });
-
+        // 延时跳入到界面2
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                tabChange(tv1,1);
+            }
+        },500);
     }
 
     private void bundle() {
