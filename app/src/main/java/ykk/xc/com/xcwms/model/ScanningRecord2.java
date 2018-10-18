@@ -56,6 +56,11 @@ public class ScanningRecord2 implements Serializable {
     private String fsrcBillTypeId; // 来源单据类型名称
     private String fRuleId; // 下推来源单据类型名称
     private String fsTableName; // 下推来源表体
+    // 临时变量
+    private String salOrderNo; // 关联的销售订单号
+    private int salOrderNoEntryId; // 关联的销售订单分录id
+
+
     public int getID() {
         return ID;
     }
@@ -374,6 +379,22 @@ public class ScanningRecord2 implements Serializable {
 
     public void setFsrcBillTypeId(String fsrcBillTypeId) {
         this.fsrcBillTypeId = fsrcBillTypeId;
+    }
+
+    public String getSalOrderNo() {
+        return salOrderNo;
+    }
+
+    public int getSalOrderNoEntryId() {
+        return salOrderNoEntryId;
+    }
+
+    public void setSalOrderNo(String salOrderNo) {
+        this.salOrderNo = salOrderNo;
+    }
+
+    public void setSalOrderNoEntryId(int salOrderNoEntryId) {
+        this.salOrderNoEntryId = salOrderNoEntryId;
     }
 
     public ScanningRecord2() {

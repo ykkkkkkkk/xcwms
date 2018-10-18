@@ -775,6 +775,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setCreateUserName(user.getUsername());
             mbr.setModifyUserId(user.getId());
             mbr.setModifyUserName(user.getUsername());
+            mbr.setSalOrderNo(pl.getSalOrderNo());
+            mbr.setSalOrderNoEntryId(pl.getSalOrderNoEntryId());
 
             mbrList.add(mbr);
         }

@@ -91,6 +91,10 @@ public class MaterialBinningRecord implements Serializable {
 	private String relationObj;
 	/* 关联单据分录id */
 	private int entryId;
+	/* 关联的销售订单号 */
+	private String salOrderNo;
+	/* 关联的销售订单分录id */
+	private int salOrderNoEntryId;
 
 	public MaterialBinningRecord() {
 		super();
@@ -343,6 +347,23 @@ public class MaterialBinningRecord implements Serializable {
 	public void setEntryId(int entryId) {
 		this.entryId = entryId;
 	}
+
+	public String getSalOrderNo() {
+		return salOrderNo;
+	}
+
+	public int getSalOrderNoEntryId() {
+		return salOrderNoEntryId;
+	}
+
+	public void setSalOrderNo(String salOrderNo) {
+		this.salOrderNo = salOrderNo;
+	}
+
+	public void setSalOrderNoEntryId(int salOrderNoEntryId) {
+		this.salOrderNoEntryId = salOrderNoEntryId;
+	}
+
 
 
 }

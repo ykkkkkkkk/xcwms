@@ -753,6 +753,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setCreateUserName(user.getUsername());
             pl.setPickingType(pickingType);
             pl.setSalOrderNo(deliOrder.getSalOrderNo());
+            pl.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
 
             checkDatas.add(pl);
         }

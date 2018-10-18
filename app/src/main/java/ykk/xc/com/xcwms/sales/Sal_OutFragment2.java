@@ -988,6 +988,8 @@ public class Sal_OutFragment2 extends BaseFragment {
                 sr2.setUnitFnumber(deliOrder.getMtl().getUnit().getUnitNumber());
                 sr2.setPoFid(deliOrder.getfId());
                 sr2.setPoFbillno(deliOrder.getFbillno());
+                sr2.setSalOrderNo(deliOrder.getSalOrderNo());
+                sr2.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
 //            sr2.setBatchno(deliOrder.getBatchCode());
 //            sr2.setSequenceNo(deliOrder.getSnCode());
 //            sr2.setBarcode(deliOrder.getBarcode());
@@ -1056,7 +1058,7 @@ public class Sal_OutFragment2 extends BaseFragment {
             for(int j=0; j<size2; j++) {
                 MaterialBinningRecord mbr = mbrList.get(j);
 //                if(mbr.getMaterialId() == sr2.getMtl().getfMaterialId()) {
-                if(mbr.getRelationBillNumber().equals(sr2.getPoFbillno()) && mbr.getEntryId() == sr2.getEntryId()) {
+                if(mbr.getSalOrderNo().equals(sr2.getSalOrderNo()) && mbr.getSalOrderNoEntryId() == sr2.getSalOrderNoEntryId()) {
                     sr2.setSourceId(mbr.getId());
                     sr2.setStockqty(sr2.getStockqty()+mbr.getNumber());
                     break;

@@ -48,6 +48,7 @@ public class PickingList implements Serializable{
 	private double usableFqty;
 	private char pickingType; // 拣货类型：1.拣货装箱，2.拣货装车
 	private String salOrderNo; // 销售订单号
+	private int salOrderNoEntryId; // 销售订单分录id
 	private int isCheck; // 新加的，用于前台临时用判断是否选中
 	private Stock stock;
 	private StockPosition stockPosition;
@@ -366,6 +367,14 @@ public class PickingList implements Serializable{
 
 	public void setSalOrderNo(String salOrderNo) {
 		this.salOrderNo = salOrderNo;
+	}
+
+	public int getSalOrderNoEntryId() {
+		return salOrderNoEntryId;
+	}
+
+	public void setSalOrderNoEntryId(int salOrderNoEntryId) {
+		this.salOrderNoEntryId = salOrderNoEntryId;
 	}
 
 

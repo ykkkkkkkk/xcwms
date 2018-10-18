@@ -30,7 +30,7 @@ public class ProdOrder implements Serializable {
 	private String custNumber; // 客户代码
 	private String custName; // 客户名称
 	private String salOrderNo; // 销售订单号
-
+	private int salOrderEntryId;//销售订单分录entryId
 	/* 对应t_barCodeTable 表中的barcode字段  */
 	private String barcode;
 	/* 对应t_barCodeTable 表中的batchCode字段  */
@@ -255,11 +255,11 @@ public class ProdOrder implements Serializable {
 		this.snCode = snCode;
 	}
 
-	public Integer getEntryId() {
+	public int getEntryId() {
 		return entryId;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(int entryId) {
 		this.entryId = entryId;
 	}
 
@@ -365,6 +365,14 @@ public class ProdOrder implements Serializable {
 
 	public void setHigh(String high) {
 		this.high = high;
+	}
+
+	public Integer getSalOrderEntryId() {
+		return salOrderEntryId;
+	}
+
+	public void setSalOrderEntryId(Integer salOrderEntryId) {
+		this.salOrderEntryId = salOrderEntryId;
 	}
 
 

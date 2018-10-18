@@ -922,6 +922,8 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             tmpMbr.setCreateUserName(user.getUsername());
             tmpMbr.setModifyUserId(user.getId());
             tmpMbr.setModifyUserName(user.getUsername());
+            tmpMbr.setSalOrderNo(prodOrder.getSalOrderNo());
+            tmpMbr.setSalOrderNoEntryId(prodOrder.getSalOrderEntryId());
 
             // 把对象转成json字符串
             String strJson = JsonUtil.objectToString(tmpMbr);
