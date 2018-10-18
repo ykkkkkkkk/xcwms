@@ -49,12 +49,10 @@ import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
-import ykk.xc.com.xcwms.model.CombineSalOrderEntry;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.ExpressCompany;
-import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
@@ -660,8 +658,8 @@ public class Sal_OutFragment2 extends BaseFragment {
                                 } else {
                                     boxBarcode = boxCode.replace("\n", "");
                                 }
-                                mHandler.sendEmptyMessage(RESET);
                                 curViewFlag = '3';
+                                mHandler.sendEmptyMessage(RESET);
                                 // 执行查询方法
                                 run_smGetDatas();
                             }
@@ -680,8 +678,8 @@ public class Sal_OutFragment2 extends BaseFragment {
                                 } else {
                                     expressNoBarcode = expressNo.replace("\n", "");
                                 }
-                                mHandler.sendEmptyMessage(RESET);
                                 curViewFlag = '9';
+                                mHandler.sendEmptyMessage(RESET);
                             }
 
                             break;
@@ -900,7 +898,7 @@ public class Sal_OutFragment2 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
-            sr2.setSourceFinterId(mbr.getRelationBillId());
+            sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
             sr2.setFitemId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
@@ -982,7 +980,7 @@ public class Sal_OutFragment2 extends BaseFragment {
             for (int i = 0; i < size; i++) {
                 DeliOrder deliOrder = deliOrderList.get(i);
                 ScanningRecord2 sr2 = new ScanningRecord2();
-                sr2.setSourceFinterId(deliOrder.getfId());
+                sr2.setSourceK3Id(deliOrder.getfId());
                 sr2.setSourceFnumber(deliOrder.getFbillno());
                 sr2.setFitemId(deliOrder.getMtlId());
                 sr2.setMtl(deliOrder.getMtl());
@@ -1057,7 +1055,9 @@ public class Sal_OutFragment2 extends BaseFragment {
             ScanningRecord2 sr2 = checkDatas.get(i);
             for(int j=0; j<size2; j++) {
                 MaterialBinningRecord mbr = mbrList.get(j);
-                if(mbr.getMaterialId() == sr2.getMtl().getfMaterialId()) {
+//                if(mbr.getMaterialId() == sr2.getMtl().getfMaterialId()) {
+                if(mbr.getRelationBillNumber().equals(sr2.getPoFbillno()) && mbr.getEntryId() == sr2.getEntryId()) {
+                    sr2.setSourceId(mbr.getId());
                     sr2.setStockqty(sr2.getStockqty()+mbr.getNumber());
                     break;
                 }
@@ -1072,7 +1072,7 @@ public class Sal_OutFragment2 extends BaseFragment {
 //        for (int i = 0, size = list.size(); i < size; i++) {
 //            MaterialBinningRecord mbr = list.get(i);
 //            ScanningRecord2 sr2 = new ScanningRecord2();
-//            sr2.setSourceFinterId(mbr.getRelationBillId());
+//            sr2.setSourceK3Id(mbr.getRelationBillId());
 //            sr2.setSourceFnumber(mbr.getRelationBillNumber());
 //            sr2.setFitemId(mbr.getMaterialId());
 //            sr2.setMtl(mbr.getMtl());
@@ -1154,7 +1154,8 @@ public class Sal_OutFragment2 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
-            sr2.setSourceFinterId(mbr.getRelationBillId());
+            sr2.setSourceId(mbr.getId());
+            sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
             sr2.setFitemId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
@@ -1312,7 +1313,8 @@ public class Sal_OutFragment2 extends BaseFragment {
             ScanningRecord record = new ScanningRecord();
             // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库
             record.setType(2);
-            record.setSourceK3Id(sr2.getSourceFinterId());
+            record.setSourceId(sr2.getSourceId());
+            record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
             record.setMtlK3Id(sr2.getFitemId());
             record.setMtlFnumber(sr2.getMtlFnumber());

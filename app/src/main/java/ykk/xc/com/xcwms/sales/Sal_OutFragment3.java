@@ -114,7 +114,6 @@ public class Sal_OutFragment3 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.reset();
-
                         Comm.showWarnDialog(m.mContext,"保存成功");
 
                         break;
@@ -342,8 +341,8 @@ public class Sal_OutFragment3 extends BaseFragment {
                                 } else {
                                     expressNoBarcode = expressNo.replace("\n", "");
                                 }
-                                mHandler.sendEmptyMessage(RESET);
                                 curViewFlag = '9';
+                                mHandler.sendEmptyMessage(RESET);
                             }
 
                             break;
@@ -478,9 +477,10 @@ public class Sal_OutFragment3 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             PickingList pl = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
-            sr2.setSourceFinterId(pl.getId());
+            sr2.setSourceId(pl.getId());
+            sr2.setSourceK3Id(pl.getId());
             sr2.setSourceFnumber(pl.getPickingListNo());
-//            sr2.setSourceFinterId(pl.getfId());
+//            sr2.setSourceK3Id(pl.getfId());
 //            sr2.setSourceFnumber(pl.getFbillno());
             sr2.setFitemId(pl.getMtlId());
             sr2.setMtl(pl.getMtl());
@@ -588,7 +588,8 @@ public class Sal_OutFragment3 extends BaseFragment {
             ScanningRecord record = new ScanningRecord();
             // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库
             record.setType(2);
-            record.setSourceK3Id(sr2.getSourceFinterId());
+            record.setSourceId(sr2.getSourceId());
+            record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
             record.setMtlK3Id(sr2.getFitemId());
             record.setMtlFnumber(sr2.getMtlFnumber());

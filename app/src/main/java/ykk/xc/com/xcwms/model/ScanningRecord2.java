@@ -2,12 +2,11 @@ package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
 
-import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
-
 public class ScanningRecord2 implements Serializable {
     private int ID;
     private int type;
-    private int sourceFinterId;
+    private int sourceId;
+    private int sourceK3Id;
     private String sourceFnumber;
     private int fitemId; // 物料id
     private Material mtl;
@@ -57,7 +56,6 @@ public class ScanningRecord2 implements Serializable {
     private String fsrcBillTypeId; // 来源单据类型名称
     private String fRuleId; // 下推来源单据类型名称
     private String fsTableName; // 下推来源表体
-
     public int getID() {
         return ID;
     }
@@ -70,11 +68,17 @@ public class ScanningRecord2 implements Serializable {
     public void setType(int type) {
         this.type = type;
     }
-    public int getSourceFinterId() {
-        return sourceFinterId;
+    public int getSourceId() {
+        return sourceId;
     }
-    public void setSourceFinterId(int sourceFinterId) {
-        this.sourceFinterId = sourceFinterId;
+    public void setSourceId(int source_Id) {
+        this.sourceId = sourceId;
+    }
+    public int getSourceK3Id() {
+        return sourceK3Id;
+    }
+    public void setSourceK3Id(int sourceK3Id) {
+        this.sourceK3Id = sourceK3Id;
     }
     public String getSourceFnumber() {
         return sourceFnumber;

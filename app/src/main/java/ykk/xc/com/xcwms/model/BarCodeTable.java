@@ -61,7 +61,7 @@ public class BarCodeTable implements Serializable {
 	private double materialCalculateNumber;
 	private MaterialBinningRecord mbr;
 	/*k3对应单据分录的id值*/
-	private Integer entryId;
+	private int entryId;
 	// 临时用的数据
 	private boolean isLocalCust; // 是否为本地数据
 
@@ -178,11 +178,11 @@ public class BarCodeTable implements Serializable {
 		this.mtl = mtl;
 	}
 
-	public Integer getEntryId() {
+	public int getEntryId() {
 		return entryId;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(int entryId) {
 		this.entryId = entryId;
 	}
 

@@ -321,8 +321,7 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
         tsc.addSize(80, 90);
         // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
         tsc.addGap(10);
-        // 设置打印方向ykks
-
+        // 设置打印方向
         tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
         // 开启带Response的打印，用于连续打印
         tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);

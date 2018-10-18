@@ -841,7 +841,7 @@ public class Pur_InFragment3 extends BaseFragment {
             PurReceiveOrder p = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setType(1);
-            sr2.setSourceFinterId(p.getfId());
+            sr2.setSourceK3Id(p.getfId());
             sr2.setSourceFnumber(p.getFbillno());
             sr2.setFitemId(p.getMtl().getfMaterialId());
             sr2.setMtl(p.getMtl());
@@ -1005,7 +1005,8 @@ public class Pur_InFragment3 extends BaseFragment {
             }
         }
         ScanningRecord2 sr2 = new ScanningRecord2();
-        sr2.setSourceFinterId(bt.getRelationBillId());
+        sr2.setSourceId(bt.getId());
+        sr2.setSourceK3Id(bt.getRelationBillId());
         sr2.setSourceFnumber(bt.getRelationBillNumber());
         sr2.setFitemId(bt.getMaterialId());
         sr2.setStockId(stock.getfStockid());
@@ -1149,7 +1150,8 @@ public class Pur_InFragment3 extends BaseFragment {
             ScanningRecord record = new ScanningRecord();
             // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库
             record.setType(1);
-            record.setSourceK3Id(sr2.getSourceFinterId());
+            record.setSourceId(sr2.getSourceId());
+            record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
             record.setMtlK3Id(sr2.getFitemId());
             record.setMtlFnumber(sr2.getMtlFnumber());

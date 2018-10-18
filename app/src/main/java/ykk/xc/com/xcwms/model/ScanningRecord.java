@@ -11,6 +11,7 @@ import java.io.Serializable;
 public class ScanningRecord implements Serializable {
     private int id;
     private int type;
+    private int sourceId;
     private int sourceK3Id;
     private String sourceFnumber;
     private int mtlK3Id;
@@ -62,6 +63,12 @@ public class ScanningRecord implements Serializable {
     }
     public int getType() {
         return type;
+    }
+    public int getSourceId() {
+        return sourceId;
+    }
+    public void setSourceId(int source_Id) {
+        this.sourceId = sourceId;
     }
     public int getSourceK3Id() {
         return sourceK3Id;
