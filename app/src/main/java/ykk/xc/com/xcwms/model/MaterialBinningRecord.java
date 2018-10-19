@@ -1,6 +1,7 @@
 package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 物料装箱记录类
@@ -95,6 +96,8 @@ public class MaterialBinningRecord implements Serializable {
 	private String salOrderNo;
 	/* 关联的销售订单分录id */
 	private int salOrderNoEntryId;
+	private List<String> listBarcode; // 记录每行中扫的条码barcode
+	private String strBarcodes; // 用逗号拼接的条码号
 
 	public MaterialBinningRecord() {
 		super();
@@ -364,6 +367,20 @@ public class MaterialBinningRecord implements Serializable {
 		this.salOrderNoEntryId = salOrderNoEntryId;
 	}
 
+	public List<String> getListBarcode() {
+		return listBarcode;
+	}
 
+	public void setListBarcode(List<String> listBarcode) {
+		this.listBarcode = listBarcode;
+	}
+
+	public String getStrBarcodes() {
+		return strBarcodes;
+	}
+
+	public void setStrBarcodes(String strBarcodes) {
+		this.strBarcodes = strBarcodes;
+	}
 
 }

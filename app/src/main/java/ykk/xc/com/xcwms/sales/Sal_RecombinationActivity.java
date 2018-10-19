@@ -169,7 +169,13 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         break;
                     case UNSUCC1:
                         m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
-                        Comm.showWarnDialog(m.context, "很抱歉，没能找到数据！");
+                        String errMsg = m.isNULLS((String) msg.obj);
+                        if(errMsg.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg);
+                            Comm.showWarnDialog(m.context, message);
+                        } else {
+                            Comm.showWarnDialog(m.context,"条码不存在，或者扫错了条码！");
+                        }
 
                         break;
                     case SAVE: // 保存 成功
@@ -777,6 +783,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setModifyUserName(user.getUsername());
             mbr.setSalOrderNo(pl.getSalOrderNo());
             mbr.setSalOrderNoEntryId(pl.getSalOrderNoEntryId());
+            if(pl.getMtl().getIsSnManager() == 1) {
+                mbr.setListBarcode(new ArrayList<String>());
+            }
+            mbr.setStrBarcodes("");
 
             mbrList.add(mbr);
         }
@@ -816,12 +826,31 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         }
                     } else {
                         // 数量已满
-                        Comm.showWarnDialog(context, "第" + (i + 1) + "行！，复核数不能大于拣货数！");
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，复核数不能大于拣货数！");
                         return;
                     }
 
                 } else { // 启用序列号
-                    mbr.setNumber(fqty);
+                    if (mbr.getRelationBillFQTY() == mbr.getNumber()) {
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，已复核完！");
+                        return;
+                    }
+                    List<String> list = mbr.getListBarcode();
+                    if(list.contains(bt.getBarcode())) {
+                        Comm.showWarnDialog(context,"该物料条码存在复核行中，请扫描未使用过的条码！");
+                        return;
+                    }
+                    list.add(bt.getBarcode());
+                    // 拼接条码号，用逗号隔开
+                    StringBuilder sb = new StringBuilder();
+                    for(int k=0,sizeK=list.size(); k<sizeK; k++) {
+                        if((k+1) == sizeK) sb.append(list.get(k));
+                        else sb.append(list.get(k)+",");
+                    }
+                    mbr.setListBarcode(list);
+                    mbr.setStrBarcodes(sb.toString());
+                    mbr.setNumber(mbr.getNumber() + fqty);
+
                 }
                 mAdapter.notifyDataSetChanged();
                 isRecombinationEnd();
@@ -875,6 +904,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 .add("boxId", boxId)
                 .add("barcode", barcode)
                 .add("strCaseId", strCaseId)
+                .add("sourceType","9") // 来源单据类型（1.物料，2.采购订单，3.收料通知单，4.生产任务单，5.销售订货单，6.拣货单，7.生产装箱，8.采购收料任务单，9.复核单）
                 .build();
 
         Request request = new Request.Builder()
@@ -895,7 +925,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);

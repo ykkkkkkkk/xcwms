@@ -143,7 +143,7 @@ public class MainTabFragmentActivity extends BaseActivity {
                 AlertDialog.Builder build = new AlertDialog.Builder(context);
                 build.setIcon(R.drawable.caution);
                 build.setTitle("系统提示");
-                build.setMessage("主人，确定要离开我吗？");
+                build.setMessage("主人，确定离开吗？");
                 build.setPositiveButton("是的", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -154,7 +154,6 @@ public class MainTabFragmentActivity extends BaseActivity {
                 build.setNegativeButton("取消", null);
                 build.setCancelable(false);
                 build.show();
-
 
                 break;
             case R.id.btn_print: // 打印

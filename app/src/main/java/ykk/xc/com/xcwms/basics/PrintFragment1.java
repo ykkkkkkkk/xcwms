@@ -86,6 +86,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                             m.xRecyclerView.loadMoreComplete(true);
                         }
 
+                        m.xRecyclerView.setPullRefreshEnabled(true); // 上啦刷新禁用
                         m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
 
                         break;
@@ -114,8 +115,8 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
-//        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
-//        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
+        xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
+        xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
 
         mAdapter.setCallBack(new PrintFragment1Adapter.MyCallBack() {
             @Override

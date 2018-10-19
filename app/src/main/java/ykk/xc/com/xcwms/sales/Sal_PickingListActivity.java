@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -30,7 +29,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
-import butterknife.OnLongClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -52,7 +50,6 @@ import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.Material;
-import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -155,7 +152,13 @@ public class Sal_PickingListActivity extends BaseActivity {
                         break;
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
-                        Comm.showWarnDialog(m.context,"很抱歉，没能找到数据！");
+                        String errMsg = m.isNULLS((String) msg.obj);
+                        if(errMsg.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg);
+                            Comm.showWarnDialog(m.context, message);
+                        } else {
+                            Comm.showWarnDialog(m.context,"条码不存在，或者扫错了条码！");
+                        }
 
                         break;
                     case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
@@ -607,22 +610,22 @@ public class Sal_PickingListActivity extends BaseActivity {
      */
     private void getMtlAfter(BarCodeTable bt) {
         setTexts(etMtlCode, mtlBarcode);
-        Material mtl = JsonUtil.stringToObject(bt.getRelationObj(), Material.class);
-        bt.setMtl(mtl);
+        Material tmpMtl = JsonUtil.stringToObject(bt.getRelationObj(), Material.class);
+        bt.setMtl(tmpMtl);
         int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
             PickingList pl = checkDatas.get(i);
-            Material mtl2 = pl.getMtl();
+            Material mtl = pl.getMtl();
             // 如果扫码相同
-            if (bt.getMaterialId() == mtl2.getfMaterialId()) {
+            if (bt.getMaterialId() == mtl.getfMaterialId()) {
                 isFlag = true;
 
                 double fqty = 1;
                 // 计量单位数量
-                if(mtl.getCalculateFqty() > 0) fqty = mtl.getCalculateFqty();
+                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
-                if (mtl.getIsSnManager() == 0) {
+                if (tmpMtl.getIsSnManager() == 0) {
                     // 发货数大于拣货数
                     if (pl.getDeliFremainoutqty() > pl.getPickingListNum()) {
                         // 如果扫的是物料包装条码，就显示个数
@@ -638,26 +641,40 @@ public class Sal_PickingListActivity extends BaseActivity {
                         pl.setSnNo(bt.getSnCode());
 
                     // 启用了最小包装
-                    } else if(mtl2.getMtlPack() != null && mtl2.getMtlPack().getIsMinNumberPack() == 1) {
-                        if(mtl2.getMtlPack().getIsMinNumberPack() == 1) {
+                    } else if(mtl.getMtlPack() != null && mtl.getMtlPack().getIsMinNumberPack() == 1) {
+                        if(mtl.getMtlPack().getIsMinNumberPack() == 1) {
                             // 如果拣货数小于订单数，就加数量
                             if(pl.getPickingListNum() < pl.getDeliFremainoutqty()) {
                                 pl.setPickingListNum(pl.getPickingListNum() + fqty);
                             } else {
-                                Comm.showWarnDialog(context, "第" + (i + 1) + "行！，已经达到最小包装发货数量！");
+                                Comm.showWarnDialog(context, "第" + (i + 1) + "行，已经达到最小包装发货数量！");
                                 return;
                             }
                         }
 
-                    } else if ((mtl2.getMtlPack() == null || mtl2.getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
+                    } else if ((mtl.getMtlPack() == null || mtl.getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                         // 数量已满
-                        Comm.showWarnDialog(context, "第" + (i + 1) + "行！，（拣货数）不能大于（订单数）！");
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，（拣货数）不能大于（订单数）！");
                         return;
                     }
                 } else {
-                    pl.setPickingListNum(fqty);
+                    List<String> list = pl.getListBarcode();
+                    if(list.contains(bt.getBarcode())) {
+                        Comm.showWarnDialog(context,"该物料条码已在拣货行中，请扫描未使用过的条码！");
+                        return;
+                    }
+                    list.add(bt.getBarcode());
+                    // 拼接条码号，用逗号隔开
+                    StringBuilder sb = new StringBuilder();
+                    for(int k=0,sizeK=list.size(); k<sizeK; k++) {
+                        if((k+1) == sizeK) sb.append(list.get(k));
+                        else sb.append(list.get(k)+",");
+                    }
+                    pl.setPickingListNum(pl.getPickingListNum() + fqty);
                     pl.setBatchNo(bt.getBatchCode());
                     pl.setSnNo(bt.getSnCode());
+                    pl.setListBarcode(list);
+                    pl.setStrBarcodes(sb.toString());
                 }
                 mAdapter.notifyDataSetChanged();
                 isPickingEnd();
@@ -754,6 +771,10 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setPickingType(pickingType);
             pl.setSalOrderNo(deliOrder.getSalOrderNo());
             pl.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
+            if(deliOrder.getMtl().getIsSnManager() == 1) {
+                pl.setListBarcode(new ArrayList<String>());
+            }
+            pl.setStrBarcodes("");
 
             checkDatas.add(pl);
         }
@@ -838,7 +859,8 @@ public class Sal_PickingListActivity extends BaseActivity {
                 .add("strCaseId", strCaseId)
                 .add("isList", String.valueOf(isList))
                 .add("barcode", barcode)
-                .add("isDefaultStock", "1") // 查询默认仓库和库位
+                .add("isDefaultStock","1") // 查询默认仓库和库位
+                .add("sourceType","6") // 来源单据类型（1.物料，2.采购订单，3.收料通知单，4.生产任务单，5.销售订货单，6.拣货单，7.生产装箱，8.采购收料任务单，9.复核单）
                 .build();
 
         Request request = new Request.Builder()
@@ -859,7 +881,8 @@ public class Sal_PickingListActivity extends BaseActivity {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC2);
+                    Message msg = mHandler.obtainMessage(UNSUCC2, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);
