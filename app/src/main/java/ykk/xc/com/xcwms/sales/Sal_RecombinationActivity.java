@@ -783,6 +783,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setModifyUserName(user.getUsername());
             mbr.setSalOrderNo(pl.getSalOrderNo());
             mbr.setSalOrderNoEntryId(pl.getSalOrderNoEntryId());
+            // 物料是否启用序列号
             if(pl.getMtl().getIsSnManager() == 1) {
                 mbr.setListBarcode(new ArrayList<String>());
             }
@@ -849,7 +850,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     }
                     mbr.setListBarcode(list);
                     mbr.setStrBarcodes(sb.toString());
-                    mbr.setNumber(mbr.getNumber() + fqty);
+                    mbr.setNumber(mbr.getNumber() + 1);
 
                 }
                 mAdapter.notifyDataSetChanged();

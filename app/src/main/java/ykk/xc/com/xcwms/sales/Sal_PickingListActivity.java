@@ -658,6 +658,10 @@ public class Sal_PickingListActivity extends BaseActivity {
                         return;
                     }
                 } else {
+                    if (pl.getPickingListNum() == pl.getDeliFremainoutqty()) {
+                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，已捡完！");
+                        return;
+                    }
                     List<String> list = pl.getListBarcode();
                     if(list.contains(bt.getBarcode())) {
                         Comm.showWarnDialog(context,"该物料条码已在拣货行中，请扫描未使用过的条码！");
@@ -670,11 +674,11 @@ public class Sal_PickingListActivity extends BaseActivity {
                         if((k+1) == sizeK) sb.append(list.get(k));
                         else sb.append(list.get(k)+",");
                     }
-                    pl.setPickingListNum(pl.getPickingListNum() + fqty);
                     pl.setBatchNo(bt.getBatchCode());
                     pl.setSnNo(bt.getSnCode());
                     pl.setListBarcode(list);
                     pl.setStrBarcodes(sb.toString());
+                    pl.setPickingListNum(pl.getPickingListNum() + 1);
                 }
                 mAdapter.notifyDataSetChanged();
                 isPickingEnd();
@@ -771,6 +775,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setPickingType(pickingType);
             pl.setSalOrderNo(deliOrder.getSalOrderNo());
             pl.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
+            // 物料是否启用序列号
             if(deliOrder.getMtl().getIsSnManager() == 1) {
                 pl.setListBarcode(new ArrayList<String>());
             }

@@ -188,7 +188,6 @@ public class Pur_InFragment3 extends BaseFragment {
                                 m.parent.isChange = true;
                                 m.getBarCodeTableAfter_recOrder(bt);
 
-
                                 break;
                             case '5': // 物料
                                 bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
@@ -203,7 +202,13 @@ public class Pur_InFragment3 extends BaseFragment {
                         break;
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(RESET, 200);
-                        Comm.showWarnDialog(m.mContext,"很抱歉，没能找到数据！");
+                        String errMsg = m.isNULLS((String) msg.obj);
+                        if(errMsg.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg);
+                            Comm.showWarnDialog(m.mContext, message);
+                        } else {
+                            Comm.showWarnDialog(m.mContext,"条码不存在，或者扫错了条码！");
+                        }
 
                         break;
                     case RESET: // 没有得到数据，就把回车的去掉，恢复正常数据
@@ -840,11 +845,13 @@ public class Pur_InFragment3 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             PurReceiveOrder p = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
+            Material mtl = p.getMtl();
+
             sr2.setType(1);
             sr2.setSourceK3Id(p.getfId());
             sr2.setSourceFnumber(p.getFbillno());
-            sr2.setFitemId(p.getMtl().getfMaterialId());
-            sr2.setMtl(p.getMtl());
+            sr2.setFitemId(mtl.getfMaterialId());
+            sr2.setMtl(mtl);
             sr2.setMtlFnumber(p.getMtl().getfNumber());
             sr2.setUnitFnumber(p.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(p.getfId());
@@ -896,6 +903,11 @@ public class Pur_InFragment3 extends BaseFragment {
             setEnables(tvPurOrg, R.drawable.back_style_gray3, false);
             tvPurOrg.setText(purOrg.getName());
             sr2.setPurOrgFnumber(purOrg.getNumber());
+            // 物料是否启用序列号
+            if(mtl.getIsSnManager() == 1) {
+                sr2.setListBarcode(new ArrayList<String>());
+            }
+            sr2.setStrBarcodes("");
 
             checkDatas.add(sr2);
         }
@@ -944,7 +956,25 @@ public class Pur_InFragment3 extends BaseFragment {
                     }
 
                 } else { // 启用序列号
-                    sr2.setStockqty(fqty);
+                    if (sr2.getFqty() == sr2.getStockqty()) {
+                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，扫码录数已完成！");
+                        return;
+                    }
+                    List<String> list = sr2.getListBarcode();
+                    if(list.contains(bt.getBarcode())) {
+                        Comm.showWarnDialog(mContext,"该物料条码已在列表中，请扫描未使用过的条码！");
+                        return;
+                    }
+                    list.add(bt.getBarcode());
+                    // 拼接条码号，用逗号隔开
+                    StringBuilder sb = new StringBuilder();
+                    for(int k=0,sizeK=list.size(); k<sizeK; k++) {
+                        if((k+1) == sizeK) sb.append(list.get(k));
+                        else sb.append(list.get(k)+",");
+                    }
+                    sr2.setListBarcode(list);
+                    sr2.setStrBarcodes(sb.toString());
+                    sr2.setStockqty(sr2.getStockqty() + 1);
                 }
                 mAdapter.notifyDataSetChanged();
                 break;
@@ -1064,6 +1094,11 @@ public class Pur_InFragment3 extends BaseFragment {
         sr2.setPoFbillno(recOrder.getFbillno());
         sr2.setPoFmustqty(recOrder.getUsableFqty());
         sr2.setBarcode(bt.getBarcode());
+        // 物料是否启用序列号
+        if(mtl.getIsSnManager() == 1) {
+            sr2.setListBarcode(new ArrayList<String>());
+        }
+        sr2.setStrBarcodes("");
 
         checkDatas.add(sr2);
         sourceList.add(recOrder);
@@ -1192,6 +1227,8 @@ public class Pur_InFragment3 extends BaseFragment {
             record.setFsrcBillTypeId("PUR_ReceiveBill");
             record.setfRuleId("PUR_ReceiveBill-STK_InStock");
             record.setFsTableName("T_PUR_ReceiveEntry");
+            record.setListBarcode(sr2.getListBarcode());
+            record.setStrBarcodes(sr2.getStrBarcodes());
 
             list.add(record);
         }
@@ -1268,6 +1305,7 @@ public class Pur_InFragment3 extends BaseFragment {
         FormBody formBody = new FormBody.Builder()
                 .add("strCaseId", strCaseId)
                 .add("barcode", barcode)
+                .add("sourceType","2") // 来源单据类型（1.物料，2.采购订单，3.收料通知单，4.生产任务单，5.销售订货单，6.拣货单，7.生产装箱，8.采购收料任务单，9.复核单）
                 .build();
 
         Request request = new Request.Builder()
@@ -1288,7 +1326,9 @@ public class Pur_InFragment3 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC2);
+                    Message msg = mHandler.obtainMessage(UNSUCC2, result);
+                    mHandler.sendMessage(msg);
+
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);

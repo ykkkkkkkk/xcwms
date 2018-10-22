@@ -4,9 +4,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
- * Scanning_record
+ * Scanning_record 出入库记录
  */
 public class ScanningRecord implements Serializable {
     private int id;
@@ -57,6 +58,9 @@ public class ScanningRecord implements Serializable {
     private String fsTableName; // 下推来源表体
     private String fcarriageNo; // 运输单号
     private String expressNumber; // 物流公司
+    // 临时变量
+    private List<String> listBarcode; // 记录每行中扫的条码barcode
+    private String strBarcodes; // 用逗号拼接的条码号
 
     public int getId() {
         return id;
@@ -338,6 +342,18 @@ public class ScanningRecord implements Serializable {
     }
     public void setExpressNumber(String expressNumber) {
         this.expressNumber = expressNumber;
+    }
+    public List<String> getListBarcode() {
+        return listBarcode;
+    }
+    public String getStrBarcodes() {
+        return strBarcodes;
+    }
+    public void setListBarcode(List<String> listBarcode) {
+        this.listBarcode = listBarcode;
+    }
+    public void setStrBarcodes(String strBarcodes) {
+        this.strBarcodes = strBarcodes;
     }
 
 

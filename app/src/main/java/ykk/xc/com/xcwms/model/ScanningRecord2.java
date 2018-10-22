@@ -1,6 +1,7 @@
 package ykk.xc.com.xcwms.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class ScanningRecord2 implements Serializable {
     private int ID;
@@ -59,7 +60,8 @@ public class ScanningRecord2 implements Serializable {
     // 临时变量
     private String salOrderNo; // 关联的销售订单号
     private int salOrderNoEntryId; // 关联的销售订单分录id
-
+    private List<String> listBarcode; // 记录每行中扫的条码barcode
+    private String strBarcodes; // 用逗号拼接的条码号
 
     public int getID() {
         return ID;
@@ -324,77 +326,71 @@ public class ScanningRecord2 implements Serializable {
     public void setEntryId(int entryId) {
         this.entryId = entryId;
     }
-
     public StockPosition getStockPos() {
         return stockPos;
     }
-
     public void setStockPos(StockPosition stockPos) {
         this.stockPos = stockPos;
     }
-
     public char getSourceType() {
         return sourceType;
     }
-
     public void setSourceType(char sourceType) {
         this.sourceType = sourceType;
     }
-
     public int getTempId() {
         return tempId;
     }
-
     public void setTempId(int tempId) {
         this.tempId = tempId;
     }
-
     public String getRelationObj() {
         return relationObj;
     }
-
     public void setRelationObj(String relationObj) {
         this.relationObj = relationObj;
     }
-
     public String getFsTableName() {
         return fsTableName;
     }
-
     public void setFsTableName(String fsTableName) {
         this.fsTableName = fsTableName;
     }
-
     public String getfRuleId() {
         return fRuleId;
     }
-
     public void setfRuleId(String fRuleId) {
         this.fRuleId = fRuleId;
     }
-
     public String getFsrcBillTypeId() {
         return fsrcBillTypeId;
     }
-
     public void setFsrcBillTypeId(String fsrcBillTypeId) {
         this.fsrcBillTypeId = fsrcBillTypeId;
     }
-
     public String getSalOrderNo() {
         return salOrderNo;
     }
-
     public int getSalOrderNoEntryId() {
         return salOrderNoEntryId;
     }
-
     public void setSalOrderNo(String salOrderNo) {
         this.salOrderNo = salOrderNo;
     }
-
     public void setSalOrderNoEntryId(int salOrderNoEntryId) {
         this.salOrderNoEntryId = salOrderNoEntryId;
+    }
+    public List<String> getListBarcode() {
+        return listBarcode;
+    }
+    public String getStrBarcodes() {
+        return strBarcodes;
+    }
+    public void setListBarcode(List<String> listBarcode) {
+        this.listBarcode = listBarcode;
+    }
+    public void setStrBarcodes(String strBarcodes) {
+        this.strBarcodes = strBarcodes;
     }
 
     public ScanningRecord2() {
