@@ -411,13 +411,18 @@ public class Sal_OutFragment2 extends BaseFragment {
         }
 
         tvSalDate.setText(Comm.getSysDate(7));
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setFocusable(etBoxCode); // 物料代码获取焦点
-            }
-        },800);
-//        setFocusable(etBoxCode); // 物料代码获取焦点
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etBoxCode); // 物料代码获取焦点
+                }
+            },200);
+        }
     }
 
     @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
@@ -1024,9 +1029,15 @@ public class Sal_OutFragment2 extends BaseFragment {
                 sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
 
                 if (salOrg == null) salOrg = new Organization();
-                salOrg.setFpkId(deliOrder.getDeliOrgId());
-                salOrg.setNumber(deliOrder.getDeliOrgNumber());
-                salOrg.setName(deliOrder.getDeliOrgName());
+                if(deliOrder.getSalOrgId() > 0) {
+                    salOrg.setFpkId(deliOrder.getSalOrgId());
+                    salOrg.setNumber(deliOrder.getSalOrgNumber());
+                    salOrg.setName(deliOrder.getSalOrgName());
+                } else {
+                    salOrg.setFpkId(deliOrder.getDeliOrgId());
+                    salOrg.setNumber(deliOrder.getDeliOrgNumber());
+                    salOrg.setName(deliOrder.getDeliOrgName());
+                }
 
                 setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
                 tvSalOrg.setText(salOrg.getName());
@@ -1200,17 +1211,23 @@ public class Sal_OutFragment2 extends BaseFragment {
                 setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
                 tvReceiveOrg.setText(receiveOrg.getName());
                 sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
+            }
 
+            if(salOrg == null) salOrg = new Organization();
+            if(deliOrder.getSalOrgId() > 0) {
                 // 销售组织
-                if(salOrg == null) salOrg = new Organization();
+                salOrg.setFpkId(deliOrder.getSalOrgId());
+                salOrg.setNumber(deliOrder.getSalOrgNumber());
+                salOrg.setName(deliOrder.getSalOrgName());
+            } else {
                 salOrg.setFpkId(deliOrder.getDeliOrgId());
                 salOrg.setNumber(deliOrder.getDeliOrgNumber());
                 salOrg.setName(deliOrder.getDeliOrgName());
-
-                setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
-                tvSalOrg.setText(salOrg.getName());
-                sr2.setPurOrgFnumber(salOrg.getNumber());
             }
+            setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
+            tvSalOrg.setText(salOrg.getName());
+            sr2.setPurOrgFnumber(salOrg.getNumber());
+
             sr2.setCustomerId(deliOrder.getCustId());
             sr2.setCustomerName(deliOrder.getCustName());
             sr2.setCustFnumber(deliOrder.getCustNumber());

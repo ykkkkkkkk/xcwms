@@ -70,6 +70,8 @@
             android:layout_height="38dp"
             android:layout_margin="@dimen/_6dp"
             android:gravity="center"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:orientation="horizontal">
 
             <TextView
@@ -93,7 +95,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/back_style_blue4"
-                    android:focusableInTouchMode="false"
                     android:inputType="none"
                     android:paddingLeft="2dp"
                     android:textColor="@color/black"
@@ -130,7 +131,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/back_style_blue4"
-                    android:focusableInTouchMode="false"
                     android:inputType="none"
                     android:paddingLeft="2dp"
                     android:textColor="@color/black"
@@ -165,10 +165,9 @@
                 android:textSize="12sp" />
 
             <EditText
-                android:id="@+id/et_matNo"
+                android:id="@+id/et_mtlNo"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:hint="销售订单扫码区"
@@ -210,7 +209,6 @@
                 android:id="@+id/tv_receiveOrg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:drawableRight="@drawable/xiala3"
@@ -232,7 +230,6 @@
                 android:id="@+id/tv_salOrg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:drawableRight="@drawable/xiala3"

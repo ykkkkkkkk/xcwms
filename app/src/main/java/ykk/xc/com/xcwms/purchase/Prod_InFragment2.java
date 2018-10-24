@@ -74,8 +74,8 @@ public class Prod_InFragment2 extends BaseFragment {
     Button btnStockPos;
     @BindView(R.id.tv_deptName)
     TextView tvDeptName;
-    @BindView(R.id.et_matNo)
-    EditText etMatNo;
+    @BindView(R.id.et_boxCode)
+    EditText etBoxCode;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.tv_inOrg)
@@ -176,7 +176,7 @@ public class Prod_InFragment2 extends BaseFragment {
                                 m.setTexts(m.etStockPos, m.stockPBarcode);
                                 break;
                             case '3': // 生产装箱单
-                                m.setTexts(m.etMatNo, m.boxBarcode);
+                                m.setTexts(m.etBoxCode, m.boxBarcode);
                                 break;
                         }
 
@@ -207,7 +207,7 @@ public class Prod_InFragment2 extends BaseFragment {
 
                         break;
                     case CODE1: // 清空数据
-                        m.etMatNo.setText("");
+                        m.etBoxCode.setText("");
                         m.boxBarcode = "";
 
                         break;
@@ -252,17 +252,17 @@ public class Prod_InFragment2 extends BaseFragment {
 
     @Override
     public void initData() {
-        hideSoftInputMode(mContext, etMatNo);
+        hideSoftInputMode(mContext, etBoxCode);
         hideSoftInputMode(mContext, etStock);
         hideSoftInputMode(mContext, etStockPos);
         getUserInfo();
         tvProdDate.setText(Comm.getSysDate(7));
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setFocusable(etMatNo); // 物料代码获取焦点
-            }
-        },200);
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setFocusable(etBoxCode); // 物料代码获取焦点
+//            }
+//        },800);
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
@@ -279,6 +279,18 @@ public class Prod_InFragment2 extends BaseFragment {
                 setTexts(etStockPos, stockP.getFnumber());
                 stockPBarcode = stockP.getFnumber();
             }
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etBoxCode); // 物料代码获取焦点
+                }
+            },200);
         }
     }
 
@@ -422,7 +434,7 @@ public class Prod_InFragment2 extends BaseFragment {
         return true;
     }
 
-    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_matNo})
+    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_boxCode})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
@@ -449,7 +461,7 @@ public class Prod_InFragment2 extends BaseFragment {
                     switch (v.getId()) {
                         case R.id.et_stock: // 仓库
                             String whName = getValues(etStock).trim();
-                            if (isKeyDownEnter(whName, event, keyCode)) {
+                            if (isKeyDownEnter(whName, keyCode)) {
                                 if (stockBarcode != null && stockBarcode.length() > 0) {
                                     if(stockBarcode.equals(whName)) {
                                         stockBarcode = whName;
@@ -468,7 +480,7 @@ public class Prod_InFragment2 extends BaseFragment {
                             break;
                         case R.id.et_stockPos: // 库位
                             String whPos = getValues(etStockPos).trim();
-                            if (isKeyDownEnter(whPos, event, keyCode)) {
+                            if (isKeyDownEnter(whPos, keyCode)) {
                                 if (stockPBarcode != null && stockPBarcode.length() > 0) {
                                     if(stockPBarcode.equals(whPos)) {
                                         stockPBarcode = whPos;
@@ -485,22 +497,22 @@ public class Prod_InFragment2 extends BaseFragment {
                             }
 
                             break;
-                        case R.id.et_matNo: // 物料
-                            String matNo = getValues(etMatNo).trim();
-                            if (isKeyDownEnter(matNo, event, keyCode)) {
+                        case R.id.et_boxCode: // 箱子条码
+                            String boxCode = getValues(etBoxCode).trim();
+                            if (isKeyDownEnter(boxCode, keyCode)) {
                                 if (!smBefore()) { // 扫码之前的判断
                                     mHandler.sendEmptyMessageDelayed(CODE1, 200);
                                     return false;
                                 }
                                 if (boxBarcode != null && boxBarcode.length() > 0) {
-                                    if(boxBarcode.equals(matNo)) {
-                                        boxBarcode = matNo;
+                                    if(boxBarcode.equals(boxCode)) {
+                                        boxBarcode = boxCode;
                                     } else {
-                                        String tmp = matNo.replaceFirst(boxBarcode, "");
+                                        String tmp = boxCode.replaceFirst(boxBarcode, "");
                                         boxBarcode = tmp.replace("\n", "");
                                     }
                                 } else {
-                                    boxBarcode = matNo.replace("\n", "");
+                                    boxBarcode = boxCode.replace("\n", "");
                                 }
                                 curViewFlag = '3';
                                 // 执行查询方法
@@ -515,13 +527,13 @@ public class Prod_InFragment2 extends BaseFragment {
         };
         etStock.setOnKeyListener(keyListener);
         etStockPos.setOnKeyListener(keyListener);
-        etMatNo.setOnKeyListener(keyListener);
+        etBoxCode.setOnKeyListener(keyListener);
     }
 
     /**
      * 是否按了回车键
      */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
+    private boolean isKeyDownEnter(String val, int keyCode) {
         if (keyCode == KeyEvent.KEYCODE_ENTER) {
             if (val.length() == 0) {
                 Comm.showWarnDialog(mContext, "请扫码条码！");
@@ -539,7 +551,7 @@ public class Prod_InFragment2 extends BaseFragment {
      */
     private void reset(char flag) {
         // 清空物料信息
-        etMatNo.setText(""); // 物料代码
+        etBoxCode.setText(""); // 物料代码
         boxBarcode = null;
         setEnables(tvInOrg, R.drawable.back_style_blue, true);
         setEnables(tvProdOrg, R.drawable.back_style_blue, true);
@@ -658,7 +670,7 @@ public class Prod_InFragment2 extends BaseFragment {
             stockBarcode = stock.getfName();
             stockPBarcode = stockP.getFnumber();
         } else {
-            setTexts(etMatNo, boxBarcode);
+            setTexts(etBoxCode, boxBarcode);
             return smBefore();
         }
         return true;
@@ -681,7 +693,7 @@ public class Prod_InFragment2 extends BaseFragment {
      * 选择来源单返回
      */
     private void getSourceAfter(List<MaterialBinningRecord> list) {
-        setTexts(etMatNo, boxBarcode);
+        setTexts(etBoxCode, boxBarcode);
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
@@ -749,8 +761,8 @@ public class Prod_InFragment2 extends BaseFragment {
 
             checkDatas.add(sr2);
         }
-        setTexts(etMatNo, boxBarcode);
-        setFocusable(etMatNo); // 物料代码获取焦点
+        setTexts(etBoxCode, boxBarcode);
+        setFocusable(etBoxCode); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();
     }
@@ -790,7 +802,7 @@ public class Prod_InFragment2 extends BaseFragment {
         if (stockP != null) {
             setTexts(etStockPos, stockP.getFnumber());
             stockPBarcode = stockP.getFnumber();
-            setFocusable(etMatNo);
+            setFocusable(etBoxCode);
         }
     }
 

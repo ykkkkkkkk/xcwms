@@ -66,6 +66,12 @@ public class ProdOrder implements Serializable {
 	private String width;
 	/*销售订单里的高，用于打印装箱清单取值*/
 	private String high;
+	/*销售订单销售组织ID*/
+	private int salOrgId;
+	/*销售订单销售组织编码*/
+	private String salOrgNumber;
+	/*销售订单销售组织名称*/
+	private String salOrgName;
 
 	public ProdOrder() {
 		super();
@@ -375,6 +381,29 @@ public class ProdOrder implements Serializable {
 		this.salOrderEntryId = salOrderEntryId;
 	}
 
+	public int getSalOrgId() {
+		return salOrgId;
+	}
+
+	public void setSalOrgId(int salOrgId) {
+		this.salOrgId = salOrgId;
+	}
+
+	public String getSalOrgNumber() {
+		return salOrgNumber;
+	}
+
+	public void setSalOrgNumber(String salOrgNumber) {
+		this.salOrgNumber = salOrgNumber;
+	}
+
+	public String getSalOrgName() {
+		return salOrgName;
+	}
+
+	public void setSalOrgName(String salOrgName) {
+		this.salOrgName = salOrgName;
+	}
 
 
 }

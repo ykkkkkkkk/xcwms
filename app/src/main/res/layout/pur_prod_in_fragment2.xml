@@ -69,6 +69,8 @@
             android:layout_width="match_parent"
             android:layout_height="38dp"
             android:layout_margin="@dimen/_6dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -164,10 +166,9 @@
                 android:textSize="12sp" />
 
             <EditText
-                android:id="@+id/et_matNo"
+                android:id="@+id/et_boxCode"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:hint="扫码区（根据箱子条码）"
@@ -199,7 +200,6 @@
                 android:id="@+id/tv_inOrg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:drawableRight="@drawable/xiala3"
@@ -221,7 +221,6 @@
                 android:id="@+id/tv_prodOrg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:drawableRight="@drawable/xiala3"

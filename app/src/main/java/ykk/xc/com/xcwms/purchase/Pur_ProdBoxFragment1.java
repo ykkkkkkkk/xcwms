@@ -190,7 +190,11 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         m.listMbr.clear();
                         List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                         m.listMbr.addAll(list);
-                        m.tvCount.setText("物料数量："+m.listMbr.size());
+                        double sum = 0;
+                        for(int i=0, size=m.listMbr.size(); i<size; i++) {
+                            sum += m.listMbr.get(i).getNumber();
+                        }
+                        m.tvCount.setText("数量："+m.df.format(sum));
                         m.mAdapter.notifyDataSetChanged();
 
                         break;
@@ -225,7 +229,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 m.listMbr.clear();
                                 m.initDataSon(true);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#000000'>未开箱</font>"));
-                                m.tvCount.setText("物料数量：0");
+                                m.tvCount.setText("数量：0");
                             }
                         }
                         m.setCloseDelDialog();
@@ -483,7 +487,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 //        setEnables(tvCustSel, R.drawable.back_style_blue, true);
 //        tvDeliverSel.setText("");
         setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
-        tvCount.setText("物料数量：0");
+        tvCount.setText("数量：0");
         rbType1.setEnabled(true);
         rbType2.setEnabled(true);
         rbType1.setChecked(true);
@@ -754,8 +758,12 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"该箱子已经装了其他类型物料，请扫描未使用的箱码！");
                     return;
                 }
-                tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
                 listMbr.addAll(boxBarCode.getMtlBinningRecord());
+                double sum = 0;
+                for(int i=0, size=listMbr.size(); i<size; i++) {
+                    sum += listMbr.get(i).getNumber();
+                }
+                tvCount.setText("数量："+df.format(sum));
 
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
@@ -778,7 +786,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
             } else {
                 initDataSon(true);
-                tvCount.setText("物料数量：0");
+                tvCount.setText("数量：0");
             }
             int status = boxBarCode.getStatus();
             if(status == 0) {
@@ -814,7 +822,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     private void getBarCodeTable2(BarCodeTable bt) {
         if (bt != null) {
             int size = listMbr.size();
-            tvCount.setText("物料数量："+size);
             getUserInfo();
 
             MaterialBinningRecord tmpMbr = null;

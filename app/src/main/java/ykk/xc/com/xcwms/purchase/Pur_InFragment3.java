@@ -318,7 +318,6 @@ public class Pur_InFragment3 extends BaseFragment {
         hideSoftInputMode(mContext, etSourceNo);
         hideSoftInputMode(mContext, etMtlNo);
         getUserInfo();
-        setFocusable(etMtlNo); // 物料代码获取焦点
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
@@ -335,6 +334,18 @@ public class Pur_InFragment3 extends BaseFragment {
                 setTexts(etStockPos, stockP.getFnumber());
                 stockPBarcode = stockP.getFnumber();
             }
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etMtlNo); // 物料代码获取焦点
+                }
+            },200);
         }
     }
 

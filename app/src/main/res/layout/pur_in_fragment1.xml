@@ -9,6 +9,8 @@
         android:id="@+id/lin_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
         <LinearLayout
@@ -219,7 +221,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
-                android:hint="扫码区"
+                android:hint="物料扫码区"
                 android:inputType="none"
                 android:paddingLeft="@dimen/_2dp"
                 android:textColor="@color/black"

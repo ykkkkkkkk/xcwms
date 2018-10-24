@@ -3,8 +3,6 @@ package ykk.xc.com.xcwms.model;
 import java.io.Serializable;
 import java.util.List;
 
-import ykk.xc.com.xcwms.model.MaterialBinningRecord;
-
 /**
  * 包装物条码类，用于记录对每个包装物使用流水号生成唯一条码
  * @author Administrator
@@ -12,9 +10,9 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
  */
 public class BoxBarCode implements Serializable {
 	/*id*/
-	private int id;
+	private Integer id;
 	/*包装物id*/
-	private int boxId;
+	private Integer boxId;
 	/*包装物生成的唯一码*/
 	private String barCode;
 	/**箱子的状态
@@ -22,94 +20,92 @@ public class BoxBarCode implements Serializable {
 	 * 1代表开箱
 	 * 2代表封箱
 	 * */
-	private int status;
+	private Integer status;
 	/*箱子净重*/
 	private double roughWeight;
 	/*包装物*/
 	private Box box;
 	/* pda扫描箱码查询箱子里的物料列表  */
 	public List<MaterialBinningRecord> mtlBinningRecord;
-
+	/*生码日期*/
+	private String createDateTime;
+	/*打印次数*/
+	private Integer printNumber;
 
 	public BoxBarCode() {
 		super();
 	}
 
-
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-
-	public int getBoxId() {
+	public Integer getBoxId() {
 		return boxId;
 	}
-
 
 	public String getBarCode() {
 		return barCode;
 	}
 
-
-	public int getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
-
 
 	public double getRoughWeight() {
 		return roughWeight;
 	}
 
-
 	public Box getBox() {
 		return box;
 	}
-
 
 	public List<MaterialBinningRecord> getMtlBinningRecord() {
 		return mtlBinningRecord;
 	}
 
-
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-
-	public void setBoxId(int boxId) {
+	public void setBoxId(Integer boxId) {
 		this.boxId = boxId;
 	}
-
 
 	public void setBarCode(String barCode) {
 		this.barCode = barCode;
 	}
 
-
-	public void setStatus(int status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
-
 
 	public void setRoughWeight(double roughWeight) {
 		this.roughWeight = roughWeight;
 	}
 
-
 	public void setBox(Box box) {
 		this.box = box;
 	}
-
 
 	public void setMtlBinningRecord(List<MaterialBinningRecord> mtlBinningRecord) {
 		this.mtlBinningRecord = mtlBinningRecord;
 	}
 
+	public String getCreateDateTime() {
+		return createDateTime;
+	}
 
-	@Override
-	public String toString() {
-		return "BoxBarCode [id=" + id + ", boxId=" + boxId + ", barCode=" + barCode + ", status=" + status
-				+ ", roughWeight=" + roughWeight + ", box=" + box + ", mtlBinningRecord=" + mtlBinningRecord + "]";
+	public void setCreateDateTime(String createDateTime) {
+		this.createDateTime = createDateTime;
+	}
+
+	public Integer getPrintNumber() {
+		return printNumber;
+	}
+
+	public void setPrintNumber(Integer printNumber) {
+		this.printNumber = printNumber;
 	}
 	
 }

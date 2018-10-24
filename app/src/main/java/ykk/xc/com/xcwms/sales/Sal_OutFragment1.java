@@ -79,8 +79,8 @@ public class Sal_OutFragment1 extends BaseFragment {
     Button btnStockPos;
     @BindView(R.id.tv_deptName)
     TextView tvDeptName;
-    @BindView(R.id.et_matNo)
-    EditText etMatNo;
+    @BindView(R.id.et_mtlNo)
+    EditText etMtlNo;
     @BindView(R.id.tv_custSel)
     TextView tvCustSel;
     @BindView(R.id.recyclerView)
@@ -187,7 +187,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                                 m.setTexts(m.etStockPos, m.stockPBarcode);
                                 break;
                             case '3': // 销售订单
-                                m.setTexts(m.etMatNo, m.mtlBarcode);
+                                m.setTexts(m.etMtlNo, m.mtlBarcode);
                                 break;
                         }
 
@@ -246,7 +246,7 @@ public class Sal_OutFragment1 extends BaseFragment {
 //
 //                        break;
                     case CODE1: // 清空数据
-                        m.etMatNo.setText("");
+                        m.etMtlNo.setText("");
                         m.mtlBarcode = "";
 
                         break;
@@ -288,7 +288,7 @@ public class Sal_OutFragment1 extends BaseFragment {
 
     @Override
     public void initData() {
-        hideSoftInputMode(mContext, etMatNo);
+        hideSoftInputMode(mContext, etMtlNo);
         hideSoftInputMode(mContext, etStock);
         hideSoftInputMode(mContext, etStockPos);
         getUserInfo();
@@ -311,13 +311,18 @@ public class Sal_OutFragment1 extends BaseFragment {
         }
 
         tvSalDate.setText(Comm.getSysDate(7));
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setFocusable(etMatNo); // 物料代码获取焦点
-            }
-        },800);
-//        setFocusable(etMatNo); // 物料代码获取焦点
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etMtlNo); // 物料代码获取焦点
+                }
+            },200);
+        }
     }
 
     @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
@@ -460,7 +465,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         return true;
     }
 
-    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_matNo})
+    @OnFocusChange({R.id.et_stock, R.id.et_stockPos, R.id.et_mtlNo})
     public void onViewFocusChange(View v, boolean hasFocus) {
         if (hasFocus) hideKeyboard(v);
     }
@@ -523,8 +528,8 @@ public class Sal_OutFragment1 extends BaseFragment {
                             }
 
                             break;
-                        case R.id.et_matNo: // 物料
-                            String matNo = getValues(etMatNo).trim();
+                        case R.id.et_mtlNo: // 物料
+                            String matNo = getValues(etMtlNo).trim();
                             if (isKeyDownEnter(matNo, keyCode)) {
                                 if (mtlBarcode != null && mtlBarcode.length() > 0) {
                                     if (mtlBarcode.equals(matNo)) {
@@ -549,7 +554,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         };
         etStock.setOnKeyListener(keyListener);
         etStockPos.setOnKeyListener(keyListener);
-        etMatNo.setOnKeyListener(keyListener);
+        etMtlNo.setOnKeyListener(keyListener);
     }
 
     /**
@@ -573,7 +578,7 @@ public class Sal_OutFragment1 extends BaseFragment {
      */
     private void reset(char flag) {
         // 清空物料信息
-        etMatNo.setText(""); // 物料代码
+        etMtlNo.setText(""); // 物料代码
         tvCustSel.setText("客户：");
         cust = null;
         setEnables(tvReceiveOrg, R.drawable.back_style_blue, true);
@@ -693,7 +698,7 @@ public class Sal_OutFragment1 extends BaseFragment {
             stockBarcode = stock.getfName();
             stockPBarcode = stockP.getFname();
         } else {
-            setTexts(etMatNo, mtlBarcode);
+            setTexts(etMtlNo, mtlBarcode);
             return smBefore();
         }
         return true;
@@ -755,7 +760,7 @@ public class Sal_OutFragment1 extends BaseFragment {
      */
     private boolean getBarCodeTableBeforeSon(BarCodeTable bt) {
         int size = checkDatas.size();
-        setTexts(etMatNo, mtlBarcode);
+        setTexts(etMtlNo, mtlBarcode);
         if(size > 0) {
             for (int i = 0; i < size; i++) {
                 ScanningRecord2 sr2 = checkDatas.get(i);
@@ -792,7 +797,7 @@ public class Sal_OutFragment1 extends BaseFragment {
      * 得到条码表的数据
      */
     private void getBarCodeTableAfter(BarCodeTable bt) {
-        setTexts(etMatNo, mtlBarcode);
+        setTexts(etMtlNo, mtlBarcode);
         ScanningRecord2 sr2 = new ScanningRecord2();
         sr2.setSourceId(bt.getId());
         sr2.setSourceK3Id(bt.getRelationBillId());
@@ -903,7 +908,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         if (stockP != null) {
             setTexts(etStockPos, stockP.getFname());
             stockPBarcode = stockP.getFname();
-            setFocusable(etMatNo);
+            setFocusable(etMtlNo);
         }
     }
 

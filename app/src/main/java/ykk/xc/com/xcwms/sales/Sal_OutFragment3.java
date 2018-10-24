@@ -524,9 +524,15 @@ public class Sal_OutFragment3 extends BaseFragment {
 
             // 销售组织
             if(salOrg == null) salOrg = new Organization();
-            salOrg.setFpkId(pl.getDeliOrgId());
-            salOrg.setNumber(pl.getDeliOrgNumber());
-            salOrg.setName(pl.getDeliOrgName());
+            if(pl.getSalOrgId() > 0) {
+                salOrg.setFpkId(pl.getSalOrgId());
+                salOrg.setNumber(pl.getSalOrgNumber());
+                salOrg.setName(pl.getSalOrgName());
+            } else {
+                salOrg.setFpkId(pl.getDeliOrgId());
+                salOrg.setNumber(pl.getDeliOrgNumber());
+                salOrg.setName(pl.getDeliOrgName());
+            }
 
             setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
             tvSalOrg.setText(salOrg.getName());

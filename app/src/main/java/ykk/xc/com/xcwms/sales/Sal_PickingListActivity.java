@@ -726,6 +726,17 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setDeliOrgId(deliOrder.getDeliOrgId());
             pl.setDeliOrgNumber(deliOrder.getDeliOrgNumber());
             pl.setDeliOrgName(deliOrder.getDeliOrgName());
+            if(deliOrder.getSalOrgId() > 0) {
+                pl.setSalOrgId(deliOrder.getSalOrgId());
+                pl.setSalOrgNumber(deliOrder.getSalOrgNumber());
+                pl.setSalOrgName(deliOrder.getSalOrgName());
+
+            } else {
+                pl.setSalOrgId(deliOrder.getDeliOrgId());
+                pl.setSalOrgNumber(deliOrder.getDeliOrgNumber());
+                pl.setSalOrgName(deliOrder.getDeliOrgName());
+            }
+
             pl.setMtl(deliOrder.getMtl());
             pl.setMtlId(deliOrder.getMtlId());
             pl.setMtlFnumber(deliOrder.getMtlFnumber());

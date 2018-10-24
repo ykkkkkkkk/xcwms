@@ -254,12 +254,12 @@ public class Prod_InFragment1 extends BaseFragment {
         hideSoftInputMode(mContext, etStockPos);
         getUserInfo();
         tvProdDate.setText(Comm.getSysDate(7));
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setFocusable(etMatNo); // 物料代码获取焦点
-            }
-        },200);
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                setFocusable(etMatNo); // 物料代码获取焦点
+//            }
+//        },800);
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
@@ -276,6 +276,18 @@ public class Prod_InFragment1 extends BaseFragment {
                 setTexts(etStockPos, stockP.getFnumber());
                 stockPBarcode = stockP.getFnumber();
             }
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etMatNo); // 物料代码获取焦点
+                }
+            },200);
         }
     }
 

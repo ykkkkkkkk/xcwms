@@ -42,6 +42,12 @@ public class DeliOrder implements Serializable{
 	private String entryCloseStatus;//发货通知单单据体关闭状态 ( A:未关闭 B:已关闭 )
 	// 临时使用的字段
 	private double number;
+	/*销售订单销售组织ID*/
+	private int salOrgId;
+	/*销售订单销售组织编码*/
+	private String salOrgNumber;
+	/*销售订单销售组织名称*/
+	private String salOrgName;
 
 	public DeliOrder() {
 		super();
@@ -269,5 +275,29 @@ public class DeliOrder implements Serializable{
 
 	public void setEntryCloseStatus(String entryCloseStatus) {
 		this.entryCloseStatus = entryCloseStatus;
+	}
+
+	public int getSalOrgId() {
+		return salOrgId;
+	}
+
+	public void setSalOrgId(int salOrgId) {
+		this.salOrgId = salOrgId;
+	}
+
+	public String getSalOrgNumber() {
+		return salOrgNumber;
+	}
+
+	public void setSalOrgNumber(String salOrgNumber) {
+		this.salOrgNumber = salOrgNumber;
+	}
+
+	public String getSalOrgName() {
+		return salOrgName;
+	}
+
+	public void setSalOrgName(String salOrgName) {
+		this.salOrgName = salOrgName;
 	}
 }

@@ -23,6 +23,9 @@ public class PickingList implements Serializable {
     private int deliOrgId; // 发货组织id
     private String deliOrgNumber; // 发货代码
     private String deliOrgName; // 发货组织
+    private int salOrgId; // 销售组织id
+    private String salOrgNumber; // 销售代码
+    private String salOrgName; // 销售组织
     private int mtlId; // 物料id
     private Material mtl; // 物料对象
     private String mtlFnumber; // 物料编码
@@ -394,6 +397,30 @@ public class PickingList implements Serializable {
 
     public void setStrBarcodes(String strBarcodes) {
         this.strBarcodes = strBarcodes;
+    }
+
+    public int getSalOrgId() {
+        return salOrgId;
+    }
+
+    public String getSalOrgNumber() {
+        return salOrgNumber;
+    }
+
+    public String getSalOrgName() {
+        return salOrgName;
+    }
+
+    public void setSalOrgId(int salOrgId) {
+        this.salOrgId = salOrgId;
+    }
+
+    public void setSalOrgNumber(String salOrgNumber) {
+        this.salOrgNumber = salOrgNumber;
+    }
+
+    public void setSalOrgName(String salOrgName) {
+        this.salOrgName = salOrgName;
     }
 
 
