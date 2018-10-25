@@ -77,6 +77,8 @@ public class Sal_OutFragment1 extends BaseFragment {
     EditText etStockPos;
     @BindView(R.id.btn_stockPos)
     Button btnStockPos;
+    @BindView(R.id.btn_save)
+    Button btnSave;
     @BindView(R.id.tv_deptName)
     TextView tvDeptName;
     @BindView(R.id.et_mtlNo)
@@ -98,7 +100,7 @@ public class Sal_OutFragment1 extends BaseFragment {
 
     private Sal_OutFragment1 context = this;
     private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
     private Customer cust; // 客户
     private Stock stock; // 仓库
@@ -116,6 +118,7 @@ public class Sal_OutFragment1 extends BaseFragment {
     private char defaultStockVal; // 默认仓库的值
     private Activity mContext;
     private Sal_OutMainActivity parent;
+    private String k3Number; // 记录传递到k3返回的单号
 
     // 消息处理
     private Sal_OutFragment1.MyHandler mHandler = new Sal_OutFragment1.MyHandler(this);
@@ -133,16 +136,29 @@ public class Sal_OutFragment1 extends BaseFragment {
 
                 switch (msg.what) {
                     case SUCC1:
+                        m.k3Number = JsonUtil.strToString((String) msg.obj);
                         m.reset('0');
 
                         m.checkDatas.clear();
                         m.getBarCodeTableBefore(true);
                         m.mAdapter.notifyDataSetChanged();
-                        Comm.showWarnDialog(m.mContext,"保存成功");
+                        m.btnSave.setVisibility(View.GONE);
+                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
                     case UNSUCC1:
                         Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
+
+                        break;
+                    case PASS: // 审核成功 返回
+                        m.k3Number = null;
+                        m.btnSave.setVisibility(View.VISIBLE);
+                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+
+                        break;
+                    case UNPASS: // 审核失败 返回
+                        String errMsg = JsonUtil.strToString((String)msg.obj);
+                        Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
                     case SUCC2: // 扫码成功后进入
@@ -325,7 +341,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
+    @OnClick({R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_pass, R.id.btn_clone,
             R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -375,6 +391,14 @@ public class Sal_OutFragment1 extends BaseFragment {
                 }
                 run_findInStockSum();
 //                run_addScanningRecord();
+
+                break;
+            case R.id.btn_pass: // 审核
+                if(k3Number == null) {
+                    Comm.showWarnDialog(mContext,"请先保存，然后审核！");
+                    return;
+                }
+                run_submitAndPass();
 
                 break;
             case R.id.btn_clone: // 重置
@@ -587,6 +611,8 @@ public class Sal_OutFragment1 extends BaseFragment {
     }
 
     private void resetSon() {
+        k3Number = null;
+        btnSave.setVisibility(View.VISIBLE);
         getBarCodeTableBefore(true);
         checkDatas.clear();
         mAdapter.notifyDataSetChanged();
@@ -995,6 +1021,8 @@ public class Sal_OutFragment1 extends BaseFragment {
             record.setFsrcBillTypeId("SAL_SALEORDER");
             record.setfRuleId("SAL_SALEORDER-SAL_OUTSTOCK");
             record.setFsTableName("T_SAL_ORDERENTRY");
+            record.setKdAccount(user.getKdAccount());
+            record.setKdAccountPassword(user.getKdAccountPassword());
 
             list.add(record);
         }
@@ -1027,7 +1055,8 @@ public class Sal_OutFragment1 extends BaseFragment {
                     return;
                 }
                 Log.e("run_addScanningRecord --> onResponse", result);
-                mHandler.sendEmptyMessage(SUCC1);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
+                mHandler.sendMessage(msg);
             }
         });
     }
@@ -1138,6 +1167,49 @@ public class Sal_OutFragment1 extends BaseFragment {
                 }
                 Message msg = mHandler.obtainMessage(SUCC3, result);
                 Log.e("run_findInStockSum --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 提交并审核
+     */
+    private void run_submitAndPass() {
+        showLoadDialog("正在审核...");
+        String mUrl = Consts.getURL("scanningRecord/submitAndPass");
+        getUserInfo();
+        FormBody formBody = new FormBody.Builder()
+                .add("fbillNo", k3Number)
+                .add("type", "2")
+                .add("kdAccount", user.getKdAccount())
+                .add("kdAccountPassword", user.getKdAccountPassword())
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNPASS);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNPASS, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(PASS, result);
+                Log.e("run_submitAndPass --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

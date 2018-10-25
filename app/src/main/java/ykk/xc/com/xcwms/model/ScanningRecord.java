@@ -61,6 +61,8 @@ public class ScanningRecord implements Serializable {
     // 临时变量
     private List<String> listBarcode; // 记录每行中扫的条码barcode
     private String strBarcodes; // 用逗号拼接的条码号
+    private String kdAccount; // k3 用户的密码
+    private String kdAccountPassword; // k3 用户的密码
 
     public int getId() {
         return id;
@@ -354,6 +356,18 @@ public class ScanningRecord implements Serializable {
     }
     public void setStrBarcodes(String strBarcodes) {
         this.strBarcodes = strBarcodes;
+    }
+    public String getKdAccount() {
+        return kdAccount;
+    }
+    public String getKdAccountPassword() {
+        return kdAccountPassword;
+    }
+    public void setKdAccount(String kdAccount) {
+        this.kdAccount = kdAccount;
+    }
+    public void setKdAccountPassword(String kdAccountPassword) {
+        this.kdAccountPassword = kdAccountPassword;
     }
 
 

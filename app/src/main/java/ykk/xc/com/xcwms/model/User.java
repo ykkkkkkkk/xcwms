@@ -26,6 +26,14 @@ public class User implements Serializable {
     private Stock stock;
     private StockPosition stockPos;
     private List<SystemSet> sysSetList;
+    /*k3账号id*/
+    private Integer kdAccountId;
+    /*k3账号名称*/
+    private String kdAccountName;
+    /*k3账号*/
+    private String kdAccount;
+    /*k3账号密码*/
+    private String kdAccountPassword;
 
     public User() {
         super();
@@ -148,6 +156,38 @@ public class User implements Serializable {
 
     public void setKdUserNumber(String kdUserNumber) {
         this.kdUserNumber = kdUserNumber;
+    }
+
+    public Integer getKdAccountId() {
+        return kdAccountId;
+    }
+
+    public void setKdAccountId(Integer kdAccountId) {
+        this.kdAccountId = kdAccountId;
+    }
+
+    public String getKdAccountName() {
+        return kdAccountName;
+    }
+
+    public void setKdAccountName(String kdAccountName) {
+        this.kdAccountName = kdAccountName;
+    }
+
+    public String getKdAccount() {
+        return kdAccount;
+    }
+
+    public void setKdAccount(String kdAccount) {
+        this.kdAccount = kdAccount;
+    }
+
+    public String getKdAccountPassword() {
+        return kdAccountPassword;
+    }
+
+    public void setKdAccountPassword(String kdAccountPassword) {
+        this.kdAccountPassword = kdAccountPassword;
     }
 
 }

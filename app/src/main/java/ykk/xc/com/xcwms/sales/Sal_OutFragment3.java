@@ -15,6 +15,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -79,10 +80,12 @@ public class Sal_OutFragment3 extends BaseFragment {
     EditText etExpressNo;
     @BindView(R.id.lin_top)
     LinearLayout linTop;
+    @BindView(R.id.btn_save)
+    Button btnSave;
 
     private Sal_OutFragment3 context = this;
     private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, RESET = 15;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, PASS = 203, UNPASS = 503;
     private static final int CODE2 = 2;
     private Department department; // 部门
     private Organization receiveOrg, salOrg; // 组织
@@ -96,6 +99,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     private User user;
     private Activity mContext;
     private Sal_OutMainActivity parent;
+    private String k3Number; // 记录传递到k3返回的单号
 
     // 消息处理
     private Sal_OutFragment3.MyHandler mHandler = new Sal_OutFragment3.MyHandler(this);
@@ -113,12 +117,25 @@ public class Sal_OutFragment3 extends BaseFragment {
 
                 switch (msg.what) {
                     case SUCC1:
+                        m.k3Number = JsonUtil.strToString((String) msg.obj);
                         m.reset();
-                        Comm.showWarnDialog(m.mContext,"保存成功");
+                        m.btnSave.setVisibility(View.GONE);
+                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
                     case UNSUCC1:
                         Comm.showWarnDialog(m.mContext,"服务器繁忙，请稍候再试！");
+
+                        break;
+                    case PASS: // 审核成功 返回
+                        m.k3Number = null;
+                        m.btnSave.setVisibility(View.VISIBLE);
+                        Comm.showWarnDialog(m.mContext,"审核成功✔");
+
+                        break;
+                    case UNPASS: // 审核失败 返回
+                        String errMsg = JsonUtil.strToString((String)msg.obj);
+                        Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
                     case SUCC2: // 判断是否存在返回
@@ -191,7 +208,7 @@ public class Sal_OutFragment3 extends BaseFragment {
 
     }
 
-    @OnClick({R.id.tv_pickingListSel, R.id.btn_save, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg,
+    @OnClick({R.id.tv_pickingListSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg,
             R.id.tv_salMan, R.id.lin_rowTitle, R.id.tv_expressCompany})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -230,6 +247,14 @@ public class Sal_OutFragment3 extends BaseFragment {
 //                run_addScanningRecord();
 
                 break;
+            case R.id.btn_pass: // 审核
+                if(k3Number == null) {
+                    Comm.showWarnDialog(mContext,"请先保存，然后审核！");
+                    return;
+                }
+                run_submitAndPass();
+
+                break;
             case R.id.btn_clone: // 重置
                 hideKeyboard(mContext.getCurrentFocus());
                 if (checkDatas != null && checkDatas.size() > 0) {
@@ -241,6 +266,8 @@ public class Sal_OutFragment3 extends BaseFragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             reset();
+                            k3Number = null;
+                            btnSave.setVisibility(View.VISIBLE);
                         }
                     });
                     build.setNegativeButton("否", null);
@@ -641,6 +668,8 @@ public class Sal_OutFragment3 extends BaseFragment {
             if(expressCompany != null) {
                 record.setExpressNumber(expressCompany.getExpressNumber());
             }
+            record.setKdAccount(user.getKdAccount());
+            record.setKdAccountPassword(user.getKdAccountPassword());
 
             list.add(record);
         }
@@ -673,7 +702,8 @@ public class Sal_OutFragment3 extends BaseFragment {
                     return;
                 }
                 Log.e("run_addScanningRecord --> onResponse", result);
-                mHandler.sendEmptyMessage(SUCC1);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
+                mHandler.sendMessage(msg);
             }
         });
     }
@@ -725,6 +755,49 @@ public class Sal_OutFragment3 extends BaseFragment {
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);
                 Log.e("run_findInStockSum --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 提交并审核
+     */
+    private void run_submitAndPass() {
+        showLoadDialog("正在审核...");
+        String mUrl = Consts.getURL("scanningRecord/submitAndPass");
+        getUserInfo();
+        FormBody formBody = new FormBody.Builder()
+                .add("fbillNo", k3Number)
+                .add("type", "2")
+                .add("kdAccount", user.getKdAccount())
+                .add("kdAccountPassword", user.getKdAccountPassword())
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNPASS);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNPASS, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(PASS, result);
+                Log.e("run_submitAndPass --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
