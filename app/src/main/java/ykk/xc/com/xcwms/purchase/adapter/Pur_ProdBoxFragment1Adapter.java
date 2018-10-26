@@ -32,11 +32,13 @@ public class Pur_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<Materi
     public void onBindHoder(RecyclerHolder holder, final MaterialBinningRecord entity, final int pos) {
         // 初始化id
         TextView tv_row = holder.obtainView(R.id.tv_row);
+        TextView tv_prodOrderNo = holder.obtainView(R.id.tv_prodOrderNo);
         TextView tv_mats = holder.obtainView(R.id.tv_mats);
         TextView tv_deliWay = holder.obtainView(R.id.tv_deliWay);
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         // 赋值
         tv_row.setText(String.valueOf(pos + 1));
+        tv_prodOrderNo.setText(entity.getRelationBillNumber());
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
         String deliWay = Comm.isNULLS(entity.getDeliveryWay());
         tv_deliWay.setText(deliWay);

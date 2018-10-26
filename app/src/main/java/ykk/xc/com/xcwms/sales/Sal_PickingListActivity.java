@@ -124,7 +124,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                         Comm.showWarnDialog(m.context,"服务器繁忙，请稍候再试！");
 
                         break;
-                    case SUCC2: // 扫码成功后进入
+                    case SUCC2: // 发货通知单
                         BarCodeTable bt = null;
                         switch (m.curViewFlag) {
                             case '3': // 发货订单

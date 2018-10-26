@@ -978,6 +978,7 @@ public class Prod_InFragment2 extends BaseFragment {
         FormBody formBody = new FormBody.Builder()
                 .add("strCaseId", strCaseId)
                 .add("barcode", barcode)
+                .add("mtlBigClass", "成品") // 生产入库，只能录类型为“成品”的
                 .build();
 
         Request request = new Request.Builder()

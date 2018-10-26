@@ -17,10 +17,20 @@
         android:textSize="12sp" />
 
     <TextView
-        android:id="@+id/tv_mats"
+        android:id="@+id/tv_prodOrderNo"
         android:layout_width="0dp"
         android:layout_height="@dimen/_46dp"
         android:layout_weight="1"
+        android:gravity="center"
+        android:text="生产订单"
+        android:textColor="#000000"
+        android:textSize="@dimen/_11sp" />
+
+    <TextView
+        android:id="@+id/tv_mats"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/_46dp"
+        android:layout_weight="1.5"
         android:gravity="center"
         android:text="物料代码\n名称"
         android:textColor="#000000"

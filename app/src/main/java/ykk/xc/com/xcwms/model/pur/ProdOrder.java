@@ -72,6 +72,11 @@ public class ProdOrder implements Serializable {
 	private String salOrgNumber;
 	/*销售订单销售组织名称*/
 	private String salOrgName;
+	/*物料大类*/
+	private String mtlBigClass;
+
+
+	private int isCheck; // 新加的是否选中
 
 	public ProdOrder() {
 		super();
@@ -403,6 +408,22 @@ public class ProdOrder implements Serializable {
 
 	public void setSalOrgName(String salOrgName) {
 		this.salOrgName = salOrgName;
+	}
+
+	public String getMtlBigClass() {
+		return mtlBigClass;
+	}
+
+	public void setMtlBigClass(String mtlBigClass) {
+		this.mtlBigClass = mtlBigClass;
+	}
+
+	public int getIsCheck() {
+		return isCheck;
+	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
 	}
 
 
