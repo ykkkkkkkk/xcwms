@@ -170,8 +170,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
                                 break;
                             case '3': // 物料扫码     返回
-//                                BarCodeTable barCodeTable2 = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
-//                                m.getBarCodeTable_delete(barCodeTable2);
                                 BarCodeTable bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 m.getMtlAfter(bt);
 
@@ -550,7 +548,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 curViewFlag = '4';
                 mHandler.sendEmptyMessageDelayed(RESET, 200);
                 // 执行查询方法
-                run_smGetDatas();
+                run_smGetDatas(mtlBarcode_del);
             }
 
             return false;
@@ -603,7 +601,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                             curViewFlag = '1';
                             mHandler.sendEmptyMessageDelayed(RESET, 200);
                             // 执行查询方法
-                            run_smGetDatas();
+                            run_smGetDatas(boxBarcode);
 
                             break;
                         case R.id.et_prodOrderCode: // 生产订单
@@ -621,13 +619,9 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                             curViewFlag = '2';
                             mHandler.sendEmptyMessageDelayed(RESET, 200);
 
-                            if(prodOrderBarcode.length() == 0) {
-                                Comm.showWarnDialog(mContext,"请对准条码！");
-                                return false;
-                            }
                             if (smMtlBefore()) {
                                 // 执行查询方法
-                                run_smGetDatas();
+                                run_smGetDatas(prodOrderBarcode);
                             }
 
                             break;
@@ -652,7 +646,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 return false;
                             }
                             // 执行查询方法
-                            run_smGetDatas();
+                            run_smGetDatas(mtlBarcode);
 
                             break;
                     }
@@ -730,11 +724,13 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         double number = parseDouble(value);
                         MaterialBinningRecord mbr = checkDatas.get(curPos);
                         if(number > mbr.getRelationBillFQTY()) {
-                            Comm.showWarnDialog(mContext,"第"+(curPos+1)+"行装箱数不能大于订单数！");
+                            Comm.showWarnDialog(mContext,"第"+(curPos+1)+"行，“装箱数”不能大于“订单数”！");
                             return;
                         }
-                        int id = mbr.getId();
-                        run_modifyNumber2(id, number);
+//                        int id = mbr.getId();
+                        mbr.setNumber(number);
+                        mAdapter.notifyDataSetChanged();
+//                        run_modifyNumber2(id, number);
                     }
                 }
 
@@ -996,6 +992,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             mbr.setModifyUserName(user.getUsername());
             mbr.setSalOrderNo(prodOrder.getSalOrderNo());
             mbr.setSalOrderNoEntryId(prodOrder.getSalOrderEntryId());
+            mbr.setMtlBigClass(prodOrder.getMtlBigClass());
             
             // 物料是否启用序列号
             if(prodOrder.getMtl().getIsSnManager() == 1) {
@@ -1129,13 +1126,25 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             MaterialBinningRecord mbr = null;
             // 已装箱的物料
             if(size > 0) {
-                // 相同的物料就+1，否则为1
-                for(int i=0; i<size; i++) {
-                    MaterialBinningRecord forMtl = checkDatas.get(i);
-                    if(bt.getRelationBillNumber().equals(forMtl.getRelationBillNumber()) && bt.getEntryId() == forMtl.getEntryId()){
-                        mbr = forMtl;
+                if(bt.getCaseId() == 34) {
+                    // 相同的分录行相等
+                    for (int i = 0; i < size; i++) {
+                        MaterialBinningRecord forMtl = checkDatas.get(i);
+                        if (bt.getRelationBillNumber().equals(forMtl.getRelationBillNumber()) && bt.getEntryId() == forMtl.getEntryId()) {
+                            mbr = forMtl;
 
-                        break;
+                            break;
+                        }
+                    }
+                } else {
+                    // 相同的物料行相等
+                    for (int i = 0; i < size; i++) {
+                        MaterialBinningRecord forMtl = checkDatas.get(i);
+                        if (bt.getMaterialId() == forMtl.getEntryId()) {
+                            mbr = forMtl;
+
+                            break;
+                        }
                     }
                 }
             }
@@ -1162,7 +1171,11 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;

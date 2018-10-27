@@ -148,14 +148,14 @@ public class Sal_OutFragment2 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
-                        m.reset('0');
-
-                        m.checkDatas.clear();
-                        m.getBarCodeTableBefore(true);
-                        m.mAdapter.notifyDataSetChanged();
-                        m.caseId = 0;
-                        m.mapBox.clear();
-                        m.deliOrderList.clear();
+//                        m.reset('0');
+//
+//                        m.checkDatas.clear();
+//                        m.getBarCodeTableBefore(true);
+//                        m.mAdapter.notifyDataSetChanged();
+//                        m.caseId = 0;
+//                        m.mapBox.clear();
+//                        m.deliOrderList.clear();
                         m.btnSave.setVisibility(View.GONE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
@@ -167,6 +167,14 @@ public class Sal_OutFragment2 extends BaseFragment {
                     case PASS: // 审核成功 返回
                         m.k3Number = null;
                         m.btnSave.setVisibility(View.VISIBLE);
+                        m.reset('0');
+
+                        m.checkDatas.clear();
+                        m.getBarCodeTableBefore(true);
+                        m.mAdapter.notifyDataSetChanged();
+                        m.caseId = 0;
+                        m.mapBox.clear();
+                        m.deliOrderList.clear();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -630,86 +638,78 @@ public class Sal_OutFragment2 extends BaseFragment {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_stock: // 仓库
                             String whName = getValues(etStock).trim();
-                            if (isKeyDownEnter(whName, keyCode)) {
-                                if (stockBarcode != null && stockBarcode.length() > 0) {
-                                    if (stockBarcode.equals(whName)) {
-                                        stockBarcode = whName;
-                                    } else {
-                                        String tmp = whName.replaceFirst(stockBarcode, "");
-                                        stockBarcode = tmp.replace("\n", "");
-                                    }
+                            if (stockBarcode != null && stockBarcode.length() > 0) {
+                                if (stockBarcode.equals(whName)) {
+                                    stockBarcode = whName;
                                 } else {
-                                    stockBarcode = whName.replace("\n", "");
+                                    String tmp = whName.replaceFirst(stockBarcode, "");
+                                    stockBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '1';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                stockBarcode = whName.replace("\n", "");
                             }
+                            curViewFlag = '1';
+                            // 执行查询方法
+                            run_smGetDatas(stockBarcode);
 
                             break;
                         case R.id.et_stockPos: // 库位
                             String whPos = getValues(etStockPos).trim();
-                            if (isKeyDownEnter(whPos, keyCode)) {
-                                if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                    if (stockPBarcode.equals(whPos)) {
-                                        stockPBarcode = whPos;
-                                    } else {
-                                        String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                        stockPBarcode = tmp.replace("\n", "");
-                                    }
+                            if (stockPBarcode != null && stockPBarcode.length() > 0) {
+                                if (stockPBarcode.equals(whPos)) {
+                                    stockPBarcode = whPos;
                                 } else {
-                                    stockPBarcode = whPos.replace("\n", "");
+                                    String tmp = whPos.replaceFirst(stockPBarcode, "");
+                                    stockPBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '2';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                stockPBarcode = whPos.replace("\n", "");
                             }
+                            curViewFlag = '2';
+                            // 执行查询方法
+                            run_smGetDatas(stockPBarcode);
 
                             break;
                         case R.id.et_boxCode: // 物料
                             String boxCode = getValues(etBoxCode).trim();
-                            if (isKeyDownEnter(boxCode, keyCode)) {
-                                if (!smBefore()) { // 扫码之前的判断
-                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                    return false;
-                                }
-                                if (boxBarcode != null && boxBarcode.length() > 0) {
-                                    if (boxBarcode.equals(boxCode)) {
-                                        boxBarcode = boxCode;
-                                    } else {
-                                        String tmp = boxCode.replaceFirst(boxBarcode, "");
-                                        boxBarcode = tmp.replace("\n", "");
-                                    }
+                            if (boxBarcode != null && boxBarcode.length() > 0) {
+                                if (boxBarcode.equals(boxCode)) {
+                                    boxBarcode = boxCode;
                                 } else {
-                                    boxBarcode = boxCode.replace("\n", "");
+                                    String tmp = boxCode.replaceFirst(boxBarcode, "");
+                                    boxBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '3';
-                                mHandler.sendEmptyMessage(RESET);
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                boxBarcode = boxCode.replace("\n", "");
                             }
+                            curViewFlag = '3';
+                            if (!smBefore()) { // 扫码之前的判断
+                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                return false;
+                            }
+                            mHandler.sendEmptyMessage(RESET);
+                            // 执行查询方法
+                            run_smGetDatas(boxBarcode);
 
                             break;
                         case R.id.et_expressNo: // 运单号
                             String expressNo = getValues(etExpressNo).trim();
-                            if (isKeyDownEnter(expressNo, keyCode)) {
-                                if (expressNoBarcode != null && expressNoBarcode.length() > 0) {
-                                    if (expressNoBarcode.equals(expressNo)) {
-                                        expressNoBarcode = expressNo;
-                                    } else {
-                                        String tmp = expressNo.replaceFirst(expressNoBarcode, "");
-                                        expressNoBarcode = tmp.replace("\n", "");
-                                    }
+                            if (expressNoBarcode != null && expressNoBarcode.length() > 0) {
+                                if (expressNoBarcode.equals(expressNo)) {
+                                    expressNoBarcode = expressNo;
                                 } else {
-                                    expressNoBarcode = expressNo.replace("\n", "");
+                                    String tmp = expressNo.replaceFirst(expressNoBarcode, "");
+                                    expressNoBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '9';
-                                mHandler.sendEmptyMessage(RESET);
+                            } else {
+                                expressNoBarcode = expressNo.replace("\n", "");
                             }
+                            curViewFlag = '9';
+                            mHandler.sendEmptyMessage(RESET);
 
                             break;
                     }
@@ -729,20 +729,6 @@ public class Sal_OutFragment2 extends BaseFragment {
             else parent.isKeyboard = false;
             }
         });
-    }
-
-    /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(mContext, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1448,7 +1434,11 @@ public class Sal_OutFragment2 extends BaseFragment {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;

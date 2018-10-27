@@ -228,29 +228,26 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_boxCode: // 箱子的防伪码
-
                             String mtlCode = getValues(etBoxCode).trim();
-                            if (isKeyDownEnter(mtlCode, event, keyCode)) {
-                                if (!smBefore()) {
-                                    mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                    return false;
-                                }
-                                if (strBarcode != null && strBarcode.length() > 0) {
-                                    if (strBarcode.equals(mtlCode)) {
-                                        strBarcode = mtlCode;
-                                    } else {
-                                        String tmp = mtlCode.replaceFirst(strBarcode, "");
-                                        strBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    strBarcode = mtlCode.replace("\n", "");
-                                }
-                                // 执行查询方法
-                                run_smGetDatas();
+                            if (!smBefore()) {
+                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                return false;
                             }
+                            if (strBarcode != null && strBarcode.length() > 0) {
+                                if (strBarcode.equals(mtlCode)) {
+                                    strBarcode = mtlCode;
+                                } else {
+                                    String tmp = mtlCode.replaceFirst(strBarcode, "");
+                                    strBarcode = tmp.replace("\n", "");
+                                }
+                            } else {
+                                strBarcode = mtlCode.replace("\n", "");
+                            }
+                            // 执行查询方法
+                            run_smGetDatas(strBarcode);
 
                             break;
                     }
@@ -322,23 +319,13 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
     }
 
     /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(mContext, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = Consts.getURL("securityCode/findListByParam");
         String strCaseId = ""; // 方案id

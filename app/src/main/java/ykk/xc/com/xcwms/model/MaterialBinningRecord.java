@@ -96,6 +96,8 @@ public class MaterialBinningRecord implements Serializable {
 	private String salOrderNo;
 	/* 关联的销售订单分录id */
 	private int salOrderNoEntryId;
+	/* 物料大类：成品 */
+	private String mtlBigClass;
 	private List<String> listBarcode; // 记录每行中扫的条码barcode
 	private String strBarcodes; // 用逗号拼接的条码号
 
@@ -365,6 +367,14 @@ public class MaterialBinningRecord implements Serializable {
 
 	public void setSalOrderNoEntryId(int salOrderNoEntryId) {
 		this.salOrderNoEntryId = salOrderNoEntryId;
+	}
+
+	public String getMtlBigClass() {
+		return mtlBigClass;
+	}
+
+	public void setMtlBigClass(String mtlBigClass) {
+		this.mtlBigClass = mtlBigClass;
 	}
 
 	public List<String> getListBarcode() {

@@ -118,7 +118,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
-                        m.reset();
+//                        m.reset();
                         m.btnSave.setVisibility(View.GONE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
@@ -130,6 +130,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     case PASS: // 审核成功 返回
                         m.k3Number = null;
                         m.btnSave.setVisibility(View.VISIBLE);
+                        m.reset();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -353,24 +354,22 @@ public class Sal_OutFragment3 extends BaseFragment {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_expressNo: // 运单号
                             String expressNo = getValues(etExpressNo).trim();
-                            if (isKeyDownEnter(expressNo, keyCode)) {
-                                if (expressNoBarcode != null && expressNoBarcode.length() > 0) {
-                                    if (expressNoBarcode.equals(expressNo)) {
-                                        expressNoBarcode = expressNo;
-                                    } else {
-                                        String tmp = expressNo.replaceFirst(expressNoBarcode, "");
-                                        expressNoBarcode = tmp.replace("\n", "");
-                                    }
+                            if (expressNoBarcode != null && expressNoBarcode.length() > 0) {
+                                if (expressNoBarcode.equals(expressNo)) {
+                                    expressNoBarcode = expressNo;
                                 } else {
-                                    expressNoBarcode = expressNo.replace("\n", "");
+                                    String tmp = expressNo.replaceFirst(expressNoBarcode, "");
+                                    expressNoBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '9';
-                                mHandler.sendEmptyMessage(RESET);
+                            } else {
+                                expressNoBarcode = expressNo.replace("\n", "");
                             }
+                            curViewFlag = '9';
+                            mHandler.sendEmptyMessage(RESET);
 
                             break;
                     }
@@ -387,20 +386,6 @@ public class Sal_OutFragment3 extends BaseFragment {
             else parent.isKeyboard = false;
             }
         });
-    }
-
-    /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(mContext, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     /**

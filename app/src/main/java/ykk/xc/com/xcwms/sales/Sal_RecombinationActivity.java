@@ -1,6 +1,5 @@
 package ykk.xc.com.xcwms.sales;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -117,7 +116,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
     private Sal_RecombinationAdapter mAdapter;
-    private String strBoxBarcode, strMtlBarcode; // 对应的条码号
+    private String boxBarcode, mtlBarcode; // 对应的条码号
     private List<MaterialBinningRecord> mbrList = new ArrayList<>();
     private List<PickingList> plList = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
@@ -209,7 +208,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         break;
                     case CODE1: // 清空数据
                         m.etMtlCode.setText("");
-                        m.strMtlBarcode = "";
+                        m.mtlBarcode = "";
 
                         break;
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
@@ -218,10 +217,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     case CODE60: // 没有得到数据，就把回车的去掉，恢复正常数据
                         switch (m.curViewFlag) {
                             case '1': // 箱码扫码
-                                m.setTexts(m.etBoxCode, m.strBoxBarcode);
+                                m.setTexts(m.etBoxCode, m.boxBarcode);
                                 break;
                             case '2': // 物料扫码
-                                m.setTexts(m.etMtlCode, m.strMtlBarcode);
+                                m.setTexts(m.etMtlCode, m.mtlBarcode);
                                 break;
                         }
 
@@ -443,8 +442,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private void reset() {
         etBoxCode.setText("");
         boxBarCode = null;
-        strBoxBarcode = null;
-        strMtlBarcode = null;
+        boxBarcode = null;
+        mtlBarcode = null;
         tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
         tvBoxName.setText("");
         tvBoxSize.setText("");
@@ -483,48 +482,44 @@ public class Sal_RecombinationActivity extends BaseActivity {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_boxCode: // 箱码
                             String boxCode = getValues(etBoxCode).trim();
-                            if (isKeyDownEnter(boxCode, event, keyCode)) {
-                                if (strBoxBarcode != null && strBoxBarcode.length() > 0) {
-                                    if (strBoxBarcode.equals(boxCode)) {
-                                        strBoxBarcode = boxCode;
-                                    } else {
-                                        String tmp = boxCode.replaceFirst(strBoxBarcode, "");
-                                        strBoxBarcode = tmp.replace("\n", "");
-                                    }
+                            if (boxBarcode != null && boxBarcode.length() > 0) {
+                                if (boxBarcode.equals(boxCode)) {
+                                    boxBarcode = boxCode;
                                 } else {
-                                    strBoxBarcode = boxCode.replace("\n", "");
+                                    String tmp = boxCode.replaceFirst(boxBarcode, "");
+                                    boxBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '1';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                boxBarcode = boxCode.replace("\n", "");
                             }
+                            curViewFlag = '1';
+                            // 执行查询方法
+                            run_smGetDatas(boxBarcode);
 
                             break;
                         case R.id.et_mtlCode: // 物料
                             String mtlCode = getValues(etMtlCode).trim();
+                            if (mtlBarcode != null && mtlBarcode.length() > 0) {
+                                if (mtlBarcode.equals(mtlCode)) {
+                                    mtlBarcode = mtlCode;
+                                } else {
+                                    String tmp = mtlCode.replaceFirst(mtlBarcode, "");
+                                    mtlBarcode = tmp.replace("\n", "");
+                                }
+                            } else {
+                                mtlBarcode = mtlCode.replace("\n", "");
+                            }
+                            curViewFlag = '2';
                             if (!smMtlBefore()) {
                                 mHandler.sendEmptyMessageDelayed(CODE1, 200);
                                 return false;
                             }
-                            if (isKeyDownEnter(mtlCode, event, keyCode)) {
-                                if (strMtlBarcode != null && strMtlBarcode.length() > 0) {
-                                    if (strMtlBarcode.equals(mtlCode)) {
-                                        strMtlBarcode = mtlCode;
-                                    } else {
-                                        String tmp = mtlCode.replaceFirst(strMtlBarcode, "");
-                                        strMtlBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    strMtlBarcode = mtlCode.replace("\n", "");
-                                }
-                                curViewFlag = '2';
-                                // 执行查询方法
-                                run_smGetDatas();
-                            }
+                            // 执行查询方法
+                            run_smGetDatas(mtlBarcode);
 
                             break;
                     }
@@ -555,20 +550,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
             return false;
         }
         return true;
-    }
-
-    /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(context, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -678,7 +659,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
         if(boxBarCode != null) {
             mbrList.clear();
             setTexts(etBoxCode, boxBarCode.getBarCode());
-            strBoxBarcode = boxBarCode.getBarCode();
+            boxBarcode = boxBarCode.getBarCode();
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
                 linBox.setVisibility(View.VISIBLE);
@@ -798,7 +779,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void getMaterialAfter(BarCodeTable bt) {
         if(bt != null) {
-            setTexts(etMtlCode, strMtlBarcode);
+            setTexts(etMtlCode, mtlBarcode);
         }
         Material tmpMtl = bt.getMtl();
         int size = mbrList.size();
@@ -883,7 +864,11 @@ public class Sal_RecombinationActivity extends BaseActivity {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(context,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
@@ -891,12 +876,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
         switch (curViewFlag) {
             case '1': // 箱码
                 mUrl = Consts.getURL("boxBarCode/findBarcode");
-                barcode = strBoxBarcode;
+                barcode = boxBarcode;
                 strCaseId = "";
                 break;
             case '2': // 物料扫码
                 mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
-                barcode = strMtlBarcode;
+                barcode = mtlBarcode;
                 strCaseId = "11,21";
                 break;
         }

@@ -148,11 +148,11 @@ public class Pur_InFragment3 extends BaseFragment {
                 switch (msg.what) {
                     case SUCC1:
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
-                        m.reset('0');
-
-                        m.checkDatas.clear();
-                        m.getBarCodeTableAfterEnable(true);
-                        m.mAdapter.notifyDataSetChanged();
+//                        m.reset('0');
+//
+//                        m.checkDatas.clear();
+//                        m.getBarCodeTableAfterEnable(true);
+//                        m.mAdapter.notifyDataSetChanged();
                         m.btnSave.setVisibility(View.GONE);
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
@@ -164,6 +164,11 @@ public class Pur_InFragment3 extends BaseFragment {
                     case PASS: // 审核成功 返回
                         m.k3Number = null;
                         m.btnSave.setVisibility(View.VISIBLE);
+                        m.reset('0');
+
+                        m.checkDatas.clear();
+                        m.getBarCodeTableAfterEnable(true);
+                        m.mAdapter.notifyDataSetChanged();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
 
                         break;
@@ -548,106 +553,97 @@ public class Pur_InFragment3 extends BaseFragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // 按下事件
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_stock: // 仓库
                             String whName = getValues(etStock).trim();
-                            if (isKeyDownEnter(whName, keyCode)) {
-                                if (stockBarcode != null && stockBarcode.length() > 0) {
-                                    if(stockBarcode.equals(whName)) {
-                                        stockBarcode = whName;
-                                    } else {
-                                        String tmp = whName.replaceFirst(stockBarcode, "");
-                                        stockBarcode = tmp.replace("\n", "");
-                                    }
+                            if (stockBarcode != null && stockBarcode.length() > 0) {
+                                if(stockBarcode.equals(whName)) {
+                                    stockBarcode = whName;
                                 } else {
-                                    stockBarcode = whName.replace("\n", "");
+                                    String tmp = whName.replaceFirst(stockBarcode, "");
+                                    stockBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '1';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                stockBarcode = whName.replace("\n", "");
                             }
+                            curViewFlag = '1';
+                            // 执行查询方法
+                            run_smGetDatas(stockBarcode);
 
                             break;
                         case R.id.et_stockPos: // 库位
                             String whPos = getValues(etStockPos).trim();
-                            if (isKeyDownEnter(whPos, keyCode)) {
-                                if (stockPBarcode != null && stockPBarcode.length() > 0) {
-                                    if(stockBarcode.equals(whPos)) {
-                                        stockPBarcode = whPos;
-                                    } else {
-                                        String tmp = whPos.replaceFirst(stockPBarcode, "");
-                                        stockPBarcode = tmp.replace("\n", "");
-                                    }
+                            if (stockPBarcode != null && stockPBarcode.length() > 0) {
+                                if(stockBarcode.equals(whPos)) {
+                                    stockPBarcode = whPos;
                                 } else {
-                                    stockPBarcode = whPos.replace("\n", "");
+                                    String tmp = whPos.replaceFirst(stockPBarcode, "");
+                                    stockPBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '2';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                stockPBarcode = whPos.replace("\n", "");
                             }
+                            curViewFlag = '2';
+                            // 执行查询方法
+                            run_smGetDatas(stockPBarcode);
 
                             break;
                         case R.id.et_deptName: // 部门
                             String deptName = getValues(etDeptName).trim();
-                            if (isKeyDownEnter(deptName, keyCode)) {
-                                if (deptBarcode != null && deptBarcode.length() > 0) {
-                                    if(deptBarcode.equals(deptName)) {
-                                        deptBarcode = deptName;
-                                    } else {
-                                        String tmp = deptName.replaceFirst(deptBarcode, "");
-                                        deptBarcode = tmp.replace("\n", "");
-                                    }
+                            if (deptBarcode != null && deptBarcode.length() > 0) {
+                                if(deptBarcode.equals(deptName)) {
+                                    deptBarcode = deptName;
                                 } else {
-                                    deptBarcode = deptName.replace("\n", "");
+                                    String tmp = deptName.replaceFirst(deptBarcode, "");
+                                    deptBarcode = tmp.replace("\n", "");
                                 }
-                                curViewFlag = '3';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                deptBarcode = deptName.replace("\n", "");
                             }
+                            curViewFlag = '3';
+                            // 执行查询方法
+                            run_smGetDatas(deptBarcode);
 
                             break;
                         case R.id.et_sourceNo: // 来源单号
                             String sourceNo = getValues(etSourceNo).trim();
-                            if (isKeyDownEnter(sourceNo, keyCode)) {
-                                if (!smBefore('0')) { // 扫码之前的判断
-                                    mHandler.sendEmptyMessageDelayed(CLEAR1, 200);
-                                    return false;
-                                }
-                                if (sourceBarcode != null && sourceBarcode.length() > 0) {
-                                    String tmp = sourceNo.replaceFirst(sourceBarcode, "");
-                                    sourceBarcode = tmp.replace("\n", "");
-                                } else {
-                                    sourceBarcode = sourceNo.replace("\n", "");
-                                }
-                                curViewFlag = '4';
-                                // 执行查询方法
-                                run_smGetDatas();
+                            if (sourceBarcode != null && sourceBarcode.length() > 0) {
+                                String tmp = sourceNo.replaceFirst(sourceBarcode, "");
+                                sourceBarcode = tmp.replace("\n", "");
+                            } else {
+                                sourceBarcode = sourceNo.replace("\n", "");
                             }
+                            curViewFlag = '4';
+                            if (!smBefore('0')) { // 扫码之前的判断
+                                mHandler.sendEmptyMessageDelayed(CLEAR1, 200);
+                                return false;
+                            }
+                            // 执行查询方法
+                            run_smGetDatas(sourceBarcode);
 
                             break;
                         case R.id.et_mtlNo: // 物料
                             String matNo = getValues(etMtlNo).trim();
+                            if (mtlBarcode != null && mtlBarcode.length() > 0) {
+                                if(mtlBarcode.equals(matNo)) {
+                                    mtlBarcode = matNo;
+                                } else {
+                                    String tmp = matNo.replaceFirst(mtlBarcode, "");
+                                    mtlBarcode = tmp.replace("\n", "");
+                                }
+                            } else {
+                                mtlBarcode = matNo.replace("\n", "");
+                            }
+                            curViewFlag = '5';
                             if (checkDatas.size() == 0) { // 扫码之前的判断
                                 Comm.showWarnDialog(mContext, "请选择或扫描来源单！");
                                 mHandler.sendEmptyMessageDelayed(CLEAR2, 200);
                                 return false;
                             }
-                            if (isKeyDownEnter(matNo, keyCode)) {
-                                if (mtlBarcode != null && mtlBarcode.length() > 0) {
-                                    if(mtlBarcode.equals(matNo)) {
-                                        mtlBarcode = matNo;
-                                    } else {
-                                        String tmp = matNo.replaceFirst(mtlBarcode, "");
-                                        mtlBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    mtlBarcode = matNo.replace("\n", "");
-                                }
-                                curViewFlag = '5';
-                                // 执行查询方法
-                                run_smGetDatas();
-                            }
+                            // 执行查询方法
+                            run_smGetDatas(mtlBarcode);
+
                             break;
                     }
                 }
@@ -658,20 +654,6 @@ public class Pur_InFragment3 extends BaseFragment {
         etStockPos.setOnKeyListener(keyListener);
         etMtlNo.setOnKeyListener(keyListener);
         etSourceNo.setOnKeyListener(keyListener);
-    }
-
-    /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(mContext, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1307,7 +1289,11 @@ public class Pur_InFragment3 extends BaseFragment {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;

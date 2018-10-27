@@ -402,54 +402,45 @@ public class Sal_PickingListActivity extends BaseActivity {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_deliCode: // 来源单号
                             curViewFlag = '3';
                             String sourceNo = getValues(etDeliCode).trim();
-//                            if (!smBefore('0')) { // 扫码之前的判断
-//                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-//                                return false;
-//                            }
-                            if (isKeyDownEnter(sourceNo, event, keyCode)) {
-                                if (deliBarcode != null && deliBarcode.length() > 0) {
-                                    if (deliBarcode.equals(sourceNo)) {
-                                        deliBarcode = sourceNo;
-                                    } else {
-                                        String tmp = sourceNo.replaceFirst(deliBarcode, "");
-                                        deliBarcode = tmp.replace("\n", "");
-                                    }
+                            if (deliBarcode != null && deliBarcode.length() > 0) {
+                                if (deliBarcode.equals(sourceNo)) {
+                                    deliBarcode = sourceNo;
                                 } else {
-                                    deliBarcode = sourceNo.replace("\n", "");
+                                    String tmp = sourceNo.replaceFirst(deliBarcode, "");
+                                    deliBarcode = tmp.replace("\n", "");
                                 }
-                                // 执行查询方法
-                                run_smGetDatas();
+                            } else {
+                                deliBarcode = sourceNo.replace("\n", "");
                             }
+                            // 执行查询方法
+                            run_smGetDatas(deliBarcode);
 
                             break;
                         case R.id.et_mtlCode: // 物料
                             curViewFlag = '4';
-                            String deliCode = getValues(etDeliCode).trim();
                             String matNo = getValues(etMtlCode).trim();
-                            if (deliCode.length() == 0) { // 扫码之前的判断
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                            if (mtlBarcode != null && mtlBarcode.length() > 0) {
+                                if (mtlBarcode.equals(matNo)) {
+                                    mtlBarcode = matNo;
+                                } else {
+                                    String tmp = matNo.replaceFirst(mtlBarcode, "");
+                                    mtlBarcode = tmp.replace("\n", "");
+                                }
+                            } else {
+                                mtlBarcode = matNo.replace("\n", "");
+                            }
+                            if (checkDatas.size() == 0) {
+                                Comm.showWarnDialog(context,"请扫码发货订单！");
                                 return false;
                             }
-                            if (isKeyDownEnter(matNo, event, keyCode)) {
-                                if (mtlBarcode != null && mtlBarcode.length() > 0) {
-                                    if (mtlBarcode.equals(matNo)) {
-                                        mtlBarcode = matNo;
-                                    } else {
-                                        String tmp = matNo.replaceFirst(mtlBarcode, "");
-                                        mtlBarcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    mtlBarcode = matNo.replace("\n", "");
-                                }
 
-                                // 执行查询方法
-                                run_smGetDatas();
-                            }
+                            // 执行查询方法
+                            run_smGetDatas(mtlBarcode);
 
                             break;
                     }
@@ -459,20 +450,6 @@ public class Sal_PickingListActivity extends BaseActivity {
         };
         etDeliCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
-    }
-
-    /**
-     * 是否按了回车键
-     */
-    private boolean isKeyDownEnter(String val, KeyEvent event, int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            if (val.length() == 0) {
-                Comm.showWarnDialog(context, "请扫码条码！");
-                return false;
-            }
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -842,7 +819,11 @@ public class Sal_PickingListActivity extends BaseActivity {
     /**
      * 扫码查询对应的方法
      */
-    private void run_smGetDatas() {
+    private void run_smGetDatas(String val) {
+        if(val.length() == 0) {
+            Comm.showWarnDialog(context,"请对准条码！");
+            return;
+        }
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;
