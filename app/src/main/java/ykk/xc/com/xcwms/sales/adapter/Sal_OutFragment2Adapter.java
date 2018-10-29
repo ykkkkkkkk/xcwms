@@ -55,9 +55,9 @@ public class Sal_OutFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
         double stockqty = entity.getStockqty();
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
         if(entity.getStockPos() != null) {
-            tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPos().getFnumber());
+            tv_stockAP.setText(entity.getStockName()+"\n"+entity.getStockPos().getFnumber());
         } else {
-            tv_stockAP.setText(entity.getStock().getfName());
+            tv_stockAP.setText(entity.getStockName());
         }
 
         View.OnClickListener click = new View.OnClickListener() {
@@ -70,10 +70,17 @@ public class Sal_OutFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
                         }
 
                         break;
+                    case R.id.tv_stockAP: // 选择仓库
+                        if(callBack != null) {
+                            callBack.onClick_selStock(v, entity, pos);
+                        }
+
+                        break;
                 }
             }
         };
         tv_nums.setOnClickListener(click);
+        tv_stockAP.setOnClickListener(click);
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -82,6 +89,7 @@ public class Sal_OutFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord2 entity, int position);
+        void onClick_selStock(View v, ScanningRecord2 entity, int position);
         void onClick_del(ScanningRecord2 entity, int position);
     }
 

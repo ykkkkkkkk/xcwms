@@ -29,6 +29,7 @@ public class DeliOrder implements Serializable{
 	private String mtlUnitName; // 单位
 	private int stockId; // 出货仓库id
 	private String stockName; // 出货仓库名称
+	private String stockNumber;//出库仓库代码
 	private Stock stock; // 出货仓库
 	private double deliFqty; // 销售数量
 	private double deliFremainoutqty; // 未出库数量
@@ -211,6 +212,14 @@ public class DeliOrder implements Serializable{
 
 	public void setStockName(String stockName) {
 		this.stockName = stockName;
+	}
+
+	public String getStockNumber() {
+		return stockNumber;
+	}
+
+	public void setStockNumber(String stockNumber) {
+		this.stockNumber = stockNumber;
 	}
 
 	public void setStock(Stock stock) {

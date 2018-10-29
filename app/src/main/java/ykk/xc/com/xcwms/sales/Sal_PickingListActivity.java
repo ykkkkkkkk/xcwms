@@ -349,7 +349,8 @@ public class Sal_PickingListActivity extends BaseActivity {
      * 选择保存之前的判断
      */
     private boolean saveBefore() {
-        if (assist == null) {
+        String deliveryWay = getValues(tvDeliverSel);
+        if (deliveryWay.length() == 0) {
             Comm.showWarnDialog(context,"请选择发货方式！");
             return false;
         }
@@ -745,15 +746,12 @@ public class Sal_PickingListActivity extends BaseActivity {
             cust.setCustomerName(deliOrder.getCustName());
             tvCustSel.setText("客户："+deliOrder.getCustName());
             // 显示交货方式
-            if(assist == null && isNULLS(deliOrder.getDeliveryWay()).length() > 0) {
+            String deliveryWay = isNULLS(deliOrder.getDeliveryWay());
+            if(deliveryWay.length() > 0) {
                 assist = new AssistInfo();
                 assist.setfName(deliOrder.getDeliveryWay());
                 tvDeliverSel.setText(deliOrder.getDeliveryWay());
                 pl.setDeliveryWay(deliOrder.getDeliveryWay());
-
-            } else if(assist != null) {
-                tvDeliverSel.setText(assist.getfName());
-                pl.setDeliveryWay(assist.getfName());
             }
 
             pl.setMtl(deliOrder.getMtl());

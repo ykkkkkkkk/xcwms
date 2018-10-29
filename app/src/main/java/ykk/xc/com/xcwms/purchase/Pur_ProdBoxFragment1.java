@@ -10,7 +10,9 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Html;
+import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -139,6 +141,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
         public void handleMessage(Message msg) {
             Pur_ProdBoxFragment1 m = mActivity.get();
+            String errMsg = null;
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -184,8 +187,13 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         break;
                     case UNSUCC1:
                         m.mHandler.sendEmptyMessageDelayed(RESET, 200);
-                        Comm.showWarnDialog(m.mContext, "很抱歉，没能找到数据！");
-
+                        errMsg = m.isNULLS((String) msg.obj);
+                        if(errMsg.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg);
+                            Comm.showWarnDialog(m.mContext, message);
+                        } else {
+                            Comm.showWarnDialog(m.mContext,"很抱歉，没能找到数据！");
+                        }
 
                         break;
                     case SAVE: // 扫描后的保存 成功
@@ -222,7 +230,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     case UNDELETE: // 删除 失败
                         JsonObject jsonObj = JsonUtil.strToObject((String) msg.obj, JsonObject.class);
                         if(jsonObj.has("errMsg")) {
-                            String errMsg = jsonObj.get("errMsg").getAsString();
+                            errMsg = jsonObj.get("errMsg").getAsString();
                             Comm.showWarnDialog(m.mContext, errMsg);
                             return;
                         }
@@ -305,11 +313,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         break;
                     case UNMODIFY_NUM: // 修改数量 失败
                         m.toasts("服务器忙，请稍候操作！");
-
-                        break;
-                    case CODE1: // 清空数据
-                        m.etProdOrderCode.setText("");
-                        m.prodOrderBarcode = "";
 
                         break;
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
@@ -415,6 +418,11 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请先扫描箱码！");
                     return;
                 }
+                String deliverWay = getValues(tvDeliverSel);
+                if(deliverWay.length() == 0) {
+                    Comm.showWarnDialog(mContext,"请选择发货方式！");
+                    return;
+                }
                 status = '1';
 
                 List<MaterialBinningRecord> list = new ArrayList<>();
@@ -441,8 +449,8 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"箱子里还没有物料不能封箱！");
                     return;
                 }
-                if(getValues(tvDeliverSel).length() == 0) {
-                    setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
+                String deliverWay2 = getValues(tvDeliverSel);
+                if(deliverWay2.length() == 0) {
                     Comm.showWarnDialog(mContext,"请选择发货方式！");
                     return;
                 }
@@ -584,7 +592,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         View.OnKeyListener keyListener = new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP) {
+                if(keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
                     switch (v.getId()) {
                         case R.id.et_boxCode: // 箱码
                             String boxCode = getValues(etBoxCode).trim();
@@ -619,10 +627,11 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                             curViewFlag = '2';
                             mHandler.sendEmptyMessageDelayed(RESET, 200);
 
-                            if (smMtlBefore()) {
-                                // 执行查询方法
-                                run_smGetDatas(prodOrderBarcode);
+                            if(boxBarCode == null) {
+                                Comm.showWarnDialog(mContext, "请扫箱码！");
+                                return false;
                             }
+                            run_smGetDatas(prodOrderBarcode);
 
                             break;
                         case R.id.et_mtlCode: // 物料
@@ -657,27 +666,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         etBoxCode.setOnKeyListener(keyListener);
         etProdOrderCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
-
-    }
-
-    /**
-     * 扫码物料之前的判断
-     */
-    private boolean smMtlBefore() {
-//        if (customer == null) {
-//            Comm.showWarnDialog(mContext,"请选择客户！");
-//            return false;
-//        }
-
-        if(boxBarCode == null) {
-            Comm.showWarnDialog(mContext, "请扫箱码！");
-            return false;
-        }
-        if (assist == null) {
-            Comm.showWarnDialog(mContext,"请选择发货方式！");
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -694,7 +682,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 }
 
                 break;
-            case SEL_DELI: //查询生产方式	返回
+            case SEL_DELI: //查询发货方式	返回
                 if (resultCode == Activity.RESULT_OK) {
                     assist = (AssistInfo) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_DELI", assist.getfName());
@@ -967,9 +955,12 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             mbr.setCustomerId(customer.getFcustId());
             mbr.setCustomerNumber(customer.getCustomerCode());
             mbr.setCustomer(customer);
-            if(assist != null) {
-                mbr.setDeliveryWay(assist.getfName());
-            }
+
+            if(assist == null) assist = new AssistInfo();
+            String deliveryWay = isNULLS(prodOrder.getDeliveryWay());
+            if(deliveryWay.length() > 0) assist.setfName(deliveryWay);
+
+            mbr.setDeliveryWay(assist.getfName());
             mbr.setPackageWorkType(2);
             mbr.setBinningType(binningType);
             mbr.setCaseId(34);
@@ -1004,6 +995,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             checkDatas.add(mbr);
         }
 
+        tvDeliverSel.setText(assist.getfName());
         tvCustSel.setText("客户："+customer.getCustomerName());
         tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
         setFocusable(etMtlCode);

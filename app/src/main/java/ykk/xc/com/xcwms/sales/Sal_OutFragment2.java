@@ -105,12 +105,12 @@ public class Sal_OutFragment2 extends BaseFragment {
     LinearLayout linTop;
 
     private Sal_OutFragment2 context = this;
-    private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15, SEL_EXPRESS = 16,RESET = 17;
+    private static final int SEL_ORDER = 10, SEL_STOCK = 11, SEL_STOCKP = 12, SEL_DEPT = 13, SEL_ORG = 14, SEL_ORG2 = 15, SEL_EXPRESS = 16,RESET = 17, SEL_STOCK2 = 18, SEL_STOCKP2 = 19;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503, SUCC4 = 204, UNSUCC4 = 504;
     private static final int CODE1 = 1, CODE2 = 2;
     private Customer cust; // 客户
-    private Stock stock; // 仓库
-    private StockPosition stockP; // 库位
+    private Stock stock, stock2; // 仓库
+    private StockPosition stockP, stockP2; // 库位
     private Department department; // 部门
     private Organization receiveOrg, salOrg; // 组织
     private ExpressCompany expressCompany; // 物料公司
@@ -142,6 +142,7 @@ public class Sal_OutFragment2 extends BaseFragment {
 
         public void handleMessage(Message msg) {
             Sal_OutFragment2 m = mActivity.get();
+            String errMsg = null;
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -179,7 +180,7 @@ public class Sal_OutFragment2 extends BaseFragment {
 
                         break;
                     case UNPASS: // 审核失败 返回
-                        String errMsg = JsonUtil.strToString((String)msg.obj);
+                        errMsg = JsonUtil.strToString((String)msg.obj);
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -254,7 +255,13 @@ public class Sal_OutFragment2 extends BaseFragment {
                         break;
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(RESET, 200);
-                        Comm.showWarnDialog(m.mContext,"很抱歉，没能找到数据！");
+                        errMsg = m.isNULLS((String) msg.obj);
+                        if(errMsg.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg);
+                            Comm.showWarnDialog(m.mContext, message);
+                        } else {
+                            Comm.showWarnDialog(m.mContext,"很抱歉，没能找到数据！");
+                        }
 
                         break;
                     case SUCC3: // 判断是否存在返回
@@ -282,34 +289,6 @@ public class Sal_OutFragment2 extends BaseFragment {
                         m.run_addScanningRecord();
 
                         break;
-//                    case SUCC3B: // 判断是否存在返回
-//                        String result2 = (String) msg.obj;
-//                        String strBarcode2 = JsonUtil.strToString(result2);
-//                        if(m.isNULLS(strBarcode2).length() > 0) m.isRepeatSave(strBarcode2);
-//                        List<CombineSalOrderEntry> list = JsonUtil.strToList(result2, CombineSalOrderEntry.class);
-//                        int count = 0; // 统计
-//                        if(list != null && list.size() > 0) {
-//                            int size = list.size();
-//                            for(int i=0; i<size; i++) {
-//                                CombineSalOrderEntry parent = list.get(i);
-//                                for(int j=0, size2=m.checkDatas.size(); j<size2; j++) {
-//                                    ScanningRecord2 son = m.checkDatas.get(j);
-//                                    if(parent.getfId() == son.getPoFid() && parent.getEntryId() == son.getEntryId()) {
-//                                        count += 1;
-//                                        break;
-//                                    }
-//                                }
-//                            }
-////                            if(size > count) {
-////                                Comm.showWarnDialog(m.mContext,"当前操作的数据与发货单不一致，请检查数据！");
-////                            }
-//                        }
-//
-//                        break;
-//                    case UNSUCC3B: // 判断是否存在返回
-//                        m.run_addScanningRecord();
-//
-//                        break;
                     case SUCC4: // 查询发货通知单
                         List<DeliOrder> list2 = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
                         boolean isBool = false;
@@ -398,6 +377,14 @@ public class Sal_OutFragment2 extends BaseFragment {
                 Log.e("num", "行：" + position);
 //                curPos = position;
 //                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
+            }
+
+            @Override
+            public void onClick_selStock(View v, ScanningRecord2 entity, int position) {
+                Log.e("selStock", "行：" + position);
+                curPos = position;
+
+                showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
             }
 
             @Override
@@ -600,17 +587,22 @@ public class Sal_OutFragment2 extends BaseFragment {
 //                return false;
 //            }
             if (sr2.getStockqty() == 0) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）必须大于0！");
+                return false;
+            }
+            if (isNULLS(sr2.getStockName()).length() == 0) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
             if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() > sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）不能大于（应发数）！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）不能大于（应发数）！");
                 return false;
             }
             if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() < sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须等于（应发数）！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）必须等于（应发数）！");
                 return false;
             }
+
         }
         return true;
     }
@@ -803,6 +795,43 @@ public class Sal_OutFragment2 extends BaseFragment {
                     stockP = (StockPosition) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKP", stockP.getFname());
                     getStockPAfter();
+                }
+
+                break;
+            case SEL_STOCK2: //行事件选择仓库	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stock2 = (Stock) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
+                    // 启用了库位管理
+                    if (stock2.isStorageLocation()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("stockId", stock2.getfStockid());
+                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
+                    } else {
+                        ScanningRecord2 sr2 = checkDatas.get(curPos);
+                        sr2.setStockId(stock2.getfStockid());
+                        sr2.setStockFnumber(stock2.getfNumber());
+                        sr2.setStockName(stock2.getfName());
+                        sr2.setStock(stock2);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                break;
+            case SEL_STOCKP2: //行事件选择库位	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stockP2 = (StockPosition) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    ScanningRecord2 sr2 = checkDatas.get(curPos);
+                    sr2.setStock(stock2);
+                    sr2.setStockId(stock2.getfStockid());
+                    sr2.setStockFnumber(stock2.getfNumber());
+                    sr2.setStockName(stock2.getfName());
+
+                    sr2.setStockPos(stockP2);
+                    sr2.setStockPositionId(stockP2.getId());
+                    sr2.setStockPName(stockP2.getFname());
+                    mAdapter.notifyDataSetChanged();
                 }
 
                 break;
@@ -1011,18 +1040,15 @@ public class Sal_OutFragment2 extends BaseFragment {
 //            sr2.setSequenceNo(deliOrder.getSnCode());
 //            sr2.setBarcode(deliOrder.getBarcode());
 
-                if (stock != null) {
-                    sr2.setStockId(stock.getfStockid());
-                    sr2.setStock(stock);
-                    sr2.setStockFnumber(stock.getfNumber());
+                if (deliOrder.getStock() != null) {
+                    sr2.setStockId(deliOrder.getStockId());
+                    sr2.setStockFnumber(deliOrder.getStockNumber());
+                    sr2.setStockName(deliOrder.getStockName());
                 }
-                if (stockP != null) {
-                    sr2.setStockPositionId(stockP.getId());
-                    sr2.setStockPName(stockP.getFname());
-                }
-//            sr2.setSupplierId(mbr.getSupplierId());
-//            sr2.setSupplierName(mbr.getSupplierName());
-//            sr2.setSupplierFnumber(supplier.getfNumber());
+//                if (stockP != null) {
+//                    sr2.setStockPositionId(stockP.getId());
+//                    sr2.setStockPName(stockP.getFname());
+//                }
                 if (department != null) {
                     sr2.setEmpId(department.getFitemID()); // 部门
                     sr2.setDepartmentFnumber(department.getDepartmentNumber());
@@ -1092,86 +1118,7 @@ public class Sal_OutFragment2 extends BaseFragment {
 
         mAdapter.notifyDataSetChanged();
     }
-    // old
-//    private void getSourceAfter2(List<MaterialBinningRecord> list) {
-//        for (int i = 0, size = list.size(); i < size; i++) {
-//            MaterialBinningRecord mbr = list.get(i);
-//            ScanningRecord2 sr2 = new ScanningRecord2();
-//            sr2.setSourceK3Id(mbr.getRelationBillId());
-//            sr2.setSourceFnumber(mbr.getRelationBillNumber());
-//            sr2.setFitemId(mbr.getMaterialId());
-//            sr2.setMtl(mbr.getMtl());
-//            sr2.setMtlFnumber(mbr.getMtl().getfNumber());
-//            sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
-//            sr2.setPoFid(mbr.getRelationBillId());
-//            sr2.setPoFbillno(mbr.getRelationBillNumber());
-//            sr2.setBatchno(mbr.getBatchCode());
-//            sr2.setSequenceNo(mbr.getSnCode());
-//            sr2.setBarcode(mbr.getBarcode());
-//
-//            if (stock != null) {
-//                sr2.setStockId(stock.getfStockid());
-//                sr2.setStock(stock);
-//                sr2.setStockFnumber(stock.getfNumber());
-//            }
-//            if (stockP != null) {
-//                sr2.setStockPositionId(stockP.getId());
-//                sr2.setStockPName(stockP.getFname());
-//            }
-////            sr2.setSupplierId(mbr.getSupplierId());
-////            sr2.setSupplierName(mbr.getSupplierName());
-////            sr2.setSupplierFnumber(supplier.getfNumber());
-//            if (department != null) {
-//                sr2.setEmpId(department.getFitemID()); // 部门
-//                sr2.setDepartmentFnumber(department.getDepartmentNumber());
-//            }
-//            // 得到生产订单
-//            ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
-//            sr2.setEntryId(prodOrder.getEntryId());
-//            sr2.setFqty(mbr.getRelationBillFQTY());
-//            sr2.setPoFmustqty(mbr.getRelationBillFQTY());
-//            sr2.setStockqty(mbr.getNumber());
-//            // 发货组织
-//            if(receiveOrg == null) receiveOrg = new Organization();
-//            receiveOrg.setFpkId(prodOrder.getProdOrgId());
-//            receiveOrg.setNumber(prodOrder.getProdOrgNumber());
-//            receiveOrg.setName(prodOrder.getProdOrgName());
-//            setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
-//            tvReceiveOrg.setText(receiveOrg.getName());
-//            sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
-//
-//            if(salOrg == null) salOrg = new Organization();
-//            salOrg.setFpkId(prodOrder.getProdOrgId());
-//            salOrg.setNumber(prodOrder.getProdOrgNumber());
-//            salOrg.setName(prodOrder.getProdOrgName());
-//
-//            setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
-//            tvSalOrg.setText(salOrg.getName());
-//            sr2.setPurOrgFnumber(salOrg.getNumber());
-//
-//            sr2.setCustomerId(prodOrder.getCustId());
-//            sr2.setCustomerName(prodOrder.getCustName());
-//            sr2.setCustFnumber(prodOrder.getCustNumber());
-//            if(cust == null) {
-//                cust = new Customer();
-//                cust.setFcustId(prodOrder.getCustId());
-//                cust.setCustomerCode(prodOrder.getCustNumber());
-//                cust.setCustomerName(prodOrder.getCustName());
-//
-//                tvCustSel.setText("客户："+prodOrder.getCustName());
-//            }
-//            sr2.setSourceType('7');
-////            sr2.setTempId(ism.getId());
-////            sr2.setRelationObj(JsonUtil.objectToString(ism));
-//            sr2.setFsrcBillTypeId("PRD_MO");
-//            sr2.setfRuleId("SAL_SALEORDER-SAL_OUTSTOCK");
-//            sr2.setFsTableName("T_PRD_MOENTRY");
-//            checkDatas.add(sr2);
-//        }
-//        setFocusable(etBoxCode); // 物料代码获取焦点
-//
-//        mAdapter.notifyDataSetChanged();
-//    }
+
     /**
      * 选择来源单返回（发货订单，复核单装箱）
      */
@@ -1192,15 +1139,16 @@ public class Sal_OutFragment2 extends BaseFragment {
             sr2.setSequenceNo(mbr.getSnCode());
             sr2.setBarcode(mbr.getBarcode());
 
-            if (stock != null) {
-                sr2.setStockId(stock.getfStockid());
-                sr2.setStock(stock);
-                sr2.setStockFnumber(stock.getfNumber());
-            }
-            if (stockP != null) {
-                sr2.setStockPositionId(stockP.getId());
-                sr2.setStockPName(stockP.getFname());
-            }
+//            if (stock != null) {
+//                sr2.setStockId(stock.getfStockid());
+//                sr2.setStock(stock);
+//                sr2.setStockFnumber(stock.getfNumber());
+//            }
+//            if (stockP != null) {
+//                sr2.setStockPositionId(stockP.getId());
+//                sr2.setStockPName(stockP.getFname());
+//            }
+
 //            sr2.setSupplierId(mbr.getSupplierId());
 //            sr2.setSupplierName(mbr.getSupplierName());
 //            sr2.setSupplierFnumber(supplier.getfNumber());
@@ -1210,6 +1158,12 @@ public class Sal_OutFragment2 extends BaseFragment {
             }
             // 得到发货订单
             DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
+            // 仓库
+            if (deliOrder.getStock() != null) {
+                sr2.setStockId(deliOrder.getStockId());
+                sr2.setStockFnumber(deliOrder.getStockNumber());
+                sr2.setStockName(deliOrder.getStockName());
+            }
             sr2.setEntryId(deliOrder.getEntryId());
             sr2.setFqty(mbr.getRelationBillFQTY());
             sr2.setPoFmustqty(mbr.getRelationBillFQTY());

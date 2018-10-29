@@ -15,6 +15,7 @@ public class ScanningRecord2 implements Serializable {
     private double fqty; // 应收数量
     private double stockqty; // 实收数量，要插入到表的数量
     private int stockId;
+    private String stockName;
     private Stock stock; // 新加
     private StockPosition stockPos; // 临时用的
     private int stockAreaId;
@@ -128,6 +129,12 @@ public class ScanningRecord2 implements Serializable {
     }
     public void setStockId(int stockId) {
         this.stockId = stockId;
+    }
+    public String getStockName() {
+        return stockName;
+    }
+    public void setStockName(String stockName) {
+        this.stockName = stockName;
     }
     public Stock getStock() {
         return stock;

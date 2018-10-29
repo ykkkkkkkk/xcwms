@@ -39,6 +39,8 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Express_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
+import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
+import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
@@ -84,9 +86,11 @@ public class Sal_OutFragment3 extends BaseFragment {
     Button btnSave;
 
     private Sal_OutFragment3 context = this;
-    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, RESET = 15;
+    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, RESET = 15, SEL_STOCK2 = 16, SEL_STOCKP2 = 17;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, PASS = 203, UNPASS = 503;
     private static final int CODE2 = 2;
+    private Stock stock; // 仓库
+    private StockPosition stockP; // 库位
     private Department department; // 部门
     private Organization receiveOrg, salOrg; // 组织
     private ExpressCompany expressCompany; // 物料公司
@@ -197,6 +201,14 @@ public class Sal_OutFragment3 extends BaseFragment {
                 Log.e("num", "行：" + position);
 //                curPos = position;
 //                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
+            }
+
+            @Override
+            public void onClick_selStock(View v, ScanningRecord2 entity, int position) {
+                Log.e("selStock", "行：" + position);
+                curPos = position;
+
+                showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
             }
 
         });
@@ -337,6 +349,10 @@ public class Sal_OutFragment3 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
+            if (isNULLS(sr2.getStockName()).length() == 0) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
+                return false;
+            }
 //            if (sr2.getStockqty() > sr2.getFqty()) {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）不能大于（应发数）！");
 //                return false;
@@ -466,6 +482,43 @@ public class Sal_OutFragment3 extends BaseFragment {
                 }
 
                 break;
+            case SEL_STOCK2: //行事件选择仓库	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stock = (Stock) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCK2", stock.getfName());
+                    // 启用了库位管理
+                    if (stock.isStorageLocation()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("stockId", stock.getfStockid());
+                        showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
+                    } else {
+                        ScanningRecord2 sr2 = checkDatas.get(curPos);
+                        sr2.setStockId(stock.getfStockid());
+                        sr2.setStockFnumber(stock.getfNumber());
+                        sr2.setStockName(stock.getfName());
+                        sr2.setStock(stock);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                break;
+            case SEL_STOCKP2: //行事件选择库位	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stockP = (StockPosition) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCKP2", stockP.getFname());
+                    ScanningRecord2 sr2 = checkDatas.get(curPos);
+                    sr2.setStock(stock);
+                    sr2.setStockId(stock.getfStockid());
+                    sr2.setStockFnumber(stock.getfNumber());
+                    sr2.setStockName(stock.getfName());
+
+                    sr2.setStockPos(stockP);
+                    sr2.setStockPositionId(stockP.getId());
+                    sr2.setStockPName(stockP.getFname());
+                    mAdapter.notifyDataSetChanged();
+                }
+
+                break;
             case CODE2: // 数量
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
@@ -505,11 +558,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setBarcode(pl.getBarcode());
             sr2.setStockId(pl.getStockId());
             sr2.setStockFnumber(pl.getStockNumber());
-            Stock stock = new Stock();
-            stock.setfStockid(pl.getStockId());
-            stock.setfNumber(pl.getStockNumber());
-            stock.setfName(pl.getStockName());
-            sr2.setStock(stock);
+            sr2.setStockName(pl.getStockName());
             sr2.setStockPositionId(pl.getStockPositionId());
             sr2.setStockPName(pl.getStockPositionName());
             StockPosition stockP = new StockPosition();
