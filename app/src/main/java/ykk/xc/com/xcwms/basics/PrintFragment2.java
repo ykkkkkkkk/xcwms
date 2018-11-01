@@ -32,8 +32,6 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
-import ykk.xc.com.xcwms.model.BarCodeTable;
-import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentKeyeventListener;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
@@ -55,9 +53,8 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     private String barcode; // 对应的条码号
     private Activity mContext;
     private PrintMainActivity parent;
-    private BarCodeTable bt;
-    private ProdOrder prodOrder;
-    private int tabFormat = 2; // 1：大标签，2：小标签
+    private int tabFormat = 2; // 1：大标签，2：小标签 ，4：生产装箱清单，5：复核装箱清单
+    private int smType = 1; // 扫码类型  1：生产订单号，2：生产顺序号，3：生产装箱清单，4：复核装箱清单
     private Button curBtn;
 
     // 消息处理
@@ -77,7 +74,16 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                 switch (msg.what) {
                     case SUCC1: // 成功
                         String result = (String) msg.obj;
-                        m.parent.setFragmentPrint2(m.tabFormat, result);
+                        if(m.smType == 1 || m.smType == 2) {
+                            m.parent.setFragmentPrint2(m.tabFormat, result);
+                        } else if(m.smType == 3) { // 生产装箱清单
+                            m.tabFormat = 4;
+                            m.parent.setFragmentPrint2B(m.tabFormat, result);
+
+                        } else if(m.smType == 4) { // 复核装箱清单
+                            m.tabFormat = 5;
+                            m.parent.setFragmentPrint2C(m.tabFormat, result);
+                        }
 
                         break;
                     case UNSUCC1: // 数据加载失败！
@@ -102,7 +108,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.ab_print_fragment0, container, false);
+        return inflater.inflate(R.layout.ab_print_fragment2, container, false);
     }
 
     @Override
@@ -221,7 +227,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
             return;
         }
         // 获取自定义布局文件popupwindow_left.xml的视图
-        final View popV = getLayoutInflater().inflate(R.layout.ab_print_fragment0_type, null);
+        final View popV = getLayoutInflater().inflate(R.layout.ab_print_fragment2_type, null);
         // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
         popWindow = new PopupWindow(popV, v.getWidth(), ViewGroup.LayoutParams.WRAP_CONTENT, true);
         // 设置动画效果
@@ -236,17 +242,47 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
             public void onClick(View v) {
                 int tmpId = 0;
                 switch (v.getId()) {
-                    case R.id.btn1:// 物料表
+                    case R.id.btn1: // 生产订单号
+                        smType = 1;
                         tmpId = v.getId();
                         caseId = 34;
+                        btnBig.setVisibility(View.VISIBLE);
+                        btnSmall.setVisibility(View.VISIBLE);
+
+                        break;
+                    case R.id.btn2: // 生产顺序号
+                        smType = 2;
+                        tmpId = v.getId();
+                        caseId = 34;
+                        btnBig.setVisibility(View.VISIBLE);
+                        btnSmall.setVisibility(View.VISIBLE);
+
+                        break;
+                    case R.id.btn3: // 生产装箱清单
+                        smType = 3;
+                        tmpId = v.getId();
+                        caseId = 34;
+                        btnBig.setVisibility(View.GONE);
+                        btnSmall.setVisibility(View.GONE);
+
+                        break;
+                    case R.id.btn4: // 复核装箱清单
+                        smType = 4;
+                        tmpId = v.getId();
+                        caseId = 37;
+                        btnBig.setVisibility(View.GONE);
+                        btnSmall.setVisibility(View.GONE);
 
                         break;
                 }
                 popWindow.dismiss();
-                tvSelectType.setText("打印类型--" + getValues((Button) popV.findViewById(tmpId)));
+                tvSelectType.setText(getValues((Button) popV.findViewById(tmpId)));
             }
         };
         popV.findViewById(R.id.btn1).setOnClickListener(click);
+        popV.findViewById(R.id.btn2).setOnClickListener(click);
+        popV.findViewById(R.id.btn3).setOnClickListener(click);
+        popV.findViewById(R.id.btn4).setOnClickListener(click);
     }
 
     /**
@@ -254,12 +290,35 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
      */
     private void run_print() {
         showLoadDialog("打印连接中...");
-        String mUrl = Consts.getURL("bigPrint");
-        // 条码号
+        String mUrl = null;
+
+        String fbillno = "", prodSeqNumber = "", boxBarCode = "", caseId = "";
+        switch (smType) {
+            case 1: // 生产订单号
+                fbillno = barcode;
+                mUrl = Consts.getURL("bigPrint");
+                break;
+            case 2: // 生产顺序号
+                prodSeqNumber = barcode;
+                mUrl = Consts.getURL("bigPrint");
+                break;
+            case 3: // 生产装箱清单
+                boxBarCode = barcode;
+                caseId = String.valueOf(context.caseId);
+                mUrl = Consts.getURL("boxBarCode/findBarcode");
+                break;
+            case 4: // 复核装箱清单
+                boxBarCode = barcode;
+                caseId = String.valueOf(context.caseId);
+                mUrl = Consts.getURL("boxBarCode/findBarcode");
+                break;
+        }
         FormBody formBody = new FormBody.Builder()
-//                .add("caseId", String.valueOf(caseId))
-//                .add("createCodeStatus", "0")
-                .add("prodSeqNumber", barcode)
+                .add("fbillno", fbillno) // 1,2
+                .add("prodSeqNumber", prodSeqNumber) // 1,2
+                .add("smType", String.valueOf(smType)) // 1,2
+                .add("barcode", boxBarCode)  // 3,4
+                .add("caseId", caseId)  // 3,4
                 .build();
 
         Request request = new Request.Builder()

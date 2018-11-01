@@ -49,6 +49,12 @@ public class DeliOrder implements Serializable{
 	private String salOrgNumber;
 	/*销售订单销售组织名称*/
 	private String salOrgName;
+	/*物流公司id*/
+	private String deliveryCompanyId;
+	/*物流公司代码*/
+	private String deliveryCompanyNumber;
+	/*物流公司名称*/
+	private String deliveryCompanyName;
 
 	public DeliOrder() {
 		super();
@@ -308,5 +314,29 @@ public class DeliOrder implements Serializable{
 
 	public void setSalOrgName(String salOrgName) {
 		this.salOrgName = salOrgName;
+	}
+
+	public String getDeliveryCompanyId() {
+		return deliveryCompanyId;
+	}
+
+	public void setDeliveryCompanyId(String deliveryCompanyId) {
+		this.deliveryCompanyId = deliveryCompanyId;
+	}
+
+	public String getDeliveryCompanyNumber() {
+		return deliveryCompanyNumber;
+	}
+
+	public void setDeliveryCompanyNumber(String deliveryCompanyNumber) {
+		this.deliveryCompanyNumber = deliveryCompanyNumber;
+	}
+
+	public String getDeliveryCompanyName() {
+		return deliveryCompanyName;
+	}
+
+	public void setDeliveryCompanyName(String deliveryCompanyName) {
+		this.deliveryCompanyName = deliveryCompanyName;
 	}
 }

@@ -59,6 +59,7 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
+import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment1Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 /**
@@ -156,19 +157,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 break;
                             case '2': // 生产订单扫码   返回
                                 List<ProdOrder> list = JsonUtil.strToList((String) msg.obj, ProdOrder.class);
-//                                BarCodeTable bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
-//                                if(!bt.getIsLocalCust()) {
-//                                    Comm.showWarnDialog(m.mContext,"客户信息未同步，请前往PC端同步！");
-//                                    return;
-//                                }
-                                // 是否启用序列号，是否装过箱
-//                                if(barCodeTable.getMtl() != null && barCodeTable.getMbr() != null && barCodeTable.getMtl().getIsSnManager() > 0 && barCodeTable.getMbr().getId() > 0) {
-//                                    m.setTexts(m.etMtlCode, m.mtlBarcode);
-//                                    Comm.showWarnDialog(m.mContext,"该物料启用了序列号，不能重复装箱！");
-//                                    return;
-//                                }
-//                                m.getBarCodeTableAfter(); // 禁用一些控件
-//                                m.getBarCodeTable2(barCodeTable);
                                 m.getProdOrderAfter(list);
 
                                 break;
@@ -688,6 +676,14 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     Log.e("onActivityResult --> SEL_DELI", assist.getfName());
                     if (assist != null) {
                         tvDeliverSel.setText(assist.getfName());
+                        if(checkDatas.size() > 0) {
+                            int size = checkDatas.size();
+                            for(int i=0; i<size; i++) {
+                                MaterialBinningRecord mbr = checkDatas.get(i);
+                                mbr.setDeliveryWay(assist.getfName());
+                            }
+                            mAdapter.notifyDataSetChanged();
+                        }
                     }
                 }
 
@@ -748,16 +744,22 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
             // 把箱子里的物料显示出来
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
-                MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
+                MaterialBinningRecord mbr = boxBarCode.getMtlBinningRecord().get(0);
 
-                if(mtlbr.getCaseId() != 34) {
+                if(mbr.getCaseId() != 34) {
                     etBoxCode.setText("");
                     boxBarcode = null;
                     setFocusable(etBoxCode);
                     Comm.showWarnDialog(mContext,"该箱子已经装了其他类型物料，请扫描未使用的箱码！");
                     return;
                 }
-                checkDatas.addAll(boxBarCode.getMtlBinningRecord());
+                List<MaterialBinningRecord> listMbr = boxBarCode.getMtlBinningRecord();
+                for(int i=0, size = listMbr.size(); i<size; i++) {
+                    MaterialBinningRecord mbr2 = listMbr.get(i);
+                    mbr2.setModifyUserId(user.getId());
+                    mbr2.setModifyUserName(user.getUsername());
+                }
+                checkDatas.addAll(listMbr);
                 double sum = 0;
                 for(int i = 0, size = checkDatas.size(); i<size; i++) {
                     sum += checkDatas.get(i).getNumber();
@@ -766,14 +768,14 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
-                customer.setFcustId(mtlbr.getCustomerId());
-                customer.setCustomerCode(mtlbr.getCustomerNumber());
-                customer.setCustomerName(mtlbr.getCustomer().getCustomerName());
-                tvCustSel.setText("客户："+mtlbr.getCustomer().getCustomerName());
+                customer.setFcustId(mbr.getCustomerId());
+                customer.setCustomerCode(mbr.getCustomerNumber());
+                customer.setCustomerName(mbr.getCustomer().getCustomerName());
+                tvCustSel.setText("客户："+mbr.getCustomer().getCustomerName());
                 // 显示交货方式
                 if(assist == null) assist = new AssistInfo();
-                assist.setfName(mtlbr.getDeliveryWay());
-                tvDeliverSel.setText(mtlbr.getDeliveryWay());
+                assist.setfName(mbr.getDeliveryWay());
+                tvDeliverSel.setText(mbr.getDeliveryWay());
 
             } else {
                 tvCount.setText("数量：0");
@@ -805,128 +807,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             tvBoxVolume.setText(df.format(boxBarCode.getBox().getVolume()));
 
             mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * （条码表 有源单）返回的值
-     */
-    private void getBarCodeTable2(BarCodeTable bt) {
-        if (bt != null) {
-            int size = checkDatas.size();
-            getUserInfo();
-
-            MaterialBinningRecord mbr = null;
-            ProdOrder prodOrder = null;
-            boolean prodOrderNotnull = false; // 销售订单是否为空
-
-            MaterialBinningRecord mbr1 = null;
-            if(size > 0) {
-                mbr1 = checkDatas.get(0);
-            }
-
-            // 得到生产订单
-            if(bt.getRelationObj() != null && bt.getRelationObj().length() > 0) {
-                // 判断来源单是否所属同一类型，销售订单，或者生产通知单
-                if(mbr1 != null && mbr1.getCaseId() != bt.getCaseId()) { // 是否为相同订单
-                    Comm.showWarnDialog(mContext, "当前订单类型不一致，请检查！" +
-                            "（已装箱为："+(mbr1.getCaseId() == 34 ? "生产订单" : "其它订单")+"，" +
-                            "当前扫码为："+(bt.getCaseId() == 34 ? "生产订单" : "其它订单")+"）");
-                    return;
-                }
-
-                //  得到对象    生产订单
-                prodOrder = JsonUtil.stringToObject(bt.getRelationObj(), ProdOrder.class);
-            }
-            // 对象是否为空
-            prodOrderNotnull = prodOrder != null;
-
-            // 带上客户和生产方式
-            if(getValues(tvCustSel).length() == 0) {
-                if(customer == null) customer = new Customer();
-                customer.setFcustId(prodOrder.getCustId());
-                customer.setCustomerCode(prodOrder.getCustNumber());
-                customer.setCustomerName(prodOrder.getCustName());
-                tvCustSel.setText("客户："+customer.getCustomerName());
-            }
-
-            // 如果来源单的的客户为空，就提示选择客户
-            if(prodOrderNotnull && prodOrder.getCustId() == 0 && getValues(tvCustSel).length() == 0) {
-//                setEnables(tvCustSel, R.drawable.back_style_blue, true);
-                Comm.showWarnDialog(mContext, "请选择客户！");
-                return;
-            }
-            // 判断客户和生产方式是否一致
-            if(prodOrderNotnull && mbr1 != null && mbr1.getCustomerId() > 0 && mbr1.getCustomerId() != prodOrder.getCustId()) {
-                Comm.showWarnDialog(mContext, "客户不一致，不能装箱！");
-                return;
-            }
-
-            // 已装箱的物料
-            if(size > 0) {
-                // 相同的物料就+1，否则为1
-                for(int i=0; i<size; i++) {
-                    MaterialBinningRecord forMtl = checkDatas.get(i);
-
-                    // 判断物料是否装满，单装或者混装
-                    if(prodOrderNotnull && bt.getRelationBillId() == forMtl.getRelationBillId() && bt.getEntryId() == forMtl.getEntryId()) {
-                        mbr = forMtl;
-                        if(forMtl.getMtl().getIsSnManager() == 0) {
-                            if((mbr.getNumber()+1) > mbr.getRelationBillFQTY()) {
-                                Comm.showWarnDialog(mContext,"第"+(i+1)+"行装箱数不能大于订单数！");
-                                return;
-                            }
-                        }
-                    }  else {
-                        if(binningType == '1') {
-                            Comm.showWarnDialog(mContext,"单装只能装一种物料！");
-                            return;
-                        }
-                    }
-
-                }
-            }
-            if(mbr == null) {
-                mbr = new MaterialBinningRecord();
-                mbr.setId(0);
-                mbr.setBoxBarCodeId(boxBarCode.getId());
-                mbr.setMaterialId(bt.getMaterialId());
-                mbr.setRelationBillId(bt.getRelationBillId());
-                mbr.setRelationBillNumber(bt.getRelationBillNumber());
-                mbr.setCustomerId(customer.getFcustId());
-                mbr.setCustomerNumber(customer.getCustomerCode());
-                if(assist != null) {
-                    mbr.setDeliveryWay(assist.getfName());
-                }
-                mbr.setPackageWorkType(2);
-                mbr.setBinningType(binningType);
-                mbr.setCaseId(bt.getCaseId());
-            }
-
-            mbr.setFbillType(1);
-            mbr.setBarcodeSource('1');
-            mbr.setNumber(1);
-            mbr.setRelationBillFQTY(prodOrder.getProdFqty());
-            mbr.setEntryId(prodOrder.getEntryId());
-            mbr.setBarcode(bt.getBarcode());
-            // 启用了批次号
-            if(mbr.getMtl() != null && mbr.getMtl().getIsBatchManager() == 1) {
-                mbr.setBatchCode(bt.getBatchCode());
-            }
-            // 启用了序列号
-            if(mbr.getMtl() != null && mbr.getMtl().getIsSnManager() == 1) {
-                mbr.setSnCode(bt.getSnCode());
-            }
-            mbr.setCreateUserId(user.getId());
-            mbr.setCreateUserName(user.getUsername());
-            mbr.setModifyUserId(user.getId());
-            mbr.setModifyUserName(user.getUsername());
-            mbr.setSalOrderNo(prodOrder.getSalOrderNo());
-            mbr.setSalOrderNoEntryId(prodOrder.getSalOrderEntryId());
-
-            // 把对象转成json字符串
-            String strJson = JsonUtil.objectToString(mbr);
-            run_save(strJson);
         }
     }
 
@@ -1054,14 +934,15 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                         return;
                     }
                 } else {
-                    if (mbr.getNumber() == mbr.getRelationBillFQTY()) {
-                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已装完！");
-                        return;
-                    }
                     List<String> list = mbr.getListBarcode();
                     if(list.contains(bt.getBarcode())) {
                         Comm.showWarnDialog(mContext,"该物料条码已在装箱行中，请扫描未使用过的条码！");
                         return;
+                    }
+                    if (mbr.getNumber() == mbr.getRelationBillFQTY()) {
+//                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已装完！");
+//                        return;
+                        continue;
                     }
                     list.add(bt.getBarcode());
                     // 拼接条码号，用逗号隔开
@@ -1219,11 +1100,12 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("run_smGetDatas --> onResponse", result);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
                 mHandler.sendMessage(msg);
             }
         });

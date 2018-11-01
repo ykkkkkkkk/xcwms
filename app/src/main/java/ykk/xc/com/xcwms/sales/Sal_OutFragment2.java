@@ -666,7 +666,7 @@ public class Sal_OutFragment2 extends BaseFragment {
                             run_smGetDatas(stockPBarcode);
 
                             break;
-                        case R.id.et_boxCode: // 物料
+                        case R.id.et_boxCode: // 箱子
                             String boxCode = getValues(etBoxCode).trim();
                             if (boxBarcode != null && boxBarcode.length() > 0) {
                                 if (boxBarcode.equals(boxCode)) {
@@ -679,10 +679,6 @@ public class Sal_OutFragment2 extends BaseFragment {
                                 boxBarcode = boxCode.replace("\n", "");
                             }
                             curViewFlag = '3';
-                            if (!smBefore()) { // 扫码之前的判断
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                return false;
-                            }
                             mHandler.sendEmptyMessage(RESET);
                             // 执行查询方法
                             run_smGetDatas(boxBarcode);
@@ -1098,6 +1094,14 @@ public class Sal_OutFragment2 extends BaseFragment {
                 sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
                 sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
                 sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
+                String deliveryCompanyId = isNULLS(deliOrder.getDeliveryCompanyId());
+                String deliveryCompanyNumber = isNULLS(deliOrder.getDeliveryCompanyNumber());
+                String deliveryCompanyName = isNULLS(deliOrder.getDeliveryCompanyName());
+                if(expressCompany == null) expressCompany = new ExpressCompany();
+                expressCompany.setUniquenessId(deliveryCompanyId);
+                expressCompany.setExpressNumber(deliveryCompanyNumber);
+                expressCompany.setExpressName(deliveryCompanyName);
+
                 checkDatas.add(sr2);
             }
         }
@@ -1114,6 +1118,7 @@ public class Sal_OutFragment2 extends BaseFragment {
                 }
             }
         }
+        tvExpressCompany.setText(expressCompany.getExpressName());
         setFocusable(etBoxCode); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();
@@ -1211,8 +1216,17 @@ public class Sal_OutFragment2 extends BaseFragment {
             sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
             sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
             sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
+            String deliveryCompanyId = isNULLS(deliOrder.getDeliveryCompanyId());
+            String deliveryCompanyNumber = isNULLS(deliOrder.getDeliveryCompanyNumber());
+            String deliveryCompanyName = isNULLS(deliOrder.getDeliveryCompanyName());
+            if(expressCompany == null) expressCompany = new ExpressCompany();
+            expressCompany.setUniquenessId(deliveryCompanyId);
+            expressCompany.setExpressNumber(deliveryCompanyNumber);
+            expressCompany.setExpressName(deliveryCompanyName);
+
             checkDatas.add(sr2);
         }
+        tvExpressCompany.setText(expressCompany.getExpressName());
         setFocusable(etBoxCode); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();

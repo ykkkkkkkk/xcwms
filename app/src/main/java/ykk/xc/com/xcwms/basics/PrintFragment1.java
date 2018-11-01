@@ -55,9 +55,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private PrintMainActivity parent;
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
-    private String barcode; // 保存条码的
     private char printType = '1'; // （1：小标签，2：大标签）
-    private boolean isRegister = false; // 是否注册了广播
 
     // 消息处理
     final PrintFragment1.MyHandler mHandler = new PrintFragment1.MyHandler(this);
@@ -77,6 +75,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                     case SUCC1: // 成功
                         String json = (String) msg.obj;
                         List<Material> list = JsonUtil.strToList2(json, Material.class);
+                        Log.e("size-=-=-=-=-=-=-===-", list.size()+"");
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
@@ -167,7 +166,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findMaterialListByParam3");
+        String mUrl = Consts.getURL("material/findMaterialListByParam3");
         String searchName = getValues(etSearch).trim();
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())

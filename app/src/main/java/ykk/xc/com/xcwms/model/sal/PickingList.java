@@ -53,6 +53,12 @@ public class PickingList implements Serializable {
     private char pickingType; // 拣货类型：1.拣货装箱，2.拣货装车
     private String salOrderNo; // 销售订单号
     private int salOrderNoEntryId; // 销售订单分录id
+    /*物流公司id*/
+    private String deliveryCompanyId;
+    /*物流公司代码*/
+    private String deliveryCompanyNumber;
+    /*物流公司名称*/
+    private String deliveryCompanyName;
     private int isCheck; // 新加的，用于前台临时用判断是否选中
     private Stock stock;
     private StockPosition stockPosition;
@@ -381,6 +387,30 @@ public class PickingList implements Serializable {
 
     public void setSalOrderNoEntryId(int salOrderNoEntryId) {
         this.salOrderNoEntryId = salOrderNoEntryId;
+    }
+
+    public String getDeliveryCompanyId() {
+        return deliveryCompanyId;
+    }
+
+    public void setDeliveryCompanyId(String deliveryCompanyId) {
+        this.deliveryCompanyId = deliveryCompanyId;
+    }
+
+    public String getDeliveryCompanyNumber() {
+        return deliveryCompanyNumber;
+    }
+
+    public void setDeliveryCompanyNumber(String deliveryCompanyNumber) {
+        this.deliveryCompanyNumber = deliveryCompanyNumber;
+    }
+
+    public String getDeliveryCompanyName() {
+        return deliveryCompanyName;
+    }
+
+    public void setDeliveryCompanyName(String deliveryCompanyName) {
+        this.deliveryCompanyName = deliveryCompanyName;
     }
 
     public List<String> getListBarcode() {

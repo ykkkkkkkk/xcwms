@@ -168,10 +168,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         break;
                     case UNSUCC1:
                         m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
-                        String errMsg = m.isNULLS((String) msg.obj);
+                        String errMsg = JsonUtil.strToString((String) msg.obj);
                         if(errMsg.length() > 0) {
-                            String message = JsonUtil.strToString(errMsg);
-                            Comm.showWarnDialog(m.context, message);
+                            Comm.showWarnDialog(m.context, errMsg);
                         } else {
                             Comm.showWarnDialog(m.context,"条码不存在，或者扫错了条码！");
                         }
@@ -514,8 +513,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
                                 mtlBarcode = mtlCode.replace("\n", "");
                             }
                             curViewFlag = '2';
-                            if (!smMtlBefore()) {
+                            if (getValues(tvPickingListSel).length() == 0) {
                                 mHandler.sendEmptyMessageDelayed(CODE1, 200);
+                                Comm.showWarnDialog(context,"请选择拣货单！");
                                 return false;
                             }
                             // 执行查询方法
@@ -531,25 +531,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
         etBoxCode.setOnKeyListener(keyListener);
         etMtlCode.setOnKeyListener(keyListener);
 
-    }
-
-    /**
-     * 扫码物料之前的判断
-     */
-    private boolean smMtlBefore() {
-//        if (customer == null) {
-//            Comm.showWarnDialog(context,"请选择客户！");
-//            return false;
-//        }
-//        if (assist == null) {
-////            Comm.showWarnDialog(context,"请选择发货方式！");
-////            return false;
-////        }
-        if (getValues(tvPickingListSel).length() == 0) {
-            Comm.showWarnDialog(context,"请选择拣货单！");
-            return false;
-        }
-        return true;
     }
 
     @Override
@@ -910,13 +891,13 @@ public class Sal_RecombinationActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC1, result);
                     mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("run_smGetDatas --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -1206,6 +1187,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱码： \n");
         tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
         rowHigthSum = beginYPos + 106;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物流公司："+isNULLS(pl.getDeliveryCompanyName())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(pl.getCustName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getSalOrderNo())+" \n");
@@ -1237,9 +1220,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
         isPair = false;
         LabelCommand tsc = new LabelCommand();
         // 设置标签尺寸，按照实际尺寸设置
-        int height = plList.size() * 40;
-        height = height > 60 ? height : 60;
-        tsc.addSize(76, height);
+        int initHigt = 50;
+        int high = plList.size() * 20;
+        int sumHigh = initHigt + high;
+        tsc.addSize(78, sumHigh);
         // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
         tsc.addGap(10);
         // 设置打印方向

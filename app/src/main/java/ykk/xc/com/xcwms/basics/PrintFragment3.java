@@ -60,9 +60,6 @@ public class PrintFragment3 extends BaseFragment implements XRecyclerView.Loadin
     private PrintMainActivity parent;
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
-    private String barcode; // 保存条码的
-    private char printType = '1'; // （1：小标签，2：大标签）
-    private boolean isRegister = false; // 是否注册了广播
     private int curId; // 当前行
 
     // 消息处理
@@ -117,7 +114,7 @@ public class PrintFragment3 extends BaseFragment implements XRecyclerView.Loadin
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.ab_print_fragment2, container, false);
+        return inflater.inflate(R.layout.ab_print_fragment3, container, false);
     }
 
     @Override
@@ -146,7 +143,7 @@ public class PrintFragment3 extends BaseFragment implements XRecyclerView.Loadin
 
     @Override
     public void initData() {
-        initLoadDatas();
+//        initLoadDatas();
     }
 
     @OnClick({R.id.btn_search})

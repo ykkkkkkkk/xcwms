@@ -608,9 +608,17 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
             sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
             sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
+            String deliveryCompanyId = isNULLS(pl.getDeliveryCompanyId());
+            String deliveryCompanyNumber = isNULLS(pl.getDeliveryCompanyNumber());
+            String deliveryCompanyName = isNULLS(pl.getDeliveryCompanyName());
+            if(expressCompany == null) expressCompany = new ExpressCompany();
+            expressCompany.setUniquenessId(deliveryCompanyId);
+            expressCompany.setExpressNumber(deliveryCompanyNumber);
+            expressCompany.setExpressName(deliveryCompanyName);
 
             checkDatas.add(sr2);
         }
+        tvExpressCompany.setText(expressCompany.getExpressName());
         mAdapter.notifyDataSetChanged();
     }
 

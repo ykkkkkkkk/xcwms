@@ -25,7 +25,7 @@ public class PrintFragment3Adapter extends BaseArrayRecyclerAdapter<Box> {
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.ab_print_fragment2_item;
+        return R.layout.ab_print_fragment3_item;
     }
 
     @Override

@@ -761,6 +761,9 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setPickingType(pickingType);
             pl.setSalOrderNo(deliOrder.getSalOrderNo());
             pl.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
+            pl.setDeliveryCompanyId(isNULLS(deliOrder.getDeliveryCompanyId()));
+            pl.setDeliveryCompanyNumber(isNULLS(deliOrder.getDeliveryCompanyNumber()));
+            pl.setDeliveryCompanyName(isNULLS(deliOrder.getDeliveryCompanyName()));
             // 物料是否启用序列号
             if(deliOrder.getMtl().getIsSnManager() == 1) {
                 pl.setListBarcode(new ArrayList<String>());
