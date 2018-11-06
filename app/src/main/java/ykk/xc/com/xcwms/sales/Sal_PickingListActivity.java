@@ -11,6 +11,8 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -81,7 +83,7 @@ public class Sal_PickingListActivity extends BaseActivity {
     private Sal_PickingListActivity context = this;
     private static final int SEL_DELI = 11, SEL_STOCK2 = 12, SEL_STOCKP2 = 13;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
-    private static final int CODE1 = 1, CODE2 = 2, CODE20 = 20;
+    private static final int CODE1 = 1, SETFOCUS = 2;
     private Customer cust; // 客户
     private Stock stock, stock2; // 仓库
     private StockPosition stockP, stockP2; // 库位
@@ -137,7 +139,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                                         break;
                                     }
                                 }
-                                m.setTexts(m.etDeliCode, m.deliBarcode);
                                 if(!m.smAfterCheck(tmpMtl)) return;
                                 m.getDeliOrderAfter(list);
 
@@ -151,30 +152,12 @@ public class Sal_PickingListActivity extends BaseActivity {
 
                         break;
                     case UNSUCC2:
-                        m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
                         String errMsg = m.isNULLS((String) msg.obj);
                         if(errMsg.length() > 0) {
                             String message = JsonUtil.strToString(errMsg);
                             Comm.showWarnDialog(m.context, message);
                         } else {
                             Comm.showWarnDialog(m.context,"条码不存在，或者扫错了条码！");
-                        }
-
-                        break;
-                    case CODE20: // 没有得到数据，就把回车的去掉，恢复正常数据
-                        switch (m.curViewFlag) {
-//                            case '1': // 仓库
-//                                m.setTexts(m.etStock, m.stockBarcode);
-//                                break;
-//                            case '2': // 库位
-//                                m.setTexts(m.etStockPos, m.stockPBarcode);
-//                                break;
-                            case '3': // 发货订单
-                                m.setTexts(m.etDeliCode, m.deliBarcode);
-                                break;
-                            case '4': // 物料
-                                m.setTexts(m.etMtlCode, m.mtlBarcode);
-                                break;
                         }
 
                         break;
@@ -196,18 +179,9 @@ public class Sal_PickingListActivity extends BaseActivity {
                         m.run_addScanningRecord();
 
                         break;
-                    case CODE1: // 清空数据
-                        switch (m.curViewFlag) {
-                            case '3': // 发货订单
-                                m.etDeliCode.setText("");
-                                m.deliBarcode = "";
-                                break;
-                            case '4': // 物料
-                                m.etMtlCode.setText("");
-                                m.mtlBarcode = "";
-                                break;
-                        }
-
+                    case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
+                        m.setFocusable(m.etDeliCode);
+                        m.setFocusable(m.etMtlCode);
                         break;
                 }
             }
@@ -230,7 +204,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             public void onClick_num(View v, PickingList entity, int position) {
                 Log.e("num", "行：" + position);
                 curPos = position;
-                showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0.0", CODE2);
+                showInputDialog("数量", String.valueOf(entity.getPickingListNum()), "0.0", CODE1);
             }
 
             @Override
@@ -250,7 +224,6 @@ public class Sal_PickingListActivity extends BaseActivity {
         hideSoftInputMode(etMtlCode);
         getUserInfo();
         setFocusable(etDeliCode); // 物料代码获取焦点
-//        setFocusable(etMtlCode); // 物料代码获取焦点
 
         // 得到默认仓库的值
         defaultStockVal = getXmlValues(spf(getResStr(R.string.saveSystemSet)), EnumDict.STOCKANDPOSTIONTDEFAULTSOURCEOFVALUE.name()).charAt(0);
@@ -376,7 +349,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 writeBatchDialog();
                 return false;
             }
-            if(pl.getStock() == null) {
+            if(isNULLS(pl.getStockName()).length() == 0) {
                 Comm.showWarnDialog(context,"第"+(i+1)+"行请选择仓库！");
                 return false;
             }
@@ -392,7 +365,9 @@ public class Sal_PickingListActivity extends BaseActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // 按了删除键，回退键
-        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
+        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
             return false;
         }
         return super.dispatchKeyEvent(event);
@@ -400,57 +375,42 @@ public class Sal_PickingListActivity extends BaseActivity {
 
     @Override
     public void setListener() {
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
+        // 发货订单
+        etDeliCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (v.getId()) {
-                        case R.id.et_deliCode: // 来源单号
-                            curViewFlag = '3';
-                            String sourceNo = getValues(etDeliCode).trim();
-                            if (deliBarcode != null && deliBarcode.length() > 0) {
-                                if (deliBarcode.equals(sourceNo)) {
-                                    deliBarcode = sourceNo;
-                                } else {
-                                    String tmp = sourceNo.replaceFirst(deliBarcode, "");
-                                    deliBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                deliBarcode = sourceNo.replace("\n", "");
-                            }
-                            // 执行查询方法
-                            run_smGetDatas(deliBarcode);
-
-                            break;
-                        case R.id.et_mtlCode: // 物料
-                            curViewFlag = '4';
-                            String matNo = getValues(etMtlCode).trim();
-                            if (mtlBarcode != null && mtlBarcode.length() > 0) {
-                                if (mtlBarcode.equals(matNo)) {
-                                    mtlBarcode = matNo;
-                                } else {
-                                    String tmp = matNo.replaceFirst(mtlBarcode, "");
-                                    mtlBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                mtlBarcode = matNo.replace("\n", "");
-                            }
-                            if (checkDatas.size() == 0) {
-                                Comm.showWarnDialog(context,"请扫码发货订单！");
-                                return false;
-                            }
-
-                            // 执行查询方法
-                            run_smGetDatas(mtlBarcode);
-
-                            break;
-                    }
-                }
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                curViewFlag = '3';
+                deliBarcode = s.toString();
+                // 执行查询方法
+                run_smGetDatas(deliBarcode);
             }
-        };
-        etDeliCode.setOnKeyListener(keyListener);
-        etMtlCode.setOnKeyListener(keyListener);
+        });
+        // 物料
+        etMtlCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                if (checkDatas.size() == 0) {
+                    s.delete(0,s.length());
+                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                    Comm.showWarnDialog(context,"请扫描发货订单！");
+                    return;
+                }
+                curViewFlag = '4';
+                mtlBarcode = s.toString();
+                // 执行查询方法
+                run_smGetDatas(mtlBarcode);
+            }
+        });
     }
 
     /**
@@ -515,7 +475,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 }
 
                 break;
-            case CODE2: // 数量
+            case CODE1: // 数量
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
@@ -577,8 +537,6 @@ public class Sal_PickingListActivity extends BaseActivity {
         if(defaultStockVal == '1' && mtl != null && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
             stock = mtl.getStock();
             stockP = mtl.getStockPos();
-        } else {
-            setTexts(etDeliCode, deliBarcode);
         }
         return true;
     }
@@ -587,7 +545,6 @@ public class Sal_PickingListActivity extends BaseActivity {
      * 来源订单 判断数据
      */
     private void getMtlAfter(BarCodeTable bt) {
-        setTexts(etMtlCode, mtlBarcode);
         Material tmpMtl = JsonUtil.stringToObject(bt.getRelationObj(), Material.class);
         bt.setMtl(tmpMtl);
         int size = checkDatas.size();

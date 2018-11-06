@@ -14,7 +14,9 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -58,6 +60,7 @@ import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_RecombinationAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -111,7 +114,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private Sal_RecombinationActivity context = this;
     private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, SEL_PICKINGLIST = 15;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
-    private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
+    private static final int CODE1 = 1, CODE2 = 2;
     private Customer customer; // 客户
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
@@ -167,7 +170,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
                         break;
                     case UNSUCC1:
-                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         String errMsg = JsonUtil.strToString((String) msg.obj);
                         if(errMsg.length() > 0) {
                             Comm.showWarnDialog(m.context, errMsg);
@@ -184,7 +186,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
 //                        Comm.showWarnDialog(m.context,"保存成功√");
                         m.toasts("保存成功，现在打印装箱清单...");
                         if(m.isConnected) {
-                            m.sendLabel();
+//                            m.sendLabel();
+                            m.setDeliBoxListPrint();
                         } else {
                             // 打开蓝牙配对页面
                             m.startActivityForResult(new Intent(m.context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
@@ -213,18 +216,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
 
                         break;
-                    case CODE60: // 没有得到数据，就把回车的去掉，恢复正常数据
-                        switch (m.curViewFlag) {
-                            case '1': // 箱码扫码
-                                m.setTexts(m.etBoxCode, m.boxBarcode);
-                                break;
-                            case '2': // 物料扫码
-                                m.setTexts(m.etMtlCode, m.mtlBarcode);
-                                break;
-                        }
-
-                        break;
-
                     // 蓝牙打印模块的
                     case CONN_STATE_DISCONN:
                         if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[m.id] != null) {
@@ -396,12 +387,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
     public boolean onViewLongClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_close: // 测试打印
-                if(isConnected) {
-                    sendLabel();
-                } else {
-                    // 打开蓝牙配对页面
-                    startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
-                }
+//                if(isConnected) {
+//                    sendLabel();
+//                } else {
+//                    // 打开蓝牙配对页面
+//                    startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+//                }
 
                 break;
         }
@@ -470,7 +461,9 @@ public class Sal_RecombinationActivity extends BaseActivity {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // 按了删除键，回退键
-        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
+        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
             return false;
         }
         return super.dispatchKeyEvent(event);
@@ -478,59 +471,41 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
     @Override
     public void setListener() {
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
+        // 箱码
+        etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (v.getId()) {
-                        case R.id.et_boxCode: // 箱码
-                            String boxCode = getValues(etBoxCode).trim();
-                            if (boxBarcode != null && boxBarcode.length() > 0) {
-                                if (boxBarcode.equals(boxCode)) {
-                                    boxBarcode = boxCode;
-                                } else {
-                                    String tmp = boxCode.replaceFirst(boxBarcode, "");
-                                    boxBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                boxBarcode = boxCode.replace("\n", "");
-                            }
-                            curViewFlag = '1';
-                            // 执行查询方法
-                            run_smGetDatas(boxBarcode);
-
-                            break;
-                        case R.id.et_mtlCode: // 物料
-                            String mtlCode = getValues(etMtlCode).trim();
-                            if (mtlBarcode != null && mtlBarcode.length() > 0) {
-                                if (mtlBarcode.equals(mtlCode)) {
-                                    mtlBarcode = mtlCode;
-                                } else {
-                                    String tmp = mtlCode.replaceFirst(mtlBarcode, "");
-                                    mtlBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                mtlBarcode = mtlCode.replace("\n", "");
-                            }
-                            curViewFlag = '2';
-                            if (getValues(tvPickingListSel).length() == 0) {
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                Comm.showWarnDialog(context,"请选择拣货单！");
-                                return false;
-                            }
-                            // 执行查询方法
-                            run_smGetDatas(mtlBarcode);
-
-                            break;
-                    }
-                }
-
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                curViewFlag = '1';
+                boxBarcode = s.toString();
+                // 执行查询方法
+                run_smGetDatas(boxBarcode);
             }
-        };
-        etBoxCode.setOnKeyListener(keyListener);
-        etMtlCode.setOnKeyListener(keyListener);
-
+        });
+        // 物料
+        etMtlCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                if (getValues(tvPickingListSel).length() == 0) {
+                    s.delete(0,s.length());
+                    Comm.showWarnDialog(context,"请选择拣货单！");
+                    return;
+                }
+                curViewFlag = '2';
+                mtlBarcode = s.toString();
+                // 执行查询方法
+                run_smGetDatas(mtlBarcode);
+            }
+        });
     }
 
     @Override
@@ -639,7 +614,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private void getBox() {
         if(boxBarCode != null) {
             mbrList.clear();
-            setTexts(etBoxCode, boxBarCode.getBarCode());
             boxBarcode = boxBarCode.getBarCode();
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
@@ -759,9 +733,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
      * 选择（物料）返回的值
      */
     private void getMaterialAfter(BarCodeTable bt) {
-        if(bt != null) {
-            setTexts(etMtlCode, mtlBarcode);
-        }
         Material tmpMtl = bt.getMtl();
         int size = mbrList.size();
         boolean isFlag = false; // 是否存在该订单
@@ -871,6 +842,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 .add("boxId", boxId)
                 .add("barcode", barcode)
                 .add("strCaseId", strCaseId)
+                .add("caseId2", "37")
                 .add("sourceType","9") // 来源单据类型（1.物料，2.采购订单，3.收料通知单，4.生产任务单，5.销售订货单，6.拣货单，7.生产装箱，8.采购收料任务单，9.复核单）
                 .build();
 
@@ -1171,15 +1143,29 @@ public class Sal_RecombinationActivity extends BaseActivity {
     }
 
     /**
-     * 设置生产订单打码格式（大标签）
-     * @param tsc
+     * 设置复核单装箱清单打印格式
      */
-    private void setPrintFormat(LabelCommand tsc) {
+    private void setDeliBoxListPrint() {
+        setDeliBoxListFormat1();
+        // 绘制箱子条码
+        for(int i=0, size = mbrList.size(); i<size; i++) {
+            setDeliBoxListFormat2(i);
+        }
+        setDeliBoxListFormat3();
+    }
+
+    /**
+     * 打印头部1
+     */
+    private void setDeliBoxListFormat1() {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
         int beginXPos = 20; // 开始横向位置
-        int beginYPos = 20; // 开始纵向位置
+        int beginYPos = 12; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
         int rowSpacing = 30; // 每行之间的距离
-        String date = Comm.getSysDate(7);
 
         PickingList pl = plList.get(0);
         // 绘制箱子条码
@@ -1192,40 +1178,77 @@ public class Sal_RecombinationActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(pl.getCustName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(pl.getSalOrderNo())+" \n");
-        rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(pl.getDeliDate()).substring(0,10)+" \n");
-        rowHigthSum = rowHigthSum + 30;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        for(int i=0; i<plList.size(); i++) {
-            PickingList pl2 = plList.get(i);
-            MaterialBinningRecord mbr2 = mbrList.get(i);
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(pl2.getMtlFnumber())+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(pl2.getMtlFname())+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr2.getNumber())+" \n");
-            tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(pl2.getMtlUnitName())+" \n");
-            rowHigthSum = rowHigthSum + 30;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        }
-        rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
+        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(pl.getDeliDate()).substring(0,10)+" \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
     }
 
     /**
-     * 发送标签
+     * 打印物料信息2
      */
-    private void sendLabel() {
-        isPair = false;
+    private void setDeliBoxListFormat2(int pos) {
         LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 35; // 每行之间的距离
+
+        PickingList pl = plList.get(pos);
+        MaterialBinningRecord mbr = mbrList.get(pos);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+        rowHigthSum = beginYPos + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(pl.getMtlFnumber())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(pl.getMtlFname())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr.getNumber())+" \n");
+        tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(pl.getMtlUnitName())+" \n");
+        rowHigthSum = rowHigthSum + 30;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+//        rowHigthSum = rowHigthSum + rowSpacing;
+//        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印日期
+     */
+    private void setDeliBoxListFormat3() {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 30; // 每行之间的距离
+        String date = Comm.getSysDate(7);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印前段配置
+     * @param tsc
+     */
+    private void setTscBegin(LabelCommand tsc) {
         // 设置标签尺寸，按照实际尺寸设置
-        int initHigt = 50;
-        int high = plList.size() * 20;
-        int sumHigh = initHigt + high;
-        tsc.addSize(78, sumHigh);
+        tsc.addSize(78, 26);
         // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
-        tsc.addGap(10);
+//        tsc.addGap(10);
+        tsc.addGap(0);
         // 设置打印方向
         tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
         // 开启带Response的打印，用于连续打印
@@ -1236,13 +1259,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
         tsc.addTear(EscCommand.ENABLE.ON);
         // 清除打印缓冲区
         tsc.addCls();
-        // 绘制简体中文
-        // --------------- 大标签打印 ------------------
-        setPrintFormat(tsc);
-//        tsc.addText(20, 250, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"【物料条码】");
-//        tsc.addText(20, 300, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+);
-//        // 绘制一维条码
-//        tsc.add1DBarcode(20, 250, LabelCommand.BARCODETYPE.CODE128, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, "SMARNET");
+    }
+    /**
+     * 打印后段配置
+     * @param tsc
+     */
+    private void setTscEnd(LabelCommand tsc) {
         // 打印标签
         tsc.addPrint(1, 1);
         // 打印标签后 蜂鸣器响
@@ -1255,8 +1277,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
             return;
         }
         DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
-        // 保存之后清空页面
-        saveAfter();
     }
 
     /**
@@ -1293,7 +1313,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
 //                            tvConnState.setText(getString(R.string.str_conn_state_connected) + "\n" + getConnDeviceInfo());
                             tvConnState.setText(getString(R.string.str_conn_state_connected));
                             tvConnState.setTextColor(Color.parseColor("#008800")); // 已连接-绿色
-                            sendLabel();
+//                            sendLabel();
+                            setDeliBoxListPrint();
                             isConnected = true;
 
                             break;

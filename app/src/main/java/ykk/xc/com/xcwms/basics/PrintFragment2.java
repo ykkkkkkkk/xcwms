@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,6 +39,8 @@ import ykk.xc.com.xcwms.util.JsonUtil;
 
 public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventListener {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.et_code)
     EditText etCode;
     @BindView(R.id.tv_selectType)
@@ -47,7 +51,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     Button btnSmall;
 
     private PrintFragment2 context = this;
-    private static final int SUCC1 = 200, UNSUCC1 = 501, NORMAL = 10;
+    private static final int SUCC1 = 200, UNSUCC1 = 501, SETFOCUS = 1;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int caseId = 34; // （34：生产订单）
     private String barcode; // 对应的条码号
@@ -91,8 +95,9 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                         Comm.showWarnDialog(m.mContext,str);
 
                         break;
-                    case NORMAL: // 输入框矫正
-                        m.setTexts(m.etCode, m.barcode);
+                    case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
+                        m.setFocusable(m.etGetFocus);
+                        m.setFocusable(m.etCode);
                         break;
                 }
             }
@@ -117,6 +122,12 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
         if(isVisibleToUser) {
             hideKeyboard(etCode);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
     }
 
     @Override
@@ -179,40 +190,20 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
 
     @Override
     public void setListener() {
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
+        // 扫码区
+        etCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // 按下事件
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (v.getId()) {
-                        case R.id.et_code: // 物料
-                            String code = getValues(etCode).trim();
-                            if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                                if (code.length() == 0) {
-                                    toasts("请扫码条码！");
-                                    return false;
-                                }
-                                if (barcode != null && barcode.length() > 0) {
-                                    if (barcode.equals(code)) {
-                                        barcode = code;
-                                    } else {
-                                        String tmp = code.replaceFirst(barcode, "");
-                                        barcode = tmp.replace("\n", "");
-                                    }
-                                } else {
-                                    barcode = code.replace("\n", "");
-                                }
-                                mHandler.sendEmptyMessageDelayed(NORMAL, 200);
-                                // 执行查询方法
-                                run_print();
-                            }
-                            break;
-                    }
-                }
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                barcode = s.toString();
+                // 执行查询方法
+                run_print();
             }
-        };
-        etCode.setOnKeyListener(keyListener);
+        });
     }
 
     /**
@@ -319,6 +310,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                 .add("smType", String.valueOf(smType)) // 1,2
                 .add("barcode", boxBarCode)  // 3,4
                 .add("caseId", caseId)  // 3,4
+                .add("caseId2", caseId)  // 3,4
                 .build();
 
         Request request = new Request.Builder()
@@ -352,7 +344,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
 
     @Override
     public boolean onFragmentKeyEvent(KeyEvent event) {
-        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
             return false;
         }
         return true;

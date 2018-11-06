@@ -9,6 +9,8 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -84,7 +86,7 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
     private Pur_ProdBoxFragment2 mFragment = this;
     private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13, SEL_DELI = 14;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SAVE = 202, UNSAVE = 502;
-    private static final int CODE1 = 1, CODE2 = 2, CODE60 = 60;
+    private static final int CODE1 = 1, CODE2 = 2;
     private Department department; // 生产车间
     private ProdOrder prodOrder; // 生产订单
     private Box box; // 包装箱
@@ -120,7 +122,6 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
 
                         break;
                     case UNSUCC1: // 数据加载失败！
-                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         Comm.showWarnDialog(m.mContext, "很抱歉，没能找到数据！");
 
                         break;
@@ -140,7 +141,6 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
 
                         break;
                     case UNSAVE: // 扫描后的保存 失败
-                        m.mHandler.sendEmptyMessageDelayed(CODE60, 200);
                         m.mAdapter.notifyDataSetChanged();
                         Comm.showWarnDialog(m.mContext,"保存到装箱失败，请检查！");
 
@@ -148,10 +148,6 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
                     case CODE1: // 清空数据
                         m.etBoxCode.setText("");
                         m.strBarcode = "";
-
-                        break;
-                    case CODE60: // 没有得到数据，就把回车的去掉，恢复正常数据
-                        m.setTexts(m.etBoxCode, m.strBarcode);
 
                         break;
                 }
@@ -225,37 +221,20 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
 
     @Override
     public void setListener() {
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
+        // 箱码
+        etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (v.getId()) {
-                        case R.id.et_boxCode: // 箱子的防伪码
-                            String mtlCode = getValues(etBoxCode).trim();
-                            if (!smBefore()) {
-                                mHandler.sendEmptyMessageDelayed(CODE1, 200);
-                                return false;
-                            }
-                            if (strBarcode != null && strBarcode.length() > 0) {
-                                if (strBarcode.equals(mtlCode)) {
-                                    strBarcode = mtlCode;
-                                } else {
-                                    String tmp = mtlCode.replaceFirst(strBarcode, "");
-                                    strBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                strBarcode = mtlCode.replace("\n", "");
-                            }
-                            // 执行查询方法
-                            run_smGetDatas(strBarcode);
-
-                            break;
-                    }
-                }
-                return false;
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                strBarcode = s.toString();
+                // 执行查询方法
+                run_smGetDatas(strBarcode);
             }
-        };
-        etBoxCode.setOnKeyListener(keyListener);
+        });
     }
 
     /**
@@ -375,7 +354,7 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
                 break;
             }
         }
-        setTexts(etBoxCode, securityCode.getSecurityQrCode());
+//        setTexts(etBoxCode, securityCode.getSecurityQrCode());
         strBarcode = securityCode.getSecurityQrCode();
 
         // 如果状态为1，就说明已经绑定了物料和箱子

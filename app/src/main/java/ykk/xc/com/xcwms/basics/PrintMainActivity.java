@@ -37,7 +37,6 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
-import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
@@ -65,7 +64,7 @@ public class PrintMainActivity extends BaseActivity {
     @BindView(R.id.tv_3)
     TextView tv3;
     private PrintMainActivity context = this;
-    private static final String TAG = "PrintFragmentsActivity";
+    private static final String TAG = "PrintMainActivity";
     private TextView curText;
     private IFragmentKeyeventListener fragment2Listener;
     private List<String> barcodeList = new ArrayList<>(); // 打印的条码
@@ -287,7 +286,7 @@ public class PrintMainActivity extends BaseActivity {
         mbrList.addAll(tmpMbrList);
 
         if(isConnected) {
-            setProdBoxListFormat();
+            setProdBoxListPrint();
         } else {
             // 打开蓝牙配对页面
             startActivityForResult(new Intent(this, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
@@ -323,7 +322,7 @@ public class PrintMainActivity extends BaseActivity {
         mbrList.addAll(tmpMbrList);
 
         if(isConnected) {
-            setDeliBoxListFormat();
+            setDeliBoxListPrint();
         } else {
             // 打开蓝牙配对页面
             startActivityForResult(new Intent(this, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
@@ -353,15 +352,6 @@ public class PrintMainActivity extends BaseActivity {
 
     public void setFragmentKeyeventListener(IFragmentKeyeventListener fragmentKeyeventListener) {
         this.fragment2Listener = fragmentKeyeventListener;
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_USB_DEVICE_DETACHED);
-        filter.addAction(DeviceConnFactoryManager.ACTION_CONN_STATE);
-        registerReceiver(receiver, filter);
     }
 
     @Override
@@ -476,22 +466,18 @@ public class PrintMainActivity extends BaseActivity {
 
         ProdOrder prodOrder = prodOrderList.get(count);
 
-        tsc.addText(100, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,""+isNULLS(prodOrder.getDeliveryCompanyName())+" \n");
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,""+isNULLS(prodOrder.getDeliveryCompanyName())+" \n");
+        tsc.add1DBarcode(300, beginYPos, LabelCommand.BARCODETYPE.CODE39, 50, LabelCommand.READABEL.DISABLE, LabelCommand.ROTATION.ROTATION_0, 2, 5, prodOrder.getFbillno());
         rowHigthSum = beginYPos + 60;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(prodOrder.getCustName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"联系人："+isNULLS(prodOrder.getReceivePerson())+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"生产单号："+prodOrder.getFbillno()+" \n");
+        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单号："+prodOrder.getSalOrderNo()+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"电话："+isNULLS(prodOrder.getReceiveTel())+" \n");
-        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"生产序号："+isNULLS(prodOrder.getProdSeqNumber())+" \n");
-        rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"收货地址："+isNULLS(prodOrder.getReceiveAddress())+" \n");
-        rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单号："+prodOrder.getSalOrderNo()+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"生产序号："+isNULLS(prodOrder.getProdSeqNumber())+" \n");
         tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"日期："+date+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"产品名称："+isNULLS(prodOrder.getMtlFname())+" \n");
-        rowHigthSum = rowHigthSum + rowSpacing;
 
         String width = isNULLS(prodOrder.getWidth());
         String high = isNULLS(prodOrder.getHigh());
@@ -499,20 +485,22 @@ public class PrintMainActivity extends BaseActivity {
         width = width.length() > 0 ? "宽："+width : "";
         high = high.length() > 0 ? "高："+high : "";
         strWidthHigh = width + "  *" + high;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"产品规格："+strWidthHigh+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"产品规格："+strWidthHigh+" \n");
 
         String leaf = isNULLS(prodOrder.getLeaf());
         String leaf2 = isNULLS(prodOrder.getLeaf1());
         String strTmp = "";
-        if (leaf.length() > 0 && leaf2.length() > 0) {
-            strTmp = leaf + " , " + leaf2;
-        } else if (leaf.length() > 0) {
-            strTmp = leaf;
-        } else if (leaf2.length() > 0) {
-            strTmp = leaf2;
-        }
+        if (leaf.length() > 0 && leaf2.length() > 0) strTmp = leaf + " , " + leaf2;
+        else if (leaf.length() > 0) strTmp = leaf;
+        else if (leaf2.length() > 0) strTmp = leaf2;
+        rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "布料/叶片：" + strTmp + " \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"联系人："+isNULLS(prodOrder.getReceivePerson())+" \n");
+        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"电话："+isNULLS(prodOrder.getReceiveTel())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"收货地址："+isNULLS(prodOrder.getReceiveAddress())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"备注："+isNULLS(prodOrder.getRemarks())+" \n");
         rowHigthSum = rowHigthSum + 51;
@@ -545,13 +533,10 @@ public class PrintMainActivity extends BaseActivity {
         String leaf = isNULLS(prodOrder.getLeaf());
         String leaf2 = isNULLS(prodOrder.getLeaf1());
         String strTmp = "";
-        if (leaf.length() > 0 && leaf2.length() > 0) {
-            strTmp = leaf + " , " + leaf2;
-        } else if (leaf.length() > 0) {
-            strTmp = leaf;
-        } else if (leaf2.length() > 0) {
-            strTmp = leaf2;
-        }
+        if (leaf.length() > 0 && leaf2.length() > 0) strTmp = leaf + " , " + leaf2;
+        else if (leaf.length() > 0) strTmp = leaf;
+        else if (leaf2.length() > 0) strTmp = leaf2;
+
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "布料/叶片：" + strTmp + " \n");
         rowHigthSum = rowHigthSum + rowSpacing;
@@ -565,7 +550,6 @@ public class PrintMainActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "产品规格：" + strWidthHigh + " \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "备注：" + isNULLS(prodOrder.getRemarks()) + " \n");
-//        }
     }
 
     /**
@@ -593,117 +577,133 @@ public class PrintMainActivity extends BaseActivity {
     /**
      * 设置生产装箱清单打印格式
      */
-    private void setProdBoxListFormat() {
+    private void setProdBoxListPrint() {
+        setProdBoxListFormat1();
+        // 绘制箱子条码
+        for(int i=0, size = mbrList.size(); i<size; i++) {
+            setProdBoxListFormat2(i);
+        }
+        setProdBoxListFormat3();
+    }
+
+    /**
+     * 打印头部1
+     */
+    private void setProdBoxListFormat1() {
         LabelCommand tsc = new LabelCommand();
-        // 设置标签尺寸，按照实际尺寸设置
-        int initHigt = 50;
-        int high = mbrList.size() * 20;
-        int sumHigh = initHigt + high;
-        tsc.addSize(78, sumHigh);
-        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
-//        tsc.addGap(10);
-        tsc.addGap(0);
-        // 设置打印方向
-        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
-        // 开启带Response的打印，用于连续打印
-        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
-        // 设置原点坐标
-        tsc.addReference(0, 0);
-        // 撕纸模式开启
-        tsc.addTear(EscCommand.ENABLE.ON);
-        // 清除打印缓冲区
-        tsc.addCls();
+        setTscBegin(tsc);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
-        int beginYPos = 20; // 开始纵向位置
+        int beginYPos = 12; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
         int rowSpacing = 30; // 每行之间的距离
-        String date = Comm.getSysDate(7);
 
         MaterialBinningRecord mbr = mbrList.get(0);
         ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
         // 绘制箱子条码
-        rowHigthSum = beginYPos + 20;
+        rowHigthSum = beginYPos + 18;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱码： \n");
-        tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
-        rowHigthSum = beginYPos + 106;
+        tsc.add1DBarcode(115, rowHigthSum-18, LabelCommand.BARCODETYPE.CODE39, 65, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
+        rowHigthSum = beginYPos + 96;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物流公司："+isNULLS(prodOrder.getDeliveryCompanyName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(mbr.getCustomer().getCustomerName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(mbr.getSalOrderNo())+" \n");
+        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(prodOrder.getProdFdate()).substring(0,10)+" \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印物料信息2
+     */
+    private void setProdBoxListFormat2(int pos) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 35; // 每行之间的距离
+
+        MaterialBinningRecord mbr = mbrList.get(pos);
+        ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+        rowHigthSum = beginYPos + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(prodOrder.getMtlFnumber())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(prodOrder.getProdFdate()).substring(0,10)+" \n");
-        rowHigthSum = rowHigthSum + 30;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        for(int i=0; i<mbrList.size(); i++) {
-            MaterialBinningRecord mbr2 = mbrList.get(i);
-            ProdOrder prodOrder2 = JsonUtil.stringToObject(mbr2.getRelationObj(), ProdOrder.class);
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(prodOrder2.getMtlFnumber())+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(prodOrder2.getMtlFname())+" \n");
-            String leaf = isNULLS(prodOrder2.getLeaf());
-            String leaf2 = isNULLS(prodOrder2.getLeaf1());
-            leaf2 = leaf2.length() > 0 ? "/"+leaf2 : "";
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"面料："+(leaf+leaf2)+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr2.getNumber())+" \n");
-            tsc.addText(200, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"宽："+isNULLS(prodOrder2.getWidth())+" \n");
-            tsc.addText(360, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"高："+isNULLS(prodOrder2.getHigh())+" \n");
-            rowHigthSum = rowHigthSum + 30;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        }
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(prodOrder.getMtlFname())+" \n");
+
+        String leaf = isNULLS(prodOrder.getLeaf());
+        String leaf2 = isNULLS(prodOrder.getLeaf1());
+        String strTmp = "";
+        if (leaf.length() > 0 && leaf2.length() > 0) strTmp = leaf + " , " + leaf2;
+        else if (leaf.length() > 0) strTmp = leaf;
+        else if (leaf2.length() > 0) strTmp = leaf2;
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"面料："+strTmp+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr.getNumber())+" \n");
+        tsc.addText(200, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"宽："+isNULLS(prodOrder.getWidth())+" \n");
+        tsc.addText(360, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"高："+isNULLS(prodOrder.getHigh())+" \n");
+//        rowHigthSum = rowHigthSum + rowSpacing;
+//        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印日期
+     */
+    private void setProdBoxListFormat3() {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 30; // 每行之间的距离
+        String date = Comm.getSysDate(7);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
 
         // --------------- 打印区-------------End
-        // 打印标签
-        tsc.addPrint(1, 1);
-        // 打印标签后 蜂鸣器响
-
-        tsc.addSound(2, 100);
-        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
-        Vector<Byte> datas = tsc.getCommand();
-        // 发送数据
-        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null) {
-            return;
-        }
-        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
+        setTscEnd(tsc);
     }
 
     /**
-     * 设置复核装箱清单打印格式
+     * 设置复核单装箱清单打印格式
      */
-    private void setDeliBoxListFormat() {
+    private void setDeliBoxListPrint() {
+        setDeliBoxListFormat1();
+        // 绘制箱子条码
+        for(int i=0, size = mbrList.size(); i<size; i++) {
+            setDeliBoxListFormat2(i);
+        }
+        setDeliBoxListFormat3();
+    }
+
+    /**
+     * 打印头部1
+     */
+    private void setDeliBoxListFormat1() {
         LabelCommand tsc = new LabelCommand();
-        // 设置标签尺寸，按照实际尺寸设置
-        int initHigt = 50;
-        int high = mbrList.size() * 20;
-        int sumHigh = initHigt + high;
-        tsc.addSize(78, sumHigh);
-        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
-//        tsc.addGap(10);
-        tsc.addGap(0);
-        // 设置打印方向
-        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
-        // 开启带Response的打印，用于连续打印
-        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
-        // 设置原点坐标
-        tsc.addReference(0, 0);
-        // 撕纸模式开启
-        tsc.addTear(EscCommand.ENABLE.ON);
-        // 清除打印缓冲区
-        tsc.addCls();
+        setTscBegin(tsc);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
-        int beginYPos = 20; // 开始纵向位置
+        int beginYPos = 12; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
         int rowSpacing = 30; // 每行之间的距离
-        String date = Comm.getSysDate(7);
 
         MaterialBinningRecord mbr = mbrList.get(0);
         DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
@@ -717,27 +717,93 @@ public class PrintMainActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"客户名称："+isNULLS(deliOrder.getCustName())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单编号："+isNULLS(deliOrder.getSalOrderNo())+" \n");
+        tsc.addText(280, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(deliOrder.getDeliDate()).substring(0,10)+" \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印物料信息2
+     */
+    private void setDeliBoxListFormat2(int pos) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 35; // 每行之间的距离
+
+        MaterialBinningRecord mbr = mbrList.get(pos);
+        DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+        rowHigthSum = beginYPos + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(deliOrder.getMtlFnumber())+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"订单日期："+isNULLS(deliOrder.getDeliDate()).substring(0,10)+" \n");
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(deliOrder.getMtlFname())+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr.getNumber())+" \n");
+        tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(deliOrder.getMtlUnitName())+" \n");
         rowHigthSum = rowHigthSum + 30;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        for(int i=0; i<mbrList.size(); i++) {
-            MaterialBinningRecord mbr2 = mbrList.get(i);
-            DeliOrder deliOrder2 = JsonUtil.stringToObject(mbr2.getRelationObj(), DeliOrder.class);
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料编码："+isNULLS(deliOrder2.getMtlFnumber())+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+isNULLS(deliOrder2.getMtlFname())+" \n");
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"数量："+df.format(mbr2.getNumber())+" \n");
-            tsc.addText(260, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"单位："+isNULLS(deliOrder2.getMtlUnitName())+" \n");
-            rowHigthSum = rowHigthSum + 30;
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
-        }
+//        rowHigthSum = rowHigthSum + rowSpacing;
+//        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印日期
+     */
+    private void setDeliBoxListFormat3() {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 0; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 30; // 每行之间的距离
+        String date = Comm.getSysDate(7);
+
+        tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
 
         // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
+     * 打印前段配置
+     * @param tsc
+     */
+    private void setTscBegin(LabelCommand tsc) {
+        // 设置标签尺寸，按照实际尺寸设置
+        tsc.addSize(78, 26);
+        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
+//        tsc.addGap(10);
+        tsc.addGap(0);
+        // 设置打印方向
+        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+        // 开启带Response的打印，用于连续打印
+        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+        // 设置原点坐标
+        tsc.addReference(0, 0);
+        // 撕纸模式开启
+        tsc.addTear(EscCommand.ENABLE.ON);
+        // 清除打印缓冲区
+        tsc.addCls();
+    }
+    /**
+     * 打印后段配置
+     * @param tsc
+     */
+    private void setTscEnd(LabelCommand tsc) {
         // 打印标签
         tsc.addPrint(1, 1);
         // 打印标签后 蜂鸣器响
@@ -817,11 +883,11 @@ public class PrintMainActivity extends BaseActivity {
 
                                     break;
                                 case 4: // 生产装箱清单打印条码
-                                    setProdBoxListFormat();
+                                    setProdBoxListPrint();
 
                                     break;
                                 case 5: // 复核装箱清单打印条码
-                                    setDeliBoxListFormat();
+                                    setDeliBoxListPrint();
 
                                     break;
                             }
@@ -887,6 +953,15 @@ public class PrintMainActivity extends BaseActivity {
             }
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_USB_DEVICE_DETACHED);
+        filter.addAction(DeviceConnFactoryManager.ACTION_CONN_STATE);
+        registerReceiver(receiver, filter);
+    }
 
     @Override
     protected void onStop() {

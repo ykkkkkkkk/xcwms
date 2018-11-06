@@ -86,7 +86,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     Button btnSave;
 
     private Sal_OutFragment3 context = this;
-    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, RESET = 15, SEL_STOCK2 = 16, SEL_STOCKP2 = 17;
+    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, PASS = 203, UNPASS = 503;
     private static final int CODE2 = 2;
     private Stock stock; // 仓库
@@ -166,14 +166,6 @@ public class Sal_OutFragment3 extends BaseFragment {
                         break;
                     case UNSUCC2: // 判断是否存在返回
                         m.run_addScanningRecord();
-
-                        break;
-                    case RESET: // 没有得到数据，就把回车的去掉，恢复正常数据
-                        switch (m.curViewFlag) {
-                            case '9': // 运单号
-                                m.setTexts(m.etExpressNo, m.expressNoBarcode);
-                                break;
-                        }
 
                         break;
                 }
@@ -367,34 +359,6 @@ public class Sal_OutFragment3 extends BaseFragment {
 
     @Override
     public void setListener() {
-        View.OnKeyListener keyListener = new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-                    switch (v.getId()) {
-                        case R.id.et_expressNo: // 运单号
-                            String expressNo = getValues(etExpressNo).trim();
-                            if (expressNoBarcode != null && expressNoBarcode.length() > 0) {
-                                if (expressNoBarcode.equals(expressNo)) {
-                                    expressNoBarcode = expressNo;
-                                } else {
-                                    String tmp = expressNo.replaceFirst(expressNoBarcode, "");
-                                    expressNoBarcode = tmp.replace("\n", "");
-                                }
-                            } else {
-                                expressNoBarcode = expressNo.replace("\n", "");
-                            }
-                            curViewFlag = '9';
-                            mHandler.sendEmptyMessage(RESET);
-
-                            break;
-                    }
-                }
-                return false;
-            }
-        };
-        etExpressNo.setOnKeyListener(keyListener);
-
         etExpressNo.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {

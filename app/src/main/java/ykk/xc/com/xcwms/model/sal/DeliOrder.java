@@ -55,6 +55,16 @@ public class DeliOrder implements Serializable{
 	private String deliveryCompanyNumber;
 	/*物流公司名称*/
 	private String deliveryCompanyName;
+	/*叶片*/
+	private String leaf;
+	/*叶片1*/
+	private String leaf1;
+	/*发货通知里的宽，用于打印装箱清单取值*/
+	private String width;
+	/*发货通知里的高，用于打印装箱清单取值*/
+	private String high;
+	/*出库类型*/
+	private String exitType;
 
 	public DeliOrder() {
 		super();
@@ -338,5 +348,45 @@ public class DeliOrder implements Serializable{
 
 	public void setDeliveryCompanyName(String deliveryCompanyName) {
 		this.deliveryCompanyName = deliveryCompanyName;
+	}
+
+	public String getLeaf() {
+		return leaf;
+	}
+
+	public void setLeaf(String leaf) {
+		this.leaf = leaf;
+	}
+
+	public String getLeaf1() {
+		return leaf1;
+	}
+
+	public void setLeaf1(String leaf1) {
+		this.leaf1 = leaf1;
+	}
+
+	public String getWidth() {
+		return width;
+	}
+
+	public void setWidth(String width) {
+		this.width = width;
+	}
+
+	public String getHigh() {
+		return high;
+	}
+
+	public void setHigh(String high) {
+		this.high = high;
+	}
+
+	public String getExitType() {
+		return exitType;
+	}
+
+	public void setExitType(String exitType) {
+		this.exitType = exitType;
 	}
 }

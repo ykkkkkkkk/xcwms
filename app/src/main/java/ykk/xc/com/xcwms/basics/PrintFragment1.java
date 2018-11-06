@@ -75,7 +75,6 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                     case SUCC1: // 成功
                         String json = (String) msg.obj;
                         List<Material> list = JsonUtil.strToList2(json, Material.class);
-                        Log.e("size-=-=-=-=-=-=-===-", list.size()+"");
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 

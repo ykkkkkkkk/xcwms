@@ -35,6 +35,16 @@
             android:textSize="14sp" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_connState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/_2dp"
+        android:text="@string/str_conn_state_disconnect"
+        android:textColor="@color/c_666666"
+        android:textSize="12sp" />
+
     <LinearLayout
         android:id="@+id/lin_tabs"
         android:layout_width="match_parent"

@@ -97,7 +97,8 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
 
                         break;
                     case UNSUCC1: // 数据加载失败！
-                        m.toasts("抱歉，没有加载到数据！");
+                        String errMsg = JsonUtil.strToString((String) msg.obj);
+                        m.toasts(errMsg);
 
                         break;
                 }
@@ -267,13 +268,14 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
                 ResponseBody body = response.body();
                 String result = body.string();
                 if(!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
                 isNextPage = JsonUtil.isNextPage(result, limit);
 
-                Message msg = mHandler.obtainMessage(SUCC1, result);
                 Log.e("Pur_SelReceiveOrderActivity --> onResponse", result);
+                Message msg = mHandler.obtainMessage(SUCC1, result);
                 mHandler.sendMessage(msg);
             }
         });
