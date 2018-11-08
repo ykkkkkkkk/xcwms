@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +23,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -43,13 +41,11 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.entrance.page4.ServiceSetActivity;
 import ykk.xc.com.xcwms.model.AppInfo;
-import ykk.xc.com.xcwms.util.IDownloadContract;
-import ykk.xc.com.xcwms.util.IDownloadPresenter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.UpdateManager;
 
-import static android.os.Process.killProcess;
-
-public class MainTabFragment5 extends BaseFragment implements IDownloadContract.View {
+//public class MainTabFragment5 extends BaseFragment implements IDownloadContract.View {
+public class MainTabFragment5 extends BaseFragment {
 
 //    Unbinder unbinder;
     private static final int SUCC1 = 200, UNSUCC1 = 500, TEST = 201, UNTEST = 501;
@@ -57,13 +53,12 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
     TextView tvUpdatePlan;
 
     private static final int REQUESTCODE = 101;
-    private IDownloadPresenter mPresenter;
+//    private IDownloadPresenter mPresenter;
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Activity mContext = null;
+    private Activity mContext;
 
     public MainTabFragment5() {
     }
-
 
     // 消息处理
     final MyHandler mHandler = new MyHandler(this);
@@ -114,7 +109,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
     @Override
     public void initData() {
         mContext = getActivity();
-        mPresenter = new IDownloadPresenter(this);
+//        mPresenter = new IDownloadPresenter(this);
         requestPermission();
     }
 
@@ -130,7 +125,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
 
                 break;
             case R.id.lin_item3: // 网络测试
-                run_test();
+//                run_test();
 
                 break;
             case R.id.lin_item4: // 更新版本
@@ -156,15 +151,17 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
                 .setTitle("更新版本").setMessage(remark)
                 .setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        mPresenter.downApk(mContext);
+//                        mPresenter.downApk(mContext);
+                        new UpdateManager(mContext).checkUpdateInfo();
                         dialog.dismiss();
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create();// 创建
+//                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                })
+                .create();// 创建
         alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();// 显示
@@ -236,11 +233,9 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
      */
     private void run_test() {
         showLoadDialog("测试中...");
-        String mUrl = Consts.getURL("");
-        int len = mUrl.indexOf("mdwms");
-        String url = mUrl.substring(0, len);
+        String mUrl = Consts.getURL("findAppInfo");
         Request request = new Request.Builder()
-                .url(url)
+                .url(mUrl)
                 .build();
         Call call = okHttpClient.newCall(request);
         call.enqueue(new Callback() {
@@ -319,47 +314,47 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
         }
     }
 
-    @Override
-    public void showUpdate(String version) {
-
-    }
-
-    @Override
-    public void showProgress(int progress) {
-        tvUpdatePlan.setText(String.format(Locale.CHINESE,"%d%%", progress));
-    }
-
-    @Override
-    public void showFail(String msg) {
-        toasts(msg);
-    }
-
-    @Override
-    public void showComplete(File file) {
-        try {
-            String authority = mContext.getApplicationContext().getPackageName() + ".fileProvider";
-            Uri fileUri = FileProvider.getUriForFile(mContext, authority, file);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            //7.0以上需要添加临时读取权限
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
-            } else {
-                Uri uri = Uri.fromFile(file);
-                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-            }
-
-            startActivity(intent);
-
-            //弹出安装窗口把原程序关闭。
-            //避免安装完毕点击打开时没反应
-            killProcess(android.os.Process.myPid());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Override
+//    public void showUpdate(String version) {
+//
+//    }
+//
+//    @Override
+//    public void showProgress(int progress) {
+//        tvUpdatePlan.setText(String.format(Locale.CHINESE,"%d%%", progress));
+//    }
+//
+//    @Override
+//    public void showFail(String msg) {
+//        toasts(msg);
+//    }
+//
+//    @Override
+//    public void showComplete(File file) {
+//        try {
+//            String authority = mContext.getApplicationContext().getPackageName() + ".fileProvider";
+//            Uri fileUri = FileProvider.getUriForFile(mContext, authority, file);
+//            Intent intent = new Intent(Intent.ACTION_VIEW);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//
+//            //7.0以上需要添加临时读取权限
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
+//            } else {
+//                Uri uri = Uri.fromFile(file);
+//                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+//            }
+//
+//            startActivity(intent);
+//
+//            //弹出安装窗口把原程序关闭。
+//            //避免安装完毕点击打开时没反应
+//            killProcess(android.os.Process.myPid());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public void onDestroyView() {

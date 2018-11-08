@@ -25,7 +25,9 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -103,6 +105,7 @@ public class Prod_InFragment2 extends BaseFragment {
     private Organization inOrg, prodOrg; // 组织
     private Prod_InFragment2Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
+    private Map<String,Boolean> mapBox = new HashMap<String,Boolean>(); // 记录箱码
     private String stockBarcode, stockPBarcode, deptBarcode, boxBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
     private int curPos; // 当前行
@@ -150,6 +153,7 @@ public class Prod_InFragment2 extends BaseFragment {
                         m.reset('0');
 
                         m.checkDatas.clear();
+                        m.mapBox.clear();
                         m.getBarCodeTableBefore(true);
                         m.mAdapter.notifyDataSetChanged();
                         Comm.showWarnDialog(m.mContext,"审核成功✔");
@@ -178,6 +182,13 @@ public class Prod_InFragment2 extends BaseFragment {
                             case '3': // 生产装箱单
                                 List<MaterialBinningRecord> list = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                                 m.getBarCodeTableBefore(false);
+                                if(m.mapBox.containsKey(m.boxBarcode)) {
+                                    Comm.showWarnDialog(m.mContext,"一个箱子只能扫一次！");
+                                    return;
+                                }
+                                // 把这个箱码保存到map中
+                                m.mapBox.put(m.boxBarcode, true);
+
                                 m.getSourceAfter(list);
 
                                 break;
@@ -731,6 +742,9 @@ public class Prod_InFragment2 extends BaseFragment {
             sr2.setFqty(prodOrder.getProdFqty());
             sr2.setStockqty(mbr.getNumber());
             sr2.setBarcode(mbr.getBarcode());
+            sr2.setSalOrderId(prodOrder.getSalOrderId());
+            sr2.setSalOrderNo(prodOrder.getSalOrderNo());
+            sr2.setSalOrderNoEntryId(prodOrder.getSalOrderEntryId());
             // 入库组织
             if(inOrg == null) inOrg = new Organization();
             inOrg.setFpkId(prodOrder.getProdOrgId());
@@ -873,6 +887,9 @@ public class Prod_InFragment2 extends BaseFragment {
             record.setK3UserFnumber(user.getKdUserNumber());
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
+            record.setSalOrderId(sr2.getSalOrderId());
+            record.setSalOrderNo(sr2.getSalOrderNo());
+            record.setSalOrderEntryId(sr2.getSalOrderNoEntryId());
 
             list.add(record);
         }

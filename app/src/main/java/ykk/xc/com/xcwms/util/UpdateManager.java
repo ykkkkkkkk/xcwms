@@ -38,7 +38,7 @@ public class UpdateManager {
     private Dialog downloadDialog;
     /* 下载包安装路径 */
     private String savePath = Comm.publicPaths + "/updateFile/";
-    private String saveFileName = savePath + "wms.apk";
+    private String saveFileName = savePath + "xcwms.apk";
     /* 进度条与通知ui刷新的handler和msg常量 */
     private ProgressBar mProgress;
     private static final int DOWN_UPDATE = 1;

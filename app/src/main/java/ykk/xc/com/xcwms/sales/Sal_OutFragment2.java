@@ -133,7 +133,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private Activity mContext;
     private Sal_OutMainActivity parent;
     private int caseId; // 当前单据的方案id
-    private Map<String,Boolean> mapBox = new HashMap<String,Boolean>();
+    private Map<String,Boolean> mapBox = new HashMap<String,Boolean>(); // 记录箱码
     private List<MaterialBinningRecord> mbrList = null; // 保存箱子里的物料
     private List<DeliOrder> deliOrderList = new ArrayList<>(); // 保存发货通知单的
     private String k3Number; // 记录传递到k3返回的单号
@@ -274,11 +274,11 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                                             Comm.showWarnDialog(m.mContext,"该销售订单的出库类型不是销售出库，不能操作");
                                             return;
                                         }
+                                        // 把这个箱码保存到map中
+                                        m.mapBox.put(m.boxBarcode, true);
                                         m.getSourceAfter3(m.mbrList);
                                         break;
                                 }
-                                // 把这个箱码保存到map中
-                                m.mapBox.put(m.boxBarcode, true);
 
                                 break;
                         }
@@ -350,10 +350,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                         m.deliOrderList.clear();
                         m.deliOrderList.addAll(list2);
 
-                        m.getBarCodeTableBefore(false);
-                        m.getSourceAfter2();
                         // 把这个箱码保存到map中
                         m.mapBox.put(m.boxBarcode, true);
+                        m.getBarCodeTableBefore(false);
+                        m.getSourceAfter2();
 
                         break;
                     case UNSUCC4: // 查询发货通知单 失败

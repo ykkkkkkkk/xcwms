@@ -58,6 +58,9 @@ public class ScanningRecord implements Serializable {
     private String fsTableName; // 下推来源表体
     private String fcarriageNo; // 运输单号
     private String expressNumber; // 物流公司
+    private int salOrderId; // 销售订单id
+    private String salOrderNo; // 销售订单号
+    private int salOrderEntryId; // 销售订单分录id
     // 临时变量
     private List<String> listBarcode; // 记录每行中扫的条码barcode
     private String strBarcodes; // 用逗号拼接的条码号
@@ -369,7 +372,24 @@ public class ScanningRecord implements Serializable {
     public void setKdAccountPassword(String kdAccountPassword) {
         this.kdAccountPassword = kdAccountPassword;
     }
-
+    public int getSalOrderId() {
+        return salOrderId;
+    }
+    public String getSalOrderNo() {
+        return salOrderNo;
+    }
+    public int getSalOrderEntryId() {
+        return salOrderEntryId;
+    }
+    public void setSalOrderId(int salOrderId) {
+        this.salOrderId = salOrderId;
+    }
+    public void setSalOrderNo(String salOrderNo) {
+        this.salOrderNo = salOrderNo;
+    }
+    public void setSalOrderEntryId(int salOrderEntryId) {
+        this.salOrderEntryId = salOrderEntryId;
+    }
 
     public ScanningRecord() {
         super();
