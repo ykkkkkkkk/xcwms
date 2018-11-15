@@ -827,12 +827,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
         String strCaseId = null;
         switch (curViewFlag) {
             case '1': // 箱码
-                mUrl = Consts.getURL("boxBarCode/findBarcode");
+                mUrl = getURL("boxBarCode/findBarcode");
                 barcode = boxBarcode;
                 strCaseId = "";
                 break;
             case '2': // 物料扫码
-                mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = mtlBarcode;
                 strCaseId = "11,21";
                 break;
@@ -880,7 +880,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_save(String json) {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("materialBinningRecord/save3");
+        String mUrl = getURL("materialBinningRecord/save3");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
 
         FormBody formBody = new FormBody.Builder()
@@ -920,7 +920,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_modifyWay() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("materialBinningRecord/modifyDeliveryway");
+        String mUrl = getURL("materialBinningRecord/modifyDeliveryway");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
         getUserInfo();
 
@@ -964,7 +964,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_delete(String json) {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("materialBinningRecord/delete");
+        String mUrl = getURL("materialBinningRecord/delete");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
 
         FormBody formBody = new FormBody.Builder()
@@ -1005,7 +1005,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_modifyStatus() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("boxBarCode/modifyStatus");
+        String mUrl = getURL("boxBarCode/modifyStatus");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
 
         FormBody formBody = new FormBody.Builder()
@@ -1046,7 +1046,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_modifyBoxIdByBarcode() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("boxBarCode/modifyBoxIdByBarcode");
+        String mUrl = getURL("boxBarCode/modifyBoxIdByBarcode");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
 
         FormBody formBody = new FormBody.Builder()
@@ -1087,7 +1087,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void run_modifyNumber2(int id, final double number) {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("materialBinningRecord/modifyNumber2");
+        String mUrl = getURL("materialBinningRecord/modifyNumber2");
         MaterialBinningRecord mtl = new MaterialBinningRecord();
         getUserInfo();
 

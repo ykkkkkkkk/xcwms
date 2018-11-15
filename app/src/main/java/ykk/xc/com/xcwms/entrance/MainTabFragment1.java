@@ -3,9 +3,11 @@ package ykk.xc.com.xcwms.entrance;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -18,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -48,7 +51,7 @@ import ykk.xc.com.xcwms.util.UpdateManager;
 
 import static android.os.Process.killProcess;
 
-public class MainTabFragment1 extends BaseFragment {
+public class MainTabFragment1 extends BaseFragment implements IDownloadContract.View {
 
 
     @BindView(R.id.tab1)
@@ -66,9 +69,11 @@ public class MainTabFragment1 extends BaseFragment {
     @BindView(R.id.lin_tab)
     LinearLayout linTab;
 
+    private MainTabFragment1 context = this;
     private Activity mContext;
-    private static final int SUCC1 = 200, UNSUCC1 = 500;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, UPDATE_PLAN = 1;
     private OkHttpClient okHttpClient = new OkHttpClient();
+    private IDownloadPresenter mPresenter;
 
     // 消息处理
     final MainTabFragment1.MyHandler mHandler = new MainTabFragment1.MyHandler(this);
@@ -95,11 +100,16 @@ public class MainTabFragment1 extends BaseFragment {
                     case UNSUCC1: // 得到更新信息失败
 
                         break;
+                    case UPDATE_PLAN: // 更新进度
+                        m.progressBar.setProgress(m.progress);
+                        m.tvDownPlan.setText(String.format(Locale.CHINESE,"%d%%", m.progress));
+
+                        break;
                 }
             }
         }
     }
-    
+
     public MainTabFragment1() {
     }
 
@@ -111,6 +121,7 @@ public class MainTabFragment1 extends BaseFragment {
     @Override
     public void initData() {
         mContext = getActivity();
+        mPresenter = new IDownloadPresenter(context);
         // 查询是否更新数据
         run_findAppInfo();
     }
@@ -137,6 +148,43 @@ public class MainTabFragment1 extends BaseFragment {
         }
     }
 
+    /**
+     * 显示下载的进度
+     */
+    private Dialog downloadDialog;
+    private ProgressBar progressBar;
+    private TextView tvDownPlan;
+    private int progress;
+    private void showDownloadDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+
+        builder.setTitle("软件更新");
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View v = inflater.inflate(R.layout.progress, null);
+        progressBar = (ProgressBar)v.findViewById(R.id.progress);
+        tvDownPlan = (TextView)v.findViewById(R.id.tv_downPlan);
+        builder.setView(v);
+        // 开发员用的，长按进度条，就关闭下载框
+        tvDownPlan.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                downloadDialog.dismiss();
+                return true;
+            }
+        });
+        // 如果用户点击取消就销毁掉这个系统
+//        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+////                mContext.finish();
+//                dialog.dismiss();
+//            }
+//        });
+        downloadDialog = builder.create();
+        downloadDialog.show();
+        downloadDialog.setCancelable(false);
+        downloadDialog.setCanceledOnTouchOutside(false);
+    }
 
     /**
      * 提示下载框
@@ -146,7 +194,14 @@ public class MainTabFragment1 extends BaseFragment {
                 .setTitle("更新版本").setMessage(remark)
                 .setPositiveButton("下载", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        new UpdateManager(mContext).checkUpdateInfo();
+                        // 得到ip和端口
+                        SharedPreferences spfConfig = spf(getResStr(R.string.saveConfig));
+                        String ip = spfConfig.getString("ip", "192.168.3.198");
+                        String port = spfConfig.getString("port", "8080");
+                        String url = "http://"+ip+":"+port+"/apks/xcwms.apk";
+
+                        showDownloadDialog();
+                        mPresenter.downApk(mContext, url);
                         dialog.dismiss();
                     }
                 })
@@ -184,7 +239,7 @@ public class MainTabFragment1 extends BaseFragment {
      */
     private void run_findAppInfo() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findAppInfo");
+        String mUrl = getURL("findAppInfo");
         ;
         FormBody formBody = new FormBody.Builder()
 //                .add("limit", "10")
@@ -216,10 +271,54 @@ public class MainTabFragment1 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("MainTabFragment4 --> onResponse", result);
+                Log.e("MainTabFragment1 --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
+    }
+
+    @Override
+    public void showUpdate(String version) {
+    }
+
+    @Override
+    public void showProgress(int progress) {
+        context.progress = progress;
+        mHandler.sendEmptyMessage(UPDATE_PLAN);
+    }
+
+    @Override
+    public void showFail(String msg) {
+        toasts(msg);
+    }
+
+    @Override
+    public void showComplete(File file) {
+        if(downloadDialog != null) downloadDialog.dismiss();
+
+        try {
+            String authority = mContext.getApplicationContext().getPackageName() + ".fileProvider";
+            Uri fileUri = FileProvider.getUriForFile(mContext, authority, file);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            //7.0以上需要添加临时读取权限
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setDataAndType(fileUri, "application/vnd.android.package-archive");
+            } else {
+                Uri uri = Uri.fromFile(file);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            }
+
+            startActivity(intent);
+
+            //弹出安装窗口把原程序关闭。
+            //避免安装完毕点击打开时没反应
+            killProcess(android.os.Process.myPid());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

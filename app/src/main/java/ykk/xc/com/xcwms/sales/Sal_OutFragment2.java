@@ -213,6 +213,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                             case '3': // 装箱单
                                 m.mbrList = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                                 MaterialBinningRecord mbr = m.mbrList.get(0);
+                                // 通过mapBox来清空箱子记录的list
+                                if(m.mapBox.size() == 0)  m.listMaps.clear();
 
                                 if(m.mapBox.containsKey(m.boxBarcode)) {
                                     Comm.showWarnDialog(m.mContext,"一个箱子只能扫一次！");
@@ -1045,6 +1047,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 sr2.setSourceFnumber(deliOrder.getFbillno());
                 sr2.setFitemId(deliOrder.getMtlId());
                 sr2.setMtl(deliOrder.getMtl());
+                //
                 sr2.setMtlFnumber(deliOrder.getMtlFnumber());
                 sr2.setUnitFnumber(deliOrder.getMtl().getUnit().getUnitNumber());
                 sr2.setPoFid(deliOrder.getfId());
@@ -1390,7 +1393,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 .add("strJson", mJson)
                 .build();
 
-        String mUrl = Consts.getURL("addScanningRecord");
+        String mUrl = getURL("addScanningRecord");
         Request request = new Request.Builder()
                 .addHeader("cookie", getSession())
                 .url(mUrl)
@@ -1407,11 +1410,11 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_addScanningRecord --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
-                Log.e("run_addScanningRecord --> onResponse", result);
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 mHandler.sendMessage(msg);
             }
@@ -1432,18 +1435,18 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
         String strCaseId = null;
         switch (curViewFlag) {
             case '1':
-                mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
                 strCaseId = "12";
                 break;
             case '2':
-                mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
                 strCaseId = "14";
                 break;
             case '3': // 箱子扫码
-                mUrl = Consts.getURL("materialBinningRecord/findList3ByParam");
+                mUrl = getURL("materialBinningRecord/findList3ByParam");
                 barcode = boxBarcode;
                 strCaseId = "";
                 break;
@@ -1499,7 +1502,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
+        String mUrl = getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
                 .add("fbillType", "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
                 .add("strFbillno", strFbillno.toString())
@@ -1523,12 +1526,12 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_findInStockSum --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC3);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC3, result);
-                Log.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -1539,7 +1542,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
      */
     private void run_findDeliOrderByProdOrder(String strOrderNo, String strOrderEntryId) {
         showLoadDialog("加载中...");
-        String mUrl = mUrl = Consts.getURL("findDeliOrderByProdOrder");;
+        String mUrl = mUrl = getURL("findDeliOrderByProdOrder");;
         FormBody formBody = new FormBody.Builder()
                 .add("strOrderNo", strOrderNo)
                 .add("strOrderEntryId", strOrderEntryId)
@@ -1562,13 +1565,13 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC4, result);
                     mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC4, result);
-                Log.e("run_smGetDatas --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -1579,7 +1582,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
      */
     private void run_submitAndPass() {
         showLoadDialog("正在审核...");
-        String mUrl = Consts.getURL("scanningRecord/submitAndPass");
+        String mUrl = getURL("scanningRecord/submitAndPass");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("fbillNo", k3Number)
@@ -1605,13 +1608,13 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("run_submitAndPass --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNPASS, result);
                     mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_submitAndPass --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

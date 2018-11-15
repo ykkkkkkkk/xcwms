@@ -1077,7 +1077,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                 .add("strJson", mJson)
                 .build();
 
-        String mUrl = Consts.getURL("addScanningRecord");
+        String mUrl = getURL("addScanningRecord");
         Request request = new Request.Builder()
                 .addHeader("cookie", getSession())
                 .url(mUrl)
@@ -1119,18 +1119,18 @@ public class Sal_OutFragment1 extends BaseFragment {
         String strCaseId = null;
         switch (curViewFlag) {
             case '1':
-                mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockBarcode;
                 isStockLong = false;
                 strCaseId = "12";
                 break;
             case '2':
-                mUrl = Consts.getURL("barCodeTable/findBarcode4ByParam");
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = stockPBarcode;
                 strCaseId = "14";
                 break;
             case '3': // 销售订单扫码
-                mUrl = Consts.getURL("barCodeTable/findBarcode3ByParam");
+                mUrl = getURL("barCodeTable/findBarcode3ByParam");
                 barcode = mtlBarcode;
                 strCaseId = "32";
                 break;
@@ -1185,7 +1185,7 @@ public class Sal_OutFragment1 extends BaseFragment {
                 strEntryId.append(sr2.getEntryId() + ",");
             }
         }
-        String mUrl = Consts.getURL("scanningRecord/findInStockSum");
+        String mUrl = getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
                 .add("fbillType", "4") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库
                 .add("strFbillno", strFbillno.toString())
@@ -1225,7 +1225,7 @@ public class Sal_OutFragment1 extends BaseFragment {
      */
     private void run_submitAndPass() {
         showLoadDialog("正在审核...");
-        String mUrl = Consts.getURL("scanningRecord/submitAndPass");
+        String mUrl = getURL("scanningRecord/submitAndPass");
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("fbillNo", k3Number)

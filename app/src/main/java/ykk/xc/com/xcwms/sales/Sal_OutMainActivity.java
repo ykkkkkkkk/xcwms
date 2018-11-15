@@ -81,7 +81,8 @@ public class Sal_OutMainActivity extends BaseActivity {
     public boolean isKeyboard; // 是否使用软键盘
     private IFragmentExec fragment2Exec;
     private List<Map<String, Object>> listMaps = new ArrayList<>();
-    private boolean isConnected, isPair; // 蓝牙是否连接标识
+    private boolean isConnected; // 蓝牙是否连接标识
+//    private boolean isPair; // 蓝牙是否打印了
     private int tabFlag;
     private int id = 0; // 设备id
     private ThreadPool threadPool;
@@ -294,7 +295,7 @@ public class Sal_OutMainActivity extends BaseActivity {
             }
         }
         setBoxListFormat3();
-//        fragment2Exec.onFragmenExec();
+        fragment2Exec.onFragmenExec();
     }
 
     /**
@@ -602,7 +603,7 @@ public class Sal_OutMainActivity extends BaseActivity {
             /*蓝牙连接*/
             case Constant.BLUETOOTH_REQUEST_CODE: {
                 if (resultCode == RESULT_OK) {
-                    isPair = true;
+//                    isPair = true;
                     /*获取蓝牙mac地址*/
                     String macAddress = data.getStringExtra(BluetoothDeviceListDialog.EXTRA_DEVICE_ADDRESS);
                     //初始化话DeviceConnFactoryManager
@@ -616,16 +617,16 @@ public class Sal_OutMainActivity extends BaseActivity {
                     //打开端口
                     DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 }
-                if(!isPair) {
-                    // 打开蓝牙配对页面
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
-                        }
-                    },500);
-
-                }
+//                if(!isPair) {
+//                    // 打开蓝牙配对页面
+//                    mHandler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+//                        }
+//                    },500);
+//
+//                }
                 break;
             }
         }

@@ -261,7 +261,7 @@
                     android:layout_width="86dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="销售数量\n累计入库数\n可用数量"
+                    android:text="销售数量\n累计入库"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 

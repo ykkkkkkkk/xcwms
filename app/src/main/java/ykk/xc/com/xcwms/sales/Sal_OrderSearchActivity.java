@@ -57,6 +57,8 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Sal_OrderSearchAdapter mAdapter;
     private List<SalOrder> listDatas = new ArrayList<>();
+    private int limit = 1;
+    private boolean isRefresh, isLoadMore, isNextPage;
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -79,10 +81,20 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
+                        if (m.isRefresh) {
+                            m.xRecyclerView.refreshComplete(true);
+                        } else if (m.isLoadMore) {
+                            m.xRecyclerView.loadMoreComplete(true);
+                        }
+                        m.xRecyclerView.setPullRefreshEnabled(true); // 上啦刷新开启
+                        m.xRecyclerView.setLoadingMoreEnabled(m.isNextPage);
+
                         break;
                     case UNSUCC1: // 数据加载失败！
+                        m.xRecyclerView.setLoadingMoreEnabled(false);
                         m.mAdapter.notifyDataSetChanged();
-                        m.toasts("抱歉，没有加载到数据！");
+                        String errMsg = JsonUtil.strToString((String) msg.obj);
+                        m.toasts(errMsg);
 
                         break;
                 }
@@ -111,7 +123,7 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
     @Override
     public void initData() {
         bundle();
-//        run_okhttpDatas();
+        initLoadDatas();
     }
 
     private void bundle() {
@@ -152,12 +164,33 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
         }
     }
 
+    private void initLoadDatas() {
+        limit = 1;
+        listDatas.clear();
+        run_okhttpDatas();
+    }
+
+    @Override
+    public void onRefresh() {
+        isRefresh = true;
+        isLoadMore = false;
+        initLoadDatas();
+    }
+
+    @Override
+    public void onLoadMore() {
+        isRefresh = false;
+        isLoadMore = true;
+        limit += 1;
+        run_okhttpDatas();
+    }
+
     /**
      * 通过okhttp加载数据
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findSalOrderList");
+        String mUrl = getURL("salOrder/findSalOrderList_app");
         FormBody formBody = new FormBody.Builder()
 
                 .add("fbillno", getValues(etFbillno).trim())
@@ -166,8 +199,8 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
                 .add("mtlFname", getValues(etMtlFname).trim())
                 .add("salFdateBeg", getValues(tvBegDate))
                 .add("salFdateEnd", getValues(tvEndDate))
-//                .add("limit", "10")
-//                .add("pageSize", "100")
+                .add("limit", String.valueOf(limit))
+                .add("pageSize", "30")
                 .build();
 
         Request request = new Request.Builder()
@@ -187,31 +220,18 @@ public class Sal_OrderSearchActivity extends BaseActivity implements XRecyclerVi
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("Sal_OrderSearchActivity --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
+                    Message msg = mHandler.obtainMessage(UNSUCC1, result);
+                    mHandler.sendMessage(msg);
                     return;
                 }
+                isNextPage = JsonUtil.isNextPage(result, limit);
+
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Sal_OrderSearchActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
-    }
-
-    @Override
-    public void onRefresh() {
-//        isRefresh = true;
-//        isLoadMore = false;
-//        page = 1;
-//        initData();
-    }
-
-    @Override
-    public void onLoadMore() {
-//        isRefresh = false;
-//        isLoadMore = true;
-//        page += 1;
-//        initData();
     }
 
     @Override

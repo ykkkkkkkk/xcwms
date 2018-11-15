@@ -157,7 +157,7 @@ public class Express_DialogActivity extends BaseDialogActivity implements XRecyc
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("findExpressCompanyByParam");
+        String mUrl = getURL("findExpressCompanyByParam");
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", getValues(etSearch).trim())
                 .add("limit", String.valueOf(limit))

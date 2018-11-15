@@ -41,8 +41,8 @@ public class IDownloadPresenter implements IDownloadContract.Presenter {
      * 模拟网络下载
      */
     @Override
-    public void downApk(Context context) {
-        final String url = Consts.getApkURL();
+    public void downApk(Context context, final String url) {
+//        final String url = Consts.getApkURL();
         if (conn == null)
             conn = new ServiceConnection() {
                 @Override
@@ -74,7 +74,7 @@ public class IDownloadPresenter implements IDownloadContract.Presenter {
 
                 @Override
                 public void onServiceDisconnected(ComponentName name) {
-                    //意味中断，较小发生，酌情处理
+                    //意外中断，较小发生，酌情处理
                 }
             };
         Intent intent = new Intent(context,DownloadService.class);

@@ -287,21 +287,21 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
         switch (smType) {
             case 1: // 生产订单号
                 fbillno = barcode;
-                mUrl = Consts.getURL("bigPrint");
+                mUrl = getURL("bigPrint");
                 break;
             case 2: // 生产顺序号
                 prodSeqNumber = barcode;
-                mUrl = Consts.getURL("bigPrint");
+                mUrl = getURL("bigPrint");
                 break;
             case 3: // 生产装箱清单
                 boxBarCode = barcode;
                 caseId = String.valueOf(context.caseId);
-                mUrl = Consts.getURL("boxBarCode/findBarcode");
+                mUrl = getURL("boxBarCode/findBarcode");
                 break;
             case 4: // 复核装箱清单
                 boxBarCode = barcode;
                 caseId = String.valueOf(context.caseId);
-                mUrl = Consts.getURL("boxBarCode/findBarcode");
+                mUrl = getURL("boxBarCode/findBarcode");
                 break;
         }
         FormBody formBody = new FormBody.Builder()

@@ -43,7 +43,8 @@ public class Sal_OrderSearchAdapter extends BaseArrayRecyclerAdapter<SalOrder> {
         tv3.setText(entity.getCustName());
         tv4.setText(entity.getSalOrgName()+"\n"+entity.getInventoryOrgName());
         tv5.setText(entity.getSalDate());
-        tv6.setText(df.format(entity.getSalFqty())+""+entity.getMtlUnitName()+"\n"+df.format(entity.getSalFstockoutqty())+"/"+df.format(entity.getSalFcanoutqty()));
+//        tv6.setText(df.format(entity.getSalFqty())+""+entity.getMtlUnitName()+"\n"+df.format(entity.getSalFstockoutqty())+"/"+df.format(entity.getSalFcanoutqty()));
+        tv6.setText(df.format(entity.getSalFqty())+""+entity.getMtlUnitName()+"\n"+df.format(entity.getSalFstockoutqty()));
         tv7.setText(entity.getMtlFnumber()+"\n"+entity.getMtlFname());
     }
 

@@ -204,7 +204,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = Consts.getURL("pickingList/findAll2");
+        String mUrl = getURL("pickingList/findAll2");
         FormBody formBody = new FormBody.Builder()
                 .add("pickingListNo_fbillno", getValues(etSearch).trim())
                 .add("pickingType", pickingType)
@@ -229,6 +229,7 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                Log.e("Sal_SelOrderActivity --> onResponse", result);
                 if(!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
@@ -236,7 +237,6 @@ public class Sal_SelPickingListActivity extends BaseActivity implements XRecycle
                 isNextPage = JsonUtil.isNextPage(result, limit);
 
                 Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Sal_SelOrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
