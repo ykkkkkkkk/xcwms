@@ -61,6 +61,7 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ScanningRecordTok3;
 import ykk.xc.com.xcwms.model.ShrinkOrder;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
@@ -1054,6 +1055,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 sr2.setPoFbillno(deliOrder.getFbillno());
                 sr2.setSalOrderNo(deliOrder.getSalOrderNo());
                 sr2.setSalOrderNoEntryId(deliOrder.getSalOrderEntryId());
+                sr2.setFprice(deliOrder.getFprice());
 //            sr2.setBatchno(deliOrder.getBatchCode());
 //            sr2.setSequenceNo(deliOrder.getSnCode());
 //            sr2.setBarcode(deliOrder.getBarcode());
@@ -1123,6 +1125,19 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 expressCompany.setUniquenessId(deliveryCompanyId);
                 expressCompany.setExpressNumber(deliveryCompanyNumber);
                 expressCompany.setExpressName(deliveryCompanyName);
+
+                ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
+                srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
+                srTok3.setCustomerService(deliOrder.getCustomerService());
+                srTok3.setFreceive(deliOrder.getFreceive());
+                srTok3.setFreceivetel(deliOrder.getFreceivetel());
+                srTok3.setFconsignee(deliOrder.getFconsignee());
+                srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
+                srTok3.setSalerNumber(deliOrder.getSalerNumber());
+                srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
+                srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
+                srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
+                sr2.setSrTok3(srTok3);
 
                 checkDatas.add(sr2);
             }
@@ -1195,6 +1210,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             sr2.setFqty(mbr.getRelationBillFQTY());
             sr2.setPoFmustqty(mbr.getRelationBillFQTY());
             sr2.setStockqty(mbr.getNumber());
+            sr2.setFprice(deliOrder.getFprice());
             // 发货组织
             if(deliOrder.getDeliOrgId() > 0) {
                 if(receiveOrg == null) receiveOrg = new Organization();
@@ -1245,6 +1261,19 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             expressCompany.setUniquenessId(deliveryCompanyId);
             expressCompany.setExpressNumber(deliveryCompanyNumber);
             expressCompany.setExpressName(deliveryCompanyName);
+
+            ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
+            srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
+            srTok3.setCustomerService(deliOrder.getCustomerService());
+            srTok3.setFreceive(deliOrder.getFreceive());
+            srTok3.setFreceivetel(deliOrder.getFreceivetel());
+            srTok3.setFconsignee(deliOrder.getFconsignee());
+            srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
+            srTok3.setSalerNumber(deliOrder.getSalerNumber());
+            srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
+            srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
+            srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
+            sr2.setSrTok3(srTok3);
 
             checkDatas.add(sr2);
         }
@@ -1354,6 +1383,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setEntryId(sr2.getEntryId());
             record.setPoFbillno(sr2.getPoFbillno());
             record.setPoFmustqty(sr2.getPoFmustqty());
+            record.setFprice(sr2.getFprice());
 
             if (department != null) {
                 record.setDepartmentK3Id(department.getFitemID());
@@ -1378,11 +1408,13 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setfRuleId(sr2.getfRuleId());
             record.setFsTableName(sr2.getFsTableName());
             record.setFcarriageNo(getValues(etExpressNo).trim());
+            record.setSalOrderNo(sr2.getSalOrderNo());
             if(expressCompany != null) {
                 record.setExpressNumber(expressCompany.getExpressNumber());
             }
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
+            record.setSrTok3(sr2.getSrTok3());
 
             list.add(record);
         }

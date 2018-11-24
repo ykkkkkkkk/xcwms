@@ -61,11 +61,13 @@ public class ScanningRecord implements Serializable {
     private int salOrderId; // 销售订单id
     private String salOrderNo; // 销售订单号
     private int salOrderEntryId; // 销售订单分录id
+    private double fprice; // 来源订单单价
     // 临时变量
     private List<String> listBarcode; // 记录每行中扫的条码barcode
     private String strBarcodes; // 用逗号拼接的条码号
     private String kdAccount; // k3 用户的密码
     private String kdAccountPassword; // k3 用户的密码
+    private ScanningRecordTok3 srTok3; // 提交到k3的字段
 
     public int getId() {
         return id;
@@ -76,7 +78,7 @@ public class ScanningRecord implements Serializable {
     public int getSourceId() {
         return sourceId;
     }
-    public void setSourceId(int source_Id) {
+    public void setSourceId(int sourceId) {
         this.sourceId = sourceId;
     }
     public int getSourceK3Id() {
@@ -389,6 +391,18 @@ public class ScanningRecord implements Serializable {
     }
     public void setSalOrderEntryId(int salOrderEntryId) {
         this.salOrderEntryId = salOrderEntryId;
+    }
+    public double getFprice() {
+        return fprice;
+    }
+    public void setFprice(double fprice) {
+        this.fprice = fprice;
+    }
+    public ScanningRecordTok3 getSrTok3() {
+        return srTok3;
+    }
+    public void setSrTok3(ScanningRecordTok3 srTok3) {
+        this.srTok3 = srTok3;
     }
 
     public ScanningRecord() {

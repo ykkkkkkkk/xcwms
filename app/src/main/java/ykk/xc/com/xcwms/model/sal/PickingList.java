@@ -59,6 +59,8 @@ public class PickingList implements Serializable {
     private String deliveryCompanyNumber;
     /*物流公司名称*/
     private String deliveryCompanyName;
+    /* 来源单价 */
+    private double fprice;
     private int isCheck; // 新加的，用于前台临时用判断是否选中
     private Stock stock;
     private StockPosition stockPosition;
@@ -453,5 +455,11 @@ public class PickingList implements Serializable {
         this.salOrgName = salOrgName;
     }
 
+    public double getFprice() {
+        return fprice;
+    }
 
+    public void setFprice(double fprice) {
+        this.fprice = fprice;
+    }
 }

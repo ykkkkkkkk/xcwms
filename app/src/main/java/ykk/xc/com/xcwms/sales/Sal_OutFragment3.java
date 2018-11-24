@@ -517,6 +517,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setUnitFnumber(pl.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(pl.getfId());
             sr2.setPoFbillno(pl.getFbillno());
+            sr2.setFprice(pl.getFprice());
 //            sr2.setBatchno(pl.getBatchCode());
 //            sr2.setSequenceNo(pl.getSnCode());
             sr2.setBarcode(pl.getBarcode());
@@ -647,6 +648,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             record.setEntryId(sr2.getEntryId());
             record.setPoFbillno(sr2.getPoFbillno());
             record.setPoFmustqty(sr2.getPoFmustqty());
+            record.setFprice(sr2.getFprice());
 
             if (department != null) {
                 record.setDepartmentK3Id(department.getFitemID());

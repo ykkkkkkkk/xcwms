@@ -33,6 +33,10 @@ public class DeliOrder implements Serializable{
 	private Stock stock; // 出货仓库
 	private double deliFqty; // 销售数量
 	private double deliFremainoutqty; // 未出库数量
+	/*单价*/
+	private double fprice;
+	/*金额*/
+	private double famount;
 	private String deliveryWay; // 发货方式
 	/*对应k3单据分录号字段*/
 	private int entryId;
@@ -65,6 +69,35 @@ public class DeliOrder implements Serializable{
 	private String high;
 	/*出库类型*/
 	private String exitType;
+
+	/*出库类型代码*/
+	private String exitTypeNumber;
+	/*客服*/
+	private String customerService;
+	/*收货人电话*/
+	private String freceivetel;
+	/*收货地址*/
+	private String freceive;
+	/*收货人*/
+	private String fconsignee;
+	/*运输方式代码*/
+	private String deliverWayNumber;
+	/*运输方式名称*/
+	private String deliverWayName;
+	/*销售员代码*/
+	private String salerNumber;
+	/*销售员名称*/
+	private String salerName;
+	/*摘要*/
+	private String summary;
+	/*承运商代码*/
+	private String carrierNumber;
+	/*承运商名称*/
+	private String carrierName;
+	/*销售部门代码*/
+	private String saleDeptNumber;
+	/*销售部门名称*/
+	private String saleDeptName;
 
 	public DeliOrder() {
 		super();
@@ -388,5 +421,133 @@ public class DeliOrder implements Serializable{
 
 	public void setExitType(String exitType) {
 		this.exitType = exitType;
+	}
+
+	public double getFprice() {
+		return fprice;
+	}
+
+	public void setFprice(double fprice) {
+		this.fprice = fprice;
+	}
+
+	public double getFamount() {
+		return famount;
+	}
+
+	public void setFamount(double famount) {
+		this.famount = famount;
+	}
+
+	public String getExitTypeNumber() {
+		return exitTypeNumber;
+	}
+
+	public void setExitTypeNumber(String exitTypeNumber) {
+		this.exitTypeNumber = exitTypeNumber;
+	}
+
+	public String getCustomerService() {
+		return customerService;
+	}
+
+	public void setCustomerService(String customerService) {
+		this.customerService = customerService;
+	}
+
+	public String getFreceivetel() {
+		return freceivetel;
+	}
+
+	public void setFreceivetel(String freceivetel) {
+		this.freceivetel = freceivetel;
+	}
+
+	public String getFreceive() {
+		return freceive;
+	}
+
+	public void setFreceive(String freceive) {
+		this.freceive = freceive;
+	}
+
+	public String getFconsignee() {
+		return fconsignee;
+	}
+
+	public void setFconsignee(String fconsignee) {
+		this.fconsignee = fconsignee;
+	}
+
+	public String getDeliverWayNumber() {
+		return deliverWayNumber;
+	}
+
+	public void setDeliverWayNumber(String deliverWayNumber) {
+		this.deliverWayNumber = deliverWayNumber;
+	}
+
+	public String getDeliverWayName() {
+		return deliverWayName;
+	}
+
+	public void setDeliverWayName(String deliverWayName) {
+		this.deliverWayName = deliverWayName;
+	}
+
+	public String getSalerNumber() {
+		return salerNumber;
+	}
+
+	public void setSalerNumber(String salerNumber) {
+		this.salerNumber = salerNumber;
+	}
+
+	public String getSalerName() {
+		return salerName;
+	}
+
+	public void setSalerName(String salerName) {
+		this.salerName = salerName;
+	}
+
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public String getCarrierNumber() {
+		return carrierNumber;
+	}
+
+	public void setCarrierNumber(String carrierNumber) {
+		this.carrierNumber = carrierNumber;
+	}
+
+	public String getCarrierName() {
+		return carrierName;
+	}
+
+	public void setCarrierName(String carrierName) {
+		this.carrierName = carrierName;
+	}
+
+	public String getSaleDeptNumber() {
+		return saleDeptNumber;
+	}
+
+	public void setSaleDeptNumber(String saleDeptNumber) {
+		this.saleDeptNumber = saleDeptNumber;
+	}
+
+	public String getSaleDeptName() {
+		return saleDeptName;
+	}
+
+	public void setSaleDeptName(String saleDeptName) {
+		this.saleDeptName = saleDeptName;
 	}
 }
