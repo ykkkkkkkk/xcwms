@@ -77,6 +77,8 @@ public class ProdOrder implements Serializable {
 	private String mtlBigClass;
 	/*销售订单交货方式*/
 	private String deliveryWay;
+	/*订单套数*/
+	private int coveQty;
 
 
 	private int isCheck; // 新加的是否选中
@@ -435,6 +437,14 @@ public class ProdOrder implements Serializable {
 
 	public void setDeliveryWay(String deliveryWay) {
 		this.deliveryWay = deliveryWay;
+	}
+
+	public int getCoveQty() {
+		return coveQty;
+	}
+
+	public void setCoveQty(int coveQty) {
+		this.coveQty = coveQty;
 	}
 
 	public int getIsCheck() {

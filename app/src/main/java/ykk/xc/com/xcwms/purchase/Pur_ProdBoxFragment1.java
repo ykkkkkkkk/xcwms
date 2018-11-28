@@ -30,6 +30,7 @@ import com.solidfire.gson.JsonObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,7 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment1Adapter;
+import ykk.xc.com.xcwms.util.BigdecimalUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 /**
  * 生产装箱--无批次
@@ -835,6 +837,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             }
             mbr.setStrBarcodes("");
             mbr.setRelationObj(JsonUtil.objectToString(prodOrder));
+            mbr.setCoveQty(prodOrder.getCoveQty());
 
             checkDatas.add(mbr);
         }
@@ -861,7 +864,13 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             if (bt.getMaterialId() == mtl.getfMaterialId()) {
                 isFlag = true;
 
-                double fqty = 1;
+                int coveQty = mbr.getCoveQty();
+                if(coveQty == 0) {
+                    Comm.showWarnDialog(mContext,"k3的生产订单中，未填写套数！");
+                    return;
+                }
+                double fqty = BigdecimalUtil.div(mbr.getRelationBillFQTY(), coveQty);
+//                double fqty = mbr.getRelationBillFQTY() / coveQty;
                 // 计量单位数量
                 if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
@@ -919,7 +928,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     mbr.setSnCode(bt.getSnCode());
                     mbr.setListBarcode(list);
                     mbr.setStrBarcodes(sb.toString());
-                    mbr.setNumber(mbr.getNumber() + 1);
+                    mbr.setNumber(mbr.getNumber() + fqty);
                 }
                 // 汇总数量
                 double sum = 0;

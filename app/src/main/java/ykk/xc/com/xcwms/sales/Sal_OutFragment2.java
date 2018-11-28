@@ -1126,6 +1126,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 expressCompany.setExpressNumber(deliveryCompanyNumber);
                 expressCompany.setExpressName(deliveryCompanyName);
 
+                sr2.setLeafNumber(deliOrder.getLeaf());
+                sr2.setLeafNumber2(deliOrder.getLeaf1());
+
                 ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
                 srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
                 srTok3.setCustomerService(deliOrder.getCustomerService());
@@ -1261,6 +1264,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             expressCompany.setUniquenessId(deliveryCompanyId);
             expressCompany.setExpressNumber(deliveryCompanyNumber);
             expressCompany.setExpressName(deliveryCompanyName);
+
+            sr2.setLeafNumber(deliOrder.getLeaf());
+            sr2.setLeafNumber2(deliOrder.getLeaf1());
 
             ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
             srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
@@ -1415,6 +1421,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
             record.setSrTok3(sr2.getSrTok3());
+            record.setLeafNumber(sr2.getLeafNumber());
+            record.setLeafNumber2(sr2.getLeafNumber2());
 
             list.add(record);
         }

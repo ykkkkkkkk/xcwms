@@ -100,6 +100,8 @@ public class MaterialBinningRecord implements Serializable {
 	private String mtlBigClass;
 	private List<String> listBarcode; // 记录每行中扫的条码barcode
 	private String strBarcodes; // 用逗号拼接的条码号
+	/*订单套数*/
+	private int coveQty;
 
 	public MaterialBinningRecord() {
 		super();
@@ -391,6 +393,14 @@ public class MaterialBinningRecord implements Serializable {
 
 	public void setStrBarcodes(String strBarcodes) {
 		this.strBarcodes = strBarcodes;
+	}
+
+	public int getCoveQty() {
+		return coveQty;
+	}
+
+	public void setCoveQty(int coveQty) {
+		this.coveQty = coveQty;
 	}
 
 }

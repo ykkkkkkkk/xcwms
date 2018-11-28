@@ -1258,7 +1258,6 @@ public class Pur_InFragment2 extends BaseFragment {
         }
 
         String mJson = JsonUtil.objectToString(list);
-        RequestBody body = RequestBody.create(Consts.JSON, mJson);
         FormBody formBody = new FormBody.Builder()
                 .add("strJson", mJson)
                 .build();
