@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -33,30 +33,25 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_SelProdOrderAdapter;
+import ykk.xc.com.xcwms.produce.adapter.Pur_SelProdOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
-public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerView.LoadingListener {
+public class Prod_SelOrder2Activity extends BaseActivity implements XRecyclerView.LoadingListener {
 
-    @BindView(R.id.tv_custInfo)
-    TextView tvCustInfo;
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
     @BindView(R.id.et_search)
     EditText etSearch;
 
-    private Pur_SelProdOrderActivity context = this;
+    private Prod_SelOrder2Activity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
-    private Department department; // 生产车间
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Pur_SelProdOrderAdapter mAdapter;
     private List<ProdOrder> listDatas = new ArrayList<>();
-    private String fbillno; // 单号
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
 
@@ -64,14 +59,14 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
     private MyHandler mHandler = new MyHandler(this);
 
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_SelProdOrderActivity> mActivity;
+        private final WeakReference<Prod_SelOrder2Activity> mActivity;
 
-        public MyHandler(Pur_SelProdOrderActivity activity) {
-            mActivity = new WeakReference<Pur_SelProdOrderActivity>(activity);
+        public MyHandler(Prod_SelOrder2Activity activity) {
+            mActivity = new WeakReference<Prod_SelOrder2Activity>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_SelProdOrderActivity m = mActivity.get();
+            Prod_SelOrder2Activity m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -101,7 +96,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_sel_prod_order;
+        return R.layout.prod_sel_order2;
     }
 
     @Override
@@ -119,15 +114,10 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
             @Override
             public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
                 ProdOrder m = listDatas.get(pos-1);
-                if(m.getMtl().getIsBatchManager() == 1) { // 启用了批次号，要输入
-                    inputBatchDialog(m);
-                } else {
-                    Intent intent = new Intent();
-                    intent.putExtra("obj", m);
-                    intent.putExtra("batch", "");
-                    context.setResult(RESULT_OK, intent);
-                    context.finish();
-                }
+                Intent intent = new Intent();
+                intent.putExtra("obj", m);
+                context.setResult(RESULT_OK, intent);
+                context.finish();
             }
         });
     }
@@ -141,10 +131,7 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
     private void bundle() {
         Bundle bundle = context.getIntent().getExtras();
         if (bundle != null) {
-            fbillno = bundle.getString("fbillno","");
-            setTexts(etSearch, fbillno);
-            department = (Department) bundle.getSerializable("department");
-            tvCustInfo.setText("生产车间：" + department.getDepartmentName());
+
         }
     }
 
@@ -221,8 +208,8 @@ public class Pur_SelProdOrderActivity extends BaseActivity implements XRecyclerV
         String mUrl = getURL("findProdOrderList");
         FormBody formBody = new FormBody.Builder()
                 .add("fbillno", getValues(etSearch).trim())
-                .add("deptId", String.valueOf(department.getFitemID()))
-                .add("isDefaultStock", "1") // 查询默认仓库和库位
+//                .add("deptId", String.valueOf(department.getFitemID()))
+//                .add("isDefaultStock", "1") // 查询默认仓库和库位
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();

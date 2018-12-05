@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 
 import android.app.Activity;
@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.Box;
 import ykk.xc.com.xcwms.model.BoxBarCode;
@@ -51,7 +49,7 @@ import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.SecurityCode;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment2Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Pur_ProdBoxFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 import static android.app.Activity.RESULT_OK;
@@ -59,7 +57,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * 生产装箱--有批次
  */
-public class Pur_ProdBoxFragment2 extends BaseFragment {
+public class Prod_BoxFragment2 extends BaseFragment {
 
     @BindView(R.id.tv_deptSel)
     TextView tvDeptSel;
@@ -80,10 +78,10 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
     @BindView(R.id.tv_countInfo)
     TextView tvCountInfo; // 合计的信息  记录箱数，件数
 
-    public Pur_ProdBoxFragment2() {
+    public Prod_BoxFragment2() {
     }
 
-    private Pur_ProdBoxFragment2 mFragment = this;
+    private Prod_BoxFragment2 mFragment = this;
     private static final int SEL_DEPT = 10, SEL_ORDER = 11, SEL_BOX = 12, SEL_CUST = 13, SEL_DELI = 14;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SAVE = 202, UNSAVE = 502;
     private static final int CODE1 = 1, CODE2 = 2;
@@ -104,14 +102,14 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
     // 消息处理
     private MyHandler mHandler = new MyHandler(mFragment);
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_ProdBoxFragment2> mFrag;
+        private final WeakReference<Prod_BoxFragment2> mFrag;
 
-        public MyHandler(Pur_ProdBoxFragment2 activity) {
-            mFrag = new WeakReference<Pur_ProdBoxFragment2>(activity);
+        public MyHandler(Prod_BoxFragment2 activity) {
+            mFrag = new WeakReference<Prod_BoxFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_ProdBoxFragment2 m = mFrag.get();
+            Prod_BoxFragment2 m = mFrag.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -157,7 +155,7 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_box_fragment2, container, false);
+        return inflater.inflate(R.layout.prod_box_fragment2, container, false);
     }
 
     @Override
@@ -197,7 +195,7 @@ public class Pur_ProdBoxFragment2 extends BaseFragment {
                 Bundle bundle = new Bundle();
                 bundle.putString("fbillno", getValues(tvSourceNo));
                 bundle.putSerializable("department", department);
-                showForResult(Pur_SelProdOrderActivity.class, SEL_ORDER, bundle);
+                showForResult(Prod_SelOrderActivity.class, SEL_ORDER, bundle);
 
                 break;
             case R.id.tv_boxSel: // 选择包装箱

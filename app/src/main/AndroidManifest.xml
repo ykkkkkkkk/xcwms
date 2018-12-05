@@ -133,14 +133,24 @@
             android:name=".purchase.Pur_OrderSearchActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
+        <!--  生产模块 -->
         <activity
-            android:name=".purchase.Pur_ProdBoxMainActivity"
+            android:name=".produce.Prod_BoxMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Pur_SelProdOrderActivity"
+            android:name=".produce.Prod_SelOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".purchase.Prod_InMainActivity"
+            android:name=".produce.Prod_SelOrder2Activity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".produce.Prod_InMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".produce.Prod_ProcessSearchActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".produce.Prod_ProcedureReportActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
 
@@ -173,6 +183,7 @@
             android:name=".sales.Sal_RecombinationActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
+        <activity android:name=".util.ImageLoadActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".entrance.MainTabFragmentActivity" />
         <activity android:name=".LoadMoreActivity" />

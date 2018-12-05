@@ -98,10 +98,11 @@ public class MaterialBinningRecord implements Serializable {
 	private int salOrderNoEntryId;
 	/* 物料大类：成品 */
 	private String mtlBigClass;
+
+	// 临时字段
 	private List<String> listBarcode; // 记录每行中扫的条码barcode
 	private String strBarcodes; // 用逗号拼接的条码号
-	/*订单套数*/
-	private int coveQty;
+	private int coveQty;  // 订单套数
 
 	public MaterialBinningRecord() {
 		super();

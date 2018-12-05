@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase.adapter;
+package ykk.xc.com.xcwms.produce.adapter;
 
 import android.app.Activity;
 import android.text.Html;
@@ -13,19 +13,19 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
+public class Prod_InFragment1Adapter extends BaseArrayRecyclerAdapter<ScanningRecord2> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Prod_InFragment2Adapter(Activity context, List<ScanningRecord2> datas) {
+    public Prod_InFragment1Adapter(Activity context, List<ScanningRecord2> datas) {
         super(datas);
         this.context = context;
     }
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_prod_in_fragment2_item;
+        return R.layout.prod_in_fragment1_item;
     }
 
     @Override
@@ -54,8 +54,8 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
         seqNo = seqNo.length() == 0 ? "无" : seqNo;
         tv_batch_seqNo.setText(batchNo+"\n"+seqNo);
         double stockqty = entity.getStockqty();
-//        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+(stockqty > 0 ? df.format(stockqty) : "")+"</font>"));
-        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"<br><font color='#009900'>"+df.format(stockqty)+"</font>"));
+//        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"/<font color='#FF4400'>"+entity.getCoveQty()+"</font><br><font color='#009900'>"+df.format(stockqty)+"</font>"));
+        tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"/<font color='#FF4400'>"+entity.getCoveQty()+"</font><br><font color='#009900'>"+df.format(stockqty)+"</font>"));
         if(entity.getStockPos() != null) {
             tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPos().getFnumber());
         } else {

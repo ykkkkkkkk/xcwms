@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -59,7 +59,7 @@ import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Prod_InFragment1Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_InFragment1Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 public class Prod_InFragment1 extends BaseFragment {
@@ -245,7 +245,7 @@ public class Prod_InFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_in_fragment1, container, false);
+        return inflater.inflate(R.layout.prod_in_fragment1, container, false);
     }
 
     @Override
@@ -807,6 +807,7 @@ public class Prod_InFragment1 extends BaseFragment {
         sr2.setPoFbillno(prodOrder.getFbillno());
         sr2.setPoFmustqty(prodOrder.getProdFqty());
         sr2.setBarcode(bt.getBarcode());
+        sr2.setCoveQty(prodOrder.getCoveQty());
 
         checkDatas.add(sr2);
         mAdapter.notifyDataSetChanged();

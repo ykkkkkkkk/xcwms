@@ -1128,6 +1128,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 
                 sr2.setLeafNumber(deliOrder.getLeaf());
                 sr2.setLeafNumber2(deliOrder.getLeaf1());
+                sr2.setCoveQty(deliOrder.getCoveQty());
 
                 ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
                 srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
@@ -1267,6 +1268,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 
             sr2.setLeafNumber(deliOrder.getLeaf());
             sr2.setLeafNumber2(deliOrder.getLeaf1());
+            sr2.setCoveQty(deliOrder.getCoveQty());
 
             ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
             srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
@@ -1423,6 +1425,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setSrTok3(sr2.getSrTok3());
             record.setLeafNumber(sr2.getLeafNumber());
             record.setLeafNumber2(sr2.getLeafNumber2());
+            record.setCoveQty(sr2.getCoveQty());
 
             list.add(record);
         }

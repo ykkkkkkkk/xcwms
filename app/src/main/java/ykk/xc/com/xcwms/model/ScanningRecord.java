@@ -70,6 +70,8 @@ public class ScanningRecord implements Serializable {
     private String kdAccount; // k3 用户的密码
     private String kdAccountPassword; // k3 用户的密码
     private ScanningRecordTok3 srTok3; // 提交到k3的字段
+    /*订单套数*/
+    private int coveQty;
 
     public int getId() {
         return id;
@@ -417,6 +419,12 @@ public class ScanningRecord implements Serializable {
     }
     public void setLeafNumber2(String leafNumber2) {
         this.leafNumber2 = leafNumber2;
+    }
+    public int getCoveQty() {
+        return coveQty;
+    }
+    public void setCoveQty(int coveQty) {
+        this.coveQty = coveQty;
     }
 
     public ScanningRecord() {

@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -62,7 +62,7 @@ import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Prod_InFragment2Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_InFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 public class Prod_InFragment2 extends BaseFragment {
@@ -198,6 +198,9 @@ public class Prod_InFragment2 extends BaseFragment {
                     case UNSUCC2:
                         m.mHandler.sendEmptyMessageDelayed(CODE20, 200);
                         errMsg = JsonUtil.strToString((String) msg.obj);
+                        if(m.isNULLS(errMsg).length() == 0) {
+                            errMsg = "很抱歉，没有找到数据！";
+                        }
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
@@ -251,7 +254,7 @@ public class Prod_InFragment2 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_in_fragment2, container, false);
+        return inflater.inflate(R.layout.prod_in_fragment2, container, false);
     }
 
     @Override
@@ -745,6 +748,7 @@ public class Prod_InFragment2 extends BaseFragment {
             sr2.setSalOrderId(prodOrder.getSalOrderId());
             sr2.setSalOrderNo(prodOrder.getSalOrderNo());
             sr2.setSalOrderNoEntryId(prodOrder.getSalOrderEntryId());
+            sr2.setCoveQty(prodOrder.getCoveQty());
             // 入库组织
             if(inOrg == null) inOrg = new Organization();
             inOrg.setFpkId(prodOrder.getProdOrgId());
@@ -890,6 +894,7 @@ public class Prod_InFragment2 extends BaseFragment {
             record.setSalOrderId(sr2.getSalOrderId());
             record.setSalOrderNo(sr2.getSalOrderNo());
             record.setSalOrderEntryId(sr2.getSalOrderNoEntryId());
+            record.setCoveQty(sr2.getCoveQty());
 
             list.add(record);
         }

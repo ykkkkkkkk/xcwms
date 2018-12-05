@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase.adapter;
+package ykk.xc.com.xcwms.produce.adapter;
 
 import android.app.Activity;
 import android.widget.TextView;
@@ -22,7 +22,7 @@ public class Pur_ProdBoxFragment2Adapter extends BaseArrayRecyclerAdapter<Materi
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_prod_box_fragment2_item;
+        return R.layout.prod_box_fragment2_item;
     }
 
     @Override

@@ -1,7 +1,6 @@
-package ykk.xc.com.xcwms.purchase.adapter;
+package ykk.xc.com.xcwms.produce.adapter;
 
 import android.app.Activity;
-import android.view.View;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -25,7 +24,7 @@ public class Pur_SelProdOrderAdapter extends BaseArrayRecyclerAdapter<ProdOrder>
 
     @Override
     public int bindView(int viewtype) {
-        return R.layout.pur_sel_prod_order_item;
+        return R.layout.prod_sel_order_item;
     }
 
     @Override

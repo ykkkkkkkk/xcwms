@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothDevice;
@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -32,11 +31,9 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.BoxBarCode;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
@@ -51,7 +48,7 @@ import static ykk.xc.com.xcwms.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
 
-public class Pur_ProdBoxMainActivity extends BaseActivity {
+public class Prod_BoxMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View radio1;
@@ -68,7 +65,7 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
     @BindView(R.id.tv_connState)
     TextView tvConnState;
 
-    private Pur_ProdBoxMainActivity context = this;
+    private Prod_BoxMainActivity context = this;
     private View curRadio;
     private int id = 0; // 设备id
     private ThreadPool threadPool;
@@ -84,7 +81,7 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.pur_prod_box_main;
+        return R.layout.prod_box_main;
     }
 
     @Override
@@ -99,8 +96,8 @@ public class Pur_ProdBoxMainActivity extends BaseActivity {
 //        Bundle bundle2 = new Bundle();
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
-        Pur_ProdBoxFragment1 fragment1 = new Pur_ProdBoxFragment1();
-        Pur_ProdBoxFragment2 fragment2 = new Pur_ProdBoxFragment2();
+        Prod_BoxFragment1 fragment1 = new Prod_BoxFragment1();
+        Prod_BoxFragment2 fragment2 = new Prod_BoxFragment2();
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);

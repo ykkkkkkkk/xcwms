@@ -1,4 +1,4 @@
-package ykk.xc.com.xcwms.purchase;
+package ykk.xc.com.xcwms.produce;
 
 
 import android.app.Activity;
@@ -15,7 +15,6 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ import com.solidfire.gson.JsonObject;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,6 @@ import ykk.xc.com.xcwms.basics.Cust_DialogActivity;
 import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Box;
@@ -60,13 +57,13 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.purchase.adapter.Pur_ProdBoxFragment1Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Pur_ProdBoxFragment1Adapter;
 import ykk.xc.com.xcwms.util.BigdecimalUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 /**
  * 生产装箱--无批次
  */
-public class Pur_ProdBoxFragment1 extends BaseFragment {
+public class Prod_BoxFragment1 extends BaseFragment {
 
     @BindView(R.id.lin_box)
     LinearLayout linBox;
@@ -105,10 +102,10 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     @BindView(R.id.btn_end)
     Button btnEnd;
 
-    public Pur_ProdBoxFragment1() {}
+    public Prod_BoxFragment1() {}
 
-    private Pur_ProdBoxFragment1 mFragment = this;
-    private Pur_ProdBoxMainActivity parent;
+    private Prod_BoxFragment1 mFragment = this;
+    private Prod_BoxMainActivity parent;
     private Activity mContext;
     private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
@@ -124,7 +121,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     private int curPos; // 当前行
     private AssistInfo assist; // 辅助资料--生产方式
     private AlertDialog delDialog;
-    private EditText etMtlCode2;
+    private EditText etMtlCodeTmp, etMtlCode2;
     private CheckBox checkClose;
     private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
     private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
@@ -133,16 +130,16 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
 
     // 消息处理
-    private Pur_ProdBoxFragment1.MyHandler mHandler = new Pur_ProdBoxFragment1.MyHandler(this);
+    private Prod_BoxFragment1.MyHandler mHandler = new Prod_BoxFragment1.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Pur_ProdBoxFragment1> mActivity;
+        private final WeakReference<Prod_BoxFragment1> mActivity;
 
-        public MyHandler(Pur_ProdBoxFragment1 activity) {
-            mActivity = new WeakReference<Pur_ProdBoxFragment1>(activity);
+        public MyHandler(Prod_BoxFragment1 activity) {
+            mActivity = new WeakReference<Prod_BoxFragment1>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Pur_ProdBoxFragment1 m = mActivity.get();
+            Prod_BoxFragment1 m = mActivity.get();
             String errMsg = null;
             if (m != null) {
                 m.hideLoadDialog();
@@ -233,7 +230,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 m.customer = null;
                                 m.checkDatas.clear();
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#000000'>未开箱</font>"));
-                                m.tvCount.setText("数量：0");
+                                m.tvCount.setText("套数：0");
                             }
                         }
                         m.setCloseDelDialog();
@@ -260,13 +257,15 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                                 m.btnEnd.setText("开箱");
                                 break;
                         }
-                        // 去打印
-                        List<MaterialBinningRecord> list = new ArrayList<>();
-                        for(int i=0; i<m.checkDatas.size(); i++) {
-                            MaterialBinningRecord mbr = m.checkDatas.get(i);
-                            if(mbr.getNumber() > 0) list.add(mbr);
+                        if(m.status == '2') {
+                            // 去打印
+                            List<MaterialBinningRecord> list = new ArrayList<>();
+                            for(int i=0; i<m.checkDatas.size(); i++) {
+                                MaterialBinningRecord mbr = m.checkDatas.get(i);
+                                if(mbr.getNumber() > 0) list.add(mbr);
+                            }
+                            m.parent.setFragmentPrint1(0, list, m.boxBarCode);
                         }
-                        m.parent.setFragmentPrint1(0, list, m.boxBarCode);
 
                         break;
                     case UNMODIFY: // 修改状态（开箱或封箱） 失败
@@ -307,7 +306,8 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
                         break;
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
-                        m.hideSoftInputMode(m.mContext, m.etMtlCode2);
+//                        m.hideSoftInputMode(m.mContext, m.etMtlCode2);
+//                        m.setFocusable(m.etMtlCodeTmp);
                         m.setFocusable(m.etMtlCode2);
 
                         break;
@@ -318,13 +318,13 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.pur_prod_box_fragment1, container, false);
+        return inflater.inflate(R.layout.prod_box_fragment1, container, false);
     }
 
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Pur_ProdBoxMainActivity) mContext;
+        parent = (Prod_BoxMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -482,7 +482,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
 //        setEnables(tvCustSel, R.drawable.back_style_blue, true);
 //        tvDeliverSel.setText("");
 //        setEnables(tvDeliverSel, R.drawable.back_style_blue, true);
-        tvCount.setText("数量：0");
+        tvCount.setText("套数：0");
 
         curViewFlag = '1';
 
@@ -498,11 +498,13 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         View v = mContext.getLayoutInflater().inflate(R.layout.sal_box_item_del_dialog, null);
         delDialog = new AlertDialog.Builder(mContext).setView(v).create();
         // 初始化id
-        etMtlCode2 = (EditText) v.findViewById(R.id.et_mtlCode2);
-        Button btnClose = (Button) v.findViewById(R.id.btn_close);
+        etMtlCodeTmp = v.findViewById(R.id.et_mtlCodeTmp);
+        etMtlCode2 = v.findViewById(R.id.et_mtlCode2);
+        Button btnClose = v.findViewById(R.id.btn_close);
         checkClose = v.findViewById(R.id.check_close);
         checkClose.setChecked(isCloseDelDialog);
-        mHandler.sendEmptyMessageDelayed(CODE2,200);
+
+        setFocusable(etMtlCodeTmp);
 
         // 关闭
         btnClose.setOnClickListener(new View.OnClickListener() {
@@ -531,6 +533,8 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         delDialog.setCancelable(false);
         delDialog.show();
         window.setGravity(Gravity.CENTER);
+
+        mHandler.sendEmptyMessageDelayed(CODE2,500);
     }
 
     /**
@@ -540,6 +544,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
         // 如果点击了关闭窗口的复选框
         if(checkClose.isChecked()) {
             setFocusable(etMtlCode);
+            etMtlCodeTmp = null;
             etMtlCode2 = null;
             delDialog.dismiss();
             delDialog = null;
@@ -606,6 +611,23 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 run_smGetDatas(mtlBarcode);
             }
         });
+
+
+        // 下面是测试的
+//        etBoxCode.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                etBoxCode.setText("9153397260049");
+//                return true;
+//            }
+//        });
+//        etProdOrderCode.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                etProdOrderCode.setText("MO011933");
+//                return true;
+//            }
+//        });
     }
 
     @Override
@@ -714,9 +736,9 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 checkDatas.addAll(listMbr);
                 double sum = 0;
                 for(int i = 0, size = checkDatas.size(); i<size; i++) {
-                    sum += checkDatas.get(i).getNumber();
+                    sum += checkDatas.get(i).getCoveQty();
                 }
-                tvCount.setText("数量："+df.format(sum));
+                tvCount.setText("套数："+df.format(sum));
 
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
@@ -730,7 +752,7 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                 tvDeliverSel.setText(mbr.getDeliveryWay());
 
             } else {
-                tvCount.setText("数量：0");
+                tvCount.setText("套数：0");
             }
             btnEnd.setText("封箱");
             btnEnd.setVisibility(View.GONE);
@@ -842,6 +864,12 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             checkDatas.add(mbr);
         }
 
+        // 汇总数量
+        double sum = 0;
+        for(int j = 0, sizeJ = checkDatas.size(); j<sizeJ; j++) {
+            sum += checkDatas.get(j).getCoveQty();
+        }
+        tvCount.setText("套数："+ df.format(sum));
         tvDeliverSel.setText(assist.getfName());
         tvCustSel.setText("客户："+customer.getCustomerName());
         tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
@@ -864,12 +892,16 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
             if (bt.getMaterialId() == mtl.getfMaterialId()) {
                 isFlag = true;
 
+                double fqty = 0;
                 int coveQty = mbr.getCoveQty();
                 if(coveQty == 0) {
-                    Comm.showWarnDialog(mContext,"k3的生产订单中，未填写套数！");
-                    return;
+//                    Comm.showWarnDialog(mContext,"k3的生产订单中，未填写套数！");
+//                    return;
+                    fqty = 1;
+                } else {
+                    fqty = BigdecimalUtil.div(mbr.getRelationBillFQTY(), coveQty);
                 }
-                double fqty = BigdecimalUtil.div(mbr.getRelationBillFQTY(), coveQty);
+
 //                double fqty = mbr.getRelationBillFQTY() / coveQty;
                 // 计量单位数量
                 if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
@@ -930,12 +962,6 @@ public class Pur_ProdBoxFragment1 extends BaseFragment {
                     mbr.setStrBarcodes(sb.toString());
                     mbr.setNumber(mbr.getNumber() + fqty);
                 }
-                // 汇总数量
-                double sum = 0;
-                for(int j = 0, sizeJ = checkDatas.size(); j<sizeJ; j++) {
-                    sum += checkDatas.get(j).getNumber();
-                }
-                tvCount.setText("数量："+ df.format(sum));
                 mAdapter.notifyDataSetChanged();
                 isPickingEnd();
                 break;

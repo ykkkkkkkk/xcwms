@@ -68,6 +68,8 @@ public class ScanningRecord2 implements Serializable {
     private List<String> listBarcode; // 记录每行中扫的条码barcode
     private String strBarcodes; // 用逗号拼接的条码号
     private ScanningRecordTok3 srTok3; // 提交到k3的字段
+    /*订单套数*/
+    private int coveQty;
 
 
     public int getID() {
@@ -434,6 +436,12 @@ public class ScanningRecord2 implements Serializable {
     }
     public void setLeafNumber2(String leafNumber2) {
         this.leafNumber2 = leafNumber2;
+    }
+    public int getCoveQty() {
+        return coveQty;
+    }
+    public void setCoveQty(int coveQty) {
+        this.coveQty = coveQty;
     }
 
     public ScanningRecord2() {

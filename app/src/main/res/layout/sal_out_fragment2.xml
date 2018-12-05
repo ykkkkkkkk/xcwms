@@ -384,9 +384,9 @@
             android:layout_width="56dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="应发数\n实发数"
+            android:text="应发数/套数\n实发数"
             android:textColor="#000000"
-            android:textSize="12sp" />
+            android:textSize="@dimen/_10sp" />
 
         <TextView
             android:layout_width="0dp"

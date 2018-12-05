@@ -102,7 +102,7 @@
                 android:id="@+id/tv_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="数量：0"
+                android:text="套数：0"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_12sp" />
 
@@ -361,12 +361,12 @@
             android:textSize="12sp" />
 
         <TextView
-            android:layout_width="56dp"
+            android:layout_width="58dp"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="订单数\n装箱数"
+            android:text="订单数/套数\n装箱数"
             android:textColor="#000000"
-            android:textSize="12sp" />
+            android:textSize="@dimen/_10sp" />
 
     </LinearLayout>
 

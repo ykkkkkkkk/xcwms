@@ -98,6 +98,8 @@ public class DeliOrder implements Serializable{
 	private String saleDeptNumber;
 	/*销售部门名称*/
 	private String saleDeptName;
+	/*订单套数*/
+	private int coveQty;
 
 	public DeliOrder() {
 		super();
@@ -550,4 +552,13 @@ public class DeliOrder implements Serializable{
 	public void setSaleDeptName(String saleDeptName) {
 		this.saleDeptName = saleDeptName;
 	}
+
+	public int getCoveQty() {
+		return coveQty;
+	}
+
+	public void setCoveQty(int coveQty) {
+		this.coveQty = coveQty;
+	}
+
 }
