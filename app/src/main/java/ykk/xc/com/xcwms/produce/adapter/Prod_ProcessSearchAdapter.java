@@ -16,12 +16,12 @@ import ykk.xc.com.xcwms.model.Procedure;
 import ykk.xc.com.xcwms.model.ProcessflowEntry;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_ProcessSearchAdapter extends BaseArrayRecyclerAdapter<ProcessflowEntry> {
+public class Prod_ProcessSearchAdapter extends BaseArrayRecyclerAdapter<ProcessflowEntry> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Pur_ProcessSearchAdapter(Activity context, List<ProcessflowEntry> datas) {
+    public Prod_ProcessSearchAdapter(Activity context, List<ProcessflowEntry> datas) {
         super(datas);
         this.context = context;
     }
@@ -47,8 +47,8 @@ public class Pur_ProcessSearchAdapter extends BaseArrayRecyclerAdapter<Processfl
         // 加载图片
         Glide.with(context)
                 .load(entity.getImgUrl())
-                .placeholder(R.drawable.image_before)
-                .error(R.drawable.image_error)
+                .placeholder(R.drawable.image_wait)
+                .error(R.drawable.image_null)
                 .into(imgView);
 
 

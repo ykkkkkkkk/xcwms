@@ -35,7 +35,7 @@ import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.produce.adapter.Pur_SelProdOrderAdapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
@@ -53,7 +53,7 @@ public class Prod_SelOrderActivity extends BaseActivity implements XRecyclerView
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private Department department; // 生产车间
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Pur_SelProdOrderAdapter mAdapter;
+    private Prod_SelOrderAdapter mAdapter;
     private List<ProdOrder> listDatas = new ArrayList<>();
     private String fbillno; // 单号
     private int limit = 1;
@@ -107,7 +107,7 @@ public class Prod_SelOrderActivity extends BaseActivity implements XRecyclerView
     public void initView() {
         xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Pur_SelProdOrderAdapter(context, listDatas);
+        mAdapter = new Prod_SelOrderAdapter(context, listDatas);
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 

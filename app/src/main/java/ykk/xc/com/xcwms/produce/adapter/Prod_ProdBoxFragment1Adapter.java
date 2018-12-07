@@ -13,12 +13,12 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<MaterialBinningRecord> {
+public class Prod_ProdBoxFragment1Adapter extends BaseArrayRecyclerAdapter<MaterialBinningRecord> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
 
-    public Pur_ProdBoxFragment1Adapter(Activity context, List<MaterialBinningRecord> datas) {
+    public Prod_ProdBoxFragment1Adapter(Activity context, List<MaterialBinningRecord> datas) {
         super(datas);
         this.context = context;
     }

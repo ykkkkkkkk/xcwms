@@ -41,6 +41,8 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Procedure;
 import ykk.xc.com.xcwms.model.SchedulTeam;
+import ykk.xc.com.xcwms.model.SchedulTeamEntry;
+import ykk.xc.com.xcwms.model.Staff;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.ValuationPayroll;
 import ykk.xc.com.xcwms.model.ValuationType;
@@ -52,8 +54,8 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     @BindView(R.id.tv_valuationType)
     TextView tvValuationType;
-    @BindView(R.id.tv_schedulTeam)
-    TextView tvSchedulTeam;
+    @BindView(R.id.tv_staff)
+    TextView tvStaff;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
     @BindView(R.id.tv_process)
@@ -75,7 +77,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     private Material mtl;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private String mtlBarcode; // 对应的条码号
-    private int valuationTypeId, procedureId, mtlId, schedulTeamId; // 1：计件类型ID，2：工序id，3：物料id，4：班次id
+    private int valuationTypeId, procedureId, mtlId, schedulTeamId, staffId, deptId; // 1：计件类型ID，2：工序id，3：物料id，4：班次id
     private char dataFlag = '1'; // 1：计价类型列表，2：工序列表
     private DecimalFormat df = new DecimalFormat("#.######");
     private User user;
@@ -124,9 +126,9 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
                                 break;
                             case '3': // 班次
-                                m.popDatasC = JsonUtil.strToList((String)msg.obj, SchedulTeam.class);
+                                m.popDatasC = JsonUtil.strToList((String)msg.obj, SchedulTeamEntry.class);
                                 m.popupWindow_C();
-                                m.popWindowC.showAsDropDown(m.tvSchedulTeam);
+                                m.popWindowC.showAsDropDown(m.tvStaff);
 
                                 break;
                         }
@@ -140,7 +142,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                     case SUCC2: // 成功
                         Comm.showWarnDialog(m.context,"保存成功");
                         m.schedulTeamId = 0;
-                        m.tvSchedulTeam.setText("");
+                        m.tvStaff.setText("");
                         m.procedureId = 0;
                         m.tvProcess.setText("");
                         m.tvNum.setText("");
@@ -171,7 +173,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
         run_itemList();
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_valuationType, R.id.tv_schedulTeam, R.id.tv_process, R.id.tv_num, R.id.btn_save})
+    @OnClick({R.id.btn_close, R.id.tv_valuationType, R.id.tv_staff, R.id.tv_process, R.id.tv_num, R.id.btn_save})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
@@ -203,13 +205,13 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 }
 
                 break;
-            case R.id.tv_schedulTeam: // 选择班次
+            case R.id.tv_staff: // 选择排班员工
                 dataFlag = '3';
                 if(popDatasC == null || popDatasC.size() == 0) {
                     run_itemList();
                 } else {
                     popupWindow_C();
-                    popWindowC.showAsDropDown(tvSchedulTeam);
+                    popWindowC.showAsDropDown(tvStaff);
                 }
 
                 break;
@@ -218,8 +220,8 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
                 break;
             case R.id.btn_save: // 保存
-                if(getValues(tvSchedulTeam).length() == 0) {
-                    Comm.showWarnDialog(context,"请选择班次！");
+                if(getValues(tvStaff).length() == 0) {
+                    Comm.showWarnDialog(context,"请选择排班员工！");
                     return;
                 }
                 if(mtlBarcode == null || mtlBarcode.length() == 0) {
@@ -237,8 +239,9 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 ValuationPayroll vp = new ValuationPayroll();
                 vp.setId(0);
                 vp.setSchedulTeamId(schedulTeamId);
-                vp.setStaffId(user.getStaffId());
-                vp.setDeptId(user.getDeptId());
+                if(getValues(tvValuationType).indexOf("集体") > -1) staffId = 0;
+                vp.setStaffId(staffId);
+                vp.setDeptId(deptId);
                 vp.setfMaterialId(mtlId);
                 vp.setProcedureId(procedureId);
                 vp.setValuationTypeId(valuationTypeId);
@@ -489,7 +492,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
      */
     private PopupWindow popWindowC;
     private ListAdapter3 adapterC;
-    private List<SchedulTeam> popDatasC;
+    private List<SchedulTeamEntry> popDatasC;
     private void popupWindow_C() {
         if (null != popWindowC) {// 不为空就隐藏
             popWindowC.dismiss();
@@ -509,9 +512,13 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    SchedulTeam st = popDatasC.get(position);
-                    schedulTeamId = st.getId();
-                    tvSchedulTeam.setText(st.getSchedulTeamName());
+                    SchedulTeamEntry stEntry = popDatasC.get(position);
+                    SchedulTeam st = stEntry.getSchedulTeam();
+                    Staff staff = stEntry.getStaff();
+                    schedulTeamId = stEntry.getSchedulTeamId();
+                    staffId = staff.getStaffId();
+                    deptId = parseInt(staff.getStaffPostDept());
+                    tvStaff.setText(st.getSchedulTeamName()+"/"+staff.getName());
 
                     popWindowC.dismiss();
                 }
@@ -519,7 +526,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
         }
 
         // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
-        popWindowC = new PopupWindow(popView, tvSchedulTeam.getWidth(),
+        popWindowC = new PopupWindow(popView, tvStaff.getWidth(),
                 ViewGroup.LayoutParams.WRAP_CONTENT, true);
         // 设置动画效果
         // popWindow4.setAnimationStyle(R.style.AnimationFade);
@@ -539,9 +546,9 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     private class ListAdapter3 extends BaseAdapter {
 
         private Activity activity;
-        private List<SchedulTeam> datas;
+        private List<SchedulTeamEntry> datas;
 
-        public ListAdapter3(Activity activity, List<SchedulTeam> datas) {
+        public ListAdapter3(Activity activity, List<SchedulTeamEntry> datas) {
             this.activity = activity;
             this.datas = datas;
         }
@@ -578,7 +585,10 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 v.setTag(holder);
             }else holder = (ViewHolder) v.getTag();
 
-            holder.tv_name.setText(datas.get(position).getSchedulTeamName());
+            SchedulTeamEntry stEntry = datas.get(position);
+            SchedulTeam st = stEntry.getSchedulTeam();
+            Staff staff = stEntry.getStaff();
+            holder.tv_name.setText(st.getSchedulTeamName() + "/"+staff.getName());
 
             return v;
         }
@@ -604,7 +614,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 mUrl = getURL("procedure/findProcedureByParam_app");
                 break;
             case '3': // 班次列表
-                mUrl = getURL("schedulTeam/findSchedulTeamByParam_app");
+                mUrl = getURL("schedulTeam/findListEntryByParam_app");
                 break;
         }
         FormBody formBody = new FormBody.Builder()
@@ -676,48 +686,6 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);
-                mHandler.sendMessage(msg);
-            }
-        });
-    }
-
-    /**
-     * 通过okhttp加载数据
-     */
-    private void run_okhttpDatas() {
-        showLoadDialog("加载中...");
-        String mUrl = getURL("findProdOrderList");
-        FormBody formBody = new FormBody.Builder()
-//                .add("fbillno", getValues(etSearch).trim())
-//                .add("deptId", String.valueOf(department.getFitemID()))
-                .add("isDefaultStock", "1") // 查询默认仓库和库位
-                .add("pageSize", "30")
-                .build();
-
-        Request request = new Request.Builder()
-                .addHeader("cookie", getSession())
-                .url(mUrl)
-                .post(formBody)
-                .build();
-
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC1);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                ResponseBody body = response.body();
-                String result = body.string();
-                if(!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC1);
-                    return;
-                }
-
-                Message msg = mHandler.obtainMessage(SUCC1, result);
-                Log.e("Ware_Pur_OrderActivity --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

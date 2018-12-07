@@ -10,13 +10,13 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_SelProdOrderAdapter extends BaseArrayRecyclerAdapter<ProdOrder> {
+public class Prod_SelOrderAdapter extends BaseArrayRecyclerAdapter<ProdOrder> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
     private MyCallBack callBack;
     private List<ProdOrder> datas;
 
-    public Pur_SelProdOrderAdapter(Activity context, List<ProdOrder> datas) {
+    public Prod_SelOrderAdapter(Activity context, List<ProdOrder> datas) {
         super(datas);
         this.context = context;
         this.datas = datas;

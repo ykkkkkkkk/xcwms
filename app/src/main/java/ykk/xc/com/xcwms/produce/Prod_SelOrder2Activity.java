@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -33,9 +32,8 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.produce.adapter.Pur_SelProdOrderAdapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_SelOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.basehelper.BaseRecyclerAdapter;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
@@ -50,7 +48,7 @@ public class Prod_SelOrder2Activity extends BaseActivity implements XRecyclerVie
     private Prod_SelOrder2Activity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500;
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private Pur_SelProdOrderAdapter mAdapter;
+    private Prod_SelOrderAdapter mAdapter;
     private List<ProdOrder> listDatas = new ArrayList<>();
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
@@ -103,7 +101,7 @@ public class Prod_SelOrder2Activity extends BaseActivity implements XRecyclerVie
     public void initView() {
         xRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Pur_SelProdOrderAdapter(context, listDatas);
+        mAdapter = new Prod_SelOrderAdapter(context, listDatas);
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 

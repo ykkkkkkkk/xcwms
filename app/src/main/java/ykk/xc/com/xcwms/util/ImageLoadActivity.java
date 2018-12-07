@@ -11,7 +11,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
-import ykk.xc.com.xcwms.comm.Comm;
 
 public class ImageLoadActivity extends BaseActivity {
 
@@ -61,13 +60,10 @@ public class ImageLoadActivity extends BaseActivity {
 
 			if(imageUrl.length() > 6) { // 图片地址都大于6
 				// 网络地址包含small的就替换成空字符串
-				int samllExist = imageUrl.indexOf("\\small"); // 是否有small文件夹
-				int samllExist2 = imageUrl.indexOf("/small"); // 是否有small文件夹
+				int samllExist = imageUrl.indexOf("_small"); // 是否有small文件夹
 
 				if(samllExist > -1) {
-					url = imageUrl.replace("\\small", ""); // 来自于网络地址
-				} else if(samllExist2 > -1) {
-					url = imageUrl.replace("/small", ""); // 来自于网络地址
+					url = imageUrl.replace("_small", ""); // 来自于网络地址
 				} else {
 					url = imageUrl;
 				}
@@ -92,8 +88,8 @@ public class ImageLoadActivity extends BaseActivity {
 					public void run() {
 						Glide.with(context)
 								.load(url)
-								.placeholder(R.drawable.image_before)
-								.error(R.drawable.image_error)
+								.placeholder(R.drawable.image_wait)
+								.error(R.drawable.image_null)
 								.into(imgView);
 						imgDialog.dismiss();
 					}

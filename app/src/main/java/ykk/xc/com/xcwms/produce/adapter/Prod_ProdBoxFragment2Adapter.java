@@ -11,11 +11,11 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
-public class Pur_ProdBoxFragment2Adapter extends BaseArrayRecyclerAdapter<MaterialBinningRecord> {
+public class Prod_ProdBoxFragment2Adapter extends BaseArrayRecyclerAdapter<MaterialBinningRecord> {
     private DecimalFormat df = new DecimalFormat("#.######");
     private Activity context;
 
-    public Pur_ProdBoxFragment2Adapter(Activity context, List<MaterialBinningRecord> datas) {
+    public Prod_ProdBoxFragment2Adapter(Activity context, List<MaterialBinningRecord> datas) {
         super(datas);
         this.context = context;
     }

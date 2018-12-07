@@ -57,7 +57,7 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.produce.adapter.Pur_ProdBoxFragment1Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_ProdBoxFragment1Adapter;
 import ykk.xc.com.xcwms.util.BigdecimalUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 /**
@@ -113,7 +113,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
     private Customer customer; // 客户
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
-    private Pur_ProdBoxFragment1Adapter mAdapter;
+    private Prod_ProdBoxFragment1Adapter mAdapter;
     private String strBoxBarcode, prodOrderBarcode, mtlBarcode, mtlBarcode_del; // 对应的条码号
     private List<MaterialBinningRecord> checkDatas = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
@@ -328,10 +328,10 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Pur_ProdBoxFragment1Adapter(mContext, checkDatas);
+        mAdapter = new Prod_ProdBoxFragment1Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
 
-        mAdapter.setCallBack(new Pur_ProdBoxFragment1Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Prod_ProdBoxFragment1Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
