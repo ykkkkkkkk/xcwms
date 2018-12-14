@@ -184,6 +184,7 @@ public class LoginActivity extends BaseActivity {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.e("CCCCCCCCCCCCCCCC", ""+e);
                 mHandler.sendEmptyMessage(UNSUCC1);
             }
 

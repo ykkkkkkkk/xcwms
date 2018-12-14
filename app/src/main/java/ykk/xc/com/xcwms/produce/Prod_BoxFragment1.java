@@ -57,7 +57,7 @@ import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
-import ykk.xc.com.xcwms.produce.adapter.Prod_ProdBoxFragment1Adapter;
+import ykk.xc.com.xcwms.produce.adapter.Prod_BoxFragment1Adapter;
 import ykk.xc.com.xcwms.util.BigdecimalUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 /**
@@ -113,7 +113,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
     private Customer customer; // 客户
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
-    private Prod_ProdBoxFragment1Adapter mAdapter;
+    private Prod_BoxFragment1Adapter mAdapter;
     private String strBoxBarcode, prodOrderBarcode, mtlBarcode, mtlBarcode_del; // 对应的条码号
     private List<MaterialBinningRecord> checkDatas = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
@@ -328,10 +328,10 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Prod_ProdBoxFragment1Adapter(mContext, checkDatas);
+        mAdapter = new Prod_BoxFragment1Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
 
-        mAdapter.setCallBack(new Prod_ProdBoxFragment1Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Prod_BoxFragment1Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
@@ -681,8 +681,8 @@ public class Prod_BoxFragment1 extends BaseFragment {
                         String value = bundle.getString("resultValue", "");
                         double number = parseDouble(value);
                         MaterialBinningRecord mbr = checkDatas.get(curPos);
-                        if(number > mbr.getRelationBillFQTY()) {
-                            Comm.showWarnDialog(mContext,"第"+(curPos+1)+"行，“装箱数”不能大于“订单数”！");
+                        if(number > mbr.getUsableFqty()) {
+                            Comm.showWarnDialog(mContext,"第"+(curPos+1)+"行，“装箱数”不能大于“可用数”！");
                             return;
                         }
 //                        int id = mbr.getId();
@@ -834,6 +834,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
             mbr.setCaseId(34);
             mbr.setBarcodeSource('1');
             mbr.setNumber(0);
+            mbr.setUsableFqty(prodOrder.getUsableFqty());
             mbr.setRelationBillFQTY(prodOrder.getProdFqty());
             mbr.setEntryId(prodOrder.getEntryId());
             mbr.setBarcode("");
@@ -901,14 +902,13 @@ public class Prod_BoxFragment1 extends BaseFragment {
                 } else {
                     fqty = BigdecimalUtil.div(mbr.getRelationBillFQTY(), coveQty);
                 }
-
 //                double fqty = mbr.getRelationBillFQTY() / coveQty;
                 // 计量单位数量
                 if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
                 if (tmpMtl.getIsSnManager() == 0) {
                     // 生产数大于装箱数
-                    if (mbr.getRelationBillFQTY() > mbr.getNumber()) {
+                    if (mbr.getUsableFqty() > mbr.getNumber()) {
                         // 如果扫的是物料包装条码，就显示个数
                         double number = 0;
                         if(bt != null) number = bt.getMaterialCalculateNumber();
@@ -925,7 +925,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
                     } else if(mtl.getMtlPack() != null && mtl.getMtlPack().getIsMinNumberPack() == 1) {
                         if(mtl.getMtlPack().getIsMinNumberPack() == 1) {
                             // 如果装箱数小于订单数，就加数量
-                            if(mbr.getNumber() < mbr.getRelationBillFQTY()) {
+                            if(mbr.getNumber() < mbr.getUsableFqty()) {
                                 mbr.setNumber(mbr.getNumber() + fqty);
                             } else {
                                 Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已经达到最小包装生产数量！");
@@ -933,9 +933,9 @@ public class Prod_BoxFragment1 extends BaseFragment {
                             }
                         }
 
-                    } else if ((mtl.getMtlPack() == null || mtl.getMtlPack().getIsMinNumberPack() == 0) && mbr.getNumber() > mbr.getRelationBillFQTY()) {
+                    } else if ((mtl.getMtlPack() == null || mtl.getMtlPack().getIsMinNumberPack() == 0) && mbr.getNumber() > mbr.getUsableFqty()) {
                         // 数量已满
-                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，（装箱数）不能大于（订单数）！");
+                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，（装箱数）不能大于（可用数）！");
                         return;
                     }
                 } else {
@@ -944,7 +944,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
                         Comm.showWarnDialog(mContext,"该物料条码已在装箱行中，请扫描未使用过的条码！");
                         return;
                     }
-                    if (mbr.getNumber() == mbr.getRelationBillFQTY()) {
+                    if (mbr.getNumber() == mbr.getUsableFqty()) {
 //                        Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已装完！");
 //                        return;
                         continue;
@@ -980,7 +980,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
         int count = 0; // 计数器
         for(int i=0; i<size; i++) {
             MaterialBinningRecord mbr = checkDatas.get(i);
-            if(mbr.getNumber() >= mbr.getRelationBillFQTY()) {
+            if(mbr.getNumber() >= mbr.getUsableFqty()) {
                 count += 1;
             }
         }

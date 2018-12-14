@@ -26,6 +26,7 @@ public class ProdOrder implements Serializable {
 	private String mtlFname; // 物料名称
 	private String unitFname; // 单位
 	private double prodFqty; // 生产数量
+	private double usableFqty; // 可用的数量
 	private int custId; // 客户
 	private String custNumber; // 客户代码
 	private String custName; // 客户名称
@@ -149,6 +150,14 @@ public class ProdOrder implements Serializable {
 
 	public double getProdFqty() {
 		return prodFqty;
+	}
+
+	public double getUsableFqty() {
+		return usableFqty;
+	}
+
+	public void setUsableFqty(double usableFqty) {
+		this.usableFqty = usableFqty;
 	}
 
 	public int getCustId() {

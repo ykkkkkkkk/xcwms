@@ -670,57 +670,6 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 //        run_findProcessflowEntryByIds_app();
     }
 
-//    /**
-//     * 查询工序查询详细列表
-//     */
-//    private void run_findProcessflowEntryByIds_app() {
-//        StringBuilder strIds = new StringBuilder();
-//        if(processflowEntryId == 0) {
-//            // list数据中有个全部，所以从1开始
-//            for (int i = 1, size = popDatasB.size(); i < size; i++) {
-//                ProcessflowEntry pe = popDatasB.get(i);
-//                if((i+1) == size) strIds.append(pe.getId());
-//                else strIds.append(pe.getId()+",");
-//                strIds.append(pe.getId());
-//            }
-//        } else strIds.append(processflowEntryId);
-//
-//        showLoadDialog("加载中...");
-//        String mUrl = getURL("processflowEntry/findProcessflowEntryByParam_app");
-//        FormBody formBody = new FormBody.Builder()
-//                .add("strIds", strIds.toString())
-//                .build();
-//
-//        Request request = new Request.Builder()
-//                .addHeader("cookie", getSession())
-//                .url(mUrl)
-//                .post(formBody)
-//                .build();
-//
-//        Call call = okHttpClient.newCall(request);
-//        call.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Call call, IOException e) {
-//                mHandler.sendEmptyMessage(UNSUCC3);
-//            }
-//
-//            @Override
-//            public void onResponse(Call call, Response response) throws IOException {
-//                ResponseBody body = response.body();
-//                String result = body.string();
-//                LogUtil.e("run_findProcessflowEntryByIds_app --> onResponse", result);
-//                if(!JsonUtil.isSuccess(result)) {
-//                    mHandler.sendEmptyMessage(UNSUCC3);
-//                    return;
-//                }
-//                isNextPage = JsonUtil.isNextPage(result, limit);
-//
-//                Message msg = mHandler.obtainMessage(SUCC3, result);
-//                mHandler.sendMessage(msg);
-//            }
-//        });
-//    }
-
     @Override
     public void onRefresh() {
 //        isRefresh = true;
