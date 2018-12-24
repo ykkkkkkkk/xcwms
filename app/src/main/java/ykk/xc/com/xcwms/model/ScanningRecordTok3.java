@@ -41,6 +41,28 @@ public class ScanningRecordTok3 implements Serializable {
 	private String deliveryCompanyNumber;
 	/*出库类型代码*/
 	private String exitTypeNumber;
+	/* 摘要  */
+	private String fpaezBeizhu;
+	/* 采购员  */
+	private String fpurchaserNumber;
+	/* 采购订单号  */
+	private String fpaezCgDanhao;
+	/* 箱数 */
+	private int fboxAmount;
+	/* 仓管员名称 */
+	private String stockStaffName;
+
+
+//	单据Entry部分---
+
+	/* 宽 */
+	private String fpaezWidth;
+	/* 高 */
+	private String fpaezHigh;
+
+	public ScanningRecordTok3() {
+		super();
+	}
 
 	public String getSaleDeptNumber() {
 		return saleDeptNumber;
@@ -48,6 +70,7 @@ public class ScanningRecordTok3 implements Serializable {
 	public void setSaleDeptNumber(String saleDeptNumber) {
 		this.saleDeptNumber = saleDeptNumber;
 	}
+
 	public String getCustomerService() {
 		return customerService;
 	}
@@ -101,6 +124,48 @@ public class ScanningRecordTok3 implements Serializable {
 	}
 	public void setExitTypeNumber(String exitTypeNumber) {
 		this.exitTypeNumber = exitTypeNumber;
+	}
+	public String getFpaezWidth() {
+		return fpaezWidth;
+	}
+	public void setFpaezWidth(String fpaezWidth) {
+		this.fpaezWidth = fpaezWidth;
+	}
+	public String getFpaezHigh() {
+		return fpaezHigh;
+	}
+	public void setFpaezHigh(String fpaezHigh) {
+		this.fpaezHigh = fpaezHigh;
+	}
+	public String getFpaezBeizhu() {
+		return fpaezBeizhu;
+	}
+	public void setFpaezBeizhu(String fpaezBeizhu) {
+		this.fpaezBeizhu = fpaezBeizhu;
+	}
+	public String getFpurchaserNumber() {
+		return fpurchaserNumber;
+	}
+	public void setFpurchaserNumber(String fpurchaserNumber) {
+		this.fpurchaserNumber = fpurchaserNumber;
+	}
+	public String getFpaezCgDanhao() {
+		return fpaezCgDanhao;
+	}
+	public void setFpaezCgDanhao(String fpaezCgDanhao) {
+		this.fpaezCgDanhao = fpaezCgDanhao;
+	}
+	public int getFboxAmount() {
+		return fboxAmount;
+	}
+	public void setFboxAmount(int fboxAmount) {
+		this.fboxAmount = fboxAmount;
+	}
+	public String getStockStaffName() {
+		return stockStaffName;
+	}
+	public void setStockStaffName(String stockStaffName) {
+		this.stockStaffName = stockStaffName;
 	}
 
 

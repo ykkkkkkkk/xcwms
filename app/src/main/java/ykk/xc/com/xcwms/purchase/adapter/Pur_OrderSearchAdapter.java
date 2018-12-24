@@ -40,6 +40,8 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
         TextView tv7a = holder.obtainView(R.id.tv7a);
         TextView tv8 = holder.obtainView(R.id.tv8);
         TextView tv9 = holder.obtainView(R.id.tv9);
+        TextView tv10 = holder.obtainView(R.id.tv10);
+        TextView tv11 = holder.obtainView(R.id.tv11);
         // 赋值
         tv1.setText(String.valueOf(pos + 1));
         tv2.setText(entity.getFbillno());
@@ -51,6 +53,8 @@ public class Pur_OrderSearchAdapter extends BaseArrayRecyclerAdapter<PurOrder> {
         tv7a.setText(entity.getMtlType());
         tv8.setText(df.format(entity.getPoFqty())+""+entity.getUnitFname()+"\n"+df.format(entity.getPoFstockinqty()));
         tv9.setText(entity.getPurOrgName());
+        tv10.setText(entity.getWidth()+"\n"+entity.getHeight()+"\n"+df.format(entity.getArea()));
+        tv11.setText(entity.getRemarks());
     }
 
     public void setCallBack(MyCallBack callBack) {

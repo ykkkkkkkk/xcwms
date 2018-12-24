@@ -307,7 +307,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
                         break;
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
 //                        m.hideSoftInputMode(m.mContext, m.etMtlCode2);
-//                        m.setFocusable(m.etMtlCodeTmp);
+                        m.setFocusable(m.etMtlCodeTmp);
                         m.setFocusable(m.etMtlCode2);
 
                         break;

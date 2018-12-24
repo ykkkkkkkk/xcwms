@@ -235,6 +235,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 		editor.putString("strUser", json);
 		editor.commit();
 	}
+
 	/**
 	 * 显示xml中User对象
 	 */

@@ -63,6 +63,8 @@ public class PrintMainActivity extends BaseActivity {
     TextView tv2;
     @BindView(R.id.tv_3)
     TextView tv3;
+    @BindView(R.id.tv_4)
+    TextView tv4;
     private PrintMainActivity context = this;
     private static final String TAG = "PrintMainActivity";
     private TextView curText;
@@ -100,10 +102,12 @@ public class PrintMainActivity extends BaseActivity {
         PrintFragment1 fragment1 = new PrintFragment1();
         PrintFragment2 fragment2 = new PrintFragment2();
         PrintFragment3 fragment3 = new PrintFragment3();
+        PrintFragment4 fragment4 = new PrintFragment4();
 
         listFragment.add(fragment1);
         listFragment.add(fragment2);
         listFragment.add(fragment3);
+        listFragment.add(fragment4);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
@@ -129,6 +133,9 @@ public class PrintMainActivity extends BaseActivity {
                     case 2:
                         tabChange(tv3,2);
                         break;
+                    case 3:
+                        tabChange(tv4,3);
+                        break;
                 }
             }
 
@@ -152,7 +159,7 @@ public class PrintMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_1, R.id.tv_2, R.id.tv_3})
+    @OnClick({R.id.btn_close, R.id.tv_1, R.id.tv_2, R.id.tv_3, R.id.tv_4})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -173,6 +180,10 @@ public class PrintMainActivity extends BaseActivity {
                 break;
             case R.id.tv_3: // 箱码打印
                 tabChange(tv3,2);
+
+                break;
+            case R.id.tv_4: // 物料包装
+                tabChange(tv4,3);
 
                 break;
         }

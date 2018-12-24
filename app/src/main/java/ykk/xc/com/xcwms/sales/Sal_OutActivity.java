@@ -890,7 +890,7 @@ public class Sal_OutActivity extends BaseActivity {
         ScanningRecord2 sr2 = new ScanningRecord2();
         sr2.setSourceK3Id(bt.getRelationBillId());
         sr2.setSourceFnumber(bt.getRelationBillNumber());
-        sr2.setFitemId(bt.getMaterialId());
+        sr2.setMtlId(bt.getMaterialId());
 //        sr2.setSupplierId(supplier.getFsupplierid());
 //        sr2.setSupplierName(supplier.getfName());
 //        sr2.setSupplierFnumber(supplier.getfNumber());
@@ -970,7 +970,7 @@ public class Sal_OutActivity extends BaseActivity {
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
-            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtlId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
@@ -1052,7 +1052,7 @@ public class Sal_OutActivity extends BaseActivity {
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
-            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtlId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
@@ -1130,7 +1130,7 @@ public class Sal_OutActivity extends BaseActivity {
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
-            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtlId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
@@ -1283,7 +1283,7 @@ public class Sal_OutActivity extends BaseActivity {
             record.setType(2);
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
-            record.setMtlK3Id(sr2.getFitemId());
+            record.setMtlK3Id(sr2.getMtlId());
             record.setMtlFnumber(sr2.getMtlFnumber());
             record.setUnitFnumber(sr2.getUnitFnumber());
             record.setStockK3Id(sr2.getStockId());

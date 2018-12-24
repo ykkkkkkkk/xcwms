@@ -1,6 +1,8 @@
 package ykk.xc.com.xcwms.model;
 
-public class Staff {
+import java.io.Serializable;
+
+public class Staff implements Serializable {
 	/* 员工id */
 	private Integer id;
 	/* k3员工id */
@@ -36,6 +38,9 @@ public class Staff {
 
 	/* 用于班组编辑成员，已存在班组标记 */
 	private int checkFlag;
+
+	// 临时字段
+	private int isCheck;
 
 	/**
 	 * 构造方法
@@ -186,13 +191,13 @@ public class Staff {
 		this.fModifyDate = fModifyDate;
 	}
 
-	@Override
-	public String toString() {
-		return "Staff [id=" + id + ", staffId=" + staffId + ", number=" + number + ", name=" + name
-				+ ", staffCreateOrgId=" + staffCreateOrgId + ", staffUseOrgId=" + staffUseOrgId + ", organization="
-				+ organization + ", staffWorkOrgId=" + staffWorkOrgId + ", staffPostDept=" + staffPostDept
-				+ ", department=" + department + ", staffPost=" + staffPost + ", post=" + post + ", dataStatus="
-				+ dataStatus + ", isDelete=" + isDelete + ", enabled=" + enabled + ", fModifyDate=" + fModifyDate + "]";
+	public int getIsCheck() {
+		return isCheck;
 	}
+
+	public void setIsCheck(int isCheck) {
+		this.isCheck = isCheck;
+	}
+
 
 }

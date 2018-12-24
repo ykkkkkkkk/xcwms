@@ -21,7 +21,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="物料"
+            android:text="收料订单入库"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
@@ -72,6 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:visibility="gone"
             android:gravity="center"
             android:orientation="horizontal">
 

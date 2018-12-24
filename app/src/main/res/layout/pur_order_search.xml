@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -294,6 +294,22 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="收料组织"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="86dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="宽/高/面积"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="110dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="备注"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 

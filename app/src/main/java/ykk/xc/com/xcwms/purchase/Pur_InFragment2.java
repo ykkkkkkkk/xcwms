@@ -38,7 +38,6 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
@@ -50,7 +49,6 @@ import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.basics.Supplier_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
@@ -880,7 +878,7 @@ public class Pur_InFragment2 extends BaseFragment {
 
             sr2.setSourceK3Id(p.getfId());
             sr2.setSourceFnumber(p.getFbillno());
-            sr2.setFitemId(mtl.getfMaterialId());
+            sr2.setMtlId(mtl.getfMaterialId());
             mtl.setReceiveMaxScale(p.getReceiveMaxScale());
             mtl.setReceiveMinScale(p.getReceiveMinScale());
             sr2.setMtl(mtl);
@@ -1061,7 +1059,7 @@ public class Pur_InFragment2 extends BaseFragment {
         sr2.setSourceId(bt.getId());
         sr2.setSourceK3Id(bt.getRelationBillId());
         sr2.setSourceFnumber(bt.getRelationBillNumber());
-        sr2.setFitemId(bt.getMaterialId());
+        sr2.setMtlId(bt.getMaterialId());
         sr2.setStock(stock);
         sr2.setStockId(stock.getfStockid());
         sr2.setStockFnumber(stock.getfNumber());
@@ -1210,7 +1208,7 @@ public class Pur_InFragment2 extends BaseFragment {
             record.setSourceId(sr2.getSourceId());
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
-            record.setMtlK3Id(sr2.getFitemId());
+            record.setMtlK3Id(sr2.getMtlId());
             record.setMtlFnumber(sr2.getMtlFnumber());
             record.setUnitFnumber(sr2.getUnitFnumber());
             record.setStockK3Id(sr2.getStockId());

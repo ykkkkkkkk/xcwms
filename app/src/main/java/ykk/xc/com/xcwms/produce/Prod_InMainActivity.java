@@ -56,16 +56,16 @@ public class Prod_InMainActivity extends BaseActivity {
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Prod_InFragment1 fragment1 = new Prod_InFragment1();
+//        Prod_InFragment1 fragment1 = new Prod_InFragment1();
         Prod_InFragment2 fragment2 = new Prod_InFragment2();
 
-        listFragment.add(fragment1);
+//        listFragment.add(fragment1);
         listFragment.add(fragment2);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

@@ -120,7 +120,13 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser) {
-            hideKeyboard(etCode);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    hideKeyboard(etCode);
+                }
+            }, 200);
+
         }
     }
 

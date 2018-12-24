@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.io.Serializable;
 
 /**
- * 客户表t_Orgnaization
+ * 组织表t_Orgnaization
  */
 public class Organization implements Serializable {
     /*组织id*/

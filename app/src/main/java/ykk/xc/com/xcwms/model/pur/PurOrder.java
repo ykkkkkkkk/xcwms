@@ -37,11 +37,25 @@ public class PurOrder implements Serializable {
     private String receiveOrgNumber; // 收料组织代码
     private String receiveOrgName; // 收料组织
     private Organization receiveOrg;
-    private int isCheck; // 新加的是否选中
     private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
-
     /*对应k3单据分录号字段*/
-    private int entryId;
+    private Integer entryId;
+    /*单价*/
+    private double fprice;
+    /*金额*/
+    private double famount;
+    /*备注*/
+    private String remarks;
+    /*宽*/
+    private String width;
+    /*高*/
+    private String height;
+    /*面积*/
+    private double area;
+
+    // 临时字段，不存表
+    private int isCheck; // 新加的是否选中
+
 
     public int getfId() {
         return fId;
@@ -293,6 +307,54 @@ public class PurOrder implements Serializable {
 
     public void setReceiveMinScale(double receiveMinScale) {
         this.receiveMinScale = receiveMinScale;
+    }
+
+    public double getFprice() {
+        return fprice;
+    }
+
+    public void setFprice(double fprice) {
+        this.fprice = fprice;
+    }
+
+    public double getFamount() {
+        return famount;
+    }
+
+    public void setFamount(double famount) {
+        this.famount = famount;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
+    public double getArea() {
+        return area;
+    }
+
+    public void setArea(double area) {
+        this.area = area;
     }
 
 

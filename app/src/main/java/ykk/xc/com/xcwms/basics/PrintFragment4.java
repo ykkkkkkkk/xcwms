@@ -28,15 +28,14 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.basics.adapter.PrintFragment1Adapter;
+import ykk.xc.com.xcwms.basics.adapter.PrintFragment4Adapter;
 import ykk.xc.com.xcwms.comm.BaseFragment;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LogUtil;
 import ykk.xc.com.xcwms.util.xrecyclerview.XRecyclerView;
 
-public class PrintFragment1 extends BaseFragment implements XRecyclerView.LoadingListener {
+public class PrintFragment4 extends BaseFragment implements XRecyclerView.LoadingListener {
 
     @BindView(R.id.et_search)
     EditText etSearch;
@@ -47,10 +46,10 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
 
-    private PrintFragment1 context = this;
+    private PrintFragment4 context = this;
     private List<Material> listDatas = new ArrayList<>();
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
-    private PrintFragment1Adapter mAdapter;
+    private PrintFragment4Adapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private Activity mContext;
     private PrintMainActivity parent;
@@ -60,16 +59,16 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     private boolean isLoad = true; // 是否加载了数据
 
     // 消息处理
-    final PrintFragment1.MyHandler mHandler = new PrintFragment1.MyHandler(this);
+    final PrintFragment4.MyHandler mHandler = new PrintFragment4.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<PrintFragment1> mActivity;
+        private final WeakReference<PrintFragment4> mActivity;
 
-        public MyHandler(PrintFragment1 activity) {
-            mActivity = new WeakReference<PrintFragment1>(activity);
+        public MyHandler(PrintFragment4 activity) {
+            mActivity = new WeakReference<PrintFragment4>(activity);
         }
 
         public void handleMessage(Message msg) {
-            PrintFragment1 m = mActivity.get();
+            PrintFragment4 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -101,7 +100,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.ab_print_fragment1, container, false);
+        return inflater.inflate(R.layout.ab_print_fragment4, container, false);
     }
 
 //    @Override
@@ -124,14 +123,14 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
 
         xRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         xRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new PrintFragment1Adapter(mContext, listDatas);
+        mAdapter = new PrintFragment4Adapter(mContext, listDatas);
         xRecyclerView.setAdapter(mAdapter);
         xRecyclerView.setLoadingListener(context);
 
         xRecyclerView.setPullRefreshEnabled(false); // 上啦刷新禁用
         xRecyclerView.setLoadingMoreEnabled(false); // 不显示下拉刷新的view
 
-        mAdapter.setCallBack(new PrintFragment1Adapter.MyCallBack() {
+        mAdapter.setCallBack(new PrintFragment4Adapter.MyCallBack() {
             @Override
             public void onPrint(Material e, int pos) {
             Log.e("onPrint1", e.getfName());
@@ -146,11 +145,11 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     @Override
     public void initData() {
         mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initLoadDatas();
-            }
-        }, 200);
+                @Override
+                public void run() {
+                    initLoadDatas();
+                }
+            }, 200);
     }
 
     @OnClick({R.id.btn_search, R.id.tv_print_type})

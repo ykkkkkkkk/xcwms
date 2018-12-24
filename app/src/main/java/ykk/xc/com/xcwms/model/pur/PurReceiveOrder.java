@@ -58,6 +58,12 @@ public class PurReceiveOrder implements Serializable {
 	private int entryId;
 	private int isCheck; // 新加的是否选中
 	private BarCodeTable bct; // 新加的条码表数据，只做显示数据用的
+	/*单价*/
+	private double fprice;
+	/*金额*/
+	private double famount;
+	/*采购订单号*/
+	private String purOrderNo;
 
 	public PurReceiveOrder() {
 		super();
@@ -314,6 +320,24 @@ public class PurReceiveOrder implements Serializable {
 	}
 	public void setReceiveMinScale(double receiveMinScale) {
 		this.receiveMinScale = receiveMinScale;
+	}
+	public double getFprice() {
+		return fprice;
+	}
+	public void setFprice(double fprice) {
+		this.fprice = fprice;
+	}
+	public double getFamount() {
+		return famount;
+	}
+	public void setFamount(double famount) {
+		this.famount = famount;
+	}
+	public String getPurOrderNo() {
+		return purOrderNo;
+	}
+	public void setPurOrderNo(String purOrderNo) {
+		this.purOrderNo = purOrderNo;
 	}
 
 

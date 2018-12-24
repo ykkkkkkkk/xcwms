@@ -59,11 +59,11 @@ public class Pur_InMainActivity extends BaseActivity {
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
         Pur_InFragment1 fragment1 = new Pur_InFragment1();
-        Pur_InFragment2 fragment2 = new Pur_InFragment2();
+//        Pur_InFragment2 fragment2 = new Pur_InFragment2();
         Pur_InFragment3 fragment3 = new Pur_InFragment3();
 
         listFragment.add(fragment1);
-        listFragment.add(fragment2);
+//        listFragment.add(fragment2);
         listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
@@ -87,11 +87,12 @@ public class Pur_InMainActivity extends BaseActivity {
 
                         break;
                     case 1:
-                        tabChange(viewRadio2,"采购订单入库",1);
-
-                        break;
-                    case 2:
-                        tabChange(viewRadio3,"收料订单入库",2);
+//                        tabChange(viewRadio2,"采购订单入库",1);
+//
+//                        break;
+//                    case 2:
+//                        tabChange(viewRadio3,"收料订单入库",2);
+                        tabChange(viewRadio3,"收料订单入库",1);
 
                         break;
                 }
@@ -151,7 +152,8 @@ public class Pur_InMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab3:
-                tabChange(viewRadio3,"收料订单入库",2);
+//                tabChange(viewRadio3,"收料订单入库",2);
+                tabChange(viewRadio3,"收料订单入库",1);
 
                 break;
         }

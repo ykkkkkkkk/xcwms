@@ -11,7 +11,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -511,7 +510,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setSourceFnumber(pl.getPickingListNo());
 //            sr2.setSourceK3Id(pl.getfId());
 //            sr2.setSourceFnumber(pl.getFbillno());
-            sr2.setFitemId(pl.getMtlId());
+            sr2.setMtlId(pl.getMtlId());
             sr2.setMtl(pl.getMtl());
             sr2.setMtlFnumber(pl.getMtl().getfNumber());
             sr2.setUnitFnumber(pl.getMtl().getUnit().getUnitNumber());
@@ -631,7 +630,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             record.setSourceId(sr2.getSourceId());
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
-            record.setMtlK3Id(sr2.getFitemId());
+            record.setMtlK3Id(sr2.getMtlId());
             record.setMtlFnumber(sr2.getMtlFnumber());
             record.setUnitFnumber(sr2.getUnitFnumber());
             record.setStockK3Id(sr2.getStockId());

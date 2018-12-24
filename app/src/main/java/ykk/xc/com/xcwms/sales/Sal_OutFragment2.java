@@ -46,7 +46,6 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Express_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
-import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
@@ -72,7 +71,6 @@ import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
-import ykk.xc.com.xcwms.util.interfaces.IFragmentKeyeventListener;
 
 /**
  * 扫箱码 出库
@@ -964,7 +962,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
-            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtlId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
@@ -1046,7 +1044,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 ScanningRecord2 sr2 = new ScanningRecord2();
                 sr2.setSourceK3Id(deliOrder.getfId());
                 sr2.setSourceFnumber(deliOrder.getFbillno());
-                sr2.setFitemId(deliOrder.getMtlId());
+                sr2.setMtlId(deliOrder.getMtlId());
                 sr2.setMtl(deliOrder.getMtl());
                 //
                 sr2.setMtlFnumber(deliOrder.getMtlFnumber());
@@ -1141,6 +1139,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
                 srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
                 srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
+                srTok3.setFpaezWidth(deliOrder.getWidth());
+                srTok3.setFpaezHigh(deliOrder.getHigh());
+                srTok3.setFpaezBeizhu(deliOrder.getSummary());
+                srTok3.setFboxAmount(mapBox.size());
                 sr2.setSrTok3(srTok3);
 
                 checkDatas.add(sr2);
@@ -1175,7 +1177,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             sr2.setSourceId(mbr.getId());
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
-            sr2.setFitemId(mbr.getMaterialId());
+            sr2.setMtlId(mbr.getMaterialId());
             sr2.setMtl(mbr.getMtl());
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
@@ -1281,6 +1283,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
             srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
             srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
+            srTok3.setFpaezWidth(deliOrder.getWidth());
+            srTok3.setFpaezHigh(deliOrder.getHigh());
+            srTok3.setFpaezBeizhu(deliOrder.getSummary());
+            srTok3.setFboxAmount(mapBox.size());
             sr2.setSrTok3(srTok3);
 
             checkDatas.add(sr2);
@@ -1374,7 +1380,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setSourceId(sr2.getSourceId());
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
-            record.setMtlK3Id(sr2.getFitemId());
+            record.setMtlK3Id(sr2.getMtlId());
             record.setMtlFnumber(sr2.getMtlFnumber());
             record.setUnitFnumber(sr2.getUnitFnumber());
             record.setStockK3Id(sr2.getStockId());

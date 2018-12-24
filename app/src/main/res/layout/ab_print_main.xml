@@ -92,6 +92,22 @@
             android:textColor="#666666"
             android:textSize="14sp" />
 
+        <View
+            android:layout_width="@dimen/_0.5dp"
+            android:layout_height="match_parent"
+            android:background="#CCCCCC" />
+
+        <TextView
+            android:id="@+id/tv_4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="物料包装"
+            android:textColor="#666666"
+            android:textSize="14sp" />
+
+
     </LinearLayout>
 
     <View

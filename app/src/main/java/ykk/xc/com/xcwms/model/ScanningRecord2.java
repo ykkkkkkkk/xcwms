@@ -9,7 +9,7 @@ public class ScanningRecord2 implements Serializable {
     private int sourceId;
     private int sourceK3Id;
     private String sourceFnumber;
-    private int fitemId; // 物料id
+    private int mtlId; // 物料id
     private Material mtl;
     private String batchno;
     private double fqty; // 应收数量
@@ -102,11 +102,11 @@ public class ScanningRecord2 implements Serializable {
     public void setSourceFnumber(String sourceFnumber) {
         this.sourceFnumber = sourceFnumber;
     }
-    public int getFitemId() {
-        return fitemId;
+    public int getMtlId() {
+        return mtlId;
     }
-    public void setFitemId(int fitemId) {
-        this.fitemId = fitemId;
+    public void setMtlId(int mtlId) {
+        this.mtlId = mtlId;
     }
     public Material getMtl() {
         return mtl;

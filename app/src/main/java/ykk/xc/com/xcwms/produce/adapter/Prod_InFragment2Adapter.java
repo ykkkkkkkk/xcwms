@@ -72,6 +72,12 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
                         }
 
                         break;
+                    case R.id.tv_stockAP: // 选择仓库
+                        if(callBack != null) {
+                            callBack.onClick_selStock(v, entity, pos);
+                        }
+
+                        break;
                     case R.id.tv_delRow: // 删除行
                         if(callBack != null) {
                             callBack.onClick_del(entity, pos);
@@ -82,6 +88,7 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
             }
         };
         tv_nums.setOnClickListener(click);
+        tv_stockAP.setOnClickListener(click);
         tv_delRow.setOnClickListener(click);
     }
 
@@ -91,6 +98,7 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
 
     public interface MyCallBack {
         void onClick_num(View v, ScanningRecord2 entity, int position);
+        void onClick_selStock(View v, ScanningRecord2 entity, int position);
         void onClick_del(ScanningRecord2 entity, int position);
     }
 

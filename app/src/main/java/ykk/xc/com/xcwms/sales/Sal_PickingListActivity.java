@@ -59,6 +59,7 @@ import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_PickingListAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.LogUtil;
 
 /**
  * 拣货单界面
@@ -332,28 +333,46 @@ public class Sal_PickingListActivity extends BaseActivity {
             return false;
         }
 
+        // 判断是否输入了数量
+        boolean is0 = false;
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            PickingList pl = checkDatas.get(i);
+            if (pl.getPickingListNum() > 0) is0 = true;
+        }
+        if(!is0) {
+            Comm.showWarnDialog(context,"当前行中，至少有一行（拣货数）必须大于0！");
+            return false;
+        }
+
+        List<PickingList> list = new ArrayList<>();
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             PickingList pl = checkDatas.get(i);
-            if (pl.getPickingListNum() == 0) {
-                Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）必须大于0！");
-                return false;
-            }
+//            if (pl.getPickingListNum() == 0) {
+//                Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）必须大于0！");
+//                return false;
+//            }
             if ((pl.getMtl().getMtlPack() == null || pl.getMtl().getMtlPack().getIsMinNumberPack() == 0) && pl.getPickingListNum() > pl.getDeliFremainoutqty()) {
                 Comm.showWarnDialog(context,"第" + (i + 1) + "行（拣货数）不能大于（订单数）！");
                 return false;
             }
             // 启用批次号
-            if(pl.getMtl().getIsBatchManager() > 0 && isNULLS(pl.getBatchNo()).length() == 0) {
+            if(pl.getPickingListNum() > 0 && pl.getMtl().getIsBatchManager() > 0 && isNULLS(pl.getBatchNo()).length() == 0) {
                 curPos = i;
                 writeBatchDialog();
                 return false;
             }
-            if(isNULLS(pl.getStockName()).length() == 0) {
+            if(pl.getPickingListNum() > 0 && isNULLS(pl.getStockName()).length() == 0) {
                 Comm.showWarnDialog(context,"第"+(i+1)+"行请选择仓库！");
                 return false;
             }
+            if (pl.getPickingListNum() > 0) {
+                list.add(pl);
+            }
         }
+        checkDatas.clear();
+        checkDatas.addAll(list);
+
         return true;
     }
 
@@ -835,13 +854,13 @@ public class Sal_PickingListActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
+                LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC2, result);
                     mHandler.sendMessage(msg);
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC2, result);
-                Log.e("run_smGetDatas --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

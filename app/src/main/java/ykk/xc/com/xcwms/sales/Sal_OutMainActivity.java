@@ -110,18 +110,19 @@ public class Sal_OutMainActivity extends BaseActivity {
 //        bundle2.putSerializable("customer", customer);
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
-        Sal_OutFragment1 fragment1 = new Sal_OutFragment1();
+//        Sal_OutFragment1 fragment1 = new Sal_OutFragment1();
         Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
         Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
 
-        listFragment.add(fragment1);
+//        listFragment.add(fragment1);
         listFragment.add(fragment2);
         listFragment.add(fragment3);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
         //ViewPager显示第一个Fragment
-        viewPager.setCurrentItem(1);
+//        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(0);
 
         //ViewPager页面切换监听
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -133,16 +134,25 @@ public class Sal_OutMainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 switch (position) {
+//                    case 0:
+//                        tabChange(viewRadio1, "销售出库--销售订单", 0);
+//
+//                        break;
+//                    case 1:
+//                        tabChange(viewRadio2, "销售出库--箱码", 1);
+//
+//                        break;
+//                    case 2:
+//                        tabChange(viewRadio3, "销售出库--拣货单", 2);
+//
+//                        break;
+
                     case 0:
-                        tabChange(viewRadio1, "销售出库--销售订单", 0);
+                        tabChange(viewRadio2, "销售出库--箱码", 0);
 
                         break;
                     case 1:
-                        tabChange(viewRadio2, "销售出库--箱码", 1);
-
-                        break;
-                    case 2:
-                        tabChange(viewRadio3, "销售出库--拣货单", 2);
+                        tabChange(viewRadio3, "销售出库--拣货单", 1);
 
                         break;
                 }
@@ -198,11 +208,13 @@ public class Sal_OutMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab2:
-                tabChange(viewRadio2, "销售出库--箱码", 1);
+//                tabChange(viewRadio2, "销售出库--箱码", 1);
+                tabChange(viewRadio2, "销售出库--箱码", 0);
 
                 break;
             case R.id.lin_tab3:
-                tabChange(viewRadio3, "销售出库--拣货单", 2);
+//                tabChange(viewRadio3, "销售出库--拣货单", 2);
+                tabChange(viewRadio3, "销售出库--拣货单", 1);
 
                 break;
         }

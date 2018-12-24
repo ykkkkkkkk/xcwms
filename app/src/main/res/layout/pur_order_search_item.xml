@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/tv1"
         android:layout_width="32dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="行号"
         android:textColor="#000000"
@@ -19,7 +19,7 @@
     <TextView
         android:id="@+id/tv2"
         android:layout_width="78dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="单据编号"
         android:textColor="#000000"
@@ -28,7 +28,7 @@
     <TextView
         android:id="@+id/tv3"
         android:layout_width="86dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="供应商"
         android:textColor="#000000"
@@ -37,7 +37,7 @@
     <TextView
         android:id="@+id/tv4"
         android:layout_width="86dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="采购员\n采购组织"
         android:textColor="#000000"
@@ -46,7 +46,7 @@
     <TextView
         android:id="@+id/tv5"
         android:layout_width="76dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="采购部门"
         android:textColor="#000000"
@@ -55,7 +55,7 @@
     <TextView
         android:id="@+id/tv6"
         android:layout_width="68dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="采购日期"
         android:maxLength="10"
@@ -65,7 +65,7 @@
     <TextView
         android:id="@+id/tv8"
         android:layout_width="86dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="采购数量\n累计入库数"
         android:textColor="#000000"
@@ -74,7 +74,7 @@
     <TextView
         android:id="@+id/tv7"
         android:layout_width="108dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="物料编码/名称\n规格型号"
         android:textColor="#000000"
@@ -83,7 +83,7 @@
     <TextView
         android:id="@+id/tv7a"
         android:layout_width="78dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="物料编码/名称\n规格型号"
         android:textColor="#000000"
@@ -93,9 +93,27 @@
     <TextView
         android:id="@+id/tv9"
         android:layout_width="86dp"
-        android:layout_height="@dimen/_42dp"
+        android:layout_height="@dimen/_46dp"
         android:gravity="center"
         android:text="收料组织"
+        android:textColor="#000000"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv10"
+        android:layout_width="86dp"
+        android:layout_height="@dimen/_46dp"
+        android:gravity="center"
+        android:text="宽/高/面积"
+        android:textColor="#000000"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv11"
+        android:layout_width="110dp"
+        android:layout_height="@dimen/_46dp"
+        android:gravity="center"
+        android:text="备注"
         android:textColor="#000000"
         android:textSize="12sp" />
 
