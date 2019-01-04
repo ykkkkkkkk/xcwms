@@ -112,7 +112,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     TextView tvConnState;
 
     private Sal_RecombinationActivity context = this;
-    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, SEL_PICKINGLIST = 15;
+    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, SEL_PICKINGLIST = 15, PAD_SM = 16;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
     private static final int CODE1 = 1, CODE2 = 2;
     private Customer customer; // 客户
@@ -135,6 +135,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private static final int CONN_STATE_DISCONN = 0x007; // 连接状态断开
     private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
     private static final int CONN_PRINTER = 0x12;
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -249,7 +250,41 @@ public class Sal_RecombinationActivity extends BaseActivity {
                                 DeviceConnFactoryManager.getDeviceConnFactoryManagers()[m.id].openPort();
                             }
                         });
+
                         break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 发货订单
+                                etName = m.getValues(m.etBoxCode);
+                                if (m.boxBarcode != null && m.boxBarcode.length() > 0) {
+                                    if(m.boxBarcode.equals(etName)) {
+                                        m.boxBarcode = etName;
+                                    } else m.boxBarcode = etName.replaceFirst(m.boxBarcode, "");
+
+                                } else m.boxBarcode = etName;
+                                m.setTexts(m.etBoxCode, m.boxBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.boxBarcode);
+
+                                break;
+                            case '2': // 物料
+                                etName = m.getValues(m.etMtlCode);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlCode, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode);
+
+                                break;
+                        }
+
+                        break;
+
                 }
             }
         }
@@ -460,13 +495,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // 按了删除键，回退键
-//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
-        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
-            return false;
-        }
-        return super.dispatchKeyEvent(event);
+        boolean isNext = Comm.smKeyIsValid(context, event);
+        return isNext ? super.dispatchKeyEvent(event) : false;
     }
 
     @Override
@@ -479,11 +509,21 @@ public class Sal_RecombinationActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '1';
-                boxBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(boxBarcode);
+//                boxBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(boxBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        boxBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(boxBarcode);
+                    }
+                }
             }
         });
         // 物料
@@ -501,9 +541,20 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     return;
                 }
                 curViewFlag = '2';
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode);
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode);
+                    }
+                }
             }
         });
     }
@@ -593,16 +644,16 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     //打开端口
                     DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 }
-                if(!isPair) {
-                    // 打开蓝牙配对页面
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
-                        }
-                    },500);
-
-                }
+//                if(!isPair) {
+//                    // 打开蓝牙配对页面
+//                    mHandler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            startActivityForResult(new Intent(context, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+//                        }
+//                    },500);
+//
+//                }
                 break;
             }
         }
@@ -817,6 +868,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
+        isTextChange = false;
         if(val.length() == 0) {
             Comm.showWarnDialog(context,"请对准条码！");
             return;

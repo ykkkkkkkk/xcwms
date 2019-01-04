@@ -120,7 +120,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     public void initData() {
         SharedPreferences spfConfig = spf(getResStr(R.string.saveConfig));
-        String ip = spfConfig.getString("ip", "192.168.3.214");
+        String ip = spfConfig.getString("ip", "192.168.3.198");
         String port = spfConfig.getString("port", "8080");
         Consts.setIp(ip);
         Consts.setPort(port);
@@ -131,6 +131,11 @@ public class LoginActivity extends BaseActivity {
             setTexts(etPwd, user.getPassword());
         }
         requestPermission();
+
+        // 保存是否为平板电脑
+        boolean isPad = Comm.isPad(context);
+        SharedPreferences spf = spf(getResStr(R.string.saveOther));
+        spf.edit().putBoolean("isPad", isPad).commit();
     }
 
     @Override

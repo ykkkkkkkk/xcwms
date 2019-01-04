@@ -38,6 +38,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Express_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
+import ykk.xc.com.xcwms.basics.Staff_DialogActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
@@ -48,10 +49,13 @@ import ykk.xc.com.xcwms.model.ExpressCompany;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
+import ykk.xc.com.xcwms.model.ScanningRecordTok3;
 import ykk.xc.com.xcwms.model.ShrinkOrder;
+import ykk.xc.com.xcwms.model.Staff;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment3Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -63,8 +67,8 @@ public class Sal_OutFragment3 extends BaseFragment {
 
     @BindView(R.id.tv_pickingListSel)
     TextView tvPickingListSel;
-    @BindView(R.id.tv_deptName)
-    TextView tvDeptName;
+    @BindView(R.id.tv_deptSel)
+    TextView tvDeptSel;
     @BindView(R.id.tv_custSel)
     TextView tvCustSel;
     @BindView(R.id.recyclerView)
@@ -73,8 +77,8 @@ public class Sal_OutFragment3 extends BaseFragment {
     TextView tvReceiveOrg;
     @BindView(R.id.tv_salOrg)
     TextView tvSalOrg;
-    @BindView(R.id.tv_salMan)
-    TextView tvSalMan;
+    @BindView(R.id.tv_stockStaff)
+    TextView tvStockStaff;
     @BindView(R.id.tv_expressCompany)
     TextView tvExpressCompany;
     @BindView(R.id.et_expressNo)
@@ -85,18 +89,18 @@ public class Sal_OutFragment3 extends BaseFragment {
     Button btnSave;
 
     private Sal_OutFragment3 context = this;
-    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16;
+    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, PASS = 203, UNPASS = 503;
     private static final int CODE2 = 2;
-    private Stock stock; // 仓库
-    private StockPosition stockP; // 库位
+    private Stock stock2; // 仓库
+    private StockPosition stockP2; // 库位
     private Department department; // 部门
+    private Staff stockStaff; // 仓管员
     private Organization receiveOrg, salOrg; // 组织
     private ExpressCompany expressCompany; // 物料公司
     private Sal_OutFragment3Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
-    private String deptBarcode, expressNoBarcode; // 对应的条码号
-    private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
+    private char curViewFlag = '1'; // 1：箱码
     private int curPos; // 当前行
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
@@ -210,10 +214,20 @@ public class Sal_OutFragment3 extends BaseFragment {
         hideSoftInputMode(mContext, etExpressNo);
         getUserInfo();
 
+        if(user.getStaff() != null) {
+            stockStaff = user.getStaff();
+        } else {
+            stockStaff = showObjectByXml(Staff.class, "strStockStaff", getResStr(R.string.saveUser));
+        }
+        department = showObjectByXml(Department.class, "strDepartment", getResStr(R.string.saveUser));
+        // 赋值
+        if(stockStaff != null) tvStockStaff.setText(stockStaff.getName());
+        if(department != null) tvDeptSel.setText(department.getDepartmentName());
+
     }
 
     @OnClick({R.id.tv_pickingListSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg,
-            R.id.tv_salMan, R.id.lin_rowTitle, R.id.tv_expressCompany})
+            R.id.tv_deptSel, R.id.tv_stockStaff, R.id.lin_rowTitle, R.id.tv_expressCompany})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -227,19 +241,22 @@ public class Sal_OutFragment3 extends BaseFragment {
                 showForResult(Sal_SelPickingListActivity.class, SEL_PICKINGLIST, bundle);
 
                 break;
-            case R.id.btn_deptName: // 选择部门
+            case R.id.tv_deptSel: // 选择部门
                 showForResult(Dept_DialogActivity.class, SEL_DEPT, null);
 
                 break;
             case R.id.tv_receiveOrg: // 发货组织
-                showForResult(Organization_DialogActivity.class, SEL_ORG, null);
+//                showForResult(Organization_DialogActivity.class, SEL_ORG, null);
 
                 break;
             case R.id.tv_salOrg: // 销售组织
-                showForResult(Organization_DialogActivity.class, SEL_ORG2, null);
+//                showForResult(Organization_DialogActivity.class, SEL_ORG2, null);
 
                 break;
-            case R.id.tv_prodMan: // 选择业务员
+            case R.id.tv_stockStaff: // 选择仓管员
+                bundle = new Bundle();
+                bundle.putInt("isload", 0);
+                showForResult(Staff_DialogActivity.class, SEL_STAFF, bundle);
 
                 break;
             case R.id.btn_save: // 保存
@@ -328,19 +345,15 @@ public class Sal_OutFragment3 extends BaseFragment {
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
-//            if (sr2.getMtl().getIsBatchManager() == 1 && sr2.getBatchno().length() == 0) {
-//                Comm.showWarnDialog(context,"第" + (i + 1) + "行请输入（批号）！");
-//                return false;
-//            }
-//            if (sr2.getMtl().getIsSnManager() == 1 && sr2.getSequenceNo().length() == 0) {
-//                Comm.showWarnDialog(context,"第" + (i + 1) + "行请输入（序列号）！");
-//                return false;
-//            }
+            ScanningRecordTok3 srToK3 = sr2.getSrTok3();
+
+            // 员工
+            if(stockStaff != null) srToK3.setStockStaffNumber(stockStaff.getNumber());
             if (sr2.getStockqty() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
-            if (isNULLS(sr2.getStockName()).length() == 0) {
+            if (sr2.getStockId() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
@@ -447,38 +460,27 @@ public class Sal_OutFragment3 extends BaseFragment {
                 break;
             case SEL_STOCK2: //行事件选择仓库	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    stock = (Stock) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCK2", stock.getfName());
+                    stock2 = (Stock) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
                     // 启用了库位管理
-                    if (stock.isStorageLocation()) {
+                    if (stock2.isStorageLocation()) {
                         Bundle bundle = new Bundle();
-                        bundle.putInt("stockId", stock.getfStockid());
+                        bundle.putInt("stockId", stock2.getfStockid());
                         showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
                     } else {
-                        ScanningRecord2 sr2 = checkDatas.get(curPos);
-                        sr2.setStockId(stock.getfStockid());
-                        sr2.setStockFnumber(stock.getfNumber());
-                        sr2.setStockName(stock.getfName());
-                        sr2.setStock(stock);
-                        mAdapter.notifyDataSetChanged();
+                        stockAllFill(false);
+                        saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     }
                 }
 
                 break;
             case SEL_STOCKP2: //行事件选择库位	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    stockP = (StockPosition) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCKP2", stockP.getFname());
-                    ScanningRecord2 sr2 = checkDatas.get(curPos);
-                    sr2.setStock(stock);
-                    sr2.setStockId(stock.getfStockid());
-                    sr2.setStockFnumber(stock.getfNumber());
-                    sr2.setStockName(stock.getfName());
-
-                    sr2.setStockPos(stockP);
-                    sr2.setStockPositionId(stockP.getId());
-                    sr2.setStockPName(stockP.getFname());
-                    mAdapter.notifyDataSetChanged();
+                    stockP2 = (StockPosition) data.getSerializableExtra("obj");
+                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    stockAllFill(true);
+                    saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
+                    saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
                 }
 
                 break;
@@ -495,7 +497,55 @@ public class Sal_OutFragment3 extends BaseFragment {
                 }
 
                 break;
+            case SEL_STAFF: // 采购员	返回
+                if (resultCode == Activity.RESULT_OK) {
+                    stockStaff = (Staff) data.getSerializableExtra("staff");
+                    tvStockStaff.setText(stockStaff.getName());
+                    saveObjectToXml(stockStaff, "strStockStaff", getResStr(R.string.saveUser));
+                }
+                break;
         }
+    }
+
+    /**
+     * 部门数据全部填充
+     */
+    private void stockAllFill(boolean inStockPosData) {
+        int size = checkDatas.size();
+        boolean isBool = false;
+        for(int i=0; i<size; i++) {
+            ScanningRecord2 sr2 = checkDatas.get(i);
+            if(sr2.getStockId() > 0) {
+                isBool = true;
+                break;
+            }
+        }
+        if(isBool) {
+            ScanningRecord2 sr2 = checkDatas.get(curPos);
+            sr2.setStockId(stock2.getfStockid());
+            sr2.setStockFnumber(stock2.getfNumber());
+            sr2.setStockName(stock2.getfName());
+            sr2.setStock(stock2);
+            if(inStockPosData) {
+                sr2.setStockPos(stockP2);
+                sr2.setStockPositionId(stockP2.getId());
+                sr2.setStockPName(stockP2.getFname());
+            }
+        } else { // 全部都为空的时候，选择任意全部填充
+            for (int i = 0; i < size; i++) {
+                ScanningRecord2 sr2 = checkDatas.get(i);
+                sr2.setStockId(stock2.getfStockid());
+                sr2.setStockFnumber(stock2.getfNumber());
+                sr2.setStockName(stock2.getfName());
+                sr2.setStock(stock2);
+                if(inStockPosData) {
+                    sr2.setStockPos(stockP2);
+                    sr2.setStockPositionId(stockP2.getId());
+                    sr2.setStockPName(stockP2.getFname());
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -504,6 +554,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     private void getPickingList(List<PickingList> list) {
         for (int i = 0, size = list.size(); i < size; i++) {
             PickingList pl = list.get(i);
+            DeliOrder deliOrder = pl.getDeliOrder();
             ScanningRecord2 sr2 = new ScanningRecord2();
             sr2.setSourceId(pl.getId());
             sr2.setSourceK3Id(pl.getId());
@@ -515,6 +566,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setMtlFnumber(pl.getMtl().getfNumber());
             sr2.setUnitFnumber(pl.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(pl.getfId());
+            sr2.setSalOrderNo(deliOrder.getSalOrderNo());
             sr2.setPoFbillno(pl.getFbillno());
             sr2.setFprice(pl.getFprice());
 //            sr2.setBatchno(pl.getBatchCode());
@@ -543,7 +595,6 @@ public class Sal_OutFragment3 extends BaseFragment {
             receiveOrg.setFpkId(pl.getDeliOrgId());
             receiveOrg.setNumber(pl.getDeliOrgNumber());
             receiveOrg.setName(pl.getDeliOrgName());
-            setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
             tvReceiveOrg.setText(receiveOrg.getName());
             sr2.setReceiveOrgFnumber(receiveOrg.getNumber());
 
@@ -559,7 +610,6 @@ public class Sal_OutFragment3 extends BaseFragment {
                 salOrg.setName(pl.getDeliOrgName());
             }
 
-            setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
             tvSalOrg.setText(salOrg.getName());
             sr2.setPurOrgFnumber(salOrg.getNumber());
             sr2.setCustomerId(pl.getCustId());
@@ -580,6 +630,29 @@ public class Sal_OutFragment3 extends BaseFragment {
             expressCompany.setExpressNumber(deliveryCompanyNumber);
             expressCompany.setExpressName(deliveryCompanyName);
 
+            sr2.setLeafNumber(deliOrder.getLeaf());
+            sr2.setLeafNumber2(deliOrder.getLeaf1());
+            sr2.setCoveQty(deliOrder.getCoveQty());
+
+            ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
+            srTok3.setSaleDeptNumber(deliOrder.getSaleDeptNumber());
+            srTok3.setCustomerService(deliOrder.getCustomerService());
+            srTok3.setFreceive(deliOrder.getFreceive());
+            srTok3.setFreceivetel(deliOrder.getFreceivetel());
+            srTok3.setFconsignee(deliOrder.getFconsignee());
+            srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
+            srTok3.setSalerNumber(deliOrder.getSalerNumber());
+            srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
+            srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
+            srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
+            srTok3.setFpaezArea(deliOrder.getEntryArea());
+            srTok3.setFpaezWidth(deliOrder.getWidth());
+            srTok3.setFpaezHigh(deliOrder.getHigh());
+            srTok3.setFpaezBeizhu(deliOrder.getSummary());
+            srTok3.setFentryNote(deliOrder.getEntryRemark());
+            srTok3.setFboxAmount(0); // 箱数
+            sr2.setSrTok3(srTok3);
+
             checkDatas.add(sr2);
         }
         tvExpressCompany.setText(expressCompany.getExpressName());
@@ -591,8 +664,7 @@ public class Sal_OutFragment3 extends BaseFragment {
      */
     private void getDeptAfter() {
         if (department != null) {
-            tvDeptName.setText(department.getDepartmentName());
-            deptBarcode = department.getDepartmentName();
+            tvDeptSel.setText(department.getDepartmentName());
         }
     }
 
@@ -672,11 +744,16 @@ public class Sal_OutFragment3 extends BaseFragment {
             record.setfRuleId(sr2.getfRuleId());
             record.setFsTableName(sr2.getFsTableName());
             record.setFcarriageNo(getValues(etExpressNo).trim());
+            record.setSalOrderNo(sr2.getSalOrderNo());
             if(expressCompany != null) {
                 record.setExpressNumber(expressCompany.getExpressNumber());
             }
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
+            record.setSrTok3(sr2.getSrTok3());
+            record.setLeafNumber(sr2.getLeafNumber());
+            record.setLeafNumber2(sr2.getLeafNumber2());
+            record.setCoveQty(sr2.getCoveQty());
 
             list.add(record);
         }

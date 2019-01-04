@@ -90,19 +90,19 @@ public class Sal_OutFragment1 extends BaseFragment {
     TextView tvSalOrg;
     @BindView(R.id.tv_salDate)
     TextView tvSalDate;
-    @BindView(R.id.tv_salMan)
-    TextView tvSalMan;
+    @BindView(R.id.tv_stockStaff)
+    TextView tvStockStaff;
     @BindView(R.id.lin_top)
     LinearLayout linTop;
 
     private Sal_OutFragment1 context = this;
-    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_STOCK2 = 14, SEL_STOCKP2 = 15, SEL_STAFF = 16;
+    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_STOCK2 = 14, SEL_STOCKP2 = 15, SEL_STAFF = 16, PAD_SM = 17;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, CODE2 = 2, CODE20 = 20;
     private Customer cust; // 客户
     private Stock stock, stock2; // 仓库
     private StockPosition stockP, stockP2; // 库位
-    private Staff salStaff; // 销售员
+    private Staff stockStaff; // 销售员
     private Department department; // 部门
     private Organization deliOrg, salOrg; // 组织
     private Sal_OutFragment1Adapter mAdapter;
@@ -116,6 +116,7 @@ public class Sal_OutFragment1 extends BaseFragment {
     private Activity mContext;
     private Sal_OutMainActivity parent;
     private String k3Number; // 记录传递到k3返回的单号
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private Sal_OutFragment1.MyHandler mHandler = new Sal_OutFragment1.MyHandler(this);
@@ -244,6 +245,25 @@ public class Sal_OutFragment1 extends BaseFragment {
                         m.setFocusable(m.etMtlNo);
 
                         break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 销售订单
+                                etName = m.getValues(m.etMtlNo);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlNo, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode);
+
+                                break;
+                        }
+
+                        break;
                 }
             }
         }
@@ -309,12 +329,16 @@ public class Sal_OutFragment1 extends BaseFragment {
             stock = showObjectByXml(Stock.class, "strStock", getResStr(R.string.saveUser));
             stockP = showObjectByXml(StockPosition.class, "strStockPos", getResStr(R.string.saveUser));
         }
-        salStaff = showObjectByXml(Staff.class, "strSalStaff", getResStr(R.string.saveUser));
+        if(user.getStaff() != null) {
+            stockStaff = user.getStaff();
+        } else {
+            stockStaff = showObjectByXml(Staff.class, "strStockStaff", getResStr(R.string.saveUser));
+        }
         department = showObjectByXml(Department.class, "strDepartment", getResStr(R.string.saveUser));
         // 赋值
         if(deliOrg != null) tvReceiveOrg.setText(deliOrg.getName());
         if(salOrg != null) tvSalOrg.setText(salOrg.getName());
-        if(salStaff != null) tvSalMan.setText(salStaff.getName());
+        if(stockStaff != null) tvStockStaff.setText(stockStaff.getName());
         if(department != null) tvDeptSel.setText(department.getDepartmentName());
 
         tvSalDate.setText(Comm.getSysDate(7));
@@ -333,7 +357,7 @@ public class Sal_OutFragment1 extends BaseFragment {
     }
 
     @OnClick({R.id.btn_save, R.id.btn_pass, R.id.btn_clone,
-            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan, R.id.lin_rowTitle})
+            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_stockStaff, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -356,7 +380,7 @@ public class Sal_OutFragment1 extends BaseFragment {
             case R.id.tv_salDate: // 出库日期
                 Comm.showDateDialog(mContext, view, 0);
                 break;
-            case R.id.tv_salMan: // 选择销售员
+            case R.id.tv_stockStaff: // 选择销售员
                 bundle = new Bundle();
                 bundle.putInt("isload", 0);
                 showForResult(Staff_DialogActivity.class, SEL_STAFF, bundle);
@@ -471,11 +495,21 @@ public class Sal_OutFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '1';
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode);
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode);
+                    }
+                }
             }
         });
     }
@@ -497,7 +531,6 @@ public class Sal_OutFragment1 extends BaseFragment {
     }
 
     private void resetSon() {
-        salStaff = null;
         k3Number = null;
         btnSave.setVisibility(View.VISIBLE);
         getBarCodeTableBefore(true);
@@ -532,8 +565,6 @@ public class Sal_OutFragment1 extends BaseFragment {
                     } else {
                         stockAllFill(false);
                         saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
@@ -545,8 +576,6 @@ public class Sal_OutFragment1 extends BaseFragment {
                     stockAllFill(true);
                     saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -555,7 +584,6 @@ public class Sal_OutFragment1 extends BaseFragment {
                     deliOrg = (Organization) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_ORG", deliOrg.getName());
                     getOrgAfter();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -564,7 +592,6 @@ public class Sal_OutFragment1 extends BaseFragment {
                     salOrg = (Organization) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_ORG2", salOrg.getName());
                     getOrg2After();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -573,7 +600,6 @@ public class Sal_OutFragment1 extends BaseFragment {
                     department = (Department) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
                     getDeptAfter();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -586,22 +612,19 @@ public class Sal_OutFragment1 extends BaseFragment {
                         checkDatas.get(curPos).setStockqty(num);
 //                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
                 break;
             case SEL_STAFF: // 采购员	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    salStaff = (Staff) data.getSerializableExtra("staff");
-                    tvSalMan.setText(salStaff.getName());
-                    saveObjectToXml(salStaff, "strSalStaff", getResStr(R.string.saveUser));
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                    stockStaff = (Staff) data.getSerializableExtra("staff");
+                    tvStockStaff.setText(stockStaff.getName());
+                    saveObjectToXml(stockStaff, "strStockStaff", getResStr(R.string.saveUser));
                 }
                 break;
         }
+        mHandler.sendEmptyMessageDelayed(SETFOCUS,300);
     }
 
     /**
@@ -763,8 +786,7 @@ public class Sal_OutFragment1 extends BaseFragment {
         sr2.setStockId(stock.getfStockid());
         sr2.setStock(stock);
         sr2.setStockFnumber(stock.getfNumber());
-//        sr2.setStockAreaId(stockA.getId());
-//        sr2.setStockAName(stockA.getFname());
+        sr2.setStockPos(stockP);
         sr2.setStockPositionId(stockP.getId());
         sr2.setStockPName(stockP.getFname());
         // 得到销售订单
@@ -993,6 +1015,7 @@ public class Sal_OutFragment1 extends BaseFragment {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
+        isTextChange = false;
         if(val.length() == 0) {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;

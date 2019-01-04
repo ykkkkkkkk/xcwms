@@ -96,20 +96,20 @@ public class Pur_InFragment3 extends BaseFragment {
     TextView tvReceiveOrg;
     @BindView(R.id.tv_purOrg)
     TextView tvPurOrg;
-    @BindView(R.id.tv_purMan)
-    TextView tvPurMan;
+    @BindView(R.id.tv_stockStaff)
+    TextView tvStockStaff;
     @BindView(R.id.lin_top)
     LinearLayout linTop;
 
     private Pur_InFragment3 context = this;
-    private static final int SEL_ORDER = 10, SEL_SUPPLIER = 11, SEL_DEPT = 12, SEL_MTL = 13, SEL_STOCK2 = 14, SEL_STOCKP2 = 15, SEL_STAFF = 16;
+    private static final int SEL_ORDER = 10, SEL_SUPPLIER = 11, SEL_DEPT = 12, SEL_MTL = 13, SEL_STOCK2 = 14, SEL_STOCKP2 = 15, SEL_STAFF = 16, PAD_SM = 17;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int SETFOCUS = 1, NUM_RESULT = 50, RESET = 60;
     private Supplier supplier; // 供应商
 //    private Material mtl;
     private Stock stock, stock2; // 仓库
     private StockPosition stockP, stockP2; // 库位
-    private Staff purStaff; // 采购员
+    private Staff stockStaff; // 仓管员
     private Department department; // 部门
 //    private Organization receiveOrg, purOrg; // 组织
     private Pur_InFragment3Adapter mAdapter;
@@ -127,6 +127,7 @@ public class Pur_InFragment3 extends BaseFragment {
     private DecimalFormat df = new DecimalFormat("#.####");
     private String k3Number; // 记录传递到k3返回的单号
     private int orgId; // 组织id
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private Pur_InFragment3.MyHandler mHandler = new Pur_InFragment3.MyHandler(this);
@@ -256,6 +257,39 @@ public class Pur_InFragment3 extends BaseFragment {
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
                         m.setFocusable(m.etGetFocus);
                         m.setFocusable(m.etMtlNo);
+
+                        break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 收料订单
+                                etName = m.getValues(m.etSourceNo);
+                                if (m.sourceBarcode != null && m.sourceBarcode.length() > 0) {
+                                    if(m.sourceBarcode.equals(etName)) {
+                                        m.sourceBarcode = etName;
+                                    } else m.sourceBarcode = etName.replaceFirst(m.sourceBarcode, "");
+
+                                } else m.sourceBarcode = etName;
+                                m.setTexts(m.etSourceNo, m.sourceBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.sourceBarcode);
+
+                                break;
+                            case '2': // 物料扫码
+                                etName = m.getValues(m.etMtlNo);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlNo, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode);
+
+                                break;
+                        }
+
                         break;
                 }
             }
@@ -296,6 +330,7 @@ public class Pur_InFragment3 extends BaseFragment {
             public void onClick_del(ScanningRecord2 entity, int position) {
                 Log.e("del", "行：" + position);
                 checkDatas.remove(position);
+                sourceList.remove(position);
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -325,11 +360,15 @@ public class Pur_InFragment3 extends BaseFragment {
             stockP = showObjectByXml(StockPosition.class, "strStockPos", getResStr(R.string.saveUser));
         }
         supplier = showObjectByXml(Supplier.class, "strSupplier", getResStr(R.string.saveUser));
-        purStaff = showObjectByXml(Staff.class, "strPurStaff", getResStr(R.string.saveUser));
+        if(user.getStaff() != null) {
+            stockStaff = user.getStaff();
+        } else {
+            stockStaff = showObjectByXml(Staff.class, "strStockStaff", getResStr(R.string.saveUser));
+        }
         department = showObjectByXml(Department.class, "strDepartment", getResStr(R.string.saveUser));
         // 赋值
         if(supplier != null) tvSupplierSel.setText(supplier.getfName());
-        if(purStaff != null) tvPurMan.setText(purStaff.getName());
+        if(stockStaff != null) tvStockStaff.setText(stockStaff.getName());
         if(department != null) tvDeptSel.setText(department.getDepartmentName());
     }
 
@@ -346,7 +385,7 @@ public class Pur_InFragment3 extends BaseFragment {
     }
 
     @OnClick({R.id.tv_supplierSel, R.id.btn_sourceNo, R.id.btn_selMtl, R.id.btn_save, R.id.btn_pass, R.id.btn_clone,
-            R.id.tv_orderTypeSel, R.id.tv_purMan, R.id.tv_deptSel, R.id.lin_rowTitle})
+            R.id.tv_orderTypeSel, R.id.tv_stockStaff, R.id.tv_deptSel, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -382,7 +421,7 @@ public class Pur_InFragment3 extends BaseFragment {
             case R.id.tv_purDate: // 入库日期
                 Comm.showDateDialog(mContext, view, 0);
                 break;
-            case R.id.tv_purMan: // 选择业务员
+            case R.id.tv_stockStaff: // 选择业务员
                 bundle = new Bundle();
                 bundle.putInt("isload", 0);
                 showForResult(Staff_DialogActivity.class, SEL_STAFF, bundle);
@@ -463,13 +502,20 @@ public class Pur_InFragment3 extends BaseFragment {
             ScanningRecord2 sr2 = checkDatas.get(i);
             ScanningRecordTok3 srToK3 = sr2.getSrTok3();
             Material mtl = sr2.getMtl();
+            String purDeptNumber = Comm.isNULLS(srToK3.getFpurchaseDeptNumber());
+            String recDeptNumber = Comm.isNULLS(srToK3.getFstockDeptNumber());
+            String purStaffNumber = Comm.isNULLS(srToK3.getFpurchaserNumber());
+            String stockStaffNumber = Comm.isNULLS(srToK3.getStockStaffNumber());
 
-            // 员工
-            if(purStaff != null) srToK3.setFpurchaserNumber(purStaff.getNumber());
+            // 采购员，仓管员
+            if(stockStaff != null && purStaffNumber.length() == 0) srToK3.setFpurchaserNumber(stockStaff.getNumber());
+            if(stockStaff != null && stockStaffNumber.length() == 0) srToK3.setStockStaffNumber(stockStaff.getNumber());
             // 部门
             if(department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
                 sr2.setDepartmentFnumber(department.getDepartmentNumber());
+                if(purDeptNumber.length() == 0 ) srToK3.setFpurchaseDeptNumber(department.getDepartmentNumber());
+                if(recDeptNumber.length() == 0 ) srToK3.setFstockDeptNumber(department.getDepartmentNumber());
             }
 
             if (sr2.getStockId() == 0) {
@@ -480,12 +526,14 @@ public class Pur_InFragment3 extends BaseFragment {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）必须大于0！");
                 return false;
             }
-            if (sr2.getStockqty() > sr2.getFqty()) {
+            if (sr2.getStockqty() > sr2.getUsableFqty()) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）不能大于（应收数）！");
                 return false;
             }
+//            double fqty = sr2.getUsableFqty()*(1+mtl.getReceiveMaxScale()/100);
+//            if (sr2.getStockqty() > fqty) {
             double fqty = sr2.getFqty()*(1+mtl.getReceiveMaxScale()/100);
-            if (sr2.getStockqty() > fqty) {
+            if ((sr2.getFqty() - sr2.getUsableFqty()) > 0 && sr2.getStockqty() > (fqty - (sr2.getFqty() - sr2.getUsableFqty()))) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实收数）不能大于（应收数）"+(mtl.getReceiveMaxScale() > 0 ? "；最大上限为（"+df.format(fqty)+"）" : "")+"！");
                 return false;
             }
@@ -508,15 +556,25 @@ public class Pur_InFragment3 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '1';
                 if (!smBefore('0')) { // 扫码之前的判断
                     s.delete(0,s.length());
                     return;
                 }
-                sourceBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(sourceBarcode);
+//                sourceBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(sourceBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        sourceBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(sourceBarcode);
+                    }
+                }
             }
         });
         // 物料
@@ -527,7 +585,6 @@ public class Pur_InFragment3 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '2';
                 if (checkDatas.size() == 0) { // 扫码之前的判断
                     s.delete(0,s.length());
@@ -535,9 +592,20 @@ public class Pur_InFragment3 extends BaseFragment {
                     mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     return;
                 }
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode);
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode);
+                    }
+                }
             }
         });
     }
@@ -553,8 +621,6 @@ public class Pur_InFragment3 extends BaseFragment {
         etMtlNo.setText(""); // 物料代码
 
         setEnables(tvSupplierSel, R.drawable.back_style_blue,true);
-        setEnables(tvReceiveOrg, R.drawable.back_style_blue,true);
-        setEnables(tvPurOrg, R.drawable.back_style_blue,true);
         stock2 = null;
         stockP2 = null;
         sourceList.clear();
@@ -563,7 +629,10 @@ public class Pur_InFragment3 extends BaseFragment {
 
     private void resetSon() {
         orgId = 0;
-        purStaff = null;
+        if(user.getStaff() != null) {
+            stockStaff = user.getStaff();
+            tvStockStaff.setText(stockStaff.getName());
+        }
         k3Number = null;
         btnSave.setVisibility(View.VISIBLE);
         getBarCodeTableAfterEnable(true);
@@ -594,8 +663,6 @@ public class Pur_InFragment3 extends BaseFragment {
                     if (supplier != null) {
                         tvSupplierSel.setText(supplier.getfName());
                         saveObjectToXml(supplier, "strSupplier", getResStr(R.string.saveUser));
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
@@ -608,8 +675,6 @@ public class Pur_InFragment3 extends BaseFragment {
                         sourceList.addAll(list);
                         parent.isChange = true;
                         getSourceAfter(list);
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
@@ -619,8 +684,6 @@ public class Pur_InFragment3 extends BaseFragment {
                     Material mtl = (Material) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_MTL", mtl.getfName());
                     getMaterialAfter(null);
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -636,8 +699,6 @@ public class Pur_InFragment3 extends BaseFragment {
                     } else {
                         stockAllFill(false);
                         saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
@@ -649,8 +710,6 @@ public class Pur_InFragment3 extends BaseFragment {
                     stockAllFill(true);
                     saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -659,8 +718,6 @@ public class Pur_InFragment3 extends BaseFragment {
                     department = (Department) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
                     getDeptAfter();
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -674,22 +731,19 @@ public class Pur_InFragment3 extends BaseFragment {
 //                        checkDatas.get(curPos).setPoFmustqty(num);
 //                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
-
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
                 break;
             case SEL_STAFF: // 采购员	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    purStaff = (Staff) data.getSerializableExtra("staff");
-                    tvPurMan.setText(purStaff.getName());
-                    saveObjectToXml(purStaff, "strPurStaff", getResStr(R.string.saveUser));
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                    stockStaff = (Staff) data.getSerializableExtra("staff");
+                    tvStockStaff.setText(stockStaff.getName());
+                    saveObjectToXml(stockStaff, "strStockStaff", getResStr(R.string.saveUser));
                 }
                 break;
         }
+        mHandler.sendEmptyMessageDelayed(SETFOCUS,300);
     }
 
     /**
@@ -752,11 +806,12 @@ public class Pur_InFragment3 extends BaseFragment {
             sr2.setPoFid(recOrder.getfId());
             sr2.setEntryId(recOrder.getEntryId());
             sr2.setPoFbillno(recOrder.getFbillno());
-            sr2.setPoFmustqty(recOrder.getUsableFqty());
-
+            sr2.setFprice(recOrder.getFprice());
 //            sr2.setBatchno(recOrder.getBct().getBatchCode());
 //            sr2.setSequenceNo(recOrder.getBct().getSnCode());
-            sr2.setFqty(recOrder.getUsableFqty());
+            sr2.setFqty(recOrder.getFactreceiveqty());
+            sr2.setUsableFqty(recOrder.getUsableFqty());
+            sr2.setPoFmustqty(recOrder.getFactreceiveqty());
             sr2.setStockqty(0);
 
             // 是否启用物料的序列号,如果启用了，则数量为1
@@ -792,6 +847,11 @@ public class Pur_InFragment3 extends BaseFragment {
 
             ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
             srTok3.setFpaezCgDanhao(recOrder.getPurOrderNo());
+            srTok3.setFpurchaseDeptNumber(recOrder.getPurDeptNumber());
+            srTok3.setFstockDeptNumber(recOrder.getRecDeptNumber());
+            srTok3.setFpurchaserNumber(recOrder.getPurUserNumber());
+            srTok3.setStockStaffNumber(recOrder.getRecStaffNumber());
+            srTok3.setFamount(recOrder.getFamount());
             sr2.setSrTok3(srTok3);
 
             checkDatas.add(sr2);
@@ -820,7 +880,7 @@ public class Pur_InFragment3 extends BaseFragment {
                 // 未启用序列号
                 if (tmpMtl.getIsSnManager() == 0) {
                     // 如果应收数大于实收数
-                    if (sr2.getFqty() > sr2.getStockqty()) {
+                    if (sr2.getUsableFqty() > sr2.getStockqty()) {
                         // 如果扫的是物料包装条码，就显示个数
                         double number = 0;
                         if(bt != null) number = bt.getMaterialCalculateNumber();
@@ -837,7 +897,7 @@ public class Pur_InFragment3 extends BaseFragment {
                     }
 
                 } else { // 启用序列号
-                    if (sr2.getFqty() == sr2.getStockqty()) {
+                    if (sr2.getUsableFqty() == sr2.getStockqty()) {
                         Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，扫码录数已完成！");
                         return;
                     }
@@ -872,12 +932,8 @@ public class Pur_InFragment3 extends BaseFragment {
     private void getBarCodeTableAfterEnable(boolean isEnable) {
         if(isEnable) {
             setEnables(tvSupplierSel, R.drawable.back_style_blue,true);
-            setEnables(tvReceiveOrg, R.drawable.back_style_blue, true);
-            setEnables(tvPurOrg, R.drawable.back_style_blue, true);
         } else {
             setEnables(tvSupplierSel, R.drawable.back_style_gray3,false);
-            setEnables(tvReceiveOrg, R.drawable.back_style_gray3, false);
-            setEnables(tvPurOrg, R.drawable.back_style_gray3, false);
         }
     }
 
@@ -934,13 +990,15 @@ public class Pur_InFragment3 extends BaseFragment {
         if(mtl.getIsSnManager() > 0) {
             sr2.setSequenceNo(bt.getSnCode());
         }
-        sr2.setFqty(recOrder.getUsableFqty());
+        sr2.setUsableFqty(recOrder.getUsableFqty());
+        sr2.setFqty(recOrder.getFactreceiveqty());
+        sr2.setPoFmustqty(recOrder.getFactreceiveqty());
         sr2.setStockqty(0);
         sr2.setPoFid(recOrder.getfId());
         sr2.setEntryId(recOrder.getEntryId());
         sr2.setPoFbillno(recOrder.getFbillno());
-        sr2.setPoFmustqty(recOrder.getUsableFqty());
         sr2.setBarcode(bt.getBarcode());
+        sr2.setFprice(recOrder.getFprice());
         // 物料是否启用序列号
         if(mtl.getIsSnManager() == 1) {
             sr2.setListBarcode(new ArrayList<String>());
@@ -948,6 +1006,11 @@ public class Pur_InFragment3 extends BaseFragment {
         sr2.setStrBarcodes("");
         ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
         srTok3.setFpaezCgDanhao(recOrder.getPurOrderNo());
+        srTok3.setFpurchaseDeptNumber(recOrder.getPurDeptNumber());
+        srTok3.setFstockDeptNumber(recOrder.getRecDeptNumber());
+        srTok3.setFpurchaserNumber(recOrder.getPurUserNumber());
+        srTok3.setStockStaffNumber(recOrder.getRecStaffNumber());
+        srTok3.setFamount(recOrder.getFamount());
         sr2.setSrTok3(srTok3);
 
         checkDatas.add(sr2);
@@ -996,6 +1059,7 @@ public class Pur_InFragment3 extends BaseFragment {
             record.setEntryId(sr2.getEntryId());
             record.setPoFbillno(sr2.getPoFbillno());
             record.setPoFmustqty(sr2.getPoFmustqty());
+            record.setFprice(sr2.getFprice());
 
             if (department != null) {
                 record.setDepartmentK3Id(department.getFitemID());
@@ -1066,6 +1130,7 @@ public class Pur_InFragment3 extends BaseFragment {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
+        isTextChange = false;
         if(val.length() == 0) {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;

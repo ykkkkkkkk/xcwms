@@ -64,6 +64,12 @@ public class PurReceiveOrder implements Serializable {
 	private double famount;
 	/*采购订单号*/
 	private String purOrderNo;
+	/*收料员id*/
+	private int recStaffId;
+	/*收料员代码*/
+	private String recStaffNumber;
+	/*收料员名称*/
+	private String recStaffName;
 
 	public PurReceiveOrder() {
 		super();
@@ -338,6 +344,24 @@ public class PurReceiveOrder implements Serializable {
 	}
 	public void setPurOrderNo(String purOrderNo) {
 		this.purOrderNo = purOrderNo;
+	}
+	public int getRecStaffId() {
+		return recStaffId;
+	}
+	public void setRecStaffId(int recStaffId) {
+		this.recStaffId = recStaffId;
+	}
+	public String getRecStaffNumber() {
+		return recStaffNumber;
+	}
+	public void setRecStaffNumber(String recStaffNumber) {
+		this.recStaffNumber = recStaffNumber;
+	}
+	public String getRecStaffName() {
+		return recStaffName;
+	}
+	public void setRecStaffName(String recStaffName) {
+		this.recStaffName = recStaffName;
 	}
 
 

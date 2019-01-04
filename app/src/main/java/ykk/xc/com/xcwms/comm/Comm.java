@@ -6,7 +6,10 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Environment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.DatePicker;
@@ -361,6 +364,51 @@ public class Comm {
 		build.setNegativeButton("知道了", null);
 		build.setCancelable(false);
 		build.show();
+	}
+
+	/**
+	 * 判断当前设备是手机还是平板
+	 * @param context
+	 * @return 平板返回 True，手机返回 False
+	 */
+	public static boolean isPad(Context context) {
+		return (context.getResources().getConfiguration().screenLayout
+				& Configuration.SCREENLAYOUT_SIZE_MASK)
+				>= Configuration.SCREENLAYOUT_SIZE_LARGE;
+	}
+
+	/**
+	 * 判断扫码是键盘按键是否有效
+	 * @param context
+	 * @param event
+	 * @return
+	 */
+	public static boolean smKeyIsValid(Activity context, KeyEvent event) {
+		// 按了删除键，回退键
+//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+		// PDA：（240 为PDA两侧面扫码键，241 为PDA中间扫码键）
+		// 外接扫码枪：（条码号的数字代表：0=7，1=8，以此下推9=16，字母代表一个字符为四个数字：A=59 29 一组，以此下推Z=59 54；59就代表是字母的意思）
+//        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
+//            return false;
+//        }
+		// 外接扫码枪：条码号的数字代表：0=7，1=8，以此下推9=16，字母代表一个字符为59开头：A=59 29 一组，以此下推Z=59 54；59就代表是字母的意思
+		boolean isPad = Comm.isPad(context);
+		if(isPad) { // 是Pad平板
+			boolean isBool = false;
+			int[] numberArr = {7,8,9,10,11,12,13,14,15,16,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,59};
+			int len = numberArr.length;
+			for(int i=0; i<len; i++) {
+				Log.e("平板平板----", ""+event.getKeyCode());
+				if(event.getKeyCode() == numberArr[i]) isBool = true;
+			}
+			return isBool;
+		} else { // 手机或者PDA
+			if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
+				Log.e("PDAPDAPDAPDA", ""+event.getKeyCode());
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

@@ -47,6 +47,7 @@ public abstract class BaseFragment extends Fragment {
 	public Activity parentActivity;
 	private LoadingDialog parentLoadDialog;
 	protected Unbinder mBinder;
+	protected boolean baseIsPad; // 是否为Pad平板
 
 	public abstract View setLayoutResID(LayoutInflater inflater, ViewGroup container);
 	public void initView(){}
@@ -64,6 +65,8 @@ public abstract class BaseFragment extends Fragment {
 		initView();
 		initData();
 		setListener();
+		SharedPreferences spf = spf(getResStr(R.string.saveOther));
+		baseIsPad = spf.getBoolean("isPad", false);
 		return view;
 	}
 

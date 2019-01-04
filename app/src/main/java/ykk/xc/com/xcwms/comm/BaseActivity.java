@@ -47,6 +47,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 	private long temptime;
 	private LoadingDialog parentLoadDialog;
 	protected Unbinder mBinder;
+	protected boolean baseIsPad; // 是否为Pad平板
 
 	public abstract int setLayoutResID();
 	public void initView(){}
@@ -68,9 +69,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 		initView();
 		initData();
 		setListener();
+		SharedPreferences spf = spf(getResStr(R.string.saveOther));
+		baseIsPad = spf.getBoolean("isPad", false);
 	}
-
-
 
 	/**
 	 * 捕获返回按键的动作

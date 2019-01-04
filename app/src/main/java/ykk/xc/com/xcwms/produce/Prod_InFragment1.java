@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
-import butterknife.OnLongClick;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -43,8 +41,6 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
 import ykk.xc.com.xcwms.basics.Staff_DialogActivity;
-import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
-import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
@@ -83,25 +79,25 @@ public class Prod_InFragment1 extends BaseFragment {
     TextView tvProdOrg;
     @BindView(R.id.tv_prodDate)
     TextView tvProdDate;
-    @BindView(R.id.tv_prodMan)
-    TextView tvProdMan;
+    @BindView(R.id.tv_stockStaff)
+    TextView tvStockStaff;
     @BindView(R.id.lin_top)
     LinearLayout linTop;
 
     private Prod_InFragment1 context = this;
-    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_STAFF = 14;
+    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_STAFF = 14, PAD_SM = 15;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int CODE1 = 1, CODE2 = 2, SETFOCUS = 3, CODE20 = 20;
 //    private Supplier supplier; // 供应商
     private Stock stock; // 仓库
     private StockPosition stockP; // 库位
-    private Staff prodStaff; // 仓管员
+    private Staff stockStaff; // 仓管员
     private Department department; // 部门
     private Organization inOrg, prodOrg; // 组织
     private Prod_InFragment1Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
     private String mtlBarcode; // 对应的条码号
-    private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
+    private char curViewFlag = '1'; // 1：箱码
     private int curPos; // 当前行
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
@@ -109,6 +105,7 @@ public class Prod_InFragment1 extends BaseFragment {
     private Activity mContext;
     private Prod_InMainActivity parent;
     private String k3Number; // 记录传递到k3返回的单号
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -162,8 +159,6 @@ public class Prod_InFragment1 extends BaseFragment {
                             case '1': // 生产订单
                                 bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 m.getBarCodeTableBefore(false);
-
-
 
                                 int size = m.checkDatas.size();
                                 boolean addRow = true;
@@ -238,6 +233,25 @@ public class Prod_InFragment1 extends BaseFragment {
                         m.setFocusable(m.etGetFocus);
                         m.setFocusable(m.etMatNo);
                         break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 箱码扫码   返回
+                                etName = m.getValues(m.etMatNo);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMatNo, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas();
+
+                                break;
+                        }
+
+                        break;
                 }
             }
         }
@@ -303,9 +317,13 @@ public class Prod_InFragment1 extends BaseFragment {
             stock = showObjectByXml(Stock.class, "strStock", getResStr(R.string.saveUser));
             stockP = showObjectByXml(StockPosition.class, "strStockPos", getResStr(R.string.saveUser));
         }
-        prodStaff = showObjectByXml(Staff.class, "strProdStaff", getResStr(R.string.saveUser));
+        if(user.getStaff() != null) {
+            stockStaff = user.getStaff();
+        } else {
+            stockStaff = showObjectByXml(Staff.class, "strStockStaff", getResStr(R.string.saveUser));
+        }
         department = showObjectByXml(Department.class, "strProdDepartment", getResStr(R.string.saveUser));
-        if(prodStaff != null) tvProdMan.setText(prodStaff.getName());
+        if(stockStaff != null) tvStockStaff.setText(stockStaff.getName());
         if(department != null) tvDeptSel.setText(department.getDepartmentName());
     }
 
@@ -321,7 +339,7 @@ public class Prod_InFragment1 extends BaseFragment {
         }
     }
 
-    @OnClick({R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_prodMan, R.id.tv_deptSel, R.id.lin_rowTitle})
+    @OnClick({R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_inOrg, R.id.tv_prodOrg, R.id.tv_prodDate, R.id.tv_stockStaff, R.id.tv_deptSel, R.id.lin_rowTitle})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -344,7 +362,7 @@ public class Prod_InFragment1 extends BaseFragment {
             case R.id.tv_prodDate: // 入库日期
                 Comm.showDateDialog(mContext, view, 0);
                 break;
-            case R.id.tv_prodMan: // 选择仓管员
+            case R.id.tv_stockStaff: // 选择仓管员
                 bundle = new Bundle();
                 bundle.putInt("isload", 0);
                 showForResult(Staff_DialogActivity.class, SEL_STAFF, bundle);
@@ -438,7 +456,7 @@ public class Prod_InFragment1 extends BaseFragment {
             ScanningRecord2 sr2 = checkDatas.get(i);
             ScanningRecordTok3 srToK3 = sr2.getSrTok3();
             // 员工
-            if(prodStaff != null) srToK3.setFpurchaserNumber(prodStaff.getNumber());
+            if(stockStaff != null) srToK3.setFpurchaserNumber(stockStaff.getNumber());
             // 部门
             if(department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
@@ -471,16 +489,26 @@ public class Prod_InFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 if(!smBefore()) {
                     s.delete(0,s.length());
                     mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     return;
                 }
                 curViewFlag = '1';
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas();
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas();
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas();
+                    }
+                }
             }
         });
     }
@@ -535,7 +563,6 @@ public class Prod_InFragment1 extends BaseFragment {
                         tvProdOrg.setText(prodOrg.getName());
                     }
                     getOrgAfter();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -544,7 +571,6 @@ public class Prod_InFragment1 extends BaseFragment {
                     prodOrg = (Organization) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_ORG2", prodOrg.getName());
                     getOrg2After();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -553,7 +579,6 @@ public class Prod_InFragment1 extends BaseFragment {
                     department = (Department) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
                     getDeptAfter();
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                 }
 
                 break;
@@ -566,21 +591,19 @@ public class Prod_InFragment1 extends BaseFragment {
                         checkDatas.get(curPos).setStockqty(num);
 //                        checkDatas.get(curPos).setFqty(num);
                         mAdapter.notifyDataSetChanged();
-                        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
                     }
                 }
 
                 break;
             case SEL_STAFF: // 仓管员	返回
                 if (resultCode == Activity.RESULT_OK) {
-                    prodStaff = (Staff) data.getSerializableExtra("staff");
-                    tvProdMan.setText(prodStaff.getName());
-                    saveObjectToXml(prodStaff, "strProdStaff", getResStr(R.string.saveUser));
-
-                    mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
+                    stockStaff = (Staff) data.getSerializableExtra("staff");
+                    tvStockStaff.setText(stockStaff.getName());
+                    saveObjectToXml(stockStaff, "strStockStaff", getResStr(R.string.saveUser));
                 }
                 break;
         }
+
     }
 
     /**
@@ -728,7 +751,6 @@ public class Prod_InFragment1 extends BaseFragment {
         if (prodOrg != null) {
             tvProdOrg.setText(prodOrg.getName());
         }
-        mHandler.sendEmptyMessageDelayed(SETFOCUS,200);
     }
 
     /**
@@ -830,6 +852,7 @@ public class Prod_InFragment1 extends BaseFragment {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas() {
+        isTextChange = false;
         showLoadDialog("加载中...");
         String mUrl = null;
         String barcode = null;

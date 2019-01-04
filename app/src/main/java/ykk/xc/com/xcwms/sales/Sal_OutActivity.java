@@ -359,7 +359,7 @@ public class Sal_OutActivity extends BaseActivity {
     }
 
     @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.btn_stock, R.id.btn_stockPos, R.id.btn_save, R.id.btn_clone,
-            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate, R.id.tv_salMan})
+            R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg, R.id.tv_salDate})
     public void onViewClicked(View view) {
         Bundle bundle = null;
         switch (view.getId()) {
@@ -421,9 +421,9 @@ public class Sal_OutActivity extends BaseActivity {
             case R.id.tv_salDate: // 出库日期
                 Comm.showDateDialog(context, view, 0);
                 break;
-            case R.id.tv_prodMan: // 选择业务员
-
-                break;
+//            case R.id.tv_prodMan: // 选择业务员
+//
+//                break;
             case R.id.btn_save: // 保存
                 hideKeyboard(getCurrentFocus());
                 if(!saveBefore()) {

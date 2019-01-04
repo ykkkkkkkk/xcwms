@@ -74,7 +74,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     private Prod_ProcedureReportActivity context = this;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 201, UNSUCC3 = 501;
-    private static final int SEL_ORDER = 10, CODE1 = 11;
+    private static final int SEL_ORDER = 10, CODE1 = 11, PAD_SM = 12;
     private Material mtl;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private String mtlBarcode; // 对应的条码号
@@ -82,6 +82,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     private char dataFlag = '1'; // 1：计价类型列表，2：工序列表
     private DecimalFormat df = new DecimalFormat("#.######");
     private User user;
+    private boolean isTextChange; // 是否为平板电脑
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -155,6 +156,20 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                         break;
                     case UNSUCC2: // 数据加载失败！
                         m.toasts("服务器繁忙，请稍后再试！");
+
+                        break;
+                    case PAD_SM: // pad扫码
+                        String etName = m.getValues(m.etMtlCode);
+                        if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                            if(m.mtlBarcode.equals(etName)) {
+                                m.mtlBarcode = etName;
+                            } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                        } else m.mtlBarcode = etName;
+                        m.setTexts(m.etMtlCode, m.mtlBarcode);
+                        // 执行查询方法
+                        m.run_itemList();
+
 
                         break;
                 }
@@ -287,12 +302,21 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
-                mtlBarcode = s.toString();
-
                 dataFlag = '2';
-                // 执行查询方法
-                run_itemList();
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_itemList();
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_itemList();
+                    }
+                }
             }
         });
 
@@ -630,6 +654,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
      * 查询计件类型
      */
     private void run_itemList() {
+        isTextChange = false;
         showLoadDialog("加载中...");
         String mUrl = null;
         switch (dataFlag) {
@@ -769,13 +794,8 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // 按了删除键，回退键
-//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
-        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
-            return false;
-        }
-        return super.dispatchKeyEvent(event);
+        boolean isNext = Comm.smKeyIsValid(context, event);
+        return isNext ? super.dispatchKeyEvent(event) : false;
     }
 
     @Override

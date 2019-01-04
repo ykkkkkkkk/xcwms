@@ -325,6 +325,7 @@ public class Pur_InFragment2 extends BaseFragment {
             public void onClick_del(ScanningRecord2 entity, int position) {
                 Log.e("del", "行：" + position);
                 checkDatas.remove(position);
+                sourceList.remove(position);
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -625,7 +626,6 @@ public class Pur_InFragment2 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '4';
                 if (!smBefore('0')) { // 扫码之前的判断
                     s.delete(0,s.length());
@@ -644,7 +644,6 @@ public class Pur_InFragment2 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '5';
                 if (checkDatas.size() == 0) { // 扫码之前的判断
                     s.delete(0,s.length());

@@ -105,18 +105,18 @@
                 android:layout_marginLeft="@dimen/_3dp"
                 android:ems="2"
                 android:gravity="center"
-                android:text="入库日期"
+                android:text="部门"
                 android:textColor="#000000"
                 android:textSize="12sp" />
 
-
             <TextView
-                android:id="@+id/tv_purDate"
+                android:id="@+id/tv_deptSel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/back_style_blue"
                 android:drawableRight="@drawable/xiala3"
+                android:inputType="none"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_14sp" />
@@ -241,12 +241,12 @@
                 android:layout_marginLeft="@dimen/_3dp"
                 android:ems="2"
                 android:gravity="center"
-                android:text="部门"
+                android:text="仓管员"
                 android:textColor="#000000"
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/tv_deptSel"
+                android:id="@+id/tv_stockStaff"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

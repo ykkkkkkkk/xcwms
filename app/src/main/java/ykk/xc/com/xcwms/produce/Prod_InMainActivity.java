@@ -18,6 +18,7 @@ import butterknife.OnClick;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
 
@@ -161,13 +162,8 @@ public class Prod_InMainActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // 按了删除键，回退键
-//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
-        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
-            return false;
-        }
-        return super.dispatchKeyEvent(event);
+        boolean isNext = Comm.smKeyIsValid(context, event);
+        return isNext ? super.dispatchKeyEvent(event) : false;
     }
 
     @Override

@@ -49,16 +49,26 @@ public class ScanningRecordTok3 implements Serializable {
 	private String fpaezCgDanhao;
 	/* 箱数 */
 	private int fboxAmount;
-	/* 仓管员名称 */
-	private String stockStaffName;
+	/* 仓管员 */
+	private String stockStaffNumber;
+	/* 采购部门代码 */
+	private String fpurchaseDeptNumber;
+	/* 收料部门代码 */
+	private String fstockDeptNumber;
 
 
 //	单据Entry部分---
 
+	/* 面积  */
+	private double fpaezArea;
 	/* 宽 */
 	private String fpaezWidth;
 	/* 高 */
 	private String fpaezHigh;
+	/* 行备注  */
+	private String fentryNote;
+	/* 金额 */
+	private double famount;
 
 	public ScanningRecordTok3() {
 		super();
@@ -70,7 +80,6 @@ public class ScanningRecordTok3 implements Serializable {
 	public void setSaleDeptNumber(String saleDeptNumber) {
 		this.saleDeptNumber = saleDeptNumber;
 	}
-
 	public String getCustomerService() {
 		return customerService;
 	}
@@ -125,6 +134,12 @@ public class ScanningRecordTok3 implements Serializable {
 	public void setExitTypeNumber(String exitTypeNumber) {
 		this.exitTypeNumber = exitTypeNumber;
 	}
+	public double getFpaezArea() {
+		return fpaezArea;
+	}
+	public void setFpaezArea(double fpaezArea) {
+		this.fpaezArea = fpaezArea;
+	}
 	public String getFpaezWidth() {
 		return fpaezWidth;
 	}
@@ -161,11 +176,35 @@ public class ScanningRecordTok3 implements Serializable {
 	public void setFboxAmount(int fboxAmount) {
 		this.fboxAmount = fboxAmount;
 	}
-	public String getStockStaffName() {
-		return stockStaffName;
+	public String getStockStaffNumber() {
+		return stockStaffNumber;
 	}
-	public void setStockStaffName(String stockStaffName) {
-		this.stockStaffName = stockStaffName;
+	public void setStockStaffNumber(String stockStaffNumber) {
+		this.stockStaffNumber = stockStaffNumber;
+	}
+	public String getFentryNote() {
+		return fentryNote;
+	}
+	public void setFentryNote(String fentryNote) {
+		this.fentryNote = fentryNote;
+	}
+	public String getFpurchaseDeptNumber() {
+		return fpurchaseDeptNumber;
+	}
+	public void setFpurchaseDeptNumber(String fpurchaseDeptNumber) {
+		this.fpurchaseDeptNumber = fpurchaseDeptNumber;
+	}
+	public String getFstockDeptNumber() {
+		return fstockDeptNumber;
+	}
+	public void setFstockDeptNumber(String fstockDeptNumber) {
+		this.fstockDeptNumber = fstockDeptNumber;
+	}
+	public double getFamount() {
+		return famount;
+	}
+	public void setFamount(double famount) {
+		this.famount = famount;
 	}
 
 

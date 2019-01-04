@@ -107,7 +107,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
     private Prod_BoxFragment1 mFragment = this;
     private Prod_BoxMainActivity parent;
     private Activity mContext;
-    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14;
+    private static final int SEL_CUST = 11, SEL_DELI = 12, SEL_BOX = 13, SEL_NUM = 14, PAD_SM = 15;
     private static final int SUCC1 = 201, UNSUCC1 = 501, SAVE = 202, UNSAVE = 502, DELETE = 203, UNDELETE = 503, MODIFY = 204, UNMODIFY = 504, MODIFY2 = 205, UNMODIFY2 = 505, MODIFY3 = 206, UNMODIFY3 = 506, MODIFY_NUM = 207, UNMODIFY_NUM = 507;
     private static final int SETFOCUS = 1, CODE2 = 2;
     private Customer customer; // 客户
@@ -128,6 +128,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
     private char binningType = '2'; // 1.单色装，2.混色装
     private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private Prod_BoxFragment1.MyHandler mHandler = new Prod_BoxFragment1.MyHandler(this);
@@ -309,6 +310,64 @@ public class Prod_BoxFragment1 extends BaseFragment {
 //                        m.hideSoftInputMode(m.mContext, m.etMtlCode2);
                         m.setFocusable(m.etMtlCodeTmp);
                         m.setFocusable(m.etMtlCode2);
+
+                        break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 箱码扫码   返回
+                                etName = m.getValues(m.etBoxCode);
+                                if (m.strBoxBarcode != null && m.strBoxBarcode.length() > 0) {
+                                    if(m.strBoxBarcode.equals(etName)) {
+                                        m.strBoxBarcode = etName;
+                                    } else m.strBoxBarcode = etName.replaceFirst(m.strBoxBarcode, "");
+
+                                } else m.strBoxBarcode = etName;
+                                m.setTexts(m.etBoxCode, m.strBoxBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.strBoxBarcode);
+
+                                break;
+                            case '2': // 生产订单扫码   返回
+                                etName = m.getValues(m.etProdOrderCode);
+                                if (m.prodOrderBarcode != null && m.prodOrderBarcode.length() > 0) {
+                                    if(m.prodOrderBarcode.equals(etName)) {
+                                        m.prodOrderBarcode = etName;
+                                    } else m.prodOrderBarcode = etName.replaceFirst(m.prodOrderBarcode, "");
+
+                                } else m.prodOrderBarcode = etName;
+                                m.setTexts(m.etProdOrderCode, m.prodOrderBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.prodOrderBarcode);
+
+                                break;
+                            case '3': // 物料扫码     返回
+                                etName = m.getValues(m.etMtlCode);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlCode, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode);
+
+                                break;
+                            case '4': // 删除物料扫码     返回
+                                etName = m.getValues(m.etMtlCode2);
+                                if (m.mtlBarcode_del != null && m.mtlBarcode_del.length() > 0) {
+                                    if(m.mtlBarcode_del.equals(etName)) {
+                                        m.mtlBarcode_del = etName;
+                                    } else m.mtlBarcode_del = etName.replaceFirst(m.mtlBarcode_del, "");
+
+                                } else m.mtlBarcode_del = etName;
+                                m.setTexts(m.etMtlCode2, m.mtlBarcode_del);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode_del);
+
+                                break;
+                        }
 
                         break;
                 }
@@ -521,11 +580,21 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '4';
-                mtlBarcode_del = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode_del);
+//                mtlBarcode_del = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode_del);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode_del = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode_del);
+                    }
+                }
             }
         });
 
@@ -565,11 +634,21 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 curViewFlag = '1';
-                strBoxBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(strBoxBarcode);
+//                strBoxBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(strBoxBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        strBoxBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(strBoxBarcode);
+                    }
+                }
             }
         });
         // 生产订单
@@ -580,15 +659,24 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 if(boxBarCode == null) {
                     s.delete(0,s.length());
                     Comm.showWarnDialog(mContext, "请扫箱码！");
                     return;
                 }
                 curViewFlag = '2';
-                prodOrderBarcode = s.toString();
-                run_smGetDatas(prodOrderBarcode);
+//                prodOrderBarcode = s.toString();
+//                run_smGetDatas(prodOrderBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        prodOrderBarcode = s.toString();
+                        run_smGetDatas(prodOrderBarcode);
+                    }
+                }
             }
         });
         // 物料
@@ -606,9 +694,20 @@ public class Prod_BoxFragment1 extends BaseFragment {
                     return;
                 }
                 curViewFlag = '3';
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode);
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode);
+                    }
+                }
             }
         });
 
@@ -1044,6 +1143,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
+        isTextChange = false;
         if(val.length() == 0) {
             Comm.showWarnDialog(mContext,"请对准条码！");
             return;

@@ -12,6 +12,7 @@ import ykk.xc.com.xcwms.model.StockPosition;
  */
 public class PickingList implements Serializable {
     private int id; // 主键id
+    private DeliOrder deliOrder; // 发货通知单对象
     private String pickingListNo; // 拣货单
     private double pickingListNum; // 拣货数量
     private int fId; // 单据id,
@@ -461,5 +462,13 @@ public class PickingList implements Serializable {
 
     public void setFprice(double fprice) {
         this.fprice = fprice;
+    }
+
+    public DeliOrder getDeliOrder() {
+        return deliOrder;
+    }
+
+    public void setDeliOrder(DeliOrder deliOrder) {
+        this.deliOrder = deliOrder;
     }
 }

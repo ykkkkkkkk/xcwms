@@ -14,6 +14,7 @@ public class ScanningRecord2 implements Serializable {
     private String batchno;
     private double fqty; // 应收数量
     private double stockqty; // 实收数量，要插入到表的数量
+    private double usableFqty; // 可用数量
     private int stockId;
     private String stockName;
     private Stock stock; // 新加
@@ -442,6 +443,12 @@ public class ScanningRecord2 implements Serializable {
     }
     public void setCoveQty(int coveQty) {
         this.coveQty = coveQty;
+    }
+    public double getUsableFqty() {
+        return usableFqty;
+    }
+    public void setUsableFqty(double recFqty) {
+        this.usableFqty = recFqty;
     }
 
     public ScanningRecord2() {

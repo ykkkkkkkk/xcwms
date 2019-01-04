@@ -23,6 +23,7 @@ public class User implements Serializable {
     private String kd_username;
     private String kdUserNumber;
     private Integer staffId;
+    private Staff staff;
     private Stock stock;
     private StockPosition stockPos;
     private List<SystemSet> sysSetList;
@@ -217,5 +218,13 @@ public class User implements Serializable {
     public User setKdAccountPassword(String kdAccountPassword) {
         this.kdAccountPassword = kdAccountPassword;
         return this;
+    }
+
+    public Staff getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Staff staff) {
+        this.staff = staff;
     }
 }

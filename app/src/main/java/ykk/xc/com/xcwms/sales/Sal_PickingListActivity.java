@@ -82,7 +82,7 @@ public class Sal_PickingListActivity extends BaseActivity {
     RadioButton rbType2;
 
     private Sal_PickingListActivity context = this;
-    private static final int SEL_DELI = 11, SEL_STOCK2 = 12, SEL_STOCKP2 = 13;
+    private static final int SEL_DELI = 11, SEL_STOCK2 = 12, SEL_STOCKP2 = 13, PAD_SM = 14;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private static final int CODE1 = 1, SETFOCUS = 2;
     private Customer cust; // 客户
@@ -91,14 +91,15 @@ public class Sal_PickingListActivity extends BaseActivity {
     private AssistInfo assist; // 辅助资料--发货方式
     private Sal_PickingListAdapter mAdapter;
     private List<PickingList> checkDatas = new ArrayList<>();
-    private String stockBarcode, stockPBarcode, mtlBarcode, deliBarcode; // 对应的条码号
-    private char curViewFlag = '1'; // 1：仓库，2：库位， 3：发货订单, 4：物料
+    private String mtlBarcode, deliBarcode; // 对应的条码号
+    private char curViewFlag = '1'; // 1：发货订单, 2：物料
     private int curPos; // 当前行
     private boolean isStockLong; // 判断选择（仓库，库区）是否长按了
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private char defaultStockVal; // 默认仓库的值
     private char pickingType = '1'; // 拣货类型：1.拣货装箱，2.拣货装车
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private Sal_PickingListActivity.MyHandler mHandler = new Sal_PickingListActivity.MyHandler(this);
@@ -130,7 +131,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                     case SUCC2: // 发货通知单
                         BarCodeTable bt = null;
                         switch (m.curViewFlag) {
-                            case '3': // 发货订单
+                            case '1': // 发货订单
                                 List<DeliOrder> list = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
                                 Material tmpMtl = null;
                                 for(int i=0, size=list.size(); i<size; i++) {
@@ -144,7 +145,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                                 m.getDeliOrderAfter(list);
 
                                 break;
-                            case '4': // 物料
+                            case '2': // 物料
                                 bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 m.getMtlAfter(bt);
 
@@ -183,6 +184,39 @@ public class Sal_PickingListActivity extends BaseActivity {
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
                         m.setFocusable(m.etDeliCode);
                         m.setFocusable(m.etMtlCode);
+
+                        break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 发货订单
+                                etName = m.getValues(m.etDeliCode);
+                                if (m.deliBarcode != null && m.deliBarcode.length() > 0) {
+                                    if(m.deliBarcode.equals(etName)) {
+                                        m.deliBarcode = etName;
+                                    } else m.deliBarcode = etName.replaceFirst(m.deliBarcode, "");
+
+                                } else m.deliBarcode = etName;
+                                m.setTexts(m.etDeliCode, m.deliBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.deliBarcode);
+
+                                break;
+                            case '2': // 物料
+                                etName = m.getValues(m.etMtlCode);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlCode, m.mtlBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.mtlBarcode);
+
+                                break;
+                        }
+
                         break;
                 }
             }
@@ -232,12 +266,10 @@ public class Sal_PickingListActivity extends BaseActivity {
 
             if(user.getStock() != null) {
                 stock = user.getStock();
-                stockBarcode = stock.getfName();
             }
 
             if(user.getStockPos() != null) {
                 stockP = user.getStockPos();
-                stockPBarcode = stockP.getFnumber();
             }
         }
     }
@@ -383,13 +415,8 @@ public class Sal_PickingListActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // 按了删除键，回退键
-//        if(event.getKeyCode() == KeyEvent.KEYCODE_FORWARD_DEL || event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-        // 240 为PDA两侧面扫码键，241 为PDA中间扫码键
-        if(!(event.getKeyCode() == 240 || event.getKeyCode() == 241)) {
-            return false;
-        }
-        return super.dispatchKeyEvent(event);
+        boolean isNext = Comm.smKeyIsValid(context, event);
+        return isNext ? super.dispatchKeyEvent(event) : false;
     }
 
     @Override
@@ -402,11 +429,21 @@ public class Sal_PickingListActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
-                curViewFlag = '3';
-                deliBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(deliBarcode);
+                curViewFlag = '1';
+//                deliBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(deliBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        deliBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(deliBarcode);
+                    }
+                }
             }
         });
         // 物料
@@ -424,10 +461,21 @@ public class Sal_PickingListActivity extends BaseActivity {
                     Comm.showWarnDialog(context,"请扫描发货订单！");
                     return;
                 }
-                curViewFlag = '4';
-                mtlBarcode = s.toString();
-                // 执行查询方法
-                run_smGetDatas(mtlBarcode);
+                curViewFlag = '2';
+//                mtlBarcode = s.toString();
+//                // 执行查询方法
+//                run_smGetDatas(mtlBarcode);
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        mtlBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(mtlBarcode);
+                    }
+                }
             }
         });
     }
@@ -465,8 +513,6 @@ public class Sal_PickingListActivity extends BaseActivity {
         assist = null;
         cust = null;
         curViewFlag = '1';
-        stockBarcode = null;
-        stockPBarcode = null;
         deliBarcode = null;
         mtlBarcode = null;
 
@@ -797,6 +843,7 @@ public class Sal_PickingListActivity extends BaseActivity {
      * 扫码查询对应的方法
      */
     private void run_smGetDatas(String val) {
+        isTextChange = false;
         if(val.length() == 0) {
             Comm.showWarnDialog(context,"请对准条码！");
             return;
@@ -807,23 +854,12 @@ public class Sal_PickingListActivity extends BaseActivity {
         String strCaseId = null;
         String isList = ""; // 是否根据单据查询全部
         switch (curViewFlag) {
-            case '1': // 仓库
-                mUrl = getURL("barCodeTable/findBarcode4ByParam");
-                barcode = stockBarcode;
-                isStockLong = false;
-                strCaseId = "12";
-                break;
-            case '2': // 库位
-                mUrl = getURL("barCodeTable/findBarcode4ByParam");
-                barcode = stockPBarcode;
-                strCaseId = "14";
-                break;
-            case '3': // 发货订单
+            case '1': // 发货订单
                 mUrl = getURL("deliverynotice/findBarcode");
                 barcode = deliBarcode;
                 strCaseId = "";
                 break;
-            case '4': // 物料
+            case '2': // 物料
                 mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = mtlBarcode;
                 strCaseId = "11,21";

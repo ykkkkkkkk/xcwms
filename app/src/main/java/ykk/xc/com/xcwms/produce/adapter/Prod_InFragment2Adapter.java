@@ -58,8 +58,10 @@ public class Prod_InFragment2Adapter extends BaseArrayRecyclerAdapter<ScanningRe
         tv_nums.setText(Html.fromHtml(df.format(entity.getFqty())+"/<font color='#FF4400'>"+entity.getCoveQty()+"</font><br><font color='#009900'>"+df.format(stockqty)+"</font>"));
         if(entity.getStockPos() != null) {
             tv_stockAP.setText(entity.getStock().getfName()+"\n"+entity.getStockPos().getFnumber());
-        } else {
+        } else if(entity.getStock() != null) {
             tv_stockAP.setText(entity.getStock().getfName());
+        } else {
+            tv_stockAP.setText("");
         }
 
         View.OnClickListener click = new View.OnClickListener() {

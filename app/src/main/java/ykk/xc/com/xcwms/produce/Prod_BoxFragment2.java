@@ -227,7 +227,6 @@ public class Prod_BoxFragment2 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
-                if(s.length() == 0) return;
                 strBarcode = s.toString();
                 // 执行查询方法
                 run_smGetDatas(strBarcode);

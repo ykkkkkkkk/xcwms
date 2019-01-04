@@ -2,6 +2,7 @@ package ykk.xc.com.xcwms.model.sal;
 
 import java.io.Serializable;
 
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.Stock;
@@ -100,6 +101,10 @@ public class DeliOrder implements Serializable{
 	private String saleDeptName;
 	/*订单套数*/
 	private int coveQty;
+	/* 发货单子表备注 */
+	private String entryRemark;
+	/* 发货单子表面积 */
+	private double entryArea;
 
 	public DeliOrder() {
 		super();
@@ -559,6 +564,22 @@ public class DeliOrder implements Serializable{
 
 	public void setCoveQty(int coveQty) {
 		this.coveQty = coveQty;
+	}
+
+	public String getEntryRemark() {
+		return entryRemark;
+	}
+
+	public void setEntryRemark(String entryRemark) {
+		this.entryRemark = entryRemark;
+	}
+
+	public double getEntryArea() {
+		return entryArea;
+	}
+
+	public void setEntryArea(double entryArea) {
+		this.entryArea = entryArea;
 	}
 
 }
