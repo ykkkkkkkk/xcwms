@@ -55,6 +55,7 @@ import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.ExpressCompany;
+import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
@@ -67,6 +68,7 @@ import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
+import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -105,7 +107,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     LinearLayout linTop;
 
     private Sal_OutFragment2 context = this;
-    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14,RESET = 15, SEL_STOCK2 = 16, SEL_STOCKP2 = 17, SEL_STAFF = 18, PAD_SM = 19;
+    private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17, PAD_SM = 18;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503, SUCC4 = 204, UNSUCC4 = 504;
     private static final int SETFOCUS = 1, CODE2 = 2;
     private Customer cust; // 客户
@@ -266,7 +268,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 
                         break;
                     case UNSUCC2:
-                        m.mHandler.sendEmptyMessageDelayed(RESET, 200);
                         errMsg = JsonUtil.strToString((String) msg.obj);
                         if(Comm.isNULLS(errMsg).length() == 0) {
                             errMsg = "服务器超时，请重试！";
@@ -342,23 +343,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                     case UNSUCC4: // 查询发货通知单 失败
                         String strError = JsonUtil.strToString((String)msg.obj);
                         Comm.showWarnDialog(m.mContext,strError);
-
-                        break;
-                    case RESET: // 没有得到数据，就把回车的去掉，恢复正常数据
-                        switch (m.curViewFlag) {
-                            case '1': // 仓库
-//                                m.setTexts(m.etStock, m.stockBarcode);
-                                break;
-                            case '2': // 库位
-//                                m.setTexts(m.etStockPos, m.stockPBarcode);
-                                break;
-//                            case '3': // 销售装箱单
-//                                m.setTexts(m.etBoxCode, m.boxBarcode);
-//                                break;
-//                            case '9': // 运单号
-//                                m.setTexts(m.etExpressNo, m.expressNoBarcode);
-//                                break;
-                        }
 
                         break;
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
@@ -616,14 +600,14 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
                 return false;
             }
-            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() > sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）不能大于（应发数）！");
-                return false;
-            }
-            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() < sr2.getFqty()) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）必须等于（应发数）！");
-                return false;
-            }
+//            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() > sr2.getFqty()) {
+//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）不能大于（应发数）！");
+//                return false;
+//            }
+//            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() < sr2.getFqty()) {
+//                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（实发数）必须等于（应发数）！");
+//                return false;
+//            }
 
         }
         return true;
@@ -636,6 +620,24 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_boxCode: // 箱码
+                        curViewFlag = '1';
+                        setFocusable(etBoxCode);
+                        break;
+                    case R.id.et_expressNo: // 运单号
+                        setFocusable(etExpressNo);
+                        break;
+                }
+            }
+        };
+        etBoxCode.setOnClickListener(click);
+        etExpressNo.setOnClickListener(click);
+
         // 箱码
         etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -644,6 +646,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                boxBarcode = s.toString();
 //                // 执行查询方法
@@ -730,7 +733,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                     } else {
                         stockAllFill(false);
                         saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
-
                     }
                 }
 
@@ -742,7 +744,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                     stockAllFill(true);
                     saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
-
                 }
 
                 break;
@@ -935,7 +936,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 salOrg.setNumber(salOrder.getSalOrgNumber());
                 salOrg.setName(salOrder.getSalOrgName());
 
-                setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
                 tvSalOrg.setText(salOrg.getName());
                 sr2.setPurOrgFnumber(salOrg.getNumber());
             }
@@ -965,13 +965,15 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             for (int i = 0; i < size; i++) {
                 DeliOrder deliOrder = deliOrderList.get(i);
                 ScanningRecord2 sr2 = new ScanningRecord2();
+                Material mtl = deliOrder.getMtl();
+
                 sr2.setSourceK3Id(deliOrder.getfId());
                 sr2.setSourceFnumber(deliOrder.getFbillno());
                 sr2.setMtlId(deliOrder.getMtlId());
-                sr2.setMtl(deliOrder.getMtl());
+                sr2.setMtl(mtl);
                 //
                 sr2.setMtlFnumber(deliOrder.getMtlFnumber());
-                sr2.setUnitFnumber(deliOrder.getMtl().getUnit().getUnitNumber());
+                sr2.setUnitFnumber(mtl.getUnit().getUnitNumber());
                 sr2.setPoFid(deliOrder.getfId());
                 sr2.setPoFbillno(deliOrder.getFbillno());
                 sr2.setSalOrderNo(deliOrder.getSalOrderNo());
@@ -981,18 +983,25 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 //            sr2.setSequenceNo(deliOrder.getSnCode());
 //            sr2.setBarcode(deliOrder.getBarcode());
 
-                sr2.setStockId(stock.getfStockid());
-                sr2.setStock(stock);
-                sr2.setStockFnumber(stock.getfNumber());
-                sr2.setStockPos(stockP);
-                sr2.setStockPositionId(stockP.getId());
-                sr2.setStockPName(stockP.getFname());
-
+                // 发货单默认的仓库
                 if (deliOrder.getStock() != null) {
+                    sr2.setStock(deliOrder.getStock());
                     sr2.setStockId(deliOrder.getStockId());
                     sr2.setStockFnumber(deliOrder.getStockNumber());
                     sr2.setStockName(deliOrder.getStockName());
+                    sr2.setStockPos(null);
+                    sr2.setStockPositionId(0);
+                    sr2.setStockPName("");
+                } else if(mtl.getStock() != null) {
+                    // 物料默认的仓库仓位
+                    setStockInfo(sr2, mtl.getStock());
+                    setStockPosInfo(sr2, mtl.getStockPos());
+                } else {
+                    // 默认操作员的仓库仓位
+                    setStockInfo(sr2, stock);
+                    setStockPosInfo(sr2, stockP);
                 }
+
                 if (department != null) {
                     sr2.setEmpId(department.getFitemID()); // 部门
                     sr2.setDepartmentFnumber(department.getDepartmentNumber());
@@ -1020,7 +1029,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                     salOrg.setName(deliOrder.getDeliOrgName());
                 }
 
-                setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
                 tvSalOrg.setText(salOrg.getName());
                 sr2.setPurOrgFnumber(salOrg.getNumber());
 
@@ -1070,6 +1078,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 srTok3.setFpaezBeizhu(deliOrder.getSummary());
                 srTok3.setFentryNote(deliOrder.getEntryRemark());
                 srTok3.setFboxAmount(mapBox.size());
+                srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
+                srTok3.setFlhDbj(deliOrder.getFlhDbj());
                 sr2.setSrTok3(srTok3);
 
                 checkDatas.add(sr2);
@@ -1088,6 +1098,12 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 }
             }
         }
+        DeliOrder deliOrder = deliOrderList.get(0);
+        Staff stockStaff = deliOrder.getStockStaff();
+        if(stockStaff != null) {
+            context.stockStaff = deliOrder.getStockStaff();
+            tvStockStaff.setText(stockStaff.getName());
+        }
         tvExpressCompany.setText(expressCompany.getExpressName());
         setFocusable(etBoxCode); // 物料代码获取焦点
 
@@ -1101,24 +1117,27 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
+            Material mtl = mbr.getMtl();
+
             sr2.setSourceId(mbr.getId());
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
             sr2.setMtlId(mbr.getMaterialId());
-            sr2.setMtl(mbr.getMtl());
-            sr2.setMtlFnumber(mbr.getMtl().getfNumber());
-            sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
+            sr2.setMtl(mtl);
+            sr2.setMtlFnumber(mtl.getfNumber());
+            sr2.setUnitFnumber(mtl.getUnit().getUnitNumber());
             sr2.setPoFid(mbr.getRelationBillId());
             sr2.setPoFbillno(mbr.getRelationBillNumber());
             sr2.setBatchno(mbr.getBatchCode());
             sr2.setSequenceNo(mbr.getSnCode());
             sr2.setBarcode(mbr.getBarcode());
-            sr2.setStockId(stock.getfStockid());
-            sr2.setStock(stock);
-            sr2.setStockFnumber(stock.getfNumber());
-            sr2.setStockPos(stockP);
-            sr2.setStockPositionId(stockP.getId());
-            sr2.setStockPName(stockP.getFname());
+
+//            sr2.setStockId(stock.getfStockid());
+//            sr2.setStock(stock);
+//            sr2.setStockFnumber(stock.getfNumber());
+//            sr2.setStockPos(stockP);
+//            sr2.setStockPositionId(stockP.getId());
+//            sr2.setStockPName(stockP.getFname());
 
             if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
@@ -1126,11 +1145,23 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             }
             // 得到发货订单
             DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
-            // 仓库
+            // 发货单默认的仓库
             if (deliOrder.getStock() != null) {
+                sr2.setStock(deliOrder.getStock());
                 sr2.setStockId(deliOrder.getStockId());
                 sr2.setStockFnumber(deliOrder.getStockNumber());
                 sr2.setStockName(deliOrder.getStockName());
+                sr2.setStockPos(null);
+                sr2.setStockPositionId(0);
+                sr2.setStockPName("");
+            } else if(mtl.getStock() != null) {
+                // 物料默认的仓库仓位
+                setStockInfo(sr2, mtl.getStock());
+                setStockPosInfo(sr2, mtl.getStockPos());
+            } else {
+                // 默认操作员的仓库仓位
+                setStockInfo(sr2, stock);
+                setStockPosInfo(sr2, stockP);
             }
             sr2.setEntryId(deliOrder.getEntryId());
             sr2.setFqty(mbr.getRelationBillFQTY());
@@ -1158,7 +1189,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 salOrg.setNumber(deliOrder.getDeliOrgNumber());
                 salOrg.setName(deliOrder.getDeliOrgName());
             }
-            setEnables(tvSalOrg, R.drawable.back_style_gray3, false);
             tvSalOrg.setText(salOrg.getName());
             sr2.setPurOrgFnumber(salOrg.getNumber());
 
@@ -1208,6 +1238,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             srTok3.setFpaezBeizhu(deliOrder.getSummary());
             srTok3.setFentryNote(deliOrder.getEntryRemark());
             srTok3.setFboxAmount(mapBox.size());
+            srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
+            srTok3.setFlhDbj(deliOrder.getFlhDbj());
             sr2.setSrTok3(srTok3);
 
             checkDatas.add(sr2);
@@ -1216,6 +1248,38 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
         setFocusable(etBoxCode); // 物料代码获取焦点
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 设置仓库的值
+     */
+    private void setStockInfo(ScanningRecord2 sr2, Stock stock) {
+        if(stock == null) {
+            sr2.setStock(null);
+            sr2.setStockId(0);
+            sr2.setStockFnumber("");
+            sr2.setStockName("");
+        } else {
+            sr2.setStock(stock);
+            sr2.setStockId(stock.getfStockid());
+            sr2.setStockFnumber(stock.getfNumber());
+            sr2.setStockName(stock.getfName());
+        }
+    }
+
+    /**
+     * 设置库位的值
+     */
+    private void setStockPosInfo(ScanningRecord2 sr2, StockPosition stockP) {
+        if(stockP == null) {
+            sr2.setStockPos(null);
+            sr2.setStockPositionId(0);
+            sr2.setStockPName("");
+        } else {
+            sr2.setStockPos(stockP);
+            sr2.setStockPositionId(stockP.getId());
+            sr2.setStockPName(stockP.getFname());
+        }
     }
 
     /**
@@ -1471,7 +1535,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
      */
     private void run_findDeliOrderByProdOrder(String strOrderNo, String strOrderEntryId) {
         showLoadDialog("加载中...");
-        String mUrl = mUrl = getURL("findDeliOrderByProdOrder");;
+        String mUrl = mUrl = getURL("findDeliOrderByProdOrder");
         FormBody formBody = new FormBody.Builder()
                 .add("strOrderNo", strOrderNo)
                 .add("strOrderEntryId", strOrderEntryId)

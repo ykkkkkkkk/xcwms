@@ -55,6 +55,10 @@ public class ScanningRecordTok3 implements Serializable {
 	private String fpurchaseDeptNumber;
 	/* 收料部门代码 */
 	private String fstockDeptNumber;
+	/* 客户  */
+	private String fpaezKehu;
+	/* 备注 */
+	private String fdescription;
 
 
 //	单据Entry部分---
@@ -69,6 +73,10 @@ public class ScanningRecordTok3 implements Serializable {
 	private String fentryNote;
 	/* 金额 */
 	private double famount;
+	/* 调拨单价 */
+	private double flhDbdj;
+	/* 调拨价 */
+	private double flhDbj;
 
 	public ScanningRecordTok3() {
 		super();
@@ -205,6 +213,30 @@ public class ScanningRecordTok3 implements Serializable {
 	}
 	public void setFamount(double famount) {
 		this.famount = famount;
+	}
+	public String getFpaezKehu() {
+		return fpaezKehu;
+	}
+	public void setFpaezKehu(String fpaezKehu) {
+		this.fpaezKehu = fpaezKehu;
+	}
+	public String getFdescription() {
+		return fdescription;
+	}
+	public void setFdescription(String fdescription) {
+		this.fdescription = fdescription;
+	}
+	public double getFlhDbdj() {
+		return flhDbdj;
+	}
+	public void setFlhDbdj(double flhDbdj) {
+		this.flhDbdj = flhDbdj;
+	}
+	public double getFlhDbj() {
+		return flhDbj;
+	}
+	public void setFlhDbj(double flhDbj) {
+		this.flhDbj = flhDbj;
 	}
 
 

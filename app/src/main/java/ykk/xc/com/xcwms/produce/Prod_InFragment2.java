@@ -50,6 +50,7 @@ import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.EnumDict;
+import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
@@ -433,6 +434,20 @@ public class Prod_InFragment2 extends BaseFragment {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_boxCode: // 发货单
+                        curViewFlag = '1';
+                        setFocusable(etBoxCode);
+                        break;
+                }
+            }
+        };
+        etBoxCode.setOnClickListener(click);
+
         // 箱码
         etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -441,6 +456,7 @@ public class Prod_InFragment2 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                boxBarcode = s.toString();
 //                // 执行查询方法
@@ -598,11 +614,15 @@ public class Prod_InFragment2 extends BaseFragment {
         for (int i = 0, size = list.size(); i < size; i++) {
             MaterialBinningRecord mbr = list.get(i);
             ScanningRecord2 sr2 = new ScanningRecord2();
+            Material mtl = mbr.getMtl();
+            // 得到生产订单
+            ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+
             sr2.setSourceId(mbr.getId());
             sr2.setSourceK3Id(mbr.getRelationBillId());
             sr2.setSourceFnumber(mbr.getRelationBillNumber());
             sr2.setMtlId(mbr.getMaterialId());
-            sr2.setMtl(mbr.getMtl());
+            sr2.setMtl(mtl);
             sr2.setMtlFnumber(mbr.getMtl().getfNumber());
             sr2.setUnitFnumber(mbr.getMtl().getUnit().getUnitNumber());
             sr2.setPoFid(mbr.getRelationBillId());
@@ -616,24 +636,30 @@ public class Prod_InFragment2 extends BaseFragment {
 //            if (mbr.getMtl().getIsSnManager() == 1) {
 //                sr2.setStockqty(1);
 //            }
-            if (stock != null) {
-                sr2.setStockId(stock.getfStockid());
-                sr2.setStock(stock);
-                sr2.setStockFnumber(stock.getfNumber());
-            }
-            if (stockP != null) {
-                sr2.setStockPositionId(stockP.getId());
-                sr2.setStockPName(stockP.getFname());
+            // 默认物料的仓库仓位
+            Stock mtlStock = mtl.getStock();
+            StockPosition mtlStockPos = mtl.getStockPos();
+            if(mtlStock != null) {
+                setStockInfo(sr2, mtlStock);
+                setStockPosInfo(sr2, mtlStockPos);
+            } else {
+                // 默认操作员的仓库仓位
+                setStockInfo(sr2, stock);
+                setStockPosInfo(sr2, stockP);
             }
 //            sr2.setSupplierId(mbr.getSupplierId());
 //            sr2.setSupplierName(mbr.getSupplierName());
 //            sr2.setSupplierFnumber(supplier.getfNumber());
-            if (department != null) {
+            String deptName = Comm.isNULLS(prodOrder.getDeptName());
+            if(deptName.length() > 0) {
+                sr2.setEmpId(prodOrder.getDeptId());
+                sr2.setDepartmentFnumber(prodOrder.getDeptNumber());
+                tvDeptSel.setText(prodOrder.getDeptName());
+            } else if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
                 sr2.setDepartmentFnumber(department.getDepartmentNumber());
             }
-            // 得到生产订单
-            ProdOrder prodOrder = JsonUtil.stringToObject(mbr.getRelationObj(), ProdOrder.class);
+
             sr2.setReceiveOrgFnumber(prodOrder.getProdOrgNumber());
             sr2.setPurOrgFnumber(prodOrder.getProdOrgNumber());
             sr2.setEntryId(prodOrder.getEntryId());
@@ -647,10 +673,10 @@ public class Prod_InFragment2 extends BaseFragment {
             sr2.setCoveQty(prodOrder.getCoveQty());
             // 入库组织
 
-            tvInOrg.setText(prodOrder.getProdOrgNumber());
+            tvInOrg.setText(prodOrder.getProdOrgName());
 
             // 生产组织
-            tvProdOrg.setText(prodOrder.getProdOrgNumber());
+            tvProdOrg.setText(prodOrder.getProdOrgName());
 //                            sr2.setOperationId(0); // 操作员id
             ScanningRecordTok3 srTok3 = new ScanningRecordTok3();
             sr2.setSrTok3(srTok3);
@@ -659,6 +685,38 @@ public class Prod_InFragment2 extends BaseFragment {
         }
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 设置仓库的值
+     */
+    private void setStockInfo(ScanningRecord2 sr2, Stock stock) {
+        if(stock == null) {
+            sr2.setStock(null);
+            sr2.setStockId(0);
+            sr2.setStockFnumber("");
+            sr2.setStockName("");
+        } else {
+            sr2.setStock(stock);
+            sr2.setStockId(stock.getfStockid());
+            sr2.setStockFnumber(stock.getfNumber());
+            sr2.setStockName(stock.getfName());
+        }
+    }
+
+    /**
+     * 设置库位的值
+     */
+    private void setStockPosInfo(ScanningRecord2 sr2, StockPosition stockP) {
+        if(stockP == null) {
+            sr2.setStockPos(null);
+            sr2.setStockPositionId(0);
+            sr2.setStockPName("");
+        } else {
+            sr2.setStockPos(stockP);
+            sr2.setStockPositionId(stockP.getId());
+            sr2.setStockPName(stockP.getFname());
+        }
     }
 
     /**
@@ -703,11 +761,8 @@ public class Prod_InFragment2 extends BaseFragment {
             record.setEntryId(sr2.getEntryId());
             record.setPoFbillno(sr2.getPoFbillno());
             record.setPoFmustqty(sr2.getPoFmustqty());
-
-            if (department != null) {
-                record.setDepartmentK3Id(department.getFitemID());
-                record.setDepartmentFnumber(department.getDepartmentNumber());
-            }
+            record.setDepartmentK3Id(sr2.getEmpId());
+            record.setDepartmentFnumber(sr2.getDepartmentFnumber());
             record.setPdaRowno((i+1));
             record.setBatchNo(sr2.getBatchno());
             record.setSequenceNo(sr2.getSequenceNo());

@@ -2,7 +2,6 @@ package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
@@ -51,7 +50,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     Button btnSmall;
 
     private PrintFragment2 context = this;
-    private static final int SUCC1 = 200, UNSUCC1 = 501, SETFOCUS = 1, PAD_SM = 2, PDA_SM = 3;
+    private static final int SUCC1 = 200, UNSUCC1 = 501, SETFOCUS = 1, PAD_SM = 2, MOBILE_SM = 3;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int caseId = 34; // （34：生产订单）
     private String barcode; // 对应的条码号
@@ -115,7 +114,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                         m.run_print();
 
                         break;
-                    case PDA_SM: // pda扫码
+                    case MOBILE_SM: // pda扫码
                         m.barcode = m.getValues(m.etCode);
                         // 执行查询方法
                         m.run_print();
@@ -232,7 +231,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
                     } else {
 //                        // 执行查询方法
 //                        run_print();
-                        mHandler.sendEmptyMessageDelayed(PDA_SM,600);
+                        mHandler.sendEmptyMessageDelayed(MOBILE_SM,600);
                     }
                 }
             }

@@ -11,6 +11,8 @@ import java.util.List;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
+import ykk.xc.com.xcwms.model.sal.DeliOrder;
+import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 public class Sal_RecombinationAdapter extends BaseArrayRecyclerAdapter<MaterialBinningRecord> {
@@ -36,9 +38,11 @@ public class Sal_RecombinationAdapter extends BaseArrayRecyclerAdapter<MaterialB
         TextView tv_nums = holder.obtainView(R.id.tv_nums);
         TextView tv_unitName = holder.obtainView(R.id.tv_unitName);
         // 赋值
+        DeliOrder deliOrder = JsonUtil.stringToObject(entity.getRelationObj(), DeliOrder.class);
+
         tv_row.setText(String.valueOf(pos + 1));
         tv_mats.setText(entity.getMtl().getfNumber()+"\n"+entity.getMtl().getfName());
-        tv_unitName.setText(entity.getMtl().getUnit().getUnitName());
+        tv_unitName.setText(deliOrder.getMtlUnitName());
         // 是否启用批次管理和序列号管理
         tv_nums.setText(Html.fromHtml(df.format(entity.getUsableFqty())+"<br><font color='#009900'>"+df.format(entity.getNumber())+"</font>"));
         if(entity.getMtl().getIsSnManager() == 1) {
@@ -48,7 +52,6 @@ public class Sal_RecombinationAdapter extends BaseArrayRecyclerAdapter<MaterialB
             tv_nums.setBackgroundResource(R.drawable.back_style_blue2);
             tv_nums.setEnabled(true);
         }
-        tv_unitName.setText(entity.getMtl().getUnit().getUnitName());
 
         View.OnClickListener click = new View.OnClickListener() {
             @Override

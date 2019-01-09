@@ -10,6 +10,8 @@ import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +39,6 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Express_DialogActivity;
-import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
 import ykk.xc.com.xcwms.basics.Staff_DialogActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
@@ -46,6 +47,7 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Department;
 import ykk.xc.com.xcwms.model.ExpressCompany;
+import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
 import ykk.xc.com.xcwms.model.ScanningRecord;
 import ykk.xc.com.xcwms.model.ScanningRecord2;
@@ -65,8 +67,12 @@ import ykk.xc.com.xcwms.util.JsonUtil;
  */
 public class Sal_OutFragment3 extends BaseFragment {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.tv_pickingListSel)
     TextView tvPickingListSel;
+    @BindView(R.id.et_deliCode)
+    EditText etDeliCode;
     @BindView(R.id.tv_deptSel)
     TextView tvDeptSel;
     @BindView(R.id.tv_custSel)
@@ -89,9 +95,9 @@ public class Sal_OutFragment3 extends BaseFragment {
     Button btnSave;
 
     private Sal_OutFragment3 context = this;
-    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, PASS = 203, UNPASS = 503;
-    private static final int CODE2 = 2;
+    private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17, PAD_SM = 18;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
+    private static final int CODE1 = 1, UPDATE = 2, UPDATE_NULL = 3;
     private Stock stock2; // 仓库
     private StockPosition stockP2; // 库位
     private Department department; // 部门
@@ -100,6 +106,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     private ExpressCompany expressCompany; // 物料公司
     private Sal_OutFragment3Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
+    private String barcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：箱码
     private int curPos; // 当前行
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -107,6 +114,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     private Activity mContext;
     private Sal_OutMainActivity parent;
     private String k3Number; // 记录传递到k3返回的单号
+    private boolean isTextChange; // 是否进入TextChange事件
 
     // 消息处理
     private Sal_OutFragment3.MyHandler mHandler = new Sal_OutFragment3.MyHandler(this);
@@ -127,6 +135,8 @@ public class Sal_OutFragment3 extends BaseFragment {
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
 //                        m.reset();
                         m.btnSave.setVisibility(View.GONE);
+                        // 反写k3number 到PickingList表
+                        m.run_modifyK3number();
                         Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
@@ -146,7 +156,30 @@ public class Sal_OutFragment3 extends BaseFragment {
                         Comm.showWarnDialog(m.mContext, errMsg);
 
                         break;
-                    case SUCC2: // 判断是否存在返回
+                    case SUCC2: // 发货通知单 扫码
+                        switch (m.curViewFlag) {
+                            case '1': // 拣货单
+                                List<PickingList> list2 = JsonUtil.strToList((String) msg.obj, PickingList.class);
+                                PickingList p = list2.get(0);
+//                                m.tvPickingListSel.setText(p.getFbillno());
+                                m.tvCustSel.setText(p.getCustName());
+                                m.getPickingList(list2);
+
+                                break;
+                        }
+
+                        break;
+                    case UNSUCC2:
+                        String errMsg2 = m.isNULLS((String) msg.obj);
+                        if(errMsg2.length() > 0) {
+                            String message = JsonUtil.strToString(errMsg2);
+                            Comm.showWarnDialog(m.mContext, message);
+                        } else {
+                            Comm.showWarnDialog(m.mContext,"条码不存在，或者扫错了条码！");
+                        }
+
+                        break;
+                    case SUCC3: // 判断是否存在返回
                         List<ShrinkOrder> list = JsonUtil.strToList((String) msg.obj, ShrinkOrder.class);
                         for (int i = 0, len = list.size(); i < len; i++) {
                             ShrinkOrder so = list.get(i);
@@ -167,8 +200,27 @@ public class Sal_OutFragment3 extends BaseFragment {
                         m.run_addScanningRecord();
 
                         break;
-                    case UNSUCC2: // 判断是否存在返回
+                    case UNSUCC3: // 判断是否存在返回
                         m.run_addScanningRecord();
+
+                        break;
+                    case PAD_SM: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 发货单
+                                etName = m.getValues(m.etDeliCode);
+                                if (m.barcode != null && m.barcode.length() > 0) {
+                                    if(m.barcode.equals(etName)) {
+                                        m.barcode = etName;
+                                    } else m.barcode = etName.replaceFirst(m.barcode, "");
+
+                                } else m.barcode = etName;
+                                m.setTexts(m.etDeliCode, m.barcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.barcode);
+
+                                break;
+                        }
 
                         break;
                 }
@@ -195,7 +247,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
                 Log.e("num", "行：" + position);
 //                curPos = position;
-//                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
+//                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE1);
             }
 
             @Override
@@ -211,6 +263,7 @@ public class Sal_OutFragment3 extends BaseFragment {
 
     @Override
     public void initData() {
+        hideSoftInputMode(mContext, etDeliCode);
         hideSoftInputMode(mContext, etExpressNo);
         getUserInfo();
 
@@ -223,7 +276,18 @@ public class Sal_OutFragment3 extends BaseFragment {
         // 赋值
         if(stockStaff != null) tvStockStaff.setText(stockStaff.getName());
         if(department != null) tvDeptSel.setText(department.getDepartmentName());
+    }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etDeliCode); // 物料代码获取焦点
+                }
+            },200);
+        }
     }
 
     @OnClick({R.id.tv_pickingListSel, R.id.btn_save, R.id.btn_pass, R.id.btn_clone, R.id.tv_orderTypeSel, R.id.tv_receiveOrg, R.id.tv_salOrg,
@@ -342,6 +406,18 @@ public class Sal_OutFragment3 extends BaseFragment {
             return false;
         }
 
+        // 判断是否输入了数量
+        boolean isNull = false;
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            ScanningRecord2 sr2 = checkDatas.get(i);
+            if (sr2.getStockqty() > 0) isNull = true;
+        }
+        if(!isNull) {
+            Comm.showWarnDialog(mContext,"当前行中，至少有一行（实收数）必须大于0！");
+            return false;
+        }
+
+        List<ScanningRecord2> list = new ArrayList<>();
         // 检查数据
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             ScanningRecord2 sr2 = checkDatas.get(i);
@@ -349,12 +425,12 @@ public class Sal_OutFragment3 extends BaseFragment {
 
             // 员工
             if(stockStaff != null) srToK3.setStockStaffNumber(stockStaff.getNumber());
-            if (sr2.getStockqty() == 0) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
-                return false;
-            }
             if (sr2.getStockId() == 0) {
                 Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
+                return false;
+            }
+            if (sr2.getStockqty() == 0) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须大于0！");
                 return false;
             }
 //            if (sr2.getStockqty() > sr2.getFqty()) {
@@ -365,12 +441,60 @@ public class Sal_OutFragment3 extends BaseFragment {
 //                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行（实发数）必须等于（应发数）！");
 //                return false;
 //            }
+            if(sr2.getStockqty() > 0) {
+                list.add(sr2);
+            }
         }
+        checkDatas.clear();
+        checkDatas.addAll(list);
+
         return true;
     }
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_deliCode: // 发货单
+                        curViewFlag = '1';
+                        setFocusable(etDeliCode);
+                        break;
+                    case R.id.et_expressNo: // 运单号
+                        setFocusable(etExpressNo);
+                        break;
+                }
+            }
+        };
+        etDeliCode.setOnClickListener(click);
+        etExpressNo.setOnClickListener(click);
+
+        // 发货单号
+        etDeliCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                curViewFlag = '1';
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        barcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(barcode);
+                    }
+                }
+            }
+        });
+
         etExpressNo.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -399,6 +523,57 @@ public class Sal_OutFragment3 extends BaseFragment {
 
         checkDatas.clear();
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 扫码查询对应的方法
+     */
+    private void run_smGetDatas(String val) {
+        isTextChange = false;
+        if(val.length() == 0) {
+            Comm.showWarnDialog(mContext,"请对准条码！");
+            return;
+        }
+        showLoadDialog("加载中...");
+        String mUrl = null;
+        switch (curViewFlag) {
+            case '1': // 发货单扫码
+                mUrl = getURL("pickingList/findBarcode");
+                break;
+        }
+        FormBody formBody = new FormBody.Builder()
+                .add("barcode", barcode)
+                .add("pickingType","2")
+                .add("isUpload", "1")
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNSUCC2);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                Log.e("run_smGetDatas --> onResponse", result);
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNSUCC2, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(SUCC2, result);
+                mHandler.sendMessage(msg);
+            }
+        });
     }
 
     @Override
@@ -484,7 +659,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                 }
 
                 break;
-            case CODE2: // 数量
+            case CODE1: // 数量
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
@@ -552,19 +727,26 @@ public class Sal_OutFragment3 extends BaseFragment {
      * 得到拣货单列表
      */
     private void getPickingList(List<PickingList> list) {
+        // 判断扫描重复单据
+        if(checkDatas.size() > 0) {
+            Comm.showWarnDialog(mContext,"请先保存当前行数据！");
+            return;
+        }
         for (int i = 0, size = list.size(); i < size; i++) {
             PickingList pl = list.get(i);
             DeliOrder deliOrder = pl.getDeliOrder();
             ScanningRecord2 sr2 = new ScanningRecord2();
+            Material mtl = pl.getMtl();
+
             sr2.setSourceId(pl.getId());
             sr2.setSourceK3Id(pl.getId());
             sr2.setSourceFnumber(pl.getPickingListNo());
 //            sr2.setSourceK3Id(pl.getfId());
 //            sr2.setSourceFnumber(pl.getFbillno());
             sr2.setMtlId(pl.getMtlId());
-            sr2.setMtl(pl.getMtl());
-            sr2.setMtlFnumber(pl.getMtl().getfNumber());
-            sr2.setUnitFnumber(pl.getMtl().getUnit().getUnitNumber());
+            sr2.setMtl(mtl);
+            sr2.setMtlFnumber(mtl.getfNumber());
+            sr2.setUnitFnumber(mtl.getUnit().getUnitNumber());
             sr2.setPoFid(pl.getfId());
             sr2.setSalOrderNo(deliOrder.getSalOrderNo());
             sr2.setPoFbillno(pl.getFbillno());
@@ -582,13 +764,11 @@ public class Sal_OutFragment3 extends BaseFragment {
             stockP.setFnumber(pl.getStockPositionNumber());
             stockP.setFname(pl.getStockPositionName());
             sr2.setStockPos(stockP);
-            if (department != null) {
-                sr2.setEmpId(department.getFitemID()); // 部门
-                sr2.setDepartmentFnumber(department.getDepartmentNumber());
-            }
+
             sr2.setEntryId(pl.getEntryId());
-            sr2.setFqty(pl.getPickingListNum());
-            sr2.setPoFmustqty(pl.getPickingListNum());
+            sr2.setFqty(pl.getDeliFqty());
+            sr2.setPoFmustqty(pl.getDeliFqty());
+            sr2.setUsableFqty(pl.getPickingListNum());
             sr2.setStockqty(pl.getPickingListNum());
             // 发货组织
             if(receiveOrg == null) receiveOrg = new Organization();
@@ -651,9 +831,18 @@ public class Sal_OutFragment3 extends BaseFragment {
             srTok3.setFpaezBeizhu(deliOrder.getSummary());
             srTok3.setFentryNote(deliOrder.getEntryRemark());
             srTok3.setFboxAmount(0); // 箱数
+            srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
+            srTok3.setFlhDbj(deliOrder.getFlhDbj());
             sr2.setSrTok3(srTok3);
 
             checkDatas.add(sr2);
+        }
+        PickingList pl = list.get(0);
+        DeliOrder deliOrder = pl.getDeliOrder();
+        Staff stockStaff = deliOrder.getStockStaff();
+        if(stockStaff != null) {
+            context.stockStaff = deliOrder.getStockStaff();
+            tvStockStaff.setText(stockStaff.getName());
         }
         tvExpressCompany.setText(expressCompany.getExpressName());
         mAdapter.notifyDataSetChanged();
@@ -826,7 +1015,7 @@ public class Sal_OutFragment3 extends BaseFragment {
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                mHandler.sendEmptyMessage(UNSUCC2);
+                mHandler.sendEmptyMessage(UNSUCC3);
             }
 
             @Override
@@ -834,11 +1023,51 @@ public class Sal_OutFragment3 extends BaseFragment {
                 ResponseBody body = response.body();
                 String result = body.string();
                 if (!JsonUtil.isSuccess(result)) {
-                    mHandler.sendEmptyMessage(UNSUCC2);
+                    mHandler.sendEmptyMessage(UNSUCC3);
                     return;
                 }
-                Message msg = mHandler.obtainMessage(SUCC2, result);
+                Message msg = mHandler.obtainMessage(SUCC3, result);
                 Log.e("run_findInStockSum --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
+     * 传入k3成功，反写k3单号的数据
+     */
+    private void run_modifyK3number() {
+        showLoadDialog("更新中...");
+        ScanningRecord2 sr2 = checkDatas.get(0);
+        String mUrl = getURL("pickingList/modifyK3number");
+        FormBody formBody = new FormBody.Builder()
+                .add("pickingListNo", sr2.getSourceFnumber())
+                .add("k3number", k3Number)
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UPDATE_NULL);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    mHandler.sendEmptyMessage(UPDATE_NULL);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(UPDATE, result);
+                Log.e("run_modifyK3number --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

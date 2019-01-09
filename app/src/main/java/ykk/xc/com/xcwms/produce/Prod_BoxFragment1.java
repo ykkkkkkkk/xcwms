@@ -65,6 +65,8 @@ import ykk.xc.com.xcwms.util.JsonUtil;
  */
 public class Prod_BoxFragment1 extends BaseFragment {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.lin_box)
     LinearLayout linBox;
     @BindView(R.id.tv_box)
@@ -124,7 +126,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
     private EditText etMtlCodeTmp, etMtlCode2;
     private CheckBox checkClose;
     private boolean isCloseDelDialog = true; // 是否关闭删除的Dialog
-    private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
+    private int status = 0; // 箱子状态（0：创建，1：开箱，2：封箱）
     private char binningType = '2'; // 1.单色装，2.混色装
     private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -187,7 +189,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
                         break;
                     case SAVE: // 扫描后的保存 成功
-                        m.status = '1';
+                        m.status = 1;
                         m.checkDatas.clear();
                         List<MaterialBinningRecord> listMbr = JsonUtil.strToList((String) msg.obj, MaterialBinningRecord.class);
                         m.checkDatas.addAll(listMbr);
@@ -242,13 +244,13 @@ public class Prod_BoxFragment1 extends BaseFragment {
                         String count = JsonUtil.strToString((String) msg.obj);
 //                        m.btnSave.setVisibility(View.VISIBLE);
                         switch (m.status) {
-                            case '1': // 开箱
+                            case 1: // 开箱
                                 m.setEnables(m.etMtlCode,R.drawable.back_style_blue,true);
                                 m.setFocusable(m.etMtlCode);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
                                 m.btnEnd.setText("封箱");
                                 break;
-                            case '2': // 封箱
+                            case 2: // 封箱
                                 m.setEnables(m.etMtlCode,R.drawable.back_style_gray3,false);
                                 m.setEnables(m.tvDeliverSel,R.drawable.back_style_gray3,false);
                                 m.tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
@@ -258,7 +260,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
                                 m.btnEnd.setText("开箱");
                                 break;
                         }
-                        if(m.status == '2') {
+                        if(m.status == 2) {
                             // 去打印
                             List<MaterialBinningRecord> list = new ArrayList<>();
                             for(int i=0; i<m.checkDatas.size(); i++) {
@@ -307,9 +309,23 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
                         break;
                     case CODE2: // Dialog默认得到焦点，隐藏软键盘
-//                        m.hideSoftInputMode(m.mContext, m.etMtlCode2);
                         m.setFocusable(m.etMtlCodeTmp);
                         m.setFocusable(m.etMtlCode2);
+
+                        break;
+                    case SETFOCUS: // 重新得到焦点
+                        m.setFocusable(m.etGetFocus);
+                        switch (m.curViewFlag) {
+                            case '1': // 箱码扫码   返回
+                                m.setFocusable(m.etBoxCode);
+                                break;
+                            case '2': // 生产订单扫码   返回
+                                m.setFocusable(m.etProdOrderCode);
+                                break;
+                            case '3': // 物料扫码     返回
+                                m.setFocusable(m.etMtlCode);
+                                break;
+                        }
 
                         break;
                     case PAD_SM: // pad扫码
@@ -410,6 +426,14 @@ public class Prod_BoxFragment1 extends BaseFragment {
         getUserInfo();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            mHandler.sendEmptyMessageDelayed(SETFOCUS, 300);
+        }
+    }
+
     @OnClick({R.id.btn_boxConfirm, R.id.tv_custSel, R.id.tv_deliverSel, R.id.btn_clone, R.id.btn_del, R.id.btn_save, R.id.btn_end, R.id.btn_print, R.id.tv_box})
     public void onViewClicked(View view) {
         Bundle bundle = null;
@@ -435,7 +459,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
                 break;
             case R.id.btn_del: // 删除
-                if(status == '2') {
+                if(status == 2) {
                     Comm.showWarnDialog(mContext,"已经封箱，不能删除，请开箱操作！");
                     return;
                 }
@@ -456,7 +480,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请选择发货方式！");
                     return;
                 }
-                status = '1';
+                status = 1;
 
                 List<MaterialBinningRecord> list = new ArrayList<>();
                 for(int i=0; i<checkDatas.size(); i++) {
@@ -487,8 +511,8 @@ public class Prod_BoxFragment1 extends BaseFragment {
                     Comm.showWarnDialog(mContext,"请选择发货方式！");
                     return;
                 }
-                if(status == '1') status = '2';
-                else status = '1';
+                if(status == 1) status = 2;
+                else status = 1;
 
                 run_modifyStatus();
 
@@ -580,6 +604,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '4';
 //                mtlBarcode_del = s.toString();
 //                // 执行查询方法
@@ -626,6 +651,30 @@ public class Prod_BoxFragment1 extends BaseFragment {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_boxCode: // 箱码
+                        curViewFlag = '1';
+                        setFocusable(etBoxCode);
+                        break;
+                    case R.id.et_prodOrderCode: // 生产订单
+                        curViewFlag = '2';
+                        setFocusable(etProdOrderCode);
+                        break;
+                    case R.id.et_mtlCode: // 物料
+                        curViewFlag = '3';
+                        setFocusable(etMtlCode);
+                        break;
+                }
+            }
+        };
+        etBoxCode.setOnClickListener(click);
+        etProdOrderCode.setOnClickListener(click);
+        etMtlCode.setOnClickListener(click);
+
         // 箱码
         etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -634,6 +683,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                strBoxBarcode = s.toString();
 //                // 执行查询方法
@@ -659,6 +709,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 if(boxBarCode == null) {
                     s.delete(0,s.length());
                     Comm.showWarnDialog(mContext, "请扫箱码！");
@@ -855,21 +906,18 @@ public class Prod_BoxFragment1 extends BaseFragment {
             }
             btnEnd.setText("封箱");
             btnEnd.setVisibility(View.GONE);
-            int status = boxBarCode.getStatus();
+            status = boxBarCode.getStatus();
             if(status == 0) {
                 tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
                 setFocusable(etProdOrderCode);
-                this.status = '0';
             } else if(status == 1) {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
                 setFocusable(etProdOrderCode);
                 btnEnd.setVisibility(View.VISIBLE);
-                this.status = '1';
             } else if(status == 2) {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
                 btnEnd.setText("开箱");
                 btnEnd.setVisibility(View.VISIBLE);
-                this.status = '2';
             }
 
             tvBoxName.setText(boxBarCode.getBox().getBoxName());
@@ -989,7 +1037,7 @@ public class Prod_BoxFragment1 extends BaseFragment {
             MaterialBinningRecord mbr = checkDatas.get(i);
             Material mtl = mbr.getMtl();
             // 如果扫码相同
-            if (bt.getMaterialId() == mtl.getfMaterialId()) {
+            if (bt.getEntryId() == mbr.getEntryId()) {
                 isFlag = true;
 
                 double fqty = 0;
@@ -1003,36 +1051,37 @@ public class Prod_BoxFragment1 extends BaseFragment {
                 }
 //                double fqty = mbr.getRelationBillFQTY() / coveQty;
                 // 计量单位数量
-                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
+//                if(tmpMtl.getCalculateFqty() > 0) fqty = tmpMtl.getCalculateFqty();
                 // 未启用序列号
                 if (tmpMtl.getIsSnManager() == 0) {
                     // 生产数大于装箱数
                     if (mbr.getUsableFqty() > mbr.getNumber()) {
                         // 如果扫的是物料包装条码，就显示个数
-                        double number = 0;
-                        if(bt != null) number = bt.getMaterialCalculateNumber();
-
-                        if(number > 0) {
-                            mbr.setNumber(mbr.getNumber() + (number*fqty));
-                        } else {
+//                        double number = 0;
+//                        if(bt != null) number = bt.getMaterialCalculateNumber();
+//
+//                        if(number > 0) {
+//                            mbr.setNumber(mbr.getNumber() + (number*fqty));
+//                        } else {
                             mbr.setNumber(mbr.getNumber() + fqty);
-                        }
+//                        }
                         mbr.setBatchCode(bt.getBatchCode());
                         mbr.setSnCode(bt.getSnCode());
 
                         // 启用了最小包装
-                    } else if(mtl.getMtlPack() != null && mtl.getMtlPack().getIsMinNumberPack() == 1) {
-                        if(mtl.getMtlPack().getIsMinNumberPack() == 1) {
-                            // 如果装箱数小于订单数，就加数量
-                            if(mbr.getNumber() < mbr.getUsableFqty()) {
-                                mbr.setNumber(mbr.getNumber() + fqty);
-                            } else {
-                                Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已经达到最小包装生产数量！");
-                                return;
-                            }
-                        }
+//                    } else if(mtl.getMtlPack() != null && mtl.getMtlPack().getIsMinNumberPack() == 1) {
+//                        if(mtl.getMtlPack().getIsMinNumberPack() == 1) {
+//                            // 如果装箱数小于订单数，就加数量
+//                            if(mbr.getNumber() < mbr.getUsableFqty()) {
+//                                mbr.setNumber(mbr.getNumber() + fqty);
+//                            } else {
+//                                Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，已经达到最小包装生产数量！");
+//                                return;
+//                            }
+//                        }
 
-                    } else if ((mtl.getMtlPack() == null || mtl.getMtlPack().getIsMinNumberPack() == 0) && mbr.getNumber() > mbr.getUsableFqty()) {
+//                    } else if ((mtl.getMtlPack() == null || mtl.getMtlPack().getIsMinNumberPack() == 0) && mbr.getNumber() > mbr.getUsableFqty()) {
+                    } else if (mbr.getNumber() > mbr.getUsableFqty()) {
                         // 数量已满
                         Comm.showWarnDialog(mContext, "第" + (i + 1) + "行，（装箱数）不能大于（可用数）！");
                         return;
@@ -1110,9 +1159,9 @@ public class Prod_BoxFragment1 extends BaseFragment {
                 } else {
                     // 相同的物料行相等
                     for (int i = 0; i < size; i++) {
-                        MaterialBinningRecord forMtl = checkDatas.get(i);
-                        if (bt.getMaterialId() == forMtl.getEntryId()) {
-                            mbr = forMtl;
+                        MaterialBinningRecord forMbr = checkDatas.get(i);
+                        if (bt.getEntryId() == forMbr.getEntryId()) {
+                            mbr = forMbr;
 
                             break;
                         }

@@ -51,7 +51,6 @@ import ykk.xc.com.xcwms.basics.DeliveryWay_DialogActivity;
 import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.AssistInfo;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Box;
@@ -76,12 +75,18 @@ import static ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager.CONN_STAT
 
 public class Sal_RecombinationActivity extends BaseActivity {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.lin_box)
     LinearLayout linBox;
     @BindView(R.id.tv_box)
     TextView tvBox;
     @BindView(R.id.et_boxCode)
     EditText etBoxCode;
+    @BindView(R.id.et_deliCode)
+    EditText etDeliCode;
+    @BindView(R.id.et_mtlCode)
+    EditText etMtlCode;
     @BindView(R.id.tv_status)
     TextView tvStatus;
     @BindView(R.id.tv_boxName)
@@ -96,8 +101,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
     TextView tvBoxAltitude;
     @BindView(R.id.tv_boxVolume)
     TextView tvBoxVolume;
-    @BindView(R.id.et_mtlCode)
-    EditText etMtlCode;
     @BindView(R.id.tv_custSel)
     TextView tvCustSel;
     @BindView(R.id.tv_deliverSel)
@@ -119,14 +122,14 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private Box box; // 箱子表
     private BoxBarCode boxBarCode; // 箱码表
     private Sal_RecombinationAdapter mAdapter;
-    private String boxBarcode, mtlBarcode; // 对应的条码号
-    private List<MaterialBinningRecord> mbrList = new ArrayList<>();
+    private String boxBarcode, deliBarcode, mtlBarcode; // 对应的条码号
+    private List<MaterialBinningRecord> checkDatas = new ArrayList<>();
     private List<PickingList> plList = new ArrayList<>();
     private char curViewFlag = '1'; // 1：箱子，2：物料
     private DecimalFormat df = new DecimalFormat("#.####");
     private int curPos; // 当前行
     private AssistInfo assist; // 辅助资料--发货方式
-    private char status = '0'; // 箱子状态（0：创建，1：开箱，2：封箱）
+    private int status = 0; // 箱子状态（0：创建，1：开箱，2：封箱）
     private User user;
     private OkHttpClient okHttpClient = new OkHttpClient();
     private int id = 0; // 设备id
@@ -156,11 +159,25 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         switch (m.curViewFlag) {
                             case '1': // 箱码扫码   返回
                                 m.boxBarCode = JsonUtil.strToObject((String) msg.obj, BoxBarCode.class);
+                                m.etDeliCode.setText("");
                                 m.etMtlCode.setText("");
                                 m.getBox();
 
                                 break;
-                            case '2': // 物料扫码   返回
+                            case '2': // 发货单查拣货单
+                                List<PickingList> list2 = JsonUtil.strToList((String) msg.obj, PickingList.class);
+                                m.getPickingList(list2);
+                                PickingList p = list2.get(0);
+                                m.tvPickingListSel.setText(p.getFbillno());
+                                m.tvCustSel.setText(p.getCustName());
+                                m.tvDeliverSel.setText(p.getDeliveryWay());
+                                m.tvCount.setText("物料数量："+list2.size());
+                                m.tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
+                                m.setFocusable(m.etMtlCode);
+                                m.mAdapter.notifyDataSetChanged();
+
+                                break;
+                            case '3': // 物料扫码   返回
                                 BarCodeTable bt = JsonUtil.strToObject((String) msg.obj, BarCodeTable.class);
                                 Material mtl = JsonUtil.stringToObject(bt.getRelationObj(), Material.class);
                                 bt.setMtl(mtl);
@@ -181,7 +198,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         break;
                     case SAVE: // 保存 成功
 //                        m.status = '1';
-//                        m.mbrList.clear();
+//                        m.checkDatas.clear();
 //                        m.plList.clear();
 //                        m.reset();
 //                        Comm.showWarnDialog(m.context,"保存成功√");
@@ -255,7 +272,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     case PAD_SM: // pad扫码
                         String etName = null;
                         switch (m.curViewFlag) {
-                            case '1': // 发货订单
+                            case '1': // 装箱单
                                 etName = m.getValues(m.etBoxCode);
                                 if (m.boxBarcode != null && m.boxBarcode.length() > 0) {
                                     if(m.boxBarcode.equals(etName)) {
@@ -268,7 +285,20 @@ public class Sal_RecombinationActivity extends BaseActivity {
                                 m.run_smGetDatas(m.boxBarcode);
 
                                 break;
-                            case '2': // 物料
+                            case '2': // 发货单查拣货单
+                                etName = m.getValues(m.etDeliCode);
+                                if (m.deliBarcode != null && m.deliBarcode.length() > 0) {
+                                    if(m.deliBarcode.equals(etName)) {
+                                        m.deliBarcode = etName;
+                                    } else m.deliBarcode = etName.replaceFirst(m.deliBarcode, "");
+
+                                } else m.deliBarcode = etName;
+                                m.setTexts(m.etDeliCode, m.deliBarcode);
+                                // 执行查询方法
+                                m.run_smGetDatas(m.deliBarcode);
+
+                                break;
+                            case '3': // 物料
                                 etName = m.getValues(m.etMtlCode);
                                 if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
                                     if(m.mtlBarcode.equals(etName)) {
@@ -291,8 +321,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
     }
 
     private void saveAfter() {
-        status = '1';
-        mbrList.clear();
+        status = 1;
+        checkDatas.clear();
         plList.clear();
         reset();
         Comm.showWarnDialog(context,"保存成功√");
@@ -307,12 +337,14 @@ public class Sal_RecombinationActivity extends BaseActivity {
     public void initView() {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new Sal_RecombinationAdapter(context, mbrList);
+        mAdapter = new Sal_RecombinationAdapter(context, checkDatas);
         recyclerView.setAdapter(mAdapter);
         mAdapter.setCallBack(new Sal_RecombinationAdapter.MyCallBack() {
             @Override
             public void onClick_num(View v, MaterialBinningRecord entity, int position) {
                 Log.e("num", "行：" + position);
+                if(status == 2) return;
+
                 curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getNumber()), "0.0", SEL_NUM);
             }
@@ -322,9 +354,15 @@ public class Sal_RecombinationActivity extends BaseActivity {
     @Override
     public void initData() {
         hideSoftInputMode(etBoxCode);
+        hideSoftInputMode(etDeliCode);
         hideSoftInputMode(etMtlCode);
         getUserInfo();
 
+        mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() { setFocusable(etBoxCode); // 物料代码获取焦点
+                }
+            },200);
     }
 
     @OnClick({R.id.btn_close, R.id.btn_print, R.id.tv_custSel, R.id.btn_boxConfirm, R.id.tv_deliverSel, R.id.btn_clone, R.id.tv_pickingListSel, R.id.btn_save, R.id.tv_box})
@@ -341,11 +379,11 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
                 break;
             case R.id.tv_custSel: // 选择客户
-                showForResult(Cust_DialogActivity.class, SEL_CUST, null);
+//                showForResult(Cust_DialogActivity.class, SEL_CUST, null);
 
                 break;
             case R.id.tv_deliverSel: // 发货方式
-                showForResult(DeliveryWay_DialogActivity.class, SEL_DELI, null);
+//                showForResult(DeliveryWay_DialogActivity.class, SEL_DELI, null);
 
                 break;
             case R.id.tv_box: // 选择箱子
@@ -375,16 +413,16 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     Comm.showWarnDialog(context,"请先扫描箱码！");
                     return;
                 }
-                if(mbrList == null || mbrList.size() == 0) {
+                if(checkDatas == null || checkDatas.size() == 0) {
                     Comm.showWarnDialog(context,"箱子里还没有物料不能封箱！");
                     return;
                 }
-                status = '2';
+                status = 2;
                 int flag = saveBefore();
                 switch (flag) {
                     case 0: // 直接保存
                         // 把对象转成json字符串
-                        String strJson = JsonUtil.objectToString(mbrList);
+                        String strJson = JsonUtil.objectToString(checkDatas);
                         run_save(strJson);
 
                         break;
@@ -399,7 +437,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 // 把对象转成json字符串
-                                String strJson = JsonUtil.objectToString(mbrList);
+                                String strJson = JsonUtil.objectToString(checkDatas);
                                 run_save(strJson);
                             }
                         });
@@ -438,22 +476,22 @@ public class Sal_RecombinationActivity extends BaseActivity {
      * 选择保存之前的判断
      */
     private int saveBefore() {
-        if (mbrList == null || mbrList.size() == 0) {
+        if (checkDatas == null || checkDatas.size() == 0) {
             Comm.showWarnDialog(context,"您还没有选择数据！");
             return -1;
         }
 
         // 检查数据
-        for (int i = 0, size = mbrList.size(); i < size; i++) {
-            MaterialBinningRecord mbr = mbrList.get(i);
+        for (int i = 0, size = checkDatas.size(); i < size; i++) {
+            MaterialBinningRecord mbr = checkDatas.get(i);
             if (mbr.getNumber() == 0) {
                 Comm.showWarnDialog(context,"第" + (i + 1) + "行（复合数）必须大于0！");
                 return -1;
             }
-            if (mbr.getNumber() < mbr.getRelationBillFQTY()) { // 提示复核数量小于拣货单数量
+            if (mbr.getNumber() < mbr.getUsableFqty()) { // 提示复核数量小于拣货单数量
                 return (i+1);
             }
-            if (mbr.getNumber() > mbr.getRelationBillFQTY()) {
+            if (mbr.getNumber() > mbr.getUsableFqty()) {
                 Comm.showWarnDialog(context,"第" + (i + 1) + "行（复合数）不能大于（拣货数）！");
                 return -1;
             }
@@ -466,8 +504,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void reset() {
         etBoxCode.setText("");
+        etDeliCode.setText("");
+        etMtlCode.setText("");
         boxBarCode = null;
-        boxBarcode = null;
+        deliBarcode = null;
         mtlBarcode = null;
         tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
         tvBoxName.setText("");
@@ -476,7 +516,6 @@ public class Sal_RecombinationActivity extends BaseActivity {
         tvBoxWidth.setText("");
         tvBoxAltitude.setText("");
         tvBoxVolume.setText("");
-        etMtlCode.setText("");
         tvCustSel.setText("");
         tvPickingListSel.setText("");
         setEnables(tvPickingListSel, R.drawable.back_style_blue, true);
@@ -488,7 +527,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
         curViewFlag = '1';
 
-        mbrList.clear();
+        checkDatas.clear();
         mAdapter.notifyDataSetChanged();
         setFocusable(etBoxCode);
     }
@@ -501,6 +540,30 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_boxCode: // 箱码
+                        curViewFlag = '1';
+                        setFocusable(etBoxCode);
+                        break;
+                    case R.id.et_deliCode: // 发货单
+                        curViewFlag = '2';
+                        setFocusable(etDeliCode);
+                        break;
+                    case R.id.et_mtlCode: // 物料
+                        curViewFlag = '3';
+                        setFocusable(etMtlCode);
+                        break;
+                }
+            }
+        };
+        etBoxCode.setOnClickListener(click);
+        etDeliCode.setOnClickListener(click);
+        etMtlCode.setOnClickListener(click);
+
         // 箱码
         etBoxCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -509,6 +572,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                boxBarcode = s.toString();
 //                // 执行查询方法
@@ -526,6 +590,30 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 }
             }
         });
+        // 发货单号
+        etDeliCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                curViewFlag = '2';
+
+                if(!isTextChange) {
+                    if (baseIsPad) {
+                        isTextChange = true;
+                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                    } else {
+                        deliBarcode = s.toString();
+                        // 执行查询方法
+                        run_smGetDatas(deliBarcode);
+                    }
+                }
+            }
+        });
+
         // 物料
         etMtlCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -540,7 +628,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     Comm.showWarnDialog(context,"请选择拣货单！");
                     return;
                 }
-                curViewFlag = '2';
+                curViewFlag = '3';
 //                mtlBarcode = s.toString();
 //                // 执行查询方法
 //                run_smGetDatas(mtlBarcode);
@@ -601,7 +689,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     if (bundle != null) {
                         String value = bundle.getString("resultValue", "");
                         double number = parseDouble(value);
-                        mbrList.get(curPos).setNumber(number);
+                        checkDatas.get(curPos).setNumber(number);
                         mAdapter.notifyDataSetChanged();
                         isRecombinationEnd();
                     }
@@ -610,7 +698,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 break;
             case SEL_PICKINGLIST: //查询拣货单	返回
                 if (resultCode == RESULT_OK) {
-                    mbrList.clear();
+                    checkDatas.clear();
                     plList.clear();
                     List<PickingList> list = (List<PickingList>) data.getSerializableExtra("checkDatas");
                     plList.addAll(list);
@@ -664,7 +752,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void getBox() {
         if(boxBarCode != null) {
-            mbrList.clear();
+            checkDatas.clear();
             boxBarcode = boxBarCode.getBarCode();
             // 箱子为空提示选择
             if(boxBarCode.getBox() == null) {
@@ -683,11 +771,29 @@ public class Sal_RecombinationActivity extends BaseActivity {
             // 把箱子里的物料显示出来
             if(boxBarCode.getMtlBinningRecord() != null && boxBarCode.getMtlBinningRecord().size() > 0) {
                 tvCount.setText("物料数量："+boxBarCode.getMtlBinningRecord().size());
-//                mbrList.addAll(boxBarCode.getMtlBinningRecord());
+                MaterialBinningRecord mbr = boxBarCode.getMtlBinningRecord().get(0);
 
-                MaterialBinningRecord mtlbr = boxBarCode.getMtlBinningRecord().get(0);
+                if(mbr.getCaseId() != 37) {
+                    etBoxCode.setText("");
+                    boxBarcode = null;
+                    setFocusable(etBoxCode);
+                    Comm.showWarnDialog(context,"该箱子已经装了其他类型物料，请扫描未使用的箱码！");
+                    return;
+                }
+                List<MaterialBinningRecord> listMbr = boxBarCode.getMtlBinningRecord();
+                for(int i=0, size = listMbr.size(); i<size; i++) {
+                    MaterialBinningRecord mbr2 = listMbr.get(i);
+                    mbr2.setModifyUserId(user.getId());
+                    mbr2.setModifyUserName(user.getUsername());
+                }
+                checkDatas.addAll(listMbr);
+                double sum = 0;
+                for(int i = 0, size = checkDatas.size(); i<size; i++) {
+                    sum += checkDatas.get(i).getCoveQty();
+                }
+
                 // 固定当前是无源单还是有源单
-                if(mtlbr.getRelationBillId() == 0) {
+                if(mbr.getRelationBillId() == 0) {
 //                    tabSelected(viewRadio1);
 //                    dataType = '1';
                 } else {
@@ -696,31 +802,34 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 }
                 // 显示当前的客户
                 if(customer == null) customer = new Customer();
-                customer.setFcustId(mtlbr.getCustomerId());
-                customer.setCustomerName(mtlbr.getCustomer().getCustomerName());
-                tvCustSel.setText(mtlbr.getCustomer().getCustomerName());
+                customer.setFcustId(mbr.getCustomerId());
+                customer.setCustomerName(mbr.getCustomer().getCustomerName());
+                tvCustSel.setText(mbr.getCustomer().getCustomerName());
                 // 显示交货方式
                 if(assist == null) assist = new AssistInfo();
-                assist.setfName(mtlbr.getDeliveryWay());
-                tvDeliverSel.setText(mtlbr.getDeliveryWay());
+                assist.setfName(mbr.getDeliveryWay());
+                tvDeliverSel.setText(mbr.getDeliveryWay());
 
             } else {
                 tvCount.setText("物料数量：0");
             }
-            int status = boxBarCode.getStatus();
+            status = boxBarCode.getStatus();
             if(status == 0) {
                 tvStatus.setText(Html.fromHtml(""+"<font color='#000000'>状态：未开箱</font>"));
                 setEnables(tvPickingListSel, R.drawable.back_style_blue, true);
+                setEnables(etDeliCode, R.drawable.back_style_blue, true);
                 setEnables(etMtlCode, R.drawable.back_style_blue, true);
-//                setFocusable(etMtlCode);
+                setFocusable(etDeliCode);
             } else if(status == 1) {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#008800'>已开箱</font>"));
                 setEnables(tvPickingListSel, R.drawable.back_style_blue, true);
                 setEnables(etMtlCode, R.drawable.back_style_blue, true);
-//                setFocusable(etMtlCode);
+                setEnables(etDeliCode, R.drawable.back_style_blue, true);
+                setFocusable(etDeliCode);
             } else if(status == 2) {
                 tvStatus.setText(Html.fromHtml("状态：<font color='#6A4BC5'>已封箱</font>"));
                 setEnables(tvPickingListSel, R.drawable.back_style_gray3, false);
+                setEnables(etDeliCode, R.drawable.back_style_gray3, false);
                 setEnables(etMtlCode, R.drawable.back_style_gray3, false);
             }
 
@@ -740,8 +849,14 @@ public class Sal_RecombinationActivity extends BaseActivity {
      * 得到拣货单列表
      */
     private void getPickingList(List<PickingList> list) {
+        // 判断扫描重复单据
+        if(checkDatas.size() > 0) {
+            Comm.showWarnDialog(context,"请先保存当前行数据！");
+            return;
+        }
         for(int i=0, size=list.size(); i<size; i++) {
             PickingList pl = list.get(i);
+            DeliOrder deliOrder = pl.getDeliOrder();
             MaterialBinningRecord mbr = new MaterialBinningRecord();
             mbr.setId(0);
             mbr.setFbillType(3); // 单据类型（1：生产装箱，2：销售装箱，3：拣货单）
@@ -753,6 +868,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setBarcodeSource('1');
             mbr.setSnCode(pl.getSnNo());
             mbr.setNumber(0);
+            mbr.setRelationBillFQTY(pl.getDeliFqty());
+            mbr.setUsableFqty(pl.getUsableFqty());
             mbr.setRelationBillId(pl.getfId());
             mbr.setRelationBillNumber(pl.getFbillno());
             mbr.setCustomerId(pl.getCustId());
@@ -761,9 +878,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             mbr.setPackageWorkType(2);
             mbr.setBinningType('3');
             mbr.setCaseId(37);
-            mbr.setRelationBillFQTY(pl.getPickingListNum());
             mbr.setEntryId(pl.getEntryId());
-            mbr.setUsableFqty(pl.getUsableFqty());
             mbr.setCreateUserId(user.getId());
             mbr.setCreateUserName(user.getUsername());
             mbr.setModifyUserId(user.getId());
@@ -775,8 +890,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 mbr.setListBarcode(new ArrayList<String>());
             }
             mbr.setStrBarcodes("");
+            mbr.setRelationObj(JsonUtil.objectToString(deliOrder));
+            mbr.setCoveQty(deliOrder.getCoveQty());
 
-            mbrList.add(mbr);
+            checkDatas.add(mbr);
         }
     }
 
@@ -785,10 +902,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
      */
     private void getMaterialAfter(BarCodeTable bt) {
         Material tmpMtl = bt.getMtl();
-        int size = mbrList.size();
+        int size = checkDatas.size();
         boolean isFlag = false; // 是否存在该订单
         for (int i = 0; i < size; i++) {
-            MaterialBinningRecord mbr = mbrList.get(i);
+            MaterialBinningRecord mbr = checkDatas.get(i);
             // 如果扫码相同
             if (bt.getMaterialId() == mbr.getMaterialId()) {
                 isFlag = true;
@@ -811,14 +928,16 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         }
                     } else {
                         // 数量已满
-                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，复核数不能大于拣货数！");
-                        return;
+//                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，复核数不能大于拣货数！");
+//                        return;
+                        continue;
                     }
 
                 } else { // 启用序列号
                     if (mbr.getRelationBillFQTY() == mbr.getNumber()) {
-                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，已复核完！");
-                        return;
+//                        Comm.showWarnDialog(context, "第" + (i + 1) + "行，已复核完！");
+//                        return;
+                        continue;
                     }
                     List<String> list = mbr.getListBarcode();
                     if(list.contains(bt.getBarcode())) {
@@ -851,10 +970,10 @@ public class Sal_RecombinationActivity extends BaseActivity {
      * 是否已经捡完货
      */
     private void isRecombinationEnd() {
-        int size = mbrList.size();
+        int size = checkDatas.size();
         int count = 0; // 计数器
         for(int i=0; i<size; i++) {
-            MaterialBinningRecord p = mbrList.get(i);
+            MaterialBinningRecord p = checkDatas.get(i);
             if(p.getNumber() >= p.getUsableFqty()) {
                 count += 1;
             }
@@ -883,7 +1002,12 @@ public class Sal_RecombinationActivity extends BaseActivity {
                 barcode = boxBarcode;
                 strCaseId = "";
                 break;
-            case '2': // 物料扫码
+            case '2': // 发货单扫码
+                mUrl = getURL("pickingList/findBarcode");
+                barcode = deliBarcode;
+                strCaseId = "";
+                break;
+            case '3': // 物料扫码
                 mUrl = getURL("barCodeTable/findBarcode4ByParam");
                 barcode = mtlBarcode;
                 strCaseId = "11,21";
@@ -1200,7 +1324,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private void setDeliBoxListPrint() {
         setDeliBoxListFormat1();
         // 绘制箱子条码
-        for(int i=0, size = mbrList.size(); i<size; i++) {
+        for(int i = 0, size = checkDatas.size(); i<size; i++) {
             setDeliBoxListFormat2(i);
         }
         setDeliBoxListFormat3();
@@ -1250,7 +1374,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
         int rowSpacing = 35; // 每行之间的距离
 
         PickingList pl = plList.get(pos);
-        MaterialBinningRecord mbr = mbrList.get(pos);
+        MaterialBinningRecord mbr = checkDatas.get(pos);
 
         tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         rowHigthSum = beginYPos + rowSpacing;

@@ -62,6 +62,10 @@ public class PickingList implements Serializable {
     private String deliveryCompanyName;
     /* 来源单价 */
     private double fprice;
+    /* k3单号*/
+    private String k3number;
+
+    /* 临时字段，不存表  */
     private int isCheck; // 新加的，用于前台临时用判断是否选中
     private Stock stock;
     private StockPosition stockPosition;
@@ -470,5 +474,13 @@ public class PickingList implements Serializable {
 
     public void setDeliOrder(DeliOrder deliOrder) {
         this.deliOrder = deliOrder;
+    }
+
+    public String getK3number() {
+        return k3number;
+    }
+
+    public void setK3number(String k3number) {
+        this.k3number = k3number;
     }
 }

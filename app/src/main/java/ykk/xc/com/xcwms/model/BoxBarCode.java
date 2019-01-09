@@ -10,9 +10,9 @@ import java.util.List;
  */
 public class BoxBarCode implements Serializable {
 	/*id*/
-	private Integer id;
+	private int id;
 	/*包装物id*/
-	private Integer boxId;
+	private int boxId;
 	/*包装物生成的唯一码*/
 	private String barCode;
 	/**箱子的状态
@@ -20,7 +20,7 @@ public class BoxBarCode implements Serializable {
 	 * 1代表开箱
 	 * 2代表封箱
 	 * */
-	private Integer status;
+	private int status;
 	/*箱子净重*/
 	private double roughWeight;
 	/*包装物*/
@@ -30,17 +30,17 @@ public class BoxBarCode implements Serializable {
 	/*生码日期*/
 	private String createDateTime;
 	/*打印次数*/
-	private Integer printNumber;
+	private int printNumber;
 
 	public BoxBarCode() {
 		super();
 	}
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public Integer getBoxId() {
+	public int getBoxId() {
 		return boxId;
 	}
 
@@ -48,7 +48,7 @@ public class BoxBarCode implements Serializable {
 		return barCode;
 	}
 
-	public Integer getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
@@ -64,11 +64,11 @@ public class BoxBarCode implements Serializable {
 		return mtlBinningRecord;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
-	public void setBoxId(Integer boxId) {
+	public void setBoxId(int boxId) {
 		this.boxId = boxId;
 	}
 
@@ -76,7 +76,7 @@ public class BoxBarCode implements Serializable {
 		this.barCode = barCode;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
@@ -100,11 +100,11 @@ public class BoxBarCode implements Serializable {
 		this.createDateTime = createDateTime;
 	}
 
-	public Integer getPrintNumber() {
+	public int getPrintNumber() {
 		return printNumber;
 	}
 
-	public void setPrintNumber(Integer printNumber) {
+	public void setPrintNumber(int printNumber) {
 		this.printNumber = printNumber;
 	}
 	

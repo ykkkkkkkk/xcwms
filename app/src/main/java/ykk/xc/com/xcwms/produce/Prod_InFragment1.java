@@ -489,6 +489,7 @@ public class Prod_InFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 if(!smBefore()) {
                     s.delete(0,s.length());
                     mHandler.sendEmptyMessageDelayed(SETFOCUS,200);

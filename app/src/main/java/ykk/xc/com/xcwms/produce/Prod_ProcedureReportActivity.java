@@ -53,6 +53,8 @@ import ykk.xc.com.xcwms.util.LogUtil;
 
 public class Prod_ProcedureReportActivity extends BaseActivity {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.tv_valuationType)
     TextView tvValuationType;
     @BindView(R.id.tv_staff)
@@ -294,6 +296,19 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_mtlCode: // 物料
+                        setFocusable(etMtlCode);
+                        break;
+                }
+            }
+        };
+        etMtlCode.setOnClickListener(click);
+
         // 物料
         etMtlCode.addTextChangedListener(new TextWatcher() {
             @Override

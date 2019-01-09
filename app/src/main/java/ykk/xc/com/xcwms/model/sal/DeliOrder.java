@@ -5,6 +5,7 @@ import java.io.Serializable;
 import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.Organization;
+import ykk.xc.com.xcwms.model.Staff;
 import ykk.xc.com.xcwms.model.Stock;
 
 /**
@@ -105,6 +106,17 @@ public class DeliOrder implements Serializable{
 	private String entryRemark;
 	/* 发货单子表面积 */
 	private double entryArea;
+	/*仓管员id*/
+	private int stockStaffId;
+	/*仓管员代码*/
+	private String stockStaffNumber;
+	/*仓管员名称*/
+	private String stockStaffName;
+	private Staff stockStaff; // 仓管员对象
+	/* 调拨单价 */
+	private double flhDbdj;
+	/* 调拨价 */
+	private double flhDbj;
 
 	public DeliOrder() {
 		super();
@@ -580,6 +592,54 @@ public class DeliOrder implements Serializable{
 
 	public void setEntryArea(double entryArea) {
 		this.entryArea = entryArea;
+	}
+
+	public int getStockStaffId() {
+		return stockStaffId;
+	}
+
+	public void setStockStaffId(int stockStaffId) {
+		this.stockStaffId = stockStaffId;
+	}
+
+	public String getStockStaffNumber() {
+		return stockStaffNumber;
+	}
+
+	public void setStockStaffNumber(String stockStaffNumber) {
+		this.stockStaffNumber = stockStaffNumber;
+	}
+
+	public String getStockStaffName() {
+		return stockStaffName;
+	}
+
+	public void setStockStaffName(String stockStaffName) {
+		this.stockStaffName = stockStaffName;
+	}
+
+	public Staff getStockStaff() {
+		return stockStaff;
+	}
+
+	public void setStockStaff(Staff stockStaff) {
+		this.stockStaff = stockStaff;
+	}
+
+	public double getFlhDbdj() {
+		return flhDbdj;
+	}
+
+	public void setFlhDbdj(double flhDbdj) {
+		this.flhDbdj = flhDbdj;
+	}
+
+	public double getFlhDbj() {
+		return flhDbj;
+	}
+
+	public void setFlhDbj(double flhDbj) {
+		this.flhDbj = flhDbj;
 	}
 
 }

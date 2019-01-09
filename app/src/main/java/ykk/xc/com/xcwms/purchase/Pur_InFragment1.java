@@ -519,6 +519,20 @@ public class Pur_InFragment1 extends BaseFragment {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_mtlNo: // 物料
+                        curViewFlag = '2';
+                        setFocusable(etMtlNo);
+                        break;
+                }
+            }
+        };
+        etMtlNo.setOnClickListener(click);
+
         etMtlNo.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -526,6 +540,7 @@ public class Pur_InFragment1 extends BaseFragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                mtlBarcode = s.toString();
 //                // 执行查询方法

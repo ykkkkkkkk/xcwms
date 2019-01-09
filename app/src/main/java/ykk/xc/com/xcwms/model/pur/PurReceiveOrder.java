@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.Staff;
 
 /**
  * 采购收料通知单
@@ -29,10 +30,18 @@ public class PurReceiveOrder implements Serializable {
 	//	private Organization recOrg;
 	private String needOrgNumber; // 需求收料代码
 	private String needOrgName; // 需求收料名称
-	private String recUserNumber; // 收料员代码,
-	private String recUserName; // 收料员名称
-	private String purUserNumber; // 采购员代码,
-	private String purUserName; // 采购员名称
+	/*收料员id*/
+	private int recStaffId;
+	/*收料员代码*/
+	private String recStaffNumber;
+	/*收料员名称*/
+	private String recStaffName;
+	private Staff recStaff; // 收料员对象
+	// 采购员
+	private String purStaffId; // 采购员id
+	private String purStaffNumber; // 采购员代码,
+	private String purStaffName; // 采购员名称
+	private Staff purStaff;  // 采购员对象
 	private String recDeptNumber; // 收料部门代码
 	private String recDeptName; // 收料部门名称
 	private String purDeptNumber; // 采购部门代码
@@ -64,12 +73,6 @@ public class PurReceiveOrder implements Serializable {
 	private double famount;
 	/*采购订单号*/
 	private String purOrderNo;
-	/*收料员id*/
-	private int recStaffId;
-	/*收料员代码*/
-	private String recStaffNumber;
-	/*收料员名称*/
-	private String recStaffName;
 
 	public PurReceiveOrder() {
 		super();
@@ -122,18 +125,6 @@ public class PurReceiveOrder implements Serializable {
 	}
 	public String getNeedOrgName() {
 		return needOrgName;
-	}
-	public String getRecUserNumber() {
-		return recUserNumber;
-	}
-	public String getRecUserName() {
-		return recUserName;
-	}
-	public String getPurUserNumber() {
-		return purUserNumber;
-	}
-	public String getPurUserName() {
-		return purUserName;
 	}
 	public String getRecDeptNumber() {
 		return recDeptNumber;
@@ -236,18 +227,6 @@ public class PurReceiveOrder implements Serializable {
 	}
 	public void setNeedOrgName(String needOrgName) {
 		this.needOrgName = needOrgName;
-	}
-	public void setRecUserNumber(String recUserNumber) {
-		this.recUserNumber = recUserNumber;
-	}
-	public void setRecUserName(String recUserName) {
-		this.recUserName = recUserName;
-	}
-	public void setPurUserNumber(String purUserNumber) {
-		this.purUserNumber = purUserNumber;
-	}
-	public void setPurUserName(String purUserName) {
-		this.purUserName = purUserName;
 	}
 	public void setRecDeptNumber(String recDeptNumber) {
 		this.recDeptNumber = recDeptNumber;
@@ -363,6 +342,36 @@ public class PurReceiveOrder implements Serializable {
 	public void setRecStaffName(String recStaffName) {
 		this.recStaffName = recStaffName;
 	}
-
+	public Staff getRecStaff() {
+		return recStaff;
+	}
+	public void setRecStaff(Staff recStaff) {
+		this.recStaff = recStaff;
+	}
+	public String getPurStaffId() {
+		return purStaffId;
+	}
+	public void setPurStaffId(String purStaffId) {
+		this.purStaffId = purStaffId;
+	}
+	public String getPurStaffNumber() {
+		return purStaffNumber;
+	}
+	public void setPurStaffNumber(String purStaffNumber) {
+		this.purStaffNumber = purStaffNumber;
+	}
+	public String getPurStaffName() {
+		return purStaffName;
+	}
+	public void setPurStaffName(String purStaffName) {
+		this.purStaffName = purStaffName;
+	}
+	public Staff getPurStaff() {
+		return purStaff;
+	}
+	public PurReceiveOrder setPurStaff(Staff purStaff) {
+		this.purStaff = purStaff;
+		return this;
+	}
 
 }

@@ -52,6 +52,7 @@ import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.EnumDict;
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.ScanningRecord2;
 import ykk.xc.com.xcwms.model.Stock;
 import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
@@ -66,6 +67,8 @@ import ykk.xc.com.xcwms.util.LogUtil;
  */
 public class Sal_PickingListActivity extends BaseActivity {
 
+    @BindView(R.id.et_getFocus)
+    EditText etGetFocus;
     @BindView(R.id.et_deliCode)
     EditText etDeliCode;
     @BindView(R.id.et_mtlCode)
@@ -133,15 +136,6 @@ public class Sal_PickingListActivity extends BaseActivity {
                         switch (m.curViewFlag) {
                             case '1': // 发货订单
                                 List<DeliOrder> list = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
-                                Material tmpMtl = null;
-                                for(int i=0, size=list.size(); i<size; i++) {
-                                    Material mtl = list.get(i).getMtl();
-                                    if(mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
-                                        tmpMtl = mtl;
-                                        break;
-                                    }
-                                }
-                                if(!m.smAfterCheck(tmpMtl)) return;
                                 m.getDeliOrderAfter(list);
 
                                 break;
@@ -182,7 +176,7 @@ public class Sal_PickingListActivity extends BaseActivity {
 
                         break;
                     case SETFOCUS: // 当弹出其他窗口会抢夺焦点，需要跳转下，才能正常得到值
-                        m.setFocusable(m.etDeliCode);
+                        m.setFocusable(m.etGetFocus);
                         m.setFocusable(m.etMtlCode);
 
                         break;
@@ -266,11 +260,16 @@ public class Sal_PickingListActivity extends BaseActivity {
 
             if(user.getStock() != null) {
                 stock = user.getStock();
+                saveObjectToXml(stock, "strStock", getResStr(R.string.saveUser));
             }
 
             if(user.getStockPos() != null) {
                 stockP = user.getStockPos();
+                saveObjectToXml(stockP, "strStockPos", getResStr(R.string.saveUser));
             }
+        } else {
+            stock = showObjectByXml(Stock.class, "strStock", getResStr(R.string.saveUser));
+            stockP = showObjectByXml(StockPosition.class, "strStockPos", getResStr(R.string.saveUser));
         }
     }
 
@@ -366,12 +365,12 @@ public class Sal_PickingListActivity extends BaseActivity {
         }
 
         // 判断是否输入了数量
-        boolean is0 = false;
+        boolean isNull = false;
         for (int i = 0, size = checkDatas.size(); i < size; i++) {
             PickingList pl = checkDatas.get(i);
-            if (pl.getPickingListNum() > 0) is0 = true;
+            if (pl.getPickingListNum() > 0) isNull = true;
         }
-        if(!is0) {
+        if(!isNull) {
             Comm.showWarnDialog(context,"当前行中，至少有一行（拣货数）必须大于0！");
             return false;
         }
@@ -421,6 +420,25 @@ public class Sal_PickingListActivity extends BaseActivity {
 
     @Override
     public void setListener() {
+        View.OnClickListener click = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setFocusable(etGetFocus);
+                switch (v.getId()) {
+                    case R.id.et_deliCode: // 发货单
+                        curViewFlag = '1';
+                        setFocusable(etDeliCode);
+                        break;
+                    case R.id.et_mtlCode: // 物料
+                        curViewFlag = '2';
+                        setFocusable(etMtlCode);
+                        break;
+                }
+            }
+        };
+        etDeliCode.setOnClickListener(click);
+        etMtlCode.setOnClickListener(click);
+
         // 发货订单
         etDeliCode.addTextChangedListener(new TextWatcher() {
             @Override
@@ -429,6 +447,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 curViewFlag = '1';
 //                deliBarcode = s.toString();
 //                // 执行查询方法
@@ -564,12 +583,8 @@ public class Sal_PickingListActivity extends BaseActivity {
                         bundle.putInt("stockId", stock2.getfStockid());
                         showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
                     } else {
-                        PickingList pk = checkDatas.get(curPos);
-                        pk.setStockId(stock2.getfStockid());
-                        pk.setStockNumber(stock2.getfNumber());
-                        pk.setStockName(stock2.getfName());
-                        pk.setStock(stock2);
-                        mAdapter.notifyDataSetChanged();
+                        stockAllFill(false);
+                        saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     }
                 }
 
@@ -578,32 +593,58 @@ public class Sal_PickingListActivity extends BaseActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     stockP2 = (StockPosition) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
-                    PickingList pk = checkDatas.get(curPos);
-                    pk.setStockId(stock2.getfStockid());
-                    pk.setStockNumber(stock2.getfNumber());
-                    pk.setStockName(stock2.getfName());
-                    pk.setStock(stock2);
-
-                    pk.setStockPositionId(stockP2.getId());
-                    pk.setStockPositionNumber(stockP2.getFnumber());
-                    pk.setStockPositionName(stockP2.getFname());
-                    pk.setStockPosition(stockP2);
-                    mAdapter.notifyDataSetChanged();
+                    stockAllFill(true);
+                    saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
+                    saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
                 }
 
                 break;
         }
+        mHandler.sendEmptyMessageDelayed(SETFOCUS,300);
+
     }
 
     /**
-     * 得到物料数据之后，判断库位是否为空
+     * 仓库数据全部填充
      */
-    private boolean smAfterCheck(Material mtl) {
-        if(defaultStockVal == '1' && mtl != null && mtl.getStockPos() != null && mtl.getStockPos().getStockId() > 0) {
-            stock = mtl.getStock();
-            stockP = mtl.getStockPos();
+    private void stockAllFill(boolean inStockPosData) {
+        int size = checkDatas.size();
+        boolean isBool = false;
+        for(int i=0; i<size; i++) {
+            PickingList pk = checkDatas.get(i);
+            if(pk.getStockId() > 0) {
+                isBool = true;
+                break;
+            }
         }
-        return true;
+        if(isBool) {
+            PickingList pk = checkDatas.get(curPos);
+            pk.setStockId(stock2.getfStockid());
+            pk.setStockNumber(stock2.getfNumber());
+            pk.setStockName(stock2.getfName());
+            pk.setStock(stock2);
+            if(inStockPosData) {
+                pk.setStockPosition(stockP2);
+                pk.setStockPositionId(stockP2.getId());
+                pk.setStockPositionNumber(stockP2.getFnumber());
+                pk.setStockPositionName(stockP2.getFname());
+            }
+        } else { // 全部都为空的时候，选择任意全部填充
+            for (int i = 0; i < size; i++) {
+                PickingList pk = checkDatas.get(i);
+                pk.setStockId(stock2.getfStockid());
+                pk.setStockNumber(stock2.getfNumber());
+                pk.setStockName(stock2.getfName());
+                pk.setStock(stock2);
+                if(inStockPosData) {
+                    pk.setStockPosition(stockP2);
+                    pk.setStockPositionId(stockP2.getId());
+                    pk.setStockPositionNumber(stockP2.getFnumber());
+                    pk.setStockPositionName(stockP2.getFname());
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -711,11 +752,16 @@ public class Sal_PickingListActivity extends BaseActivity {
      * 得到发货订单的数据
      */
     private void getDeliOrderAfter(List<DeliOrder> list) {
-        checkDatas.clear(); // 清空
+        // 判断扫描重复单据
+        if(checkDatas.size() > 0) {
+            Comm.showWarnDialog(context,"请先保存当前行数据！");
+            return;
+        }
         int size = list.size();
         for(int i=0; i<size; i++) {
             PickingList pl = new PickingList();
             DeliOrder deliOrder = list.get(i);
+            Material mtl = deliOrder.getMtl();
 
             pl.setfId(deliOrder.getfId());
             pl.setFbillno(deliOrder.getFbillno());
@@ -736,23 +782,21 @@ public class Sal_PickingListActivity extends BaseActivity {
                 pl.setSalOrgNumber(deliOrder.getDeliOrgNumber());
                 pl.setSalOrgName(deliOrder.getDeliOrgName());
             }
-
             pl.setMtl(deliOrder.getMtl());
             pl.setMtlId(deliOrder.getMtlId());
             pl.setMtlFnumber(deliOrder.getMtlFnumber());
             pl.setMtlFname(deliOrder.getMtlFname());
             pl.setMtlUnitName(deliOrder.getMtlUnitName());
-            if(stock != null) {
-                pl.setStockId(stock.getfStockid());
-                pl.setStockNumber(stock.getfNumber());
-                pl.setStockName(stock.getfNumber());
-                pl.setStock(stock);
-            }
-            if(stockP != null) {
-                pl.setStockPositionId(stockP.getId());
-                pl.setStockPositionNumber(stockP.getFnumber());
-                pl.setStockPositionName(stockP.getFname());
-                pl.setStockPosition(stockP);
+            // 默认物料的仓库仓位
+            Stock mtlStock = mtl.getStock();
+            StockPosition mtlStockPos = mtl.getStockPos();
+            if(mtlStock != null) {
+                setStockInfo(pl, mtlStock);
+                setStockPosInfo(pl, mtlStockPos);
+            } else {
+                // 默认操作员的仓库仓位
+                setStockInfo(pl, stock);
+                setStockPosInfo(pl, stockP);
             }
             pl.setDeliFqty(deliOrder.getDeliFqty());
             pl.setDeliFremainoutqty(deliOrder.getDeliFremainoutqty());
@@ -776,7 +820,7 @@ public class Sal_PickingListActivity extends BaseActivity {
                 pl.setDeliveryWay(deliOrder.getDeliveryWay());
             }
 
-            pl.setMtl(deliOrder.getMtl());
+            pl.setMtl(mtl);
             pl.setPickingListNum(0);
             pl.setCreateUserId(user.getId());
             pl.setCreateUserName(user.getUsername());
@@ -797,6 +841,40 @@ public class Sal_PickingListActivity extends BaseActivity {
 
         setFocusable(etMtlCode);
         mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 设置仓库的值
+     */
+    private void setStockInfo(PickingList pl, Stock stock) {
+        if(stock == null) {
+            pl.setStock(null);
+            pl.setStockId(0);
+            pl.setStockNumber("");
+            pl.setStockName("");
+        } else {
+            pl.setStock(stock);
+            pl.setStockId(stock.getfStockid());
+            pl.setStockNumber(stock.getfNumber());
+            pl.setStockName(stock.getfName());
+        }
+    }
+
+    /**
+     * 设置库位的值
+     */
+    private void setStockPosInfo(PickingList pl, StockPosition stockP) {
+        if(stockP == null) {
+            pl.setStockPosition(null);
+            pl.setStockPositionId(0);
+            pl.setStockPositionNumber("");
+            pl.setStockPositionName("");
+        } else {
+            pl.setStockPosition(stockP);
+            pl.setStockPositionId(stockP.getId());
+            pl.setStockPositionNumber(stockP.getFnumber());
+            pl.setStockPositionName(stockP.getFname());
+        }
     }
 
     /**

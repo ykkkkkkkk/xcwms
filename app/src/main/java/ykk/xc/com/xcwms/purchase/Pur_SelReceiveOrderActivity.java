@@ -37,6 +37,7 @@ import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.Supplier;
 import ykk.xc.com.xcwms.model.pur.PurOrder;
 import ykk.xc.com.xcwms.model.pur.PurReceiveOrder;
+import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelOrderAdapter;
 import ykk.xc.com.xcwms.purchase.adapter.Pur_SelReceiveOrderAdapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -126,13 +127,19 @@ public class Pur_SelReceiveOrderActivity extends BaseActivity implements XRecycl
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
-                PurReceiveOrder m = listDatas.get(pos-1);
-                int check = m.getIsCheck();
-                if (check == 1) {
-                    m.setIsCheck(0);
-                } else {
-                    m.setIsCheck(1);
+                PurReceiveOrder recOrder = listDatas.get(pos-1);
+                int size = listDatas.size();
+                String fbillno = recOrder.getFbillno();
+                for(int i=0; i<size; i++) {
+                    listDatas.get(i).setIsCheck(0);
                 }
+                for(int i=0; i<size; i++) {
+                    PurReceiveOrder recOrder2 = listDatas.get(i);
+                    if(fbillno.equals(recOrder2.getFbillno())) {
+                        recOrder2.setIsCheck(1);
+                    }
+                }
+
                 mAdapter.notifyDataSetChanged();
             }
         });
