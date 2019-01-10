@@ -23,6 +23,7 @@ import com.gprinter.command.LabelCommand;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import butterknife.BindView;
@@ -33,7 +34,6 @@ import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Box;
 import ykk.xc.com.xcwms.model.BoxBarCode;
-import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
@@ -75,7 +75,8 @@ public class PrintMainActivity extends BaseActivity {
     private int tabFlag;
     private int id = 0; // 设备id
     private ThreadPool threadPool;
-    private Material mtl;
+    private BarCodeTable bt;
+    private Map<String, String> map4;
     private List<ProdOrder> prodOrderList = new ArrayList<>();
     private List<MaterialBinningRecord> mbrList = new ArrayList<>();
     private List<BoxBarCode> boxBarCodeList = null;
@@ -218,9 +219,8 @@ public class PrintMainActivity extends BaseActivity {
         if(tabFlag != flag) {
 //            isConnected = false;
         }
-        String date = Comm.getSysDate(7);
-        mtl = JsonUtil.stringToObject(result, Material.class);
-        barcode = mtl.getBarcodeTable().getBarcode();
+        bt = JsonUtil.stringToObject(result, BarCodeTable.class);
+        barcode = bt.getBarcode();
 
         if(isConnected) {
             sendLabel(0);
@@ -361,6 +361,28 @@ public class PrintMainActivity extends BaseActivity {
         }
     }
 
+    /**
+     * Fragment4打印回调
+     */
+    public void setFragmentPrint4(int flag, String result) {
+        prodOrderList.clear();
+
+        tabFlag = flag;
+        if(tabFlag != flag) {
+//            isConnected = false;
+        }
+        map4 = JsonUtil.stringToObject(result, Map.class);
+        barcode = map4.get("barCode");
+
+        if(isConnected) {
+            sendLabel(6);
+
+        } else {
+            // 打开蓝牙配对页面
+            startActivityForResult(new Intent(this, BluetoothDeviceListDialog.class), Constant.BLUETOOTH_REQUEST_CODE);
+        }
+    }
+
     public void setFragmentKeyeventListener(IFragmentKeyeventListener fragmentKeyeventListener) {
         this.fragment2Listener = fragmentKeyeventListener;
     }
@@ -397,78 +419,97 @@ public class PrintMainActivity extends BaseActivity {
      *
      */
     void sendLabel(int count) {
-        LabelCommand tsc = new LabelCommand();
-        // 设置标签尺寸，按照实际尺寸设置
-        tsc.addSize(76, 60);
-        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
-        tsc.addGap(10);
-        // 设置打印方向
-        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
-        // 开启带Response的打印，用于连续打印
-        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
-        // 设置原点坐标
-        tsc.addReference(0, 0);
-        // 撕纸模式开启
-        tsc.addTear(EscCommand.ENABLE.ON);
-        // 清除打印缓冲区
-        tsc.addCls();
+//        LabelCommand tsc = new LabelCommand();
+//        // 设置标签尺寸，按照实际尺寸设置
+////        tsc.addSize(76, 60); // 有间隙的纸
+//        tsc.addSize(80, 26); // 连纸
+//        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
+//        tsc.addGap(10);
+//        // 设置打印方向
+//        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+//        // 开启带Response的打印，用于连续打印
+//        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+//        // 设置原点坐标
+//        tsc.addReference(0, 0);
+//        // 撕纸模式开启
+//        tsc.addTear(EscCommand.ENABLE.ON);
+//        // 清除打印缓冲区
+//        tsc.addCls();
             // 绘制简体中文
         switch (tabFlag) {
             case 0: // 物料条码
-                setMtlFormat(tsc);
+                setMtlFormat(80,26,false);
 
                 break;
             case 1: // 生产订单--大标签
-                setDeliOrderFormat(tsc, count);
+                setDeliOrderFormat(count,80,60,true);
 
                 break;
             case 2: // 生产订单--小标签
-                setDeliOrderFormat2(tsc, count);
+                setDeliOrderFormat2(count,80,60,true);
 
                 break;
             case 3: // 箱码打印条码
-                setBoxBarCodeFormat(tsc, count);
+                setBoxBarCodeFormat(count,80,60,true);
+
+                break;
+            case 6: // 物料包装
+                setMtlBoxFormat(80,60,true);
 
                 break;
         }
-//        tsc.addText(20, 250, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"【物料条码】");
-//        tsc.addText(20, 300, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+);
-//        // 绘制一维条码
-//        tsc.add1DBarcode(20, 250, LabelCommand.BARCODETYPE.CODE128, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, "SMARNET");
-        // 打印标签
-        tsc.addPrint(1, 1);
-        // 打印标签后 蜂鸣器响
 
-        tsc.addSound(2, 100);
-        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
-        Vector<Byte> datas = tsc.getCommand();
-        // 发送数据
-        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null) {
-            return;
-        }
-        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
+        // 打印标签end
+//        tsc.addPrint(1, 1);
+//        // 打印标签后 蜂鸣器响
+//
+//        tsc.addSound(2, 100);
+//        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
+//        Vector<Byte> datas = tsc.getCommand();
+//        // 发送数据
+//        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null) {
+//            return;
+//        }
+//        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
     }
 
     /**
      * 设置物料打码格式
-     * @param tsc
      */
-    private void setMtlFormat(LabelCommand tsc) {
-        tsc.addText(150, 28, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"【物料条码】");
-        tsc.addText(20, 90, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料名称："+mtl.getfName());
-        tsc.addText(20, 120, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料代码："+mtl.getfNumber());
-        tsc.addText(20, 150, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"物料规格："+isNULLS(mtl.getMaterialSize()));
-        tsc.addText(20, 216, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"条码：");
+    private void setMtlFormat(int width, int height, boolean isAddGap) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc, width, height, isAddGap);
+        // --------------- 打印区-------------Begin
+        tsc.addText(10, 20, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"编码："+bt.getMaterialNumber());
+        tsc.addText(350, 20, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"规格："+bt.getMaterialSize());
+        String tmpName = bt.getMaterialName();
+        int tmpLen = tmpName.length();
+        String mtlName1 = null;
+        String mtlName2 = null;
+        if(tmpName.length() <= 27) {
+            tsc.addText(10, 50, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+tmpName);
+        } else {
+            mtlName1 = tmpName.substring(0, 27);
+            mtlName2 = tmpName.substring(27, tmpLen);
+            tsc.addText(10, 50, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+mtlName1);
+            tsc.addText(80, 80, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+mtlName2);
+        }
 
         // 绘制一维条码
-        tsc.add1DBarcode(120, 190, LabelCommand.BARCODETYPE.CODE39, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        tsc.add1DBarcode(10, 110, LabelCommand.BARCODETYPE.CODE39, 60, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        tsc.addText(480, 130, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+Comm.getSysDate(9));
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
     }
 
     /**
      * 设置生产订单打码格式（大标签）
-     * @param tsc
      */
-    private void setDeliOrderFormat(LabelCommand tsc, int count) {
+    private void setDeliOrderFormat(int count, int width2, int height2, boolean isAddGap) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc, width2, width2, isAddGap);
+        // --------------- 打印区-------------Begin
+
         int beginXPos = 20; // 开始横向位置
         int beginYPos = 26; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
@@ -519,12 +560,17 @@ public class PrintMainActivity extends BaseActivity {
         // 绘制一维条码
         tsc.add1DBarcode(115, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcodeList.get(count));
 
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
     }
     /**
      * 设置生产订单打码格式（小标签）
-     * @param tsc
      */
-    private void setDeliOrderFormat2(LabelCommand tsc, int count) {
+    private void setDeliOrderFormat2(int count, int width2, int height2, boolean isAddGap) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc, width2, height2, isAddGap);
+        // --------------- 打印区-------------Begin
+
         int beginXPos = 20; // 开始横向位置
         int beginYPos = 26; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
@@ -561,13 +607,19 @@ public class PrintMainActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "产品规格：" + strWidthHigh + " \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1, "备注：" + isNULLS(prodOrder.getRemarks()) + " \n");
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
     }
 
     /**
      * 设置箱码打印格式
-     * @param tsc
      */
-    private void setBoxBarCodeFormat(LabelCommand tsc, int count) {
+    private void setBoxBarCodeFormat(int count, int width, int height, boolean isAddGap) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc, width, height, isAddGap);
+        // --------------- 打印区-------------Begin
+
         int beginXPos = 20; // 开始横向位置
         int beginYPos = 40; // 开始纵向位置
         int rowHigthSum = 0; // 纵向高度的叠加
@@ -583,6 +635,9 @@ public class PrintMainActivity extends BaseActivity {
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"条码： \n");
         // 绘制一维条码
         tsc.add1DBarcode(140, rowHigthSum-20, LabelCommand.BARCODETYPE.CODE39, 75, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, boxBarCode.getBarCode());
+
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
     }
 
     /**
@@ -602,7 +657,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setProdBoxListFormat1() {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -633,7 +688,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setProdBoxListFormat2(int pos) {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -674,7 +729,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setProdBoxListFormat3() {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -708,7 +763,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setDeliBoxListFormat1() {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -739,7 +794,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setDeliBoxListFormat2(int pos) {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -772,7 +827,7 @@ public class PrintMainActivity extends BaseActivity {
      */
     private void setDeliBoxListFormat3() {
         LabelCommand tsc = new LabelCommand();
-        setTscBegin(tsc);
+        setTscBegin(tsc,0,0, false);
         // --------------- 打印区-------------Begin
 
         int beginXPos = 20; // 开始横向位置
@@ -790,15 +845,62 @@ public class PrintMainActivity extends BaseActivity {
     }
 
     /**
+     * 设置物料包装打码格式
+     */
+    private void setMtlBoxFormat(int width, int height, boolean isAddGap) {
+        LabelCommand tsc = new LabelCommand();
+        setTscBegin(tsc, width, height, isAddGap);
+        // --------------- 打印区-------------Begin
+
+        int beginXPos = 20; // 开始横向位置
+        int beginYPos = 38; // 开始纵向位置
+        int rowHigthSum = 0; // 纵向高度的叠加
+        int rowSpacing = 35; // 每行之间的距离
+
+        tsc.addText(210, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_2, LabelCommand.FONTMUL.MUL_2,"物料包装");
+        rowHigthSum = rowHigthSum + rowSpacing+65;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"编码："+ map4.get("MaterialNumber"));
+        rowHigthSum = rowHigthSum + rowSpacing;
+        String tmpName = map4.get("MaterialName");
+        int tmpLen = tmpName.length();
+        String mtlName1 = null;
+        String mtlName2 = null;
+        if(tmpName.length() <= 27) {
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+tmpName);
+            rowHigthSum = rowHigthSum + rowSpacing;
+        } else {
+            mtlName1 = tmpName.substring(0, 27);
+            mtlName2 = tmpName.substring(27, tmpLen);
+            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+mtlName1);
+            rowHigthSum = rowHigthSum + rowSpacing;
+            tsc.addText(80, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+mtlName2);
+        }
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"包装名称："+map4.get("MaterialPackName"));
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"包装规格："+map4.get("MaterialPackSize"));
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"包装数量："+map4.get("MaterialCalculateNumber"));
+        tsc.addText(320, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"日期："+map4.get("PrintDate"));
+        rowHigthSum = rowHigthSum + rowSpacing+5;
+        // 绘制一维条码
+        tsc.add1DBarcode(30, rowHigthSum, LabelCommand.BARCODETYPE.CODE39, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        // --------------- 打印区-------------End
+        setTscEnd(tsc);
+    }
+
+    /**
      * 打印前段配置
      * @param tsc
      */
-    private void setTscBegin(LabelCommand tsc) {
+    private void setTscBegin(LabelCommand tsc, int width, int height, boolean isAddGap) {
         // 设置标签尺寸，按照实际尺寸设置
-        tsc.addSize(78, 26);
+        if(width > 0) tsc.addSize(width, height);
+        else tsc.addSize(78, 26); // 这个为生产装箱单打印的
         // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
 //        tsc.addGap(10);
-        tsc.addGap(0);
+        if(isAddGap) tsc.addGap(10);
+        else tsc.addGap(0);
         // 设置打印方向
         tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
         // 开启带Response的打印，用于连续打印
@@ -866,7 +968,7 @@ public class PrintMainActivity extends BaseActivity {
 
                             switch (tabFlag) {
                                 case 0: // 物料条码
-
+                                    sendLabel(0);
 
                                     break;
                                 case 1: // 生产订单--大标签
@@ -899,6 +1001,10 @@ public class PrintMainActivity extends BaseActivity {
                                     break;
                                 case 5: // 复核装箱清单打印条码
                                     setDeliBoxListPrint();
+
+                                    break;
+                                case 6: // 物料包装打印条码
+                                    sendLabel(6);
 
                                     break;
                             }

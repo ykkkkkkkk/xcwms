@@ -321,11 +321,13 @@ public class Sal_RecombinationActivity extends BaseActivity {
     }
 
     private void saveAfter() {
+        isPair = false;
+        isTextChange = false;
         status = 1;
         checkDatas.clear();
         plList.clear();
         reset();
-        Comm.showWarnDialog(context,"保存成功√");
+//        Comm.showWarnDialog(context,"保存成功√");
     }
 
     @Override
@@ -732,7 +734,8 @@ public class Sal_RecombinationActivity extends BaseActivity {
                     //打开端口
                     DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].openPort();
                 }
-//                if(!isPair) {
+                if(!isPair) {
+                    saveAfter();
 //                    // 打开蓝牙配对页面
 //                    mHandler.postDelayed(new Runnable() {
 //                        @Override
@@ -741,7 +744,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
 //                        }
 //                    },500);
 //
-//                }
+                }
                 break;
             }
         }
@@ -1328,6 +1331,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
             setDeliBoxListFormat2(i);
         }
         setDeliBoxListFormat3();
+        saveAfter();
     }
 
     /**

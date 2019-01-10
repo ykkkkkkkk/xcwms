@@ -224,6 +224,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
                 if(!isTextChange) {
                     isTextChange = true;
                     if (baseIsPad) {

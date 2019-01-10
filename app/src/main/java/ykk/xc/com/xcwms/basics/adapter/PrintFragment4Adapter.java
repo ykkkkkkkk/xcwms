@@ -7,18 +7,18 @@ import android.widget.TextView;
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
-import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
  * 物料列表适配器
  */
-public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<Material> {
+public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<BarCodeTable> {
 //
     private Activity context;
     private MyCallBack callBack;
 
-    public PrintFragment4Adapter(Activity context, List<Material> datas) {
+    public PrintFragment4Adapter(Activity context, List<BarCodeTable> datas) {
         super(datas);
         this.context = context;
     }
@@ -29,7 +29,7 @@ public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<Material> {
     }
 
     @Override
-    public void onBindHoder(RecyclerHolder holder, final Material entity, final int pos) {
+    public void onBindHoder(RecyclerHolder holder, final BarCodeTable entity, final int pos) {
             // 初始化id
             TextView tv_row = holder.obtainView(R.id.tv_row);
             TextView tv_fnumber = holder.obtainView(R.id.tv_fnumber);
@@ -38,8 +38,8 @@ public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<Material> {
             TextView tv_print = holder.obtainView(R.id.tv_print);
             // 赋值
             tv_row.setText(String.valueOf(pos + 1));
-            tv_fnumber.setText(entity.getfNumber());
-            tv_fname.setText(entity.getfName());
+            tv_fnumber.setText(entity.getMaterialNumber());
+            tv_fname.setText(entity.getMaterialName());
             tv_fModel.setText(entity.getMaterialSize());
 
             View.OnClickListener click = new View.OnClickListener() {
@@ -63,7 +63,7 @@ public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<Material> {
     }
 
     public interface MyCallBack {
-        void onPrint(Material entity, int position);
+        void onPrint(BarCodeTable entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

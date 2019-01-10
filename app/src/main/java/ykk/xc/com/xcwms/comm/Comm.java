@@ -151,6 +151,9 @@ public class Comm {
 			case 8:
 				dateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 				break;
+			case 9:
+				dateFormat = new SimpleDateFormat("yyyy.MM.dd");
+				break;
 		}
 		return dateFormat.format(Calendar.getInstance().getTime());
 	}

@@ -44,6 +44,8 @@ public class BarCodeTable implements Serializable {
 	private String materialNumber;
 	/*物料名称*/
 	private String materialName;
+	/*项目规格*/
+	private String materialSize;
 	private Material mtl;
 	/*条码*/
 	private String barcode;
@@ -177,7 +179,12 @@ public class BarCodeTable implements Serializable {
 	public void setMtl(Material mtl) {
 		this.mtl = mtl;
 	}
-
+	public String getMaterialSize() {
+		return materialSize;
+	}
+	public void setMaterialSize(String materialSize) {
+		this.materialSize = materialSize;
+	}
 	public int getEntryId() {
 		return entryId;
 	}

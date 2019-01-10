@@ -31,6 +31,7 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.adapter.PrintFragment1Adapter;
 import ykk.xc.com.xcwms.comm.BaseFragment;
 import ykk.xc.com.xcwms.comm.Consts;
+import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LogUtil;
@@ -48,7 +49,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
     XRecyclerView xRecyclerView;
 
     private PrintFragment1 context = this;
-    private List<Material> listDatas = new ArrayList<>();
+    private List<BarCodeTable> listDatas = new ArrayList<>();
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502;
     private PrintFragment1Adapter mAdapter;
     private OkHttpClient okHttpClient = new OkHttpClient();
@@ -76,7 +77,7 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
                 switch (msg.what) {
                     case SUCC1: // 成功
                         String json = (String) msg.obj;
-                        List<Material> list = JsonUtil.strToList2(json, Material.class);
+                        List<BarCodeTable> list = JsonUtil.strToList2(json, BarCodeTable.class);
                         m.listDatas.addAll(list);
                         m.mAdapter.notifyDataSetChanged();
 
@@ -133,12 +134,12 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
 
         mAdapter.setCallBack(new PrintFragment1Adapter.MyCallBack() {
             @Override
-            public void onPrint(Material e, int pos) {
-            Log.e("onPrint1", e.getfName());
-            // 打印
-//            connectBluetoothBefore();
-            String result = JsonUtil.objectToString(e);
-            parent.setFragmentPrint(0, result);
+            public void onPrint(BarCodeTable e, int pos) {
+                Log.e("onPrint1", e.getMaterialName());
+                // 打印
+    //            connectBluetoothBefore();
+                String result = JsonUtil.objectToString(e);
+                parent.setFragmentPrint(0, result);
             }
         });
     }
@@ -185,10 +186,11 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
      */
     private void run_okhttpDatas() {
         showLoadDialog("加载中...");
-        String mUrl = getURL("material/findMaterialListByParam3");
+        String mUrl = getURL("barcodeTable/findMaterailBarcode_app");
         String searchName = getValues(etSearch).trim();
         FormBody formBody = new FormBody.Builder()
                 .add("fNumberAndName", searchName)
+                .add("caseId", "11")
                 .add("limit", String.valueOf(limit))
                 .add("pageSize", "30")
                 .build();
