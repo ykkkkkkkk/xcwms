@@ -35,6 +35,8 @@ public class ScanningRecordTok3 implements Serializable {
 	private String carrierNumber;
 	/*销售员代码*/
 	private String salerNumber;
+	/* 销售员名称 */
+	private String salerName;
 	/*运输方式代码*/
 	private String deliverWayNumber;
 	/*物流公司代码*/
@@ -237,6 +239,12 @@ public class ScanningRecordTok3 implements Serializable {
 	}
 	public void setFlhDbj(double flhDbj) {
 		this.flhDbj = flhDbj;
+	}
+	public String getSalerName() {
+		return salerName;
+	}
+	public void setSalerName(String salerName) {
+		this.salerName = salerName;
 	}
 
 

@@ -1,8 +1,5 @@
 package ykk.xc.com.xcwms.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -72,6 +69,8 @@ public class ScanningRecord implements Serializable {
     private ScanningRecordTok3 srTok3; // 提交到k3的字段
     /*订单套数*/
     private int coveQty;
+    private Stock stock2; // 调入仓库
+    private StockPosition stockPos2; // 调入库位
 
     public int getId() {
         return id;
@@ -425,6 +424,18 @@ public class ScanningRecord implements Serializable {
     }
     public void setCoveQty(int coveQty) {
         this.coveQty = coveQty;
+    }
+    public Stock getStock2() {
+        return stock2;
+    }
+    public void setStock2(Stock stock2) {
+        this.stock2 = stock2;
+    }
+    public StockPosition getStockPos2() {
+        return stockPos2;
+    }
+    public void setStockPos2(StockPosition stockPos2) {
+        this.stockPos2 = stockPos2;
     }
 
     public ScanningRecord() {

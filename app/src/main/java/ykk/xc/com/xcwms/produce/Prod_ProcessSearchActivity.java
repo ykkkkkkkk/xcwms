@@ -108,25 +108,25 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
                 switch (msg.what) {
                     case SUCC1: // 扫码成功后进入
-                        m.popDatasA = JsonUtil.strToList((String)msg.obj, ProdOrder.class);
-                        if(m.smFlag == '1') { // 生产订单物料
+                        m.popDatasA = JsonUtil.strToList((String) msg.obj, ProdOrder.class);
+                        if (m.smFlag == '1') { // 生产订单物料
                             ProdOrder prodOrder = m.popDatasA.get(0);
                             Material mtl = prodOrder.getMtl();
                             m.showProdOrderInfo(prodOrder);
                             // 查询工序
-                            m.run_findProcessflowEntryByParam_app(mtl.getMaterialTypeId());
+                            m.run_findProcessflowEntryByParam_app(mtl.getfMaterialId());
                         }
 
                         break;
                     case UNSUCC1:
                         m.popDatasA = null;
                         String errMsg = JsonUtil.strToString((String) msg.obj);
-                        if(Comm.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没有找到数据！";
+                        if (Comm.isNULLS(errMsg).length() == 0) errMsg = "很抱歉，没有找到数据！";
                         Comm.showWarnDialog(m.context, errMsg);
 
                         break;
                     case SUCC2: // 查询工序 成功
-                        List<ProcessflowEntry> listP = JsonUtil.strToList((String)msg.obj, ProcessflowEntry.class);
+                        List<ProcessflowEntry> listP = JsonUtil.strToList((String) msg.obj, ProcessflowEntry.class);
                         Procedure procedure = new Procedure();
                         procedure.setProcedureName("全部");
                         ProcessflowEntry pe1 = new ProcessflowEntry();
@@ -171,7 +171,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                             case '1': // 生产订单物料
                                 etName = m.getValues(m.etMtlCode);
                                 if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
-                                    if(m.mtlBarcode.equals(etName)) {
+                                    if (m.mtlBarcode.equals(etName)) {
                                         m.mtlBarcode = etName;
                                     } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
 
@@ -184,9 +184,10 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                             case '2': // 生产订单
                                 etName = m.getValues(m.etSourceCode);
                                 if (m.sourceBarcode != null && m.sourceBarcode.length() > 0) {
-                                    if(m.sourceBarcode.equals(etName)) {
+                                    if (m.sourceBarcode.equals(etName)) {
                                         m.sourceBarcode = etName;
-                                    } else m.sourceBarcode = etName.replaceFirst(m.sourceBarcode, "");
+                                    } else
+                                        m.sourceBarcode = etName.replaceFirst(m.sourceBarcode, "");
 
                                 } else m.sourceBarcode = etName;
                                 m.setTexts(m.etSourceCode, m.sourceBarcode);
@@ -238,7 +239,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         mAdapter.setOnItemClickListener(new BaseRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseRecyclerAdapter adapter, BaseRecyclerAdapter.RecyclerHolder holder, View view, int pos) {
-                ProcessflowEntry m = listDatas.get(pos-1);
+                ProcessflowEntry m = listDatas.get(pos - 1);
 
             }
         });
@@ -258,6 +259,12 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         hideSoftInputMode(etSourceCode);
         hideSoftInputMode(etMtlCode);
         curRadio = viewRadio1;
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setFocusable(etMtlCode);
+            }
+        }, 200);
     }
 
     @OnClick({R.id.btn_close, R.id.tv_mtlSel, R.id.tv_process, R.id.lin_tab1, R.id.lin_tab2})
@@ -274,11 +281,11 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                 linSm1.setVisibility(View.VISIBLE);
                 linSm2.setVisibility(View.GONE);
                 relativeInfo.setVisibility(View.GONE);
-                if(popDatasA != null) {
+                if (popDatasA != null) {
                     popDatasA.clear();
                     popDatasA = null;
                 }
-                if(popDatasB != null) {
+                if (popDatasB != null) {
                     popDatasB.clear();
                     popDatasB = null;
                 }
@@ -291,11 +298,11 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                 linSm1.setVisibility(View.GONE);
                 linSm2.setVisibility(View.VISIBLE);
                 relativeInfo.setVisibility(View.GONE);
-                if(popDatasA != null) {
+                if (popDatasA != null) {
                     popDatasA.clear();
                     popDatasA = null;
                 }
-                if(popDatasB != null) {
+                if (popDatasB != null) {
                     popDatasB.clear();
                     popDatasB = null;
                 }
@@ -303,8 +310,8 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
                 break;
             case R.id.tv_mtlSel: // 选择物料
-                if(popDatasA == null || popDatasA.size() == 0) {
-                    Comm.showWarnDialog(context,"请扫描生产订单条码！");
+                if (popDatasA == null || popDatasA.size() == 0) {
+                    Comm.showWarnDialog(context, "请扫描生产订单条码！");
                     return;
                 }
                 popupWindow_A();
@@ -312,10 +319,10 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
                 break;
             case R.id.tv_process: // 选择工序
-                if(popDatasB == null || popDatasB.size() == 0) {
-                    if(smFlag == '1') {
-                        Comm.showWarnDialog(context,"请扫描物料！");
-                    } else if(smFlag == '2') {
+                if (popDatasB == null || popDatasB.size() == 0) {
+                    if (smFlag == '1') {
+                        Comm.showWarnDialog(context, "请扫描物料！");
+                    } else if (smFlag == '2') {
                         Comm.showWarnDialog(context, "请选中物料！");
                     }
                     return;
@@ -358,21 +365,25 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         // 生产订单
         etSourceCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
             @Override
             public void afterTextChanged(Editable s) {
 //                sourceBarcode = s.toString();
 //                // 执行查询方法
 //                run_smGetDatas(sourceBarcode);
 
-                if(!isTextChange) {
+                if (!isTextChange) {
                     isTextChange = true;
                     if (baseIsPad) {
-                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                        mHandler.sendEmptyMessageDelayed(PAD_SM, 600);
                     } else {
-                        mHandler.sendEmptyMessageDelayed(MOBILE_SM,600);
+                        mHandler.sendEmptyMessageDelayed(MOBILE_SM, 600);
                     }
                 }
             }
@@ -381,21 +392,25 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         // 生产订单物料
         etMtlCode.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
             @Override
             public void afterTextChanged(Editable s) {
 //                mtlBarcode = s.toString();
 //                // 执行查询方法
 //                run_smGetDatas(mtlBarcode);
 
-                if(!isTextChange) {
+                if (!isTextChange) {
                     isTextChange = true;
                     if (baseIsPad) {
-                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
+                        mHandler.sendEmptyMessageDelayed(PAD_SM, 600);
                     } else {
-                        mHandler.sendEmptyMessageDelayed(MOBILE_SM,600);
+                        mHandler.sendEmptyMessageDelayed(MOBILE_SM, 600);
                     }
                 }
             }
@@ -408,12 +423,13 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
      */
     private void run_smGetDatas(String val) {
         isTextChange = false;
-        if(val.length() == 0) {
-            Comm.showWarnDialog(context,"请对准条码！");
+        if (val.length() == 0) {
+            Comm.showWarnDialog(context, "请对准条码！");
             return;
         }
         showLoadDialog("加载中...");
-        String mUrl = null;;
+        String mUrl = null;
+        ;
         String barcode = null;
         switch (smFlag) {
             case '1': // 生产订单物料
@@ -471,17 +487,17 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         else if (leaf2.length() > 0) strTmp = leaf2;
         String remark = isNULLS(prodOrder.getRemarks());
         tv1.setText(Html.fromHtml(
-                "生产单号：<font color='#000000'>"+prodOrder.getFbillno()+"</font>&emsp 订单号：<font color='#000000'>"+prodOrder.getSalOrderNo()+"</font>" +
+                "生产单号：<font color='#000000'>" + prodOrder.getFbillno() + "</font>&emsp 订单号：<font color='#000000'>" + prodOrder.getSalOrderNo() + "</font>" +
                         "<br>" +
-                        "成品编码：<font color='#000000'>"+prodOrder.getMtlFnumber()+"</font>" +
+                        "成品编码：<font color='#000000'>" + prodOrder.getMtlFnumber() + "</font>" +
                         "<br>" +
-                        "成品名称：<font color='#000000'>"+prodOrder.getMtlFname()+"</font>" +
-                        (width.length() > 0 && !width.equals("0") ? "<br>宽：<font color='#000000'>"+width+"</font>&emsp " : "") + // &emsp表示一个空格
-                        (high.length() > 0  && !high.equals("0") ? "高：<font color='#000000'>"+high+"</font>&emsp " : "") + // &emsp表示一个空格
-                        (strTmp.length() > 0 ? "<br>叶片：<font color='#000000'>"+strTmp+"</font>" : "") + // &emsp表示一个空格
+                        "成品名称：<font color='#000000'>" + prodOrder.getMtlFname() + "</font>" +
+                        (width.length() > 0 && !width.equals("0") ? "<br>宽：<font color='#000000'>" + width + "</font>&emsp " : "") + // &emsp表示一个空格
+                        (high.length() > 0 && !high.equals("0") ? "高：<font color='#000000'>" + high + "</font>&emsp " : "") + // &emsp表示一个空格
+                        (strTmp.length() > 0 ? "<br>叶片：<font color='#000000'>" + strTmp + "</font>" : "") + // &emsp表示一个空格
                         "<br>" +
-                        "数量：<font color='#000000'>"+prodOrder.getProdFqty()+"/"+prodOrder.getUnitFname()+"</font>" +
-                        (remark.trim().length() > 0 ? "<br>备注：<font color='#000000'>"+remark+"</font>" : "")
+                        "数量：<font color='#000000'>" + prodOrder.getProdFqty() + "/" + prodOrder.getUnitFname() + "</font>" +
+                        (remark.trim().length() > 0 ? "<br>备注：<font color='#000000'>" + remark + "</font>" : "")
         ));
     }
 
@@ -491,6 +507,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
     private PopupWindow popWindowA;
     private ListAdapter adapterA;
     private List<ProdOrder> popDatasA;
+
     private void popupWindow_A() {
         if (null != popWindowA) {// 不为空就隐藏
             popWindowA.dismiss();
@@ -514,7 +531,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 //                    valuationTypeId = vt.getId();
                     tvMtlSel.setText(prodOrder.getMtlFname());
                     showProdOrderInfo(prodOrder);
-                    run_findProcessflowEntryByParam_app(mtl.getMaterialTypeId());
+                    run_findProcessflowEntryByParam_app(mtl.getfMaterialId());
 
                     popWindowA.dismiss();
                 }
@@ -546,7 +563,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
         @Override
         public int getCount() {
-            if(datas == null) {
+            if (datas == null) {
                 return 0;
             }
             return datas.size();
@@ -554,7 +571,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
         @Override
         public Object getItem(int position) {
-            if(datas == null) {
+            if (datas == null) {
                 return null;
             }
             return datas.get(position);
@@ -568,21 +585,21 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         @Override
         public View getView(int position, View v, ViewGroup parent) {
             ListAdapter.ViewHolder holder = null;
-            if(v == null) {
+            if (v == null) {
                 holder = new ListAdapter.ViewHolder();
                 v = activity.getLayoutInflater().inflate(R.layout.popup_list_item2, null);
                 holder.tv_name = (TextView) v.findViewById(R.id.tv_name);
 
                 v.setTag(holder);
-            }else holder = (ListAdapter.ViewHolder) v.getTag();
+            } else holder = (ListAdapter.ViewHolder) v.getTag();
 
             ProdOrder prodOrder = datas.get(position);
-            holder.tv_name.setText(prodOrder.getMtlFnumber()+"/"+prodOrder.getMtlFname());
+            holder.tv_name.setText(prodOrder.getMtlFnumber() + "/" + prodOrder.getMtlFname());
 
             return v;
         }
 
-        class ViewHolder{//listView中显示的组件
+        class ViewHolder {//listView中显示的组件
             TextView tv_name;
 
         }
@@ -591,15 +608,15 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
     /**
      * 根据物料类别查询工序
      */
-    private void run_findProcessflowEntryByParam_app(int materialTypeId) {
-        if(popDatasB != null) popDatasB.clear();
+    private void run_findProcessflowEntryByParam_app(int mtlId) {
+        if (popDatasB != null) popDatasB.clear();
         else popDatasB = new ArrayList<>();
 
         showLoadDialog("加载中...");
 
         String mUrl = getURL("processflowEntry/findProcessflowEntryByParam_app");
         FormBody formBody = new FormBody.Builder()
-                .add("materialTypeId", String.valueOf(materialTypeId))
+                .add("mtlId", String.valueOf(mtlId))
                 .build();
 
         Request request = new Request.Builder()
@@ -637,6 +654,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
     private PopupWindow popWindowB;
     private ListAdapter2 adapterB;
     private List<ProcessflowEntry> popDatasB;
+
     private void popupWindow_B() {
         if (null != popWindowB) {// 不为空就隐藏
             popWindowB.dismiss();
@@ -661,7 +679,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                     processflowEntryId = pe.getId();
                     // 加载对应列表
                     listDatas.clear();
-                    if(pe.getId() == 0) {
+                    if (pe.getId() == 0) {
                         listDatas.addAll(popDatasB);
                         listDatas.remove(0);
                     } else {
@@ -684,6 +702,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         popWindowB.setOutsideTouchable(true);
         popWindowB.setFocusable(true);
     }
+
     /**
      * 工序 适配器
      */
@@ -699,7 +718,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
         @Override
         public int getCount() {
-            if(datas == null) {
+            if (datas == null) {
                 return 0;
             }
             return datas.size();
@@ -707,7 +726,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
 
         @Override
         public Object getItem(int position) {
-            if(datas == null) {
+            if (datas == null) {
                 return null;
             }
             return datas.get(position);
@@ -721,13 +740,13 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
         @Override
         public View getView(int position, View v, ViewGroup parent) {
             ViewHolder holder = null;
-            if(v == null) {
+            if (v == null) {
                 holder = new ViewHolder();
                 v = activity.getLayoutInflater().inflate(R.layout.popup_list_item, null);
                 holder.tv_name = (TextView) v.findViewById(R.id.tv_name);
 
                 v.setTag(holder);
-            }else holder = (ViewHolder) v.getTag();
+            } else holder = (ViewHolder) v.getTag();
 
             ProcessflowEntry pe = datas.get(position);
             Procedure procedure = pe.getProcedure();
@@ -736,7 +755,7 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
             return v;
         }
 
-        class ViewHolder{//listView中显示的组件
+        class ViewHolder {//listView中显示的组件
             TextView tv_name;
         }
     }
@@ -778,13 +797,13 @@ public class Prod_ProcessSearchActivity extends BaseActivity implements XRecycle
                         String width = isNULLS(prodOrder.getWidth());
                         String high = isNULLS(prodOrder.getHigh());
                         tv1.setText(Html.fromHtml(
-                                "成品编码：<font color='#000000'>"+prodOrder.getMtlFnumber()+"</font>" +
+                                "成品编码：<font color='#000000'>" + prodOrder.getMtlFnumber() + "</font>" +
                                         "<br>" +
-                                        "成品名称：<font color='#000000'>"+prodOrder.getMtlFname()+"</font>" +
+                                        "成品名称：<font color='#000000'>" + prodOrder.getMtlFname() + "</font>" +
                                         "<br>" +
-                                        (width.length() > 0 ? "宽：<font color='#000000'>"+width+"</font>&emsp " : "") + // &emsp表示一个空格
-                                        (high.length() > 0 ? "高：<font color='#000000'>"+high+"</font>&emsp " : "") + // &emsp表示一个空格
-                                        "数量：<font color='#000000'>"+prodOrder.getProdFqty()+"/"+prodOrder.getUnitFname()+"</font>" +
+                                        (width.length() > 0 ? "宽：<font color='#000000'>" + width + "</font>&emsp " : "") + // &emsp表示一个空格
+                                        (high.length() > 0 ? "高：<font color='#000000'>" + high + "</font>&emsp " : "") + // &emsp表示一个空格
+                                        "数量：<font color='#000000'>" + prodOrder.getProdFqty() + "/" + prodOrder.getUnitFname() + "</font>" +
                                         "<br>"));
 //                        initLoadDatas();
                     }

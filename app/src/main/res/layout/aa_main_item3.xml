@@ -88,7 +88,7 @@
                 android:layout_below="@+id/tvImg3"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_3dp"
-                android:text="单据下推"
+                android:text="直接调拨"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_18sp" />
 

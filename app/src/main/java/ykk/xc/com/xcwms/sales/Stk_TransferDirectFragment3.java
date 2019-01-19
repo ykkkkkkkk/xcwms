@@ -60,12 +60,13 @@ import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment3Adapter;
+import ykk.xc.com.xcwms.sales.adapter.Stk_TransferDirectFragment3Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 
 /**
  * 扫箱码 出库
  */
-public class Sal_OutFragment3 extends BaseFragment {
+public class Stk_TransferDirectFragment3 extends BaseFragment {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
@@ -94,7 +95,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     @BindView(R.id.btn_save)
     Button btnSave;
 
-    private Sal_OutFragment3 context = this;
+    private Stk_TransferDirectFragment3 context = this;
     private static final int SEL_PICKINGLIST = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17, PAD_SM = 18;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503;
     private static final int CODE1 = 1, UPDATE = 2, UPDATE_NULL = 3;
@@ -104,7 +105,7 @@ public class Sal_OutFragment3 extends BaseFragment {
     private Staff stockStaff; // 仓管员
     private Organization receiveOrg, salOrg; // 组织
     private ExpressCompany expressCompany; // 物料公司
-    private Sal_OutFragment3Adapter mAdapter;
+    private Stk_TransferDirectFragment3Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
     private String barcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：箱码
@@ -112,21 +113,22 @@ public class Sal_OutFragment3 extends BaseFragment {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private User user;
     private Activity mContext;
-    private Sal_OutMainActivity parent;
+    private Stk_TransferDirectMainActivity parent;
     private String k3Number; // 记录传递到k3返回的单号
     private boolean isTextChange; // 是否进入TextChange事件
+    private boolean isDbd; // 发货通知单的出库类型是否为直接调拨
 
     // 消息处理
-    private Sal_OutFragment3.MyHandler mHandler = new Sal_OutFragment3.MyHandler(this);
+    private Stk_TransferDirectFragment3.MyHandler mHandler = new Stk_TransferDirectFragment3.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Sal_OutFragment3> mActivity;
+        private final WeakReference<Stk_TransferDirectFragment3> mActivity;
 
-        public MyHandler(Sal_OutFragment3 activity) {
-            mActivity = new WeakReference<Sal_OutFragment3>(activity);
+        public MyHandler(Stk_TransferDirectFragment3 activity) {
+            mActivity = new WeakReference<Stk_TransferDirectFragment3>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Sal_OutFragment3 m = mActivity.get();
+            Stk_TransferDirectFragment3 m = mActivity.get();
             if (m != null) {
                 m.hideLoadDialog();
 
@@ -163,8 +165,8 @@ public class Sal_OutFragment3 extends BaseFragment {
                                 PickingList pl = list2.get(0);
                                 DeliOrder deliOrder = pl.getDeliOrder();
                                 String outStockType = m.isNULLS(deliOrder.getOutStockType());
-                                if(!outStockType.equals("销售出库")) {
-                                    Comm.showWarnDialog(m.mContext,"该发货通知单的出库类型不是销售出库，不能操作");
+                                if(!outStockType.equals("直接调拨")) {
+                                    Comm.showWarnDialog(m.mContext,"该销售订单的出库类型不是直接调拨，不能操作");
                                     return;
                                 }
 //                                m.tvPickingListSel.setText(p.getFbillno());
@@ -236,19 +238,19 @@ public class Sal_OutFragment3 extends BaseFragment {
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.sal_out_fragment3, container, false);
+        return inflater.inflate(R.layout.stk_transferdirect_fragment3, container, false);
     }
 
     @Override
     public void initView() {
         mContext = getActivity();
-        parent = (Sal_OutMainActivity) mContext;
+        parent = (Stk_TransferDirectMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Sal_OutFragment3Adapter(mContext, checkDatas);
+        mAdapter = new Stk_TransferDirectFragment3Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
-        mAdapter.setCallBack(new Sal_OutFragment3Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Stk_TransferDirectFragment3Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
                 Log.e("num", "行：" + position);
@@ -743,6 +745,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             DeliOrder deliOrder = pl.getDeliOrder();
             ScanningRecord2 sr2 = new ScanningRecord2();
             Material mtl = pl.getMtl();
+            isDbd = deliOrder.getOutStockType().equals("直接调拨") ? true : false;
 
             sr2.setSourceId(pl.getId());
             sr2.setSourceK3Id(pl.getId());
@@ -805,7 +808,9 @@ public class Sal_OutFragment3 extends BaseFragment {
             sr2.setSourceType('6');
 //            sr2.setTempId(ism.getId());
 //            sr2.setRelationObj(JsonUtil.objectToString(ism));
-            sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+            if(isDbd) sr2.setfRuleId("4c607866-23b3-4001-b642-03a94c9b8b59");
+            else sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+
             sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
             sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
             String deliveryCompanyId = isNULLS(pl.getDeliveryCompanyId());
@@ -828,6 +833,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             srTok3.setFconsignee(deliOrder.getFconsignee());
             srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
             srTok3.setSalerNumber(deliOrder.getSalerNumber());
+            srTok3.setSalerName(deliOrder.getSalerName());
             srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
             srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
             srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
@@ -893,7 +899,8 @@ public class Sal_OutFragment3 extends BaseFragment {
             ScanningRecord2 sr2 = checkDatas.get(i);
             ScanningRecord record = new ScanningRecord();
             // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库 6、直接调拨
-            record.setType(2);
+            if(isDbd) record.setType(6);
+            else record.setType(2);
             record.setSourceId(sr2.getSourceId());
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
@@ -1006,7 +1013,7 @@ public class Sal_OutFragment3 extends BaseFragment {
         }
         String mUrl = getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
-                .add("fbillType", "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库，6：发货通知单下推调拨单
+                .add("fbillType", isDbd ? "6" : "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库，6：发货通知单下推调拨单
                 .add("strFbillno", strFbillno.toString())
                 .add("strEntryId", strEntryId.toString())
                 .build();

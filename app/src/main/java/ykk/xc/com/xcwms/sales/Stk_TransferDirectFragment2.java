@@ -43,7 +43,6 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.Dept_DialogActivity;
 import ykk.xc.com.xcwms.basics.Express_DialogActivity;
-import ykk.xc.com.xcwms.basics.Organization_DialogActivity;
 import ykk.xc.com.xcwms.basics.Staff_DialogActivity;
 import ykk.xc.com.xcwms.basics.StockPos_DialogActivity;
 import ykk.xc.com.xcwms.basics.Stock_DialogActivity;
@@ -68,16 +67,15 @@ import ykk.xc.com.xcwms.model.StockPosition;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
-import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
-import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment2Adapter;
+import ykk.xc.com.xcwms.sales.adapter.Stk_TransferDirectFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
 
 /**
- * 扫箱码 出库
+ * 扫箱码（发货通知单出库类型为直接调拨） 出库
  */
-public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
+public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragmentExec {
 
     @BindView(R.id.et_getFocus)
     EditText etGetFocus;
@@ -106,7 +104,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     @BindView(R.id.lin_top)
     LinearLayout linTop;
 
-    private Sal_OutFragment2 context = this;
+    private Stk_TransferDirectFragment2 context = this;
     private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17, PAD_SM = 18;
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, PASS = 203, UNPASS = 503, SUCC4 = 204, UNSUCC4 = 504;
     private static final int SETFOCUS = 1, CODE2 = 2;
@@ -117,7 +115,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private Department department; // 部门
     private Organization receiveOrg, salOrg; // 组织
     private ExpressCompany expressCompany; // 物料公司
-    private Sal_OutFragment2Adapter mAdapter;
+    private Stk_TransferDirectFragment2Adapter mAdapter;
     private List<ScanningRecord2> checkDatas = new ArrayList<>();
     private String boxBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：箱码
@@ -126,7 +124,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private User user;
     private char defaultStockVal; // 默认仓库的值
     private Activity mContext;
-    private Sal_OutMainActivity parent;
+    private Stk_TransferDirectMainActivity parent;
     private int caseId; // 当前单据的方案id
     private Map<String,Boolean> mapBox = new HashMap<String,Boolean>(); // 记录箱码
     private List<MaterialBinningRecord> mbrList = null; // 保存箱子里的物料
@@ -134,18 +132,20 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private String k3Number; // 记录传递到k3返回的单号
     private List<Map<String, Object>> listMaps = new ArrayList<>(); // 记录多少个箱子和箱子里的物料
     private boolean isTextChange; // 是否进入TextChange事件
+    private boolean isDbd; // 发货通知单的出库类型是否为直接调拨
+    private boolean isInStock; // 是否为调入仓库，否则为调出仓库
 
     // 消息处理
-    private Sal_OutFragment2.MyHandler mHandler = new Sal_OutFragment2.MyHandler(this);
+    private Stk_TransferDirectFragment2.MyHandler mHandler = new Stk_TransferDirectFragment2.MyHandler(this);
     private static class MyHandler extends Handler {
-        private final WeakReference<Sal_OutFragment2> mActivity;
+        private final WeakReference<Stk_TransferDirectFragment2> mActivity;
 
-        public MyHandler(Sal_OutFragment2 activity) {
-            mActivity = new WeakReference<Sal_OutFragment2>(activity);
+        public MyHandler(Stk_TransferDirectFragment2 activity) {
+            mActivity = new WeakReference<Stk_TransferDirectFragment2>(activity);
         }
 
         public void handleMessage(Message msg) {
-            Sal_OutFragment2 m = mActivity.get();
+            Stk_TransferDirectFragment2 m = mActivity.get();
             String errMsg = null;
             if (m != null) {
                 m.hideLoadDialog();
@@ -153,16 +153,17 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 switch (msg.what) {
                     case SUCC1:
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
-//                        m.reset('0');
+                        m.reset('0');
 //
-//                        m.checkDatas.clear();
-//                        m.getBarCodeTableBefore(true);
-//                        m.mAdapter.notifyDataSetChanged();
-//                        m.caseId = 0;
-//                        m.mapBox.clear();
-//                        m.deliOrderList.clear();
-                        m.btnSave.setVisibility(View.GONE);
-                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.checkDatas.clear();
+                        m.mAdapter.notifyDataSetChanged();
+                        m.caseId = 0;
+                        m.mapBox.clear();
+                        m.deliOrderList.clear();
+                        Comm.showWarnDialog(m.mContext,"保存成功✔");
+//                        m.parent.setFragment2Print(2, m.listMaps);
+//                        m.btnSave.setVisibility(View.GONE);
+//                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
                     case UNSUCC1:
@@ -253,8 +254,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                                         MaterialBinningRecord tmpMbr = m.mbrList.get(0);
                                         DeliOrder deliOrder = JsonUtil.stringToObject(tmpMbr.getRelationObj(), DeliOrder.class);
                                         String outStockType = m.isNULLS(deliOrder.getOutStockType());
-                                        if(!outStockType.equals("销售出库")) {
-                                            Comm.showWarnDialog(m.mContext,"该发货通知单的出库类型不是销售出库，不能操作");
+                                        if(!outStockType.equals("直接调拨")) {
+                                            Comm.showWarnDialog(m.mContext,"该销售订单的出库类型不是直接调拨，不能操作");
                                             return;
                                         }
                                         // 把这个箱码保存到map中
@@ -304,8 +305,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                         List<DeliOrder> list2 = JsonUtil.strToList((String) msg.obj, DeliOrder.class);
                         DeliOrder deliOrderP = list2.get(0);
                         String exitType = m.isNULLS(deliOrderP.getExitType());
-                        if(!exitType.equals("销售出库")) {
-                            Comm.showWarnDialog(m.mContext,"该销售订单的出库类型不是销售出库，不能操作");
+                        if(!exitType.equals("直接调拨")) {
+                            Comm.showWarnDialog(m.mContext,"该销售订单的出库类型不是直接调拨，不能操作");
                             return;
                         }
                         boolean isBool = false;
@@ -382,25 +383,25 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        parent = (Sal_OutMainActivity) context;
+        parent = (Stk_TransferDirectMainActivity) context;
         parent.setFragmentExec(this);
     }
 
     @Override
     public View setLayoutResID(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.sal_out_fragment2, container, false);
+        return inflater.inflate(R.layout.stk_transferdirect_fragment2, container, false);
     }
 
     @Override
     public void initView() {
         mContext = getActivity();
-//        parent = (Sal_OutMainActivity) mContext;
+//        parent = (Stk_TransferDirectMainActivity) mContext;
 
         recyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mAdapter = new Sal_OutFragment2Adapter(mContext, checkDatas);
+        mAdapter = new Stk_TransferDirectFragment2Adapter(mContext, checkDatas);
         recyclerView.setAdapter(mAdapter);
-        mAdapter.setCallBack(new Sal_OutFragment2Adapter.MyCallBack() {
+        mAdapter.setCallBack(new Stk_TransferDirectFragment2Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
                 Log.e("num", "行：" + position);
@@ -409,10 +410,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             }
 
             @Override
-            public void onClick_selStock(View v, ScanningRecord2 entity, int position) {
+            public void onClick_selStock(View v, ScanningRecord2 entity, int position, boolean isInStock) {
                 Log.e("selStock", "行：" + position);
                 curPos = position;
-
+                context.isInStock = isInStock;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
             }
 
@@ -597,7 +598,15 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 return false;
             }
             if (sr2.getStockId() == 0) {
-                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（仓库）！");
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（调出仓库）！");
+                return false;
+            }
+            if (sr2.getStock2() == null) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，请选择（调入仓库）！");
+                return false;
+            }
+            if(sr2.getStockId() == sr2.getStock2().getfStockid()) {
+                Comm.showWarnDialog(mContext,"第" + (i + 1) + "行，（调出仓库）和（调入仓库）不能一致！");
                 return false;
             }
 //            if ((sr2.getMtl().getMtlPack() == null || sr2.getMtl().getMtlPack().getIsMinNumberPack() == 0) && sr2.getStockqty() > sr2.getFqty()) {
@@ -731,8 +740,11 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                         bundle.putInt("stockId", stock2.getfStockid());
                         showForResult(StockPos_DialogActivity.class, SEL_STOCKP2, bundle);
                     } else {
-                        stockAllFill(false);
-                        saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
+                        if(isInStock) stockAllFill2(false);
+                        else {
+                            stockAllFill(false);
+                            saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
+                        }
                     }
                 }
 
@@ -741,9 +753,12 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 if (resultCode == Activity.RESULT_OK) {
                     stockP2 = (StockPosition) data.getSerializableExtra("obj");
                     Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
-                    stockAllFill(true);
-                    saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
-                    saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
+                    if(isInStock) stockAllFill2(true);
+                    else {
+                        stockAllFill(true);
+                        saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
+                        saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
+                    }
                 }
 
                 break;
@@ -807,7 +822,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     }
 
     /**
-     * 部门数据全部填充
+     * 仓库数据全部填充（调出仓库）
      */
     private void stockAllFill(boolean inStockPosData) {
         int size = checkDatas.size();
@@ -841,6 +856,37 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                     sr2.setStockPos(stockP2);
                     sr2.setStockPositionId(stockP2.getId());
                     sr2.setStockPName(stockP2.getFname());
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 仓库数据全部填充（调入仓库）
+     */
+    private void stockAllFill2(boolean inStockPosData) {
+        int size = checkDatas.size();
+        boolean isBool = false;
+        for(int i=0; i<size; i++) {
+            ScanningRecord2 sr2 = checkDatas.get(i);
+            if(sr2.getStock2() != null) {
+                isBool = true;
+                break;
+            }
+        }
+        if(isBool) {
+            ScanningRecord2 sr2 = checkDatas.get(curPos);
+            sr2.setStock2(stock2);
+            if(inStockPosData) {
+                sr2.setStockPos2(stockP2);
+            }
+        } else { // 全部都为空的时候，选择任意全部填充
+            for (int i = 0; i < size; i++) {
+                ScanningRecord2 sr2 = checkDatas.get(i);
+                sr2.setStock2(stock2);
+                if(inStockPosData) {
+                    sr2.setStockPos2(stockP2);
                 }
             }
         }
@@ -966,6 +1012,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 DeliOrder deliOrder = deliOrderList.get(i);
                 ScanningRecord2 sr2 = new ScanningRecord2();
                 Material mtl = deliOrder.getMtl();
+                isDbd = deliOrder.getOutStockType().equals("直接调拨") ? true : false;
 
                 sr2.setSourceK3Id(deliOrder.getfId());
                 sr2.setSourceFnumber(deliOrder.getFbillno());
@@ -1046,7 +1093,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 sr2.setSourceType('7');
 //            sr2.setTempId(ism.getId());
 //            sr2.setRelationObj(JsonUtil.objectToString(ism));
-                sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+                if(isDbd) sr2.setfRuleId("4c607866-23b3-4001-b642-03a94c9b8b59");
+                else sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+
                 sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
                 sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
 
@@ -1070,6 +1119,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 srTok3.setFconsignee(deliOrder.getFconsignee());
                 srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
                 srTok3.setSalerNumber(deliOrder.getSalerNumber());
+                srTok3.setSalerName(deliOrder.getSalerName());
                 srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
                 srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
                 srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
@@ -1120,6 +1170,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             ScanningRecord2 sr2 = new ScanningRecord2();
             DeliOrder deliOrder = JsonUtil.stringToObject(mbr.getRelationObj(), DeliOrder.class);
             Material mtl = mbr.getMtl();
+            isDbd = deliOrder.getOutStockType().equals("直接调拨") ? true : false;
 
             sr2.setSourceId(mbr.getId());
             sr2.setSourceK3Id(mbr.getRelationBillId());
@@ -1206,7 +1257,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             sr2.setSourceType('9');
 //            sr2.setTempId(ism.getId());
 //            sr2.setRelationObj(JsonUtil.objectToString(ism));
-            sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+            if(isDbd) sr2.setfRuleId("4c607866-23b3-4001-b642-03a94c9b8b59");
+            else sr2.setfRuleId("SAL_DELIVERYNOTICE-SAL_OUTSTOCK");
+
             sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
             sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
             String deliveryCompanyId = isNULLS(deliOrder.getDeliveryCompanyId());
@@ -1229,6 +1282,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             srTok3.setFconsignee(deliOrder.getFconsignee());
             srTok3.setCarrierNumber(deliOrder.getCarrierNumber());
             srTok3.setSalerNumber(deliOrder.getSalerNumber());
+            srTok3.setSalerName(deliOrder.getSalerName());
             srTok3.setDeliverWayNumber(deliOrder.getDeliverWayNumber());
             srTok3.setDeliveryCompanyNumber(deliOrder.getDeliveryCompanyNumber());
             srTok3.setExitTypeNumber(deliOrder.getExitTypeNumber());
@@ -1337,7 +1391,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             ScanningRecord2 sr2 = checkDatas.get(i);
             ScanningRecord record = new ScanningRecord();
             // type: 1,采购入库，2，销售出库 3、其他入库 4、其他出库 5、生产入库 6、直接调拨
-            record.setType(2);
+            if(isDbd) record.setType(6);
+            else record.setType(2);
             record.setSourceId(sr2.getSourceId());
             record.setSourceK3Id(sr2.getSourceK3Id());
             record.setSourceFnumber(sr2.getSourceFnumber());
@@ -1393,6 +1448,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             record.setLeafNumber(sr2.getLeafNumber());
             record.setLeafNumber2(sr2.getLeafNumber2());
             record.setCoveQty(sr2.getCoveQty());
+            record.setStock2(sr2.getStock2());
+            record.setStockPos2(sr2.getStockPos2());
 
             list.add(record);
         }
@@ -1505,7 +1562,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
         String mUrl = getURL("scanningRecord/findInStockSum");
         FormBody formBody = new FormBody.Builder()
 
-                .add("fbillType", "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库，6：发货通知单下推调拨单
+                .add("fbillType", isDbd ? "6" : "5") // fbillType  1：采购订单入库，2：收料任务单入库，3：生产订单入库，4：销售订单出库，5：发货通知单出库，6：发货通知单下推调拨单
                 .add("strFbillno", strFbillno.toString())
                 .add("strEntryId", strEntryId.toString())
                 .build();

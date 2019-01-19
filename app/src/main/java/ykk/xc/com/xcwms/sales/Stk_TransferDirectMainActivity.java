@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,14 +34,10 @@ import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.PrintMainActivity;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
-import ykk.xc.com.xcwms.model.AssistInfo;
-import ykk.xc.com.xcwms.model.Box;
-import ykk.xc.com.xcwms.model.Customer;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.model.MaterialBinningRecord;
 import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.model.sal.DeliOrder;
-import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.MyViewPager;
 import ykk.xc.com.xcwms.util.adapter.BaseFragmentAdapter;
@@ -52,13 +47,15 @@ import ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager;
 import ykk.xc.com.xcwms.util.blueTooth.ThreadPool;
 import ykk.xc.com.xcwms.util.blueTooth.Utils;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
-import ykk.xc.com.xcwms.util.interfaces.IFragmentKeyeventListener;
 
 import static android.hardware.usb.UsbManager.ACTION_USB_DEVICE_DETACHED;
 import static ykk.xc.com.xcwms.util.blueTooth.Constant.MESSAGE_UPDATE_PARAMETER;
 import static ykk.xc.com.xcwms.util.blueTooth.DeviceConnFactoryManager.CONN_STATE_FAILED;
 
-public class Sal_OutMainActivity extends BaseActivity {
+/**
+ * 发货通知单下推直接调拨单
+ */
+public class Stk_TransferDirectMainActivity extends BaseActivity {
 
     @BindView(R.id.viewRadio1)
     View viewRadio1;
@@ -66,6 +63,8 @@ public class Sal_OutMainActivity extends BaseActivity {
     View viewRadio2;
     @BindView(R.id.viewRadio3)
     View viewRadio3;
+    @BindView(R.id.viewRadio4)
+    View viewRadio4;
     @BindView(R.id.btn_close)
     Button btnClose;
     @BindView(R.id.viewPager)
@@ -75,8 +74,8 @@ public class Sal_OutMainActivity extends BaseActivity {
     @BindView(R.id.tv_connState)
     TextView tvConnState;
 
-    private Sal_OutMainActivity context = this;
-    private static final String TAG = "Sal_OutMainActivity";
+    private Stk_TransferDirectMainActivity context = this;
+    private static final String TAG = "Stk_TransferDirectMainActivity";
     private View curRadio;
     public boolean isChange; // 返回的时候是否需要判断数据是否保存了
     public boolean isKeyboard; // 是否使用软键盘
@@ -95,7 +94,7 @@ public class Sal_OutMainActivity extends BaseActivity {
 
     @Override
     public int setLayoutResID() {
-        return R.layout.sal_out_main;
+        return R.layout.stk_transferdirect_main;
     }
 
     @Override
@@ -112,12 +111,14 @@ public class Sal_OutMainActivity extends BaseActivity {
 //        fragment1.setArguments(bundle2); // 传参数
 //        fragment2.setArguments(bundle2); // 传参数
 //        Sal_OutFragment1 fragment1 = new Sal_OutFragment1();
-        Sal_OutFragment2 fragment2 = new Sal_OutFragment2();
-        Sal_OutFragment3 fragment3 = new Sal_OutFragment3();
+        Stk_TransferDirectFragment2 fragment2 = new Stk_TransferDirectFragment2();
+//        Stk_TransferDirectFragment3 fragment3 = new Stk_TransferDirectFragment3();
+        Stk_TransferDirectFragment4 fragment4 = new Stk_TransferDirectFragment4();
 
 //        listFragment.add(fragment1);
         listFragment.add(fragment2);
-        listFragment.add(fragment3);
+//        listFragment.add(fragment3);
+        listFragment.add(fragment4);
 //        viewPager.setScanScroll(false); // 禁止左右滑动
         //ViewPager设置适配器
         viewPager.setAdapter(new BaseFragmentAdapter(getSupportFragmentManager(), listFragment));
@@ -149,11 +150,12 @@ public class Sal_OutMainActivity extends BaseActivity {
 //                        break;
 
                     case 0:
-                        tabChange(viewRadio2, "销售出库--箱码", 0);
+                        tabChange(viewRadio2, "直接调拨--箱码", 0);
 
                         break;
                     case 1:
-                        tabChange(viewRadio3, "销售出库--拣货单", 1);
+//                        tabChange(viewRadio3, "直接调拨--拣货单", 1);
+                        tabChange(viewRadio4, "直接调拨--调拨申请单", 1);
 
                         break;
                 }
@@ -173,7 +175,7 @@ public class Sal_OutMainActivity extends BaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3})
+    @OnClick({R.id.btn_close, R.id.btn_print, R.id.lin_tab1, R.id.lin_tab2, R.id.lin_tab3, R.id.lin_tab4})
     public void onViewClicked(View view) {
         // setCurrentItem第二个参数控制页面切换动画
         //  true:打开/false:关闭
@@ -205,17 +207,19 @@ public class Sal_OutMainActivity extends BaseActivity {
 
                 break;
             case R.id.lin_tab1:
-                tabChange(viewRadio1, "销售出库--销售订单", 0);
+                tabChange(viewRadio1, "直接调拨--销售订单", 0);
 
                 break;
             case R.id.lin_tab2:
-//                tabChange(viewRadio2, "销售出库--箱码", 1);
-                tabChange(viewRadio2, "销售出库--箱码", 0);
+                tabChange(viewRadio2, "直接调拨--箱码", 0);
 
                 break;
             case R.id.lin_tab3:
-//                tabChange(viewRadio3, "销售出库--拣货单", 2);
-                tabChange(viewRadio3, "销售出库--拣货单", 1);
+                tabChange(viewRadio3, "直接调拨--拣货单", 1);
+
+                break;
+            case R.id.lin_tab4:
+                tabChange(viewRadio4, "直接调拨--调拨申请单", 1);
 
                 break;
         }
@@ -450,22 +454,12 @@ public class Sal_OutMainActivity extends BaseActivity {
         tsc.addText(beginXPos, beginYPos, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"------------------------------------------------- \n");
         rowHigthSum = rowHigthSum + rowSpacing;
         tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"联系人："+linkMan+" \n");
-        tsc.addText(230, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"电话："+linkTel+" \n");
-        tsc.addText(500, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+date+" \n");
-
+        tsc.addText(320, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"电话："+linkTel+" \n");
         rowHigthSum = rowHigthSum + rowSpacing;
-        int tmpLen = address.length();
-        String addres1 = null;
-        String addres2 = null;
-        if(address.length() <= 22) {
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"地址："+address);
-        } else {
-            addres1 = address.substring(0, 22);
-            addres2 = address.substring(22, tmpLen);
-            tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"地址："+addres1);
-            rowHigthSum = rowHigthSum + rowSpacing;
-            tsc.addText(80, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+addres2);
-        }
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"地址："+address+" \n");
+        rowHigthSum = rowHigthSum + rowSpacing;
+        tsc.addText(beginXPos, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"箱数："+boxSize+" \n");
+        tsc.addText(300, rowHigthSum, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"打印日期："+date+" \n");
 
         // --------------- 打印区-------------End
         setTscEnd(tsc);

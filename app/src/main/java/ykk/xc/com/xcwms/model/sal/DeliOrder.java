@@ -117,6 +117,8 @@ public class DeliOrder implements Serializable{
 	private double flhDbdj;
 	/* 调拨价 */
 	private double flhDbj;
+	/* 出库类型   */
+	private String outStockType;
 
 	public DeliOrder() {
 		super();
@@ -640,6 +642,14 @@ public class DeliOrder implements Serializable{
 
 	public void setFlhDbj(double flhDbj) {
 		this.flhDbj = flhDbj;
+	}
+
+	public String getOutStockType() {
+		return outStockType;
+	}
+
+	public void setOutStockType(String outStockType) {
+		this.outStockType = outStockType;
 	}
 
 }

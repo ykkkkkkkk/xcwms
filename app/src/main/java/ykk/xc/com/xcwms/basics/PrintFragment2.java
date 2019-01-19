@@ -160,7 +160,7 @@ public class PrintFragment2 extends BaseFragment implements IFragmentKeyeventLis
     public void initView() {
         mContext = getActivity();
         parent = (PrintMainActivity) mContext;
-        curBtn = btnSmall;
+        curBtn = btnBig;
     }
 
     @Override

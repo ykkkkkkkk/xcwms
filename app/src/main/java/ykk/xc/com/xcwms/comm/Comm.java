@@ -7,6 +7,8 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -412,6 +414,19 @@ public class Comm {
 			}
 		}
 		return true;
+	}
+
+
+	/**
+	 * 根据wifi信息获取本地mac
+	 * @param context
+	 * @return
+	 */
+	public static String getAddressMac(Activity context){
+		WifiManager wifi = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+		WifiInfo winfo = wifi.getConnectionInfo();
+		String mac =  winfo.getMacAddress();
+		return mac;
 	}
 
 }

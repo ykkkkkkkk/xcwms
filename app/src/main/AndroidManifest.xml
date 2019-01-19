@@ -155,6 +155,10 @@
         <activity
             android:name=".produce.Prod_ProcedureReportActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".produce.Prod_ProcedureBindingActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
 
 
         <!-- 销售模块 -->
@@ -163,6 +167,9 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_OutMainActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sales.Stk_TransferDirectMainActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_SelOrderActivity"
@@ -184,6 +191,11 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".sales.Sal_RecombinationActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!-- 调拨  -->
+        <activity
+            android:name=".sales.Stk_SelTransferOrderActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity android:name=".util.ImageLoadActivity" />

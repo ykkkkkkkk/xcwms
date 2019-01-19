@@ -18,6 +18,7 @@ import ykk.xc.com.xcwms.sales.Sal_OutActivity;
 import ykk.xc.com.xcwms.sales.Sal_OutMainActivity;
 import ykk.xc.com.xcwms.sales.Sal_PickingListActivity;
 import ykk.xc.com.xcwms.sales.Sal_RecombinationActivity;
+import ykk.xc.com.xcwms.sales.Stk_TransferDirectMainActivity;
 
 public class MainTabFragment3 extends BaseFragment {
 
@@ -82,8 +83,8 @@ public class MainTabFragment3 extends BaseFragment {
                 show(Sal_OutMainActivity.class, null);
 
                 break;
-            case R.id.relative3: // 单据下推
-                showLoadDialog("连接服务器...");
+            case R.id.relative3: // 直接调拨
+                show(Stk_TransferDirectMainActivity.class, null);
 
                 break;
             case R.id.relative4: // 生产领料

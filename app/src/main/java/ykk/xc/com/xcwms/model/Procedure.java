@@ -11,6 +11,8 @@ import java.io.Serializable;
 public class Procedure implements Serializable {
 
 	private Integer id;
+	/* 计价类型id */
+	private int valuationTypeId;
 	/* 工序编号 */
 	private String procedureNumber;
 	/* 工序名称 */
@@ -32,21 +34,26 @@ public class Procedure implements Serializable {
 
 	/* 用于设置顺序号 */
 	private String standard;
-	/*用于设置单价*/
-	private Double price;
+	/* 用于设置单价 */
+	private double price;
+	private ValuationType valuationType;
 	private ProcessflowEntry pfEntry;
 
 	// 临时字段，不存表
 	private int materialId;
+	private String barCode; // 工序条码
+	private Collective collective;
 
 	public Procedure() {
 		super();
 	}
 
-	public Procedure(Integer id, String procedureNumber, String procedureName, Integer procedureState,
-					 String createDate, String fModifyDate, Integer createrId, String createrName) {
+	public Procedure(Integer id, int valuationTypeId, String procedureNumber, String procedureName,
+					 Integer procedureState, String createDate, String fModifyDate, Integer createrId, String createrName,
+					 int checkFlag, String standard, Double price, ProcessflowEntry pfEntry, int materialId, String barCode) {
 		super();
 		this.id = id;
+		this.valuationTypeId = valuationTypeId;
 		this.procedureNumber = procedureNumber;
 		this.procedureName = procedureName;
 		this.procedureState = procedureState;
@@ -54,8 +61,21 @@ public class Procedure implements Serializable {
 		this.fModifyDate = fModifyDate;
 		this.createrId = createrId;
 		this.createrName = createrName;
+		this.checkFlag = checkFlag;
+		this.standard = standard;
+		this.price = price;
+		this.pfEntry = pfEntry;
+		this.materialId = materialId;
+		this.barCode = barCode;
 	}
 
+	public ValuationType getValuationType() {
+		return valuationType;
+	}
+
+	public void setValuationType(ValuationType valuationType) {
+		this.valuationType = valuationType;
+	}
 
 	public ProcessflowEntry getPfEntry() {
 		return pfEntry;
@@ -71,6 +91,14 @@ public class Procedure implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public int getValuationTypeId() {
+		return valuationTypeId;
+	}
+
+	public void setValuationTypeId(int valuationTypeId) {
+		this.valuationTypeId = valuationTypeId;
 	}
 
 	public String getProcedureNumber() {
@@ -159,6 +187,22 @@ public class Procedure implements Serializable {
 
 	public void setMaterialId(int materialId) {
 		this.materialId = materialId;
+	}
+
+	public String getBarCode() {
+		return barCode;
+	}
+
+	public void setBarCode(String barCode) {
+		this.barCode = barCode;
+	}
+
+	public Collective getCollective() {
+		return collective;
+	}
+
+	public void setCollective(Collective collective) {
+		this.collective = collective;
 	}
 
 }

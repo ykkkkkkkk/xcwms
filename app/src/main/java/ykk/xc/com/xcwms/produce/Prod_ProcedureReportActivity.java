@@ -2,7 +2,6 @@ package ykk.xc.com.xcwms.produce;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,12 +11,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,15 +33,16 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.comm.BaseActivity;
 import ykk.xc.com.xcwms.comm.Comm;
+import ykk.xc.com.xcwms.model.BarCodeTable;
+import ykk.xc.com.xcwms.model.Collective;
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.MaterialProcedureTime;
+import ykk.xc.com.xcwms.model.MaterialProcedureTimeEntry;
 import ykk.xc.com.xcwms.model.Procedure;
-import ykk.xc.com.xcwms.model.SchedulTeam;
-import ykk.xc.com.xcwms.model.SchedulTeamEntry;
 import ykk.xc.com.xcwms.model.Staff;
 import ykk.xc.com.xcwms.model.User;
 import ykk.xc.com.xcwms.model.ValuationPayroll;
 import ykk.xc.com.xcwms.model.ValuationType;
-import ykk.xc.com.xcwms.model.pur.ProdOrder;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LogUtil;
 
@@ -57,12 +52,22 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     EditText etGetFocus;
     @BindView(R.id.tv_valuationType)
     TextView tvValuationType;
+    @BindView(R.id.tv_collTitle)
+    TextView tvCollTitle;
+    @BindView(R.id.tv_coll)
+    TextView tvColl;
+    @BindView(R.id.tv_process)
+    TextView tvProcess;
     @BindView(R.id.tv_staff)
     TextView tvStaff;
     @BindView(R.id.et_mtlCode)
     EditText etMtlCode;
-    @BindView(R.id.tv_process)
-    TextView tvProcess;
+    @BindView(R.id.et_staffCode)
+    EditText etStaffCode;
+    @BindView(R.id.tv_mtlNumber)
+    TextView tvMtlNumber;
+    @BindView(R.id.tv_mtlName)
+    TextView tvMtlName;
     @BindView(R.id.tv_num)
     TextView tvNum;
     @BindView(R.id.relative_Info)
@@ -71,20 +76,24 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     TextView tv1;
     @BindView(R.id.tv_remark)
     TextView tvRemark;
-//    @BindView(R.id.btn_save)
-//    Button btnSave;
 
     private Prod_ProcedureReportActivity context = this;
-    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 201, UNSUCC3 = 501;
-    private static final int SEL_ORDER = 10, CODE1 = 11, PAD_SM = 12;
+    private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, BIND = 1;
+    private static final int SEL_ORDER = 10, CODE1 = 11, SCAN = 12;
     private Material mtl;
     private OkHttpClient okHttpClient = new OkHttpClient();
-    private String mtlBarcode; // 对应的条码号
-    private int valuationTypeId, procedureId, mtlId, schedulTeamId, staffId, deptId; // 1：计件类型ID，2：工序id，3：物料id，4：班次id
-    private char dataFlag = '1'; // 1：计价类型列表，2：工序列表
+    private String mtlBarcode, staffBarcode; // 对应的条码号
     private DecimalFormat df = new DecimalFormat("#.######");
+    private char curViewFlag = '1'; // 1：物料，2：员工
     private User user;
+    private Staff staff;
+    private Collective collective; // 集体
+    private Procedure procedure; // 工序表
+    private MaterialProcedureTimeEntry mptEntry; // 工序工时entry表
     private boolean isTextChange; // 是否为平板电脑
+    private String mobileMac; // 本地Mac地址
+    private boolean notGetFosus; // 不能得到焦点
+
 
     // 消息处理
     private MyHandler mHandler = new MyHandler(this);
@@ -101,77 +110,127 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
             if (m != null) {
                 m.hideLoadDialog();
 
+                String errMsg = null;
                 switch (msg.what) {
-                    case SUCC1: // 扫码成功后进入
-                        boolean isBool = false;
-                        switch (m.dataFlag) {
-                            case '1': // 计件类型
-                                isBool = m.popDatasA != null;
-                                m.popDatasA = JsonUtil.strToList((String)msg.obj, ValuationType.class);
-                                if(isBool) m.popupWindow_A();
-                                else {
-                                    ValuationType vt = m.popDatasA.get(0);
-                                    m.valuationTypeId = vt.getId();
-                                    m.tvValuationType.setText(vt.getDescription());
-                                    if(vt.getDescription().indexOf("集体") > -1) {
-                                        m.setEnables(m.tvProcess, R.drawable.back_style_gray3,false);
-                                    }
-                                }
+                    case SUCC1: // 默认工序 返回
+                        m.procedure = JsonUtil.strToObject((String)msg.obj, Procedure.class);
+                        ValuationType vt = m.procedure.getValuationType();
+                        m.tvProcess.setText(m.procedure.getProcedureName());
+                        if(vt.getDescription().indexOf("集体") > -1) {
+                            m.tvCollTitle.setVisibility(View.VISIBLE);
+                            m.tvColl.setVisibility(View.VISIBLE);
+                        } else {
+                            m.tvCollTitle.setVisibility(View.GONE);
+                            m.tvColl.setVisibility(View.GONE);
+                        }
+                        m.tvValuationType.setText(vt.getDescription());
+                        m.collective = m.procedure.getCollective();
+                        if(m.collective != null)
+                            m.tvColl.setText(m.collective.getCollectiveName());
+                        else m.tvColl.setText("");
+
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_blue, true);
+                        m.setEnables(m.etStaffCode, R.drawable.back_style_blue, true);
+                        if(!m.notGetFosus) m.setFocusable(m.etMtlCode);
+                        m.notGetFosus = false;
+
+                        break;
+                    case UNSUCC1:
+                        errMsg = JsonUtil.strToString((String) msg.obj);
+                        Comm.showWarnDialog(m.context, errMsg);
+                        m.procedure = null;
+                        m.tvProcess.setText("");
+                        m.tvValuationType.setText("");
+                        m.tvColl.setText("");
+                        m.setEnables(m.etMtlCode, R.drawable.back_style_gray3, false);
+                        m.setEnables(m.etStaffCode, R.drawable.back_style_gray3, false);
+
+                        break;
+                    case SUCC2: // 成功
+                        Comm.showWarnDialog(m.context,"保存成功");
+                        m.mptEntry = null;
+                        m.tvMtlNumber.setText("物料编号：");
+                        m.tvMtlName.setText("物料名称：");
+                        m.tvStaff.setText(Html.fromHtml("员工：<font color='#000000'>"+m.staff.getName()+"</font>"));
+                        m.etMtlCode.setText("");
+                        m.etStaffCode.setText("");
+                        m.setFocusable(m.etMtlCode);
+
+                        break;
+                    case UNSUCC2: // 数据加载失败！
+                        errMsg = JsonUtil.strToString((String) msg.obj);
+                        Comm.showWarnDialog(m.context, errMsg);
+
+                        break;
+                    case SUCC3: // 物料扫码   成功
+                        switch (m.curViewFlag) {
+                            case '1': // 物料
+                                m.mptEntry = JsonUtil.strToObject((String)msg.obj, MaterialProcedureTimeEntry.class);
+                                MaterialProcedureTime mpt = m.mptEntry.getMaterialProcedureTime();
+                                Material mtl = mpt.getMaterial();
+                                m.tvMtlNumber.setText(Html.fromHtml("物料编号：<font color='#000000'>"+mtl.getfNumber()+"</font>"));
+                                m.tvMtlName.setText(Html.fromHtml("物料名称：<font color='#000000'>"+mtl.getfName()+"</font>"));
+                                m.setFocusable(m.etStaffCode);
 
                                 break;
-                            case '2': // 工序
-                                isBool = m.popDatasB != null;
-                                m.popDatasB = JsonUtil.strToList((String)msg.obj, Procedure.class);
-                                Procedure procedure = m.popDatasB.get(0);
-                                m.mtlId = procedure.getMaterialId();
-                                if(isBool) m.popupWindow_B();
-                                else {
-//                                    Procedure pd = m.popDatasB.get(0);
-//                                    m.procedureId = pd.getId();
-//                                    m.tvProcess.setText(pd.getProcedureName());
-                                }
-
-                                break;
-                            case '3': // 班次
-                                m.popDatasC = JsonUtil.strToList((String)msg.obj, SchedulTeamEntry.class);
-                                m.popupWindow_C();
-                                m.popWindowC.showAsDropDown(m.tvStaff);
+                            case '2': // 员工
+                                BarCodeTable bt = JsonUtil.strToObject((String)msg.obj, BarCodeTable.class);
+                                Staff staff = JsonUtil.stringToObject(bt.getRelationObj(), Staff.class);
+                                m.staff = staff;
+                                m.tvStaff.setText(Html.fromHtml("员工：<font color='#000000'>"+staff.getName()+"</font>"));
+                                m.notGetFosus = true;
+                                // 重新检测当前工序工序集体下是否为这个人
+                                m.run_findBindingProcedure();
 
                                 break;
                         }
 
                         break;
-                    case UNSUCC1:
-                        String errMsg = JsonUtil.strToString((String) msg.obj);
-                        Comm.showWarnDialog(m.context, errMsg);
+                    case UNSUCC3: // 数据加载失败！
+                        switch (m.curViewFlag) {
+                            case '1': // 物料
+                                m.mptEntry = null;
+                                m.tvMtlNumber.setText("物料编号：");
+                                m.tvMtlName.setText("物料名称：");
+
+                                break;
+                            case '2': // 员工
+                                m.staff = null;
+                                m.tvStaff.setText("员工：");
+
+                                break;
+                        }
+                        String errMsg2 = JsonUtil.strToString((String) msg.obj);
+                        Comm.showWarnDialog(m.context, errMsg2);
 
                         break;
-                    case SUCC2: // 成功
-                        Comm.showWarnDialog(m.context,"保存成功");
-                        m.schedulTeamId = 0;
-                        m.tvStaff.setText("");
-                        m.procedureId = 0;
-                        m.tvProcess.setText("");
-                        m.tvNum.setText("");
-                        m.setEnables(m.tvProcess, R.drawable.back_style_blue,true);
+                    case SCAN: // pad扫码
+                        String etName = null;
+                        switch (m.curViewFlag) {
+                            case '1': // 物料
+                                etName = m.getValues(m.etMtlCode);
+                                if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
+                                    if(m.mtlBarcode.equals(etName)) {
+                                        m.mtlBarcode = etName;
+                                    } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
 
-                        break;
-                    case UNSUCC2: // 数据加载失败！
-                        m.toasts("服务器繁忙，请稍后再试！");
+                                } else m.mtlBarcode = etName;
+                                m.setTexts(m.etMtlCode, m.mtlBarcode);
 
-                        break;
-                    case PAD_SM: // pad扫码
-                        String etName = m.getValues(m.etMtlCode);
-                        if (m.mtlBarcode != null && m.mtlBarcode.length() > 0) {
-                            if(m.mtlBarcode.equals(etName)) {
-                                m.mtlBarcode = etName;
-                            } else m.mtlBarcode = etName.replaceFirst(m.mtlBarcode, "");
+                                break;
+                            case '2': // 员工
+                                etName = m.getValues(m.etStaffCode);
+                                if (m.staffBarcode != null && m.staffBarcode.length() > 0) {
+                                    if(m.staffBarcode.equals(etName)) {
+                                        m.staffBarcode = etName;
+                                    } else m.staffBarcode = etName.replaceFirst(m.staffBarcode, "");
 
-                        } else m.mtlBarcode = etName;
-                        m.setTexts(m.etMtlCode, m.mtlBarcode);
-                        // 执行查询方法
-                        m.run_itemList();
+                                } else m.staffBarcode = etName;
+                                m.setTexts(m.etStaffCode, m.staffBarcode);
 
+                                break;
+                        }
+                        m.run_smGetDatas();
 
                         break;
                 }
@@ -186,16 +245,22 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     @Override
     public void initView() {
+        mobileMac = Comm.getAddressMac(context);
     }
 
     @Override
     public void initData() {
         hideSoftInputMode(etMtlCode);
+        hideSoftInputMode(etStaffCode);
         getUserInfo();
-        run_itemList();
+        staff = user.getStaff();
+        if(staff != null) {
+            tvStaff.setText(Html.fromHtml("员工：<font color='#000000'>" + staff.getName() + "</font>"));
+        }
+        run_findBindingProcedure();
     }
 
-    @OnClick({R.id.btn_close, R.id.tv_valuationType, R.id.tv_staff, R.id.tv_process, R.id.tv_num, R.id.btn_save})
+    @OnClick({R.id.btn_close, R.id.btn_bind, R.id.tv_num, R.id.btn_save})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_close: // 关闭
@@ -203,92 +268,67 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 context.finish();
 
                 break;
-            case R.id.tv_valuationType: // 计件类型
-                dataFlag = '1';
-                if(popDatasA == null || popDatasA.size() == 0) {
-                    run_itemList();
-                } else {
-                    popupWindow_A();
-                    popWindowA.showAsDropDown(tvValuationType);
-                }
-
-                break;
-            case R.id.tv_process: // 工序
-                if(getValues(etMtlCode).length() == 0) {
-                    Comm.showWarnDialog(context,"请先扫码条码！");
-                    return;
-                }
-                dataFlag = '2';
-                if(popDatasB == null || popDatasB.size() == 0) {
-                    run_itemList();
-                } else {
-                    popupWindow_B();
-                    popWindowB.showAsDropDown(tvProcess);
-                }
-
-                break;
-            case R.id.tv_staff: // 选择排班员工
-                dataFlag = '3';
-                if(popDatasC == null || popDatasC.size() == 0) {
-                    run_itemList();
-                } else {
-                    popupWindow_C();
-                    popWindowC.showAsDropDown(tvStaff);
-                }
+            case R.id.btn_bind: // 计件类型
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("isBack", true);
+                showForResult(Prod_ProcedureBindingActivity.class, BIND, bundle);
 
                 break;
             case R.id.tv_num: // 选择数量
-                showInputDialog("数量", getValues(tvNum), "0", CODE1);
+//                showInputDialog("数量", getValues(tvNum), "0", CODE1);
 
                 break;
             case R.id.btn_save: // 保存
-                if(getValues(tvStaff).length() == 0) {
-                    Comm.showWarnDialog(context,"请选择排班员工！");
+                if(getValues(tvProcess).length() == 0) {
+                    Comm.showWarnDialog(context,"请绑定工序！");
                     return;
                 }
-                if(mtlBarcode == null || mtlBarcode.length() == 0) {
-                    Comm.showWarnDialog(context,"请扫码生产订单的物料条码！");
+                ValuationType vt = procedure.getValuationType();
+                if(vt.getDescription().indexOf("集体") > -1 && getValues(tvColl).length() == 0) {
+                    Comm.showWarnDialog(context,"请在PC端维护集体下的人员和对应工序！");
                     return;
                 }
-                if(getValues(tvValuationType).indexOf("集体") == -1 && getValues(tvProcess).length() == 0) {
-                    Comm.showWarnDialog(context,"请选择工序！");
+                if(mptEntry == null) {
+                    Comm.showWarnDialog(context,"请扫描有效的物料条码！");
                     return;
                 }
-                if(parseInt(getValues(tvNum)) == 0) {
-                    Comm.showWarnDialog(context,"请选择数量！");
+                if(staff == null) {
+                    Comm.showWarnDialog(context,"请扫描有效的员工条码！");
                     return;
                 }
-                List<ValuationPayroll> listVp = new ArrayList<>();
-                int sizeB = popDatasB.size();
-                if(getValues(tvValuationType).indexOf("集体") == -1) {
-                    sizeB = 1;
-                }
-                for(int i=0; i<sizeB; i++) {
-                    ValuationPayroll vp = new ValuationPayroll();
-                    vp.setId(0);
-                    vp.setSchedulTeamId(schedulTeamId);
-                    if(getValues(tvValuationType).indexOf("集体") > -1) {
-                        vp.setStaffId(0);
-                        vp.setAssignState(1);
-                        Procedure pd = popDatasB.get(i);
-                        vp.setProcedureId(pd.getId());
-                    } else {
-                        vp.setStaffId(staffId);
-                        vp.setAssignState(0);
-                        vp.setProcedureId(procedureId);
-                    }
-                    vp.setDeptId(deptId);
-                    vp.setfMaterialId(mtlId);
-                    vp.setValuationTypeId(valuationTypeId);
-                    vp.setTotalNumber(parseInt(getValues(tvNum)));
-                    vp.setCreaterId(user.getId());
-                    vp.setCreaterName(user.getUsername());
-                    vp.setValState(1);
-                    vp.setCreateWay(1);
 
-                    listVp.add(vp);
+//                if(parseInt(getValues(tvNum)) == 0) {
+//                    Comm.showWarnDialog(context,"请选择数量！");
+//                    return;
+//                }
+                ValuationPayroll vp = new ValuationPayroll();
+                vp.setId(0);
+                if(getValues(tvValuationType).indexOf("集体") > -1) {
+                    vp.setCollectiveId(collective.getId());
+                    vp.setStaffId(0);
+                    vp.setDeptId(0);
+                } else {
+                    vp.setCollectiveId(0);
+                    vp.setStaffId(staff.getStaffId());
+                    vp.setDeptId(parseInt(staff.getStaffPostDept()));
                 }
-                run_save(listVp);
+
+                MaterialProcedureTime mpt = mptEntry.getMaterialProcedureTime();
+                vp.setfMaterialId(mpt.getfMaterialId());
+                vp.setProcessflowId(mpt.getProcessflowId());
+                vp.setProcedureId(procedure.getId());
+                vp.setValuationTypeId(vt.getId());
+                vp.setTotalNumber(parseInt(getValues(tvNum)));
+                vp.setJobTime(mptEntry.getWorkTime());
+                vp.setBarCode(mtlBarcode);
+                vp.setSequent(mptEntry.getSeqNo());
+
+                vp.setCreaterId(user.getId());
+                vp.setCreaterName(user.getUsername());
+                vp.setValState(1);
+                vp.setCreateWay(1);
+
+                run_save(vp);
 
                 break;
         }
@@ -302,12 +342,18 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 setFocusable(etGetFocus);
                 switch (v.getId()) {
                     case R.id.et_mtlCode: // 物料
+                        curViewFlag = '1';
                         setFocusable(etMtlCode);
+                        break;
+                    case R.id.et_staffCode: // 员工
+                        curViewFlag = '2';
+                        setFocusable(etStaffCode);
                         break;
                 }
             }
         };
         etMtlCode.setOnClickListener(click);
+        etStaffCode.setOnClickListener(click);
 
         // 物料
         etMtlCode.addTextChangedListener(new TextWatcher() {
@@ -317,375 +363,45 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                dataFlag = '2';
-//                mtlBarcode = s.toString();
-//                // 执行查询方法
-//                run_itemList();
+                if(s.length() == 0) return;
+                curViewFlag = '1';
 
                 if(!isTextChange) {
-                    if (baseIsPad) {
-                        isTextChange = true;
-                        mHandler.sendEmptyMessageDelayed(PAD_SM,600);
-                    } else {
-                        mtlBarcode = s.toString();
-                        // 执行查询方法
-                        run_itemList();
-                    }
+                    isTextChange = true;
+                    mHandler.sendEmptyMessageDelayed(SCAN,600);
                 }
             }
         });
 
-//        etSourceCode.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                etSourceCode.setText("1543804790733");
-//                return true;
-//            }
-//        });
-    }
+        // 物料
+        etStaffCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length() == 0) return;
+                curViewFlag = '2';
 
-    /**
-     * 创建PopupWindow 【查询计件类别】
-     */
-    private PopupWindow popWindowA;
-    private ListAdapter adapterA;
-    private List<ValuationType> popDatasA;
-    private void popupWindow_A() {
-        if (null != popWindowA) {// 不为空就隐藏
-            popWindowA.dismiss();
-            return;
-        }
-        // 获取自定义布局文件popupwindow_left.xml的视图
-        View popView = getLayoutInflater().inflate(R.layout.popup_list, null);
-        final ListView listView = (ListView) popView.findViewById(R.id.listView);
-
-        if (adapterA != null) {
-            adapterA.notifyDataSetChanged();
-        } else {
-            adapterA = new ListAdapter(context, popDatasA);
-            listView.setAdapter(adapterA);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    ValuationType vt = popDatasA.get(position);
-                    valuationTypeId = vt.getId();
-                    if(vt.getDescription().indexOf("集体") > -1) {
-                        setEnables(tvProcess, R.drawable.back_style_gray3,false);
-                    } else {
-                        setEnables(tvProcess, R.drawable.back_style_blue,true);
-                    }
-                    tvValuationType.setText(vt.getDescription());
-
-                    popWindowA.dismiss();
+                if(!isTextChange) {
+                    isTextChange = true;
+                    mHandler.sendEmptyMessageDelayed(SCAN,600);
                 }
-            });
-        }
-
-        // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
-        popWindowA = new PopupWindow(popView, tvValuationType.getWidth(),
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        // 设置动画效果
-        // popWindow4.setAnimationStyle(R.style.AnimationFade);
-        popWindowA.setBackgroundDrawable(new BitmapDrawable());
-        popWindowA.setOutsideTouchable(true);
-        popWindowA.setFocusable(true);
-    }
-    /**
-     * 计件类别 适配器
-     */
-    private class ListAdapter extends BaseAdapter {
-
-        private Activity activity;
-        private List<ValuationType> datas;
-
-        public ListAdapter(Activity activity, List<ValuationType> datas) {
-            this.activity = activity;
-            this.datas = datas;
-        }
-
-        @Override
-        public int getCount() {
-            if(datas == null) {
-                return 0;
             }
-            return datas.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if(datas == null) {
-                return null;
-            }
-            return datas.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View v, ViewGroup parent) {
-            ViewHolder holder = null;
-            if(v == null) {
-                holder = new ViewHolder();
-                v = activity.getLayoutInflater().inflate(R.layout.popup_list_item, null);
-                holder.tv_name = (TextView) v.findViewById(R.id.tv_name);
-
-                v.setTag(holder);
-            }else holder = (ViewHolder) v.getTag();
-
-            holder.tv_name.setText(datas.get(position).getDescription());
-
-            return v;
-        }
-
-        class ViewHolder{//listView中显示的组件
-            TextView tv_name;
-
-        }
-
-    }
-    /**
-     * 创建PopupWindowB 【查询工序列表】
-     */
-    private PopupWindow popWindowB;
-    private ListAdapter2 adapterB;
-    private List<Procedure> popDatasB;
-    private void popupWindow_B() {
-        if (null != popWindowB) {// 不为空就隐藏
-            popWindowB.dismiss();
-            return;
-        }
-//        btnSave.setVisibility(View.GONE);
-        // 获取自定义布局文件popupwindow_left.xml的视图
-        View popView = getLayoutInflater().inflate(R.layout.popup_list, null);
-        final ListView listView = (ListView) popView.findViewById(R.id.listView);
-
-        if (adapterB != null) {
-            adapterB.notifyDataSetChanged();
-        } else {
-            adapterB = new ListAdapter2(context, popDatasB);
-            listView.setAdapter(adapterB);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Procedure pd = popDatasB.get(position);
-                    procedureId = pd.getId();
-                    tvProcess.setText(pd.getProcedureName());
-
-                    popWindowB.dismiss();
-                }
-            });
-        }
-
-        // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
-        popWindowB = new PopupWindow(popView, tvProcess.getWidth(),
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        // 设置动画效果
-        // popWindow4.setAnimationStyle(R.style.AnimationFade);
-        popWindowB.setBackgroundDrawable(new BitmapDrawable());
-        popWindowB.setOutsideTouchable(true);
-        popWindowB.setFocusable(true);
-//        popWindowB.setOnDismissListener(new PopupWindow.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                btnSave.setVisibility(View.VISIBLE);
-//            }
-//        });
-    }
-    /**
-     * 工序 适配器
-     */
-    private class ListAdapter2 extends BaseAdapter {
-
-        private Activity activity;
-        private List<Procedure> datas;
-
-        public ListAdapter2(Activity activity, List<Procedure> datas) {
-            this.activity = activity;
-            this.datas = datas;
-        }
-
-        @Override
-        public int getCount() {
-            if(datas == null) {
-                return 0;
-            }
-            return datas.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if(datas == null) {
-                return null;
-            }
-            return datas.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View v, ViewGroup parent) {
-            ViewHolder holder = null;
-            if(v == null) {
-                holder = new ViewHolder();
-                v = activity.getLayoutInflater().inflate(R.layout.popup_list_item, null);
-                holder.tv_name = (TextView) v.findViewById(R.id.tv_name);
-
-                v.setTag(holder);
-            }else holder = (ViewHolder) v.getTag();
-
-            holder.tv_name.setText(datas.get(position).getProcedureName());
-
-            return v;
-        }
-
-        class ViewHolder{//listView中显示的组件
-            TextView tv_name;
-
-        }
+        });
     }
 
     /**
-     * 创建PopupWindow 【查询班次】
+     * 查询绑定的工序
      */
-    private PopupWindow popWindowC;
-    private ListAdapter3 adapterC;
-    private List<SchedulTeamEntry> popDatasC;
-    private void popupWindow_C() {
-        if (null != popWindowC) {// 不为空就隐藏
-            popWindowC.dismiss();
-            return;
-        }
-//        btnSave.setVisibility(View.GONE);
-        // 获取自定义布局文件popupwindow_left.xml的视图
-        View popView = getLayoutInflater().inflate(R.layout.popup_list, null);
-        final ListView listView = (ListView) popView.findViewById(R.id.listView);
-
-        if (adapterC != null) {
-            adapterC.notifyDataSetChanged();
-        } else {
-            adapterC = new ListAdapter3(context, popDatasC);
-            listView.setAdapter(adapterC);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    SchedulTeamEntry stEntry = popDatasC.get(position);
-                    SchedulTeam st = stEntry.getSchedulTeam();
-                    Staff staff = stEntry.getStaff();
-                    schedulTeamId = stEntry.getSchedulTeamId();
-                    staffId = staff.getStaffId();
-                    deptId = parseInt(staff.getStaffPostDept());
-                    tvStaff.setText(st.getSchedulTeamName()+"/"+staff.getName());
-
-                    popWindowC.dismiss();
-                }
-            });
-        }
-
-        // 创建PopupWindow实例,200,LayoutParams.MATCH_PARENT分别是宽度和高度
-        popWindowC = new PopupWindow(popView, tvStaff.getWidth(),
-                ViewGroup.LayoutParams.WRAP_CONTENT, true);
-        // 设置动画效果
-        // popWindow4.setAnimationStyle(R.style.AnimationFade);
-        popWindowC.setBackgroundDrawable(new BitmapDrawable());
-        popWindowC.setOutsideTouchable(true);
-        popWindowC.setFocusable(true);
-//        popWindowC.setOnDismissListener(new PopupWindow.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                btnSave.setVisibility(View.VISIBLE);
-//            }
-//        });
-    }
-    /**
-     * 工序 适配器
-     */
-    private class ListAdapter3 extends BaseAdapter {
-
-        private Activity activity;
-        private List<SchedulTeamEntry> datas;
-
-        public ListAdapter3(Activity activity, List<SchedulTeamEntry> datas) {
-            this.activity = activity;
-            this.datas = datas;
-        }
-
-        @Override
-        public int getCount() {
-            if(datas == null) {
-                return 0;
-            }
-            return datas.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            if(datas == null) {
-                return null;
-            }
-            return datas.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View v, ViewGroup parent) {
-            ViewHolder holder = null;
-            if(v == null) {
-                holder = new ViewHolder();
-                v = activity.getLayoutInflater().inflate(R.layout.popup_list_item, null);
-                holder.tv_name = (TextView) v.findViewById(R.id.tv_name);
-
-                v.setTag(holder);
-            }else holder = (ViewHolder) v.getTag();
-
-            SchedulTeamEntry stEntry = datas.get(position);
-            SchedulTeam st = stEntry.getSchedulTeam();
-            Staff staff = stEntry.getStaff();
-            holder.tv_name.setText(st.getSchedulTeamName() + "/"+staff.getName());
-
-            return v;
-        }
-
-        class ViewHolder{//listView中显示的组件
-            TextView tv_name;
-
-        }
-
-    }
-
-    /**
-     * 查询计件类型
-     */
-    private void run_itemList() {
+    private void run_findBindingProcedure() {
         isTextChange = false;
         showLoadDialog("加载中...");
-        String mUrl = null;
-        switch (dataFlag) {
-            case '1': // 计件类型
-                mUrl = getURL("valuation/findListByParam_app");
-                break;
-            case '2': // 工序列表
-                mUrl = getURL("procedure/findProcedureByParam_app");
-                break;
-            case '3': // 班次列表
-                mUrl = getURL("schedulTeam/findListEntryByParam_app");
-                break;
-        }
+        String mUrl = getURL("procedure/findBindingProcedure");
         FormBody formBody = new FormBody.Builder()
-                .add("barcode", mtlBarcode == null ? "" : mtlBarcode)
-                .add("strCaseId", "34")
+                .add("mobileMac", mobileMac)
+                .add("staffId", staff != null ? String.valueOf(staff.getStaffId()) : "")
                 .build();
 
         Request request = new Request.Builder()
@@ -705,7 +421,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                LogUtil.e("run_itemList --> onResponse", result);
+                LogUtil.e("run_findBindingProcedure --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC1, result);
                     mHandler.sendMessage(msg);
@@ -718,12 +434,68 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     }
 
     /**
+     * 扫码查询对应的方法
+     */
+    private void run_smGetDatas() {
+        isTextChange = false;
+        showLoadDialog("加载中...");
+        String mUrl = null;
+        String barcode = null;
+        String strCaseId = null;
+        switch (curViewFlag) {
+            case '1': // 物料扫码
+                mUrl = getURL("materialProcedureTime/findMptEntryByPortion_app");
+                barcode = mtlBarcode;
+                strCaseId = "";
+                break;
+            case '2': // 员工扫码
+                mUrl = getURL("barCodeTable/findBarcode4ByParam");
+                barcode = staffBarcode;
+                strCaseId = "16";
+                break;
+        }
+        FormBody formBody = new FormBody.Builder()
+                .add("procedureId", String.valueOf(procedure.getId())) // 物料条件
+                .add("strCaseId", strCaseId) // 员工条件
+                .add("barcode", barcode) // 都有
+                .build();
+
+        Request request = new Request.Builder()
+                .addHeader("cookie", getSession())
+                .url(mUrl)
+                .post(formBody)
+                .build();
+
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mHandler.sendEmptyMessage(UNSUCC3);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                String result = body.string();
+                if (!JsonUtil.isSuccess(result)) {
+                    Message msg = mHandler.obtainMessage(UNSUCC3, result);
+                    mHandler.sendMessage(msg);
+                    return;
+                }
+                Message msg = mHandler.obtainMessage(SUCC3, result);
+                Log.e("run_smGetDatas --> onResponse", result);
+                mHandler.sendMessage(msg);
+            }
+        });
+    }
+
+    /**
      * 保存
      */
-    private void run_save(List<ValuationPayroll> listVp) {
+    private void run_save(ValuationPayroll vp) {
         showLoadDialog("保存中...");
         String mUrl = getURL("valuationPayroll/insertList");
-        String mJson = JsonUtil.objectToString(listVp);
+        String mJson = JsonUtil.objectToString(vp);
         FormBody formBody = new FormBody.Builder()
                 .add("strJson", mJson)
                 .build();
@@ -761,26 +533,11 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case SEL_ORDER: // 查询订单返回
+            case BIND: // 查询订单返回
                 if (resultCode == Activity.RESULT_OK) {
                     Bundle bundle = data.getExtras();
                     if (bundle != null) {
-                        ProdOrder prodOrder = (ProdOrder) bundle.getSerializable("obj");
-                        LogUtil.e("EEEEEEEE", JsonUtil.objectToString(prodOrder));
-                        relativeInfo.setVisibility(View.VISIBLE);
-
-                        String width = isNULLS(prodOrder.getWidth());
-                        String high = isNULLS(prodOrder.getHigh());
-                        tv1.setText(Html.fromHtml(
-                                "成品编码：<font color='#000000'>"+prodOrder.getMtlFnumber()+"</font>" +
-                                        "<br>" +
-                                        "成品名称：<font color='#000000'>"+prodOrder.getMtlFname()+"</font>" +
-                                        "<br>" +
-                                        (width.length() > 0 ? "宽：<font color='#000000'>"+width+"</font>&emsp " : "") + // &emsp表示一个空格
-                                        (high.length() > 0 ? "高：<font color='#000000'>"+high+"</font>&emsp " : "") + // &emsp表示一个空格
-                                        "数量：<font color='#000000'>"+prodOrder.getProdFqty()+"/"+prodOrder.getUnitFname()+"</font>" +
-                                        "<br>"));
-                        tvRemark.setText("");
+                        run_findBindingProcedure();
                     }
                 }
 
