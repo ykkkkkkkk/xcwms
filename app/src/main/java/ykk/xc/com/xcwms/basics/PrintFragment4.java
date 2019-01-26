@@ -1,10 +1,13 @@
 package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +34,7 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.adapter.PrintFragment4Adapter;
 import ykk.xc.com.xcwms.comm.BaseFragment;
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
 import ykk.xc.com.xcwms.util.JsonUtil;
@@ -43,7 +47,7 @@ public class PrintFragment4 extends BaseFragment implements XRecyclerView.Loadin
     EditText etSearch;
     @BindView(R.id.btn_search)
     Button btnSearch;
-    @BindView(R.id.tv_print_type)
+    @BindView(R.id.tv_printType)
     TextView tvPrintType;
     @BindView(R.id.xRecyclerView)
     XRecyclerView xRecyclerView;
@@ -57,8 +61,9 @@ public class PrintFragment4 extends BaseFragment implements XRecyclerView.Loadin
     private PrintMainActivity parent;
     private int limit = 1;
     private boolean isRefresh, isLoadMore, isNextPage;
-    private char printType = '1'; // （1：小标签，2：大标签）
+    private char printType = '1'; // （1：大标签，2：小标签）
     private boolean isLoad = true; // 是否加载了数据
+    private int printCount; // 打印次数
 
     // 消息处理
     final PrintFragment4.MyHandler mHandler = new PrintFragment4.MyHandler(this);
@@ -99,7 +104,11 @@ public class PrintFragment4 extends BaseFragment implements XRecyclerView.Loadin
                         String json2 = (String) msg.obj;
                         List<Map> listMap = JsonUtil.strToList(json2, Map.class);
                         String result = JsonUtil.objectToString(listMap.get(0));
-                        m.parent.setFragmentPrint4(6, result);
+                        if(m.printType == '1') {
+                            m.parent.setFragmentPrint4(6, result, m.printCount);
+                        } else {
+                            m.parent.setFragmentPrint4(7, result, m.printCount);
+                        }
 
                         break;
                     case UNSUCC2: //
@@ -149,10 +158,48 @@ public class PrintFragment4 extends BaseFragment implements XRecyclerView.Loadin
             public void onPrint(BarCodeTable e, int pos) {
                 Log.e("onPrint1", e.getMaterialName());
                 // 打印
-    //            connectBluetoothBefore();
-//                String result = JsonUtil.objectToString(e);
-//                parent.setFragmentPrint(0, result);
+                printCount = 1;
                 materialPackPrintSel_app(e.getId());
+            }
+
+            @Override
+            public void onPrint2(final BarCodeTable e, int pos) {
+                Log.e("onPrint2", e.getMaterialName());
+                // 打印
+
+                // 新建一个Dialog
+                final EditText et = new EditText(mContext);
+                et.setInputType( InputType.TYPE_CLASS_NUMBER);
+                et.setHint("1");
+
+                AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+                build.setTitle("请输入打印次数");
+                build.setView(et);
+                build.setPositiveButton("打印", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String count = et.getText().toString().trim();
+                        int num = 1;
+                        if(count.length() == 0) {
+                            num = Comm.parseInt(et.getHint().toString());
+                        } else {
+                            num = Comm.parseInt(et.getText().toString());
+                        }
+
+                        printCount = num;
+                        materialPackPrintSel_app(e.getId());
+                    }
+                });
+                build.setNegativeButton("取消", null);
+                build.setCancelable(false);
+                build.show();
+                // 延时显示软键盘
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Comm.showSoftInputFromWindow(et);
+                    }
+                },200);
             }
         });
     }
@@ -167,19 +214,19 @@ public class PrintFragment4 extends BaseFragment implements XRecyclerView.Loadin
             }, 200);
     }
 
-    @OnClick({R.id.btn_search, R.id.tv_print_type})
+    @OnClick({R.id.btn_search, R.id.tv_printType})
     public void onViewClicked(View v) {
         switch (v.getId()) {
             case R.id.btn_search: // 查询数据
                 initLoadDatas();
 
                 break;
-            case R.id.tv_print_type: // 打印类型（小标和大标）
+            case R.id.tv_printType: // 打印类型（小标和大标）
                 if(printType == '1') {
-                    tvPrintType.setText("大标打印");
+                    tvPrintType.setText("小标打印");
                     printType = '2';
                 } else {
-                    tvPrintType.setText("小标打印");
+                    tvPrintType.setText("大标打印");
                     printType = '1';
                 }
 

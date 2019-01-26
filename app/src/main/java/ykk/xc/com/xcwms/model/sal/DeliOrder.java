@@ -119,6 +119,10 @@ public class DeliOrder implements Serializable{
 	private double flhDbj;
 	/* 出库类型   */
 	private String outStockType;
+	private int inStockId; // 调入仓库id
+	private String inStockName; // 调入仓库名称
+	private String inStockNumber;//调入仓库代码
+	private Stock inStock; // 调入仓库
 
 	public DeliOrder() {
 		super();
@@ -650,6 +654,38 @@ public class DeliOrder implements Serializable{
 
 	public void setOutStockType(String outStockType) {
 		this.outStockType = outStockType;
+	}
+
+	public int getInStockId() {
+		return inStockId;
+	}
+
+	public String getInStockName() {
+		return inStockName;
+	}
+
+	public String getInStockNumber() {
+		return inStockNumber;
+	}
+
+	public Stock getInStock() {
+		return inStock;
+	}
+
+	public void setInStockId(int inStockId) {
+		this.inStockId = inStockId;
+	}
+
+	public void setInStockName(String inStockName) {
+		this.inStockName = inStockName;
+	}
+
+	public void setInStockNumber(String inStockNumber) {
+		this.inStockNumber = inStockNumber;
+	}
+
+	public void setInStock(Stock inStock) {
+		this.inStock = inStock;
 	}
 
 }

@@ -61,6 +61,7 @@ import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment3Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.LogUtil;
 
 /**
  * 扫箱码 出库
@@ -251,14 +252,14 @@ public class Sal_OutFragment3 extends BaseFragment {
         mAdapter.setCallBack(new Sal_OutFragment3Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
-                Log.e("num", "行：" + position);
+                LogUtil.e("num", "行：" + position);
 //                curPos = position;
 //                showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE1);
             }
 
             @Override
             public void onClick_selStock(View v, ScanningRecord2 entity, int position) {
-                Log.e("selStock", "行：" + position);
+                LogUtil.e("selStock", "行：" + position);
                 curPos = position;
 
                 showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
@@ -570,7 +571,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_smGetDatas --> onResponse", result);
+                LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC2, result);
                     mHandler.sendMessage(msg);
@@ -600,7 +601,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_ORG: //查询出库组织   	返回
                 if (resultCode == Activity.RESULT_OK) {
                     receiveOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_ORG", receiveOrg.getName());
+                    LogUtil.e("onActivityResult --> SEL_ORG", receiveOrg.getName());
                     if(salOrg == null) {
                         try {
                             salOrg = Comm.deepCopy(receiveOrg);
@@ -616,7 +617,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_ORG2: //查询生产组织   	返回
                 if (resultCode == Activity.RESULT_OK) {
                     salOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_ORG2", salOrg.getName());
+                    LogUtil.e("onActivityResult --> SEL_ORG2", salOrg.getName());
                     getOrg2After();
                 }
 
@@ -624,7 +625,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_DEPT: //查询部门	返回
                 if (resultCode == Activity.RESULT_OK) {
                     department = (Department) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
+                    LogUtil.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
                     getDeptAfter();
                 }
 
@@ -632,7 +633,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_EXPRESS: //查询物料公司	返回
                 if (resultCode == Activity.RESULT_OK) {
                     expressCompany = (ExpressCompany) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_EXPRESS", expressCompany.getExpressName());
+                    LogUtil.e("onActivityResult --> SEL_EXPRESS", expressCompany.getExpressName());
                     tvExpressCompany.setText(expressCompany.getExpressName());
                     setTexts(etExpressNo, getValues(etExpressNo));
                     setFocusable(etExpressNo);
@@ -642,7 +643,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_STOCK2: //行事件选择仓库	返回
                 if (resultCode == Activity.RESULT_OK) {
                     stock2 = (Stock) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
+                    LogUtil.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
                     // 启用了库位管理
                     if (stock2.isStorageLocation()) {
                         Bundle bundle = new Bundle();
@@ -658,7 +659,7 @@ public class Sal_OutFragment3 extends BaseFragment {
             case SEL_STOCKP2: //行事件选择库位	返回
                 if (resultCode == Activity.RESULT_OK) {
                     stockP2 = (StockPosition) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    LogUtil.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
                     stockAllFill(true);
                     saveObjectToXml(stock2, "strStock", getResStr(R.string.saveUser));
                     saveObjectToXml(stockP2, "strStockPos", getResStr(R.string.saveUser));
@@ -980,7 +981,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
                 }
-                Log.e("run_addScanningRecord --> onResponse", result);
+                LogUtil.e("run_addScanningRecord --> onResponse", result);
                 Message msg = mHandler.obtainMessage(SUCC1, result);
                 mHandler.sendMessage(msg);
             }
@@ -1033,7 +1034,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(SUCC3, result);
-                Log.e("run_findInStockSum --> onResponse", result);
+                LogUtil.e("run_findInStockSum --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -1073,7 +1074,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(UPDATE, result);
-                Log.e("run_modifyK3number --> onResponse", result);
+                LogUtil.e("run_modifyK3number --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });
@@ -1116,7 +1117,7 @@ public class Sal_OutFragment3 extends BaseFragment {
                     return;
                 }
                 Message msg = mHandler.obtainMessage(PASS, result);
-                Log.e("run_submitAndPass --> onResponse", result);
+                LogUtil.e("run_submitAndPass --> onResponse", result);
                 mHandler.sendMessage(msg);
             }
         });

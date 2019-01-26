@@ -70,6 +70,7 @@ import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Stk_TransferDirectFragment2Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.LogUtil;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
 
 /**
@@ -1196,7 +1197,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                 sr2.setEmpId(department.getFitemID()); // 部门
                 sr2.setDepartmentFnumber(department.getDepartmentNumber());
             }
-            // 发货单默认的仓库
+            // 发货单的出货仓库
             if (deliOrder.getStock() != null) {
                 sr2.setStock(deliOrder.getStock());
                 sr2.setStockId(deliOrder.getStockId());
@@ -1214,6 +1215,9 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                 setStockInfo(sr2, stock);
                 setStockPosInfo(sr2, stockP);
             }
+            // 发货单的调入仓库
+            sr2.setStock2(deliOrder.getInStock());
+
             sr2.setEntryId(deliOrder.getEntryId());
             sr2.setFqty(mbr.getRelationBillFQTY());
             sr2.setPoFmustqty(mbr.getRelationBillFQTY());
@@ -1477,7 +1481,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_addScanningRecord --> onResponse", result);
+                LogUtil.e("run_addScanningRecord --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
@@ -1530,7 +1534,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_smGetDatas --> onResponse", result);
+                LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC2, result);
                     mHandler.sendMessage(msg);
@@ -1584,7 +1588,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_findInStockSum --> onResponse", result);
+                LogUtil.e("run_findInStockSum --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC3);
                     return;
@@ -1623,7 +1627,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_smGetDatas --> onResponse", result);
+                LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC4, result);
                     mHandler.sendMessage(msg);
@@ -1666,7 +1670,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_submitAndPass --> onResponse", result);
+                LogUtil.e("run_submitAndPass --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNPASS, result);
                     mHandler.sendMessage(msg);

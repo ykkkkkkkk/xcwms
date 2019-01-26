@@ -1,17 +1,22 @@
 package ykk.xc.com.xcwms.basics.adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.text.InputType;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
 
 import ykk.xc.com.xcwms.R;
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.util.basehelper.BaseArrayRecyclerAdapter;
 
 /**
- * 物料列表适配器
+ * 物料包装适配器
  */
 public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<BarCodeTable> {
 //
@@ -56,6 +61,17 @@ public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<BarCodeTable
                 }
             };
             tv_print.setOnClickListener(click);
+
+            // 长按打印多次
+            tv_print.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if(callBack != null) {
+                        callBack.onPrint2(entity, pos);
+                    }
+                    return true;
+                }
+            });
     }
 
     public void setCallBack(MyCallBack callBack) {
@@ -64,6 +80,7 @@ public class PrintFragment4Adapter extends BaseArrayRecyclerAdapter<BarCodeTable
 
     public interface MyCallBack {
         void onPrint(BarCodeTable entity, int position);
+        void onPrint2(BarCodeTable entity, int position);
     }
 
     /*之下的方法都是为了方便操作，并不是必须的*/

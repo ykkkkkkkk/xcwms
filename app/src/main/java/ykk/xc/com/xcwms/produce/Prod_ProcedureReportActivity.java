@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -70,6 +71,8 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     TextView tvMtlName;
     @BindView(R.id.tv_num)
     TextView tvNum;
+    @BindView(R.id.btn_save)
+    Button btnSave;
     @BindView(R.id.relative_Info)
     RelativeLayout relativeInfo;
     @BindView(R.id.tv1)
@@ -171,6 +174,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                                 m.tvMtlNumber.setText(Html.fromHtml("物料编号：<font color='#000000'>"+mtl.getfNumber()+"</font>"));
                                 m.tvMtlName.setText(Html.fromHtml("物料名称：<font color='#000000'>"+mtl.getfName()+"</font>"));
                                 m.setFocusable(m.etStaffCode);
+                                m.btnSave.performClick();
 
                                 break;
                             case '2': // 员工
@@ -306,7 +310,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
                 if(getValues(tvValuationType).indexOf("集体") > -1) {
                     vp.setCollectiveId(collective.getId());
                     vp.setStaffId(0);
-                    vp.setDeptId(0);
+                    vp.setDeptId(collective.getEmp().getDeptId());
                 } else {
                     vp.setCollectiveId(0);
                     vp.setStaffId(staff.getStaffId());

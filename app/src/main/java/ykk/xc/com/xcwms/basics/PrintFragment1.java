@@ -1,10 +1,13 @@
 package ykk.xc.com.xcwms.basics;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +33,7 @@ import okhttp3.ResponseBody;
 import ykk.xc.com.xcwms.R;
 import ykk.xc.com.xcwms.basics.adapter.PrintFragment1Adapter;
 import ykk.xc.com.xcwms.comm.BaseFragment;
+import ykk.xc.com.xcwms.comm.Comm;
 import ykk.xc.com.xcwms.comm.Consts;
 import ykk.xc.com.xcwms.model.BarCodeTable;
 import ykk.xc.com.xcwms.model.Material;
@@ -137,9 +141,47 @@ public class PrintFragment1 extends BaseFragment implements XRecyclerView.Loadin
             public void onPrint(BarCodeTable e, int pos) {
                 Log.e("onPrint1", e.getMaterialName());
                 // 打印
-    //            connectBluetoothBefore();
                 String result = JsonUtil.objectToString(e);
-                parent.setFragmentPrint(0, result);
+                parent.setFragmentPrint(0, result, 1);
+            }
+
+            @Override
+            public void onPrint2(BarCodeTable e, int pos) {
+                Log.e("onPrint2", e.getMaterialName());
+                // 打印多次
+                final String result = JsonUtil.objectToString(e);
+
+                // 新建一个Dialog
+                final EditText et = new EditText(mContext);
+                et.setInputType( InputType.TYPE_CLASS_NUMBER);
+                et.setHint("1");
+
+                AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+                build.setTitle("请输入打印次数");
+                build.setView(et);
+                build.setPositiveButton("打印", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String count = et.getText().toString().trim();
+                        int num = 1;
+                        if(count.length() == 0) {
+                            num = Comm.parseInt(et.getHint().toString());
+                        } else {
+                            num = Comm.parseInt(et.getText().toString());
+                        }
+                        parent.setFragmentPrint(0, result, num);
+                    }
+                });
+                build.setNegativeButton("取消", null);
+                build.setCancelable(false);
+                build.show();
+                // 延时显示软键盘
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Comm.showSoftInputFromWindow(et);
+                    }
+                },200);
             }
         });
     }

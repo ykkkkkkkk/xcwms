@@ -64,6 +64,7 @@ import ykk.xc.com.xcwms.model.stock.StkTransferApp;
 import ykk.xc.com.xcwms.sales.adapter.Stk_TransferDirectFragment4Adapter;
 import ykk.xc.com.xcwms.sales.adapter.Stk_TransferDirectFragment4Adapter;
 import ykk.xc.com.xcwms.util.JsonUtil;
+import ykk.xc.com.xcwms.util.LogUtil;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
 
 /**
@@ -286,14 +287,14 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
         mAdapter.setCallBack(new Stk_TransferDirectFragment4Adapter.MyCallBack() {
             @Override
             public void onClick_num(View v, ScanningRecord2 entity, int position) {
-                Log.e("num", "行：" + position);
-//                curPos = position;
+                LogUtil.e("num", "行：" + position);
+                curPos = position;
                 showInputDialog("数量", String.valueOf(entity.getStockqty()), "0", CODE2);
             }
 
             @Override
             public void onClick_selStock(View v, ScanningRecord2 entity, int position, boolean isInStock) {
-                Log.e("selStock", "行：" + position);
+                LogUtil.e("selStock", "行：" + position);
                 curPos = position;
                 context.isInStock = isInStock;
                 showForResult(Stock_DialogActivity.class, SEL_STOCK2, null);
@@ -301,7 +302,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
 
             @Override
             public void onClick_del(ScanningRecord2 entity, int position) {
-                Log.e("del", "行：" + position);
+                LogUtil.e("del", "行：" + position);
                 checkDatas.remove(position);
                 mAdapter.notifyDataSetChanged();
             }
@@ -634,7 +635,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             case SEL_STOCK2: //行事件选择仓库	返回
                 if (resultCode == Activity.RESULT_OK) {
                     stock2 = (Stock) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
+                    LogUtil.e("onActivityResult --> SEL_STOCK2", stock2.getfName());
                     // 启用了库位管理
                     if (stock2.isStorageLocation()) {
                         Bundle bundle = new Bundle();
@@ -653,7 +654,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             case SEL_STOCKP2: //行事件选择库位	返回
                 if (resultCode == Activity.RESULT_OK) {
                     stockP2 = (StockPosition) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
+                    LogUtil.e("onActivityResult --> SEL_STOCKP2", stockP2.getFname());
                     if(isInStock) stockAllFill2(true);
                     else {
                         stockAllFill(true);
@@ -666,7 +667,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             case SEL_ORG: //查询出库组织   	返回
                 if (resultCode == Activity.RESULT_OK) {
                     inOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_ORG", inOrg.getName());
+                    LogUtil.e("onActivityResult --> SEL_ORG", inOrg.getName());
                     getOrgAfter();
                 }
 
@@ -674,7 +675,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             case SEL_ORG2: //查询生产组织   	返回
                 if (resultCode == Activity.RESULT_OK) {
                     outOrg = (Organization) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_ORG2", outOrg.getName());
+                    LogUtil.e("onActivityResult --> SEL_ORG2", outOrg.getName());
                     getOrg2After();
                 }
 
@@ -682,7 +683,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             case SEL_DEPT: //查询部门	返回
                 if (resultCode == Activity.RESULT_OK) {
                     department = (Department) data.getSerializableExtra("obj");
-                    Log.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
+                    LogUtil.e("onActivityResult --> SEL_DEPT", department.getDepartmentName());
                     getDeptAfter();
                 }
 
@@ -815,7 +816,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
 //            sr2.setSequenceNo(stk.getSnCode());
 //            sr2.setBarcode(stk.getBarcode());
 
-            // 发货单默认的仓库
+            // 调拨申请单的调出仓库
             if (stk.getfStockId() > 0) {
                 Stock stock = new Stock();
                 stock.setfStockid(stk.getfStockId());
@@ -837,6 +838,8 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
                 setStockInfo(sr2, stock);
                 setStockPosInfo(sr2, stockP);
             }
+            // 调拨申请单的调入仓库
+            sr2.setStock2(stk.getfStockIn());
 
             if (department != null) {
                 sr2.setEmpId(department.getFitemID()); // 部门
@@ -1189,7 +1192,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_addScanningRecord --> onResponse", result);
+                LogUtil.e("run_addScanningRecord --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC1);
                     return;
@@ -1247,7 +1250,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_smGetDatas --> onResponse", result);
+                LogUtil.e("run_smGetDatas --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNSUCC2, result);
                     mHandler.sendMessage(msg);
@@ -1301,7 +1304,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_findInStockSum --> onResponse", result);
+                LogUtil.e("run_findInStockSum --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     mHandler.sendEmptyMessage(UNSUCC3);
                     return;
@@ -1343,7 +1346,7 @@ public class Stk_TransferDirectFragment4 extends BaseFragment implements IFragme
             public void onResponse(Call call, Response response) throws IOException {
                 ResponseBody body = response.body();
                 String result = body.string();
-                Log.e("run_submitAndPass --> onResponse", result);
+                LogUtil.e("run_submitAndPass --> onResponse", result);
                 if (!JsonUtil.isSuccess(result)) {
                     Message msg = mHandler.obtainMessage(UNPASS, result);
                     mHandler.sendMessage(msg);

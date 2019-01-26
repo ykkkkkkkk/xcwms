@@ -3,6 +3,7 @@ package ykk.xc.com.xcwms.model.stock;
 import java.io.Serializable;
 
 import ykk.xc.com.xcwms.model.Material;
+import ykk.xc.com.xcwms.model.Stock;
 
 /**
  * 调拨申请单实体类
@@ -88,6 +89,7 @@ public class StkTransferApp implements Serializable {
 
 	/*调出仓库名称*/
 	private String fStockName;
+	private Stock fStock; //  调出仓库对象
 
 	/*调入仓库id*/
 	private Integer fStockInId;
@@ -97,6 +99,7 @@ public class StkTransferApp implements Serializable {
 
 	/*调入仓库名称*/
 	private String fStockInName;
+	private Stock fStockIn; //  调入仓库对象
 
 	/*调出货主id*/
 	private Integer fOwnerId;
@@ -530,5 +533,20 @@ public class StkTransferApp implements Serializable {
         this.usableFqty = usableFqty;
     }
 
+	public Stock getfStock() {
+		return fStock;
+	}
+
+	public Stock getfStockIn() {
+		return fStockIn;
+	}
+
+	public void setfStock(Stock fStock) {
+		this.fStock = fStock;
+	}
+
+	public void setfStockIn(Stock fStockIn) {
+		this.fStockIn = fStockIn;
+	}
 
 }

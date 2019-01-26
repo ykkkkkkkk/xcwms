@@ -82,6 +82,7 @@ public class PrintMainActivity extends BaseActivity {
     private List<MaterialBinningRecord> mbrList = new ArrayList<>();
     private List<BoxBarCode> boxBarCodeList = null;
     private BoxBarCode boxBarCode;
+    private int printCount; // 打印次数
     private DecimalFormat df = new DecimalFormat("#.####");
     private static final int CONN_STATE_DISCONN = 0x007; // 连接状态断开
     private static final int PRINTER_COMMAND_ERROR = 0x008; // 使用打印机指令错误
@@ -213,10 +214,11 @@ public class PrintMainActivity extends BaseActivity {
     /**
      * Fragment打印回调
      */
-    public void setFragmentPrint(int flag, String result) {
+    public void setFragmentPrint(int flag, String result, int count) {
         prodOrderList.clear();
 
         tabFlag = flag;
+        printCount = count;
         if(tabFlag != flag) {
 //            isConnected = false;
         }
@@ -224,7 +226,9 @@ public class PrintMainActivity extends BaseActivity {
         barcode = bt.getBarcode();
 
         if(isConnected) {
-            sendLabel(0);
+            for(int i=0; i<count; i++) {
+                sendLabel(0);
+            }
 
         } else {
             // 打开蓝牙配对页面
@@ -365,10 +369,11 @@ public class PrintMainActivity extends BaseActivity {
     /**
      * Fragment4打印回调
      */
-    public void setFragmentPrint4(int flag, String result) {
+    public void setFragmentPrint4(int flag, String result, int count) {
         prodOrderList.clear();
 
         tabFlag = flag;
+        printCount = count;
         if(tabFlag != flag) {
 //            isConnected = false;
         }
@@ -376,7 +381,9 @@ public class PrintMainActivity extends BaseActivity {
         barcode = map4.get("barCode");
 
         if(isConnected) {
-            sendLabel(6);
+            for(int i=0; i<count; i++) {
+                sendLabel(6);
+            }
 
         } else {
             // 打开蓝牙配对页面
@@ -454,8 +461,12 @@ public class PrintMainActivity extends BaseActivity {
                 setBoxBarCodeFormat(count);
 
                 break;
-            case 6: // 物料包装
+            case 6: // 物料包装--大标签
                 setMtlBoxFormat();
+
+                break;
+            case 7: // 物料包装--小标签
+                setMtlBoxFormat2();
 
                 break;
         }
@@ -983,7 +994,7 @@ public class PrintMainActivity extends BaseActivity {
     }
 
     /**
-     * 设置物料包装打码格式
+     * 设置物料包装打码格式（大标签）
      */
     private void setMtlBoxFormat() {
         LabelCommand tsc = new LabelCommand();
@@ -1036,6 +1047,60 @@ public class PrintMainActivity extends BaseActivity {
         rowHigthSum = rowHigthSum + rowSpacing+5;
         // 绘制一维条码
         tsc.add1DBarcode(30, rowHigthSum, LabelCommand.BARCODETYPE.CODE39, 80, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        // --------------- 打印区-------------End
+        // 打印标签end
+        tsc.addPrint(1, 1);
+        // 打印标签后 蜂鸣器响
+
+        tsc.addSound(2, 100);
+        tsc.addCashdrwer(LabelCommand.FOOT.F5, 255, 255);
+        Vector<Byte> datas = tsc.getCommand();
+        // 发送数据
+        if (DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id] == null) {
+            return;
+        }
+        DeviceConnFactoryManager.getDeviceConnFactoryManagers()[id].sendDataImmediately(datas);
+    }
+
+    /**
+     * 设置物料包装打码格式（小标签）
+     */
+    private void setMtlBoxFormat2() {
+        LabelCommand tsc = new LabelCommand();
+        // 设置标签尺寸，按照实际尺寸设置
+        tsc.addSize(80, 26); // 有间隙的纸
+        // 设置标签间隙，按照实际尺寸设置，如果为无间隙纸则设置为0
+        tsc.addGap(0);
+        // 设置打印方向
+        tsc.addDirection(LabelCommand.DIRECTION.FORWARD, LabelCommand.MIRROR.NORMAL);
+        // 开启带Response的打印，用于连续打印
+        tsc.addQueryPrinterStatus(LabelCommand.RESPONSE_MODE.ON);
+        // 设置原点坐标
+        tsc.addReference(0, 0);
+        // 撕纸模式开启
+        tsc.addTear(EscCommand.ENABLE.ON);
+        // 清除打印缓冲区
+        tsc.addCls();
+        // --------------- 打印区-------------Begin
+        tsc.addText(10, 20, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"包装编码："+map4.get("MaterialNumber"));
+        tsc.addText(350, 20, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"规格："+map4.get("MaterialPackSize"));
+        String tmpName = map4.get("MaterialName");
+        int tmpLen = tmpName.length();
+        String mtlName1 = null;
+        String mtlName2 = null;
+        if(tmpName.length() <= 27) {
+            tsc.addText(10, 50, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+tmpName);
+        } else {
+            mtlName1 = tmpName.substring(0, 27);
+            mtlName2 = tmpName.substring(27, tmpLen);
+            tsc.addText(10, 50, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,"名称："+mtlName1);
+            tsc.addText(80, 80, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+mtlName2);
+        }
+
+        // 绘制一维条码
+        tsc.add1DBarcode(10, 110, LabelCommand.BARCODETYPE.CODE39, 60, LabelCommand.READABEL.EANBEL, LabelCommand.ROTATION.ROTATION_0, 2, 5, barcode);
+        tsc.addText(480, 130, LabelCommand.FONTTYPE.SIMPLIFIED_CHINESE, LabelCommand.ROTATION.ROTATION_0, LabelCommand.FONTMUL.MUL_1, LabelCommand.FONTMUL.MUL_1,""+Comm.getSysDate(9));
+
         // --------------- 打印区-------------End
         // 打印标签end
         tsc.addPrint(1, 1);
@@ -1130,7 +1195,9 @@ public class PrintMainActivity extends BaseActivity {
 
                             switch (tabFlag) {
                                 case 0: // 物料条码
-                                    sendLabel(0);
+                                    for(int i=0; i<printCount; i++) {
+                                        sendLabel(0);
+                                    }
 
                                     break;
                                 case 1: // 生产订单--大标签
@@ -1166,7 +1233,15 @@ public class PrintMainActivity extends BaseActivity {
 
                                     break;
                                 case 6: // 物料包装打印条码
-                                    sendLabel(6);
+                                    for(int i=0; i<printCount; i++) {
+                                        sendLabel(6);
+                                    }
+
+                                    break;
+                                case 7: // 物料包装打印条码
+                                    for(int i=0; i<printCount; i++) {
+                                        sendLabel(7);
+                                    }
 
                                     break;
                             }

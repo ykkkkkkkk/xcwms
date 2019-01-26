@@ -51,7 +51,7 @@
         android:layout_height="@dimen/_34dp"
         android:gravity="center"
         android:background="@drawable/btn_blue_selector"
-        android:text="打印"
+        android:text="打印*"
         android:textColor="@color/white"
         android:textSize="12sp" />
 

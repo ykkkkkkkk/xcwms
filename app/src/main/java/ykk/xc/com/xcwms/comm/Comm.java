@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -77,15 +78,6 @@ public class Comm {
 			}
 
 		}
-		return result;
-	}
-	/**
-	 * 转换成int类型
-	 */
-	public static int toInt(String str){
-		int result = 0;
-		try { result = str!=null && str!=""?Integer.parseInt(str):0; }
-		catch (Exception e) { result = 0; }
 		return result;
 	}
 
@@ -321,25 +313,6 @@ public class Comm {
 	}
 
 	/**
-	 * 关闭的dialog
-	 */
-	/**
-	 * 关闭
-	 * @param context
-	 * @param message
-	 * @return
-	 */
-	public static void showDialogClose(Activity context, String message) {
-		AlertDialog.Builder build = new AlertDialog.Builder(context);
-		build.setIcon(R.drawable.caution);
-		build.setTitle("系统提示您");
-		build.setMessage(message);
-		build.setNegativeButton("关闭", null);
-		build.setCancelable(false);
-		build.show();
-	}
-
-	/**
 	 * 生成13位唯一条码(根据表的自增长id来生成)
 	 */
 	public static String randBarcode(String id) {
@@ -427,6 +400,18 @@ public class Comm {
 		WifiInfo winfo = wifi.getConnectionInfo();
 		String mac =  winfo.getMacAddress();
 		return mac;
+	}
+
+	/**
+	 *
+	 * @param editText
+	 */
+	public static void  showSoftInputFromWindow(EditText editText) {
+		editText.setFocusable(true);
+		editText.setFocusableInTouchMode(true);
+		editText.requestFocus();
+		InputMethodManager inputManager = (InputMethodManager) editText.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputManager.showSoftInput(editText, 0);
 	}
 
 }
