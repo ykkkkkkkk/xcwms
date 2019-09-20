@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -103,7 +104,7 @@ public class Prod_InFragment2 extends BaseFragment {
     private String boxBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：仓库，2：库位， 3：车间， 4：物料 ，箱码
     private int curPos; // 当前行
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private User user;
     private char defaultStockVal; // 默认仓库的值
     private Activity mContext;
@@ -244,6 +245,13 @@ public class Prod_InFragment2 extends BaseFragment {
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
         mContext = getActivity();
         parent = (Prod_InMainActivity) mContext;
 

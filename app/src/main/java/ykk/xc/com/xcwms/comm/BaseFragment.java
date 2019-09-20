@@ -127,7 +127,7 @@ public abstract class BaseFragment extends Fragment {
 	 */
 	public String getURL(String param) {
 		SharedPreferences spfConfig = spf(getResStr(R.string.saveConfig));
-		String ip = spfConfig.getString("ip", "192.168.3.198");
+		String ip = spfConfig.getString("ip", "192.168.3.214");
 		String port = spfConfig.getString("port", "8080");
 		return "http://"+ip+":"+port+"/xcwms/"+param;
 	}

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -121,7 +122,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
     private String boxBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：箱码
     private int curPos; // 当前行
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private User user;
     private char defaultStockVal; // 默认仓库的值
     private Activity mContext;
@@ -320,10 +321,10 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                             }
                             fbillNo = deli.getFbillno();
                         }
-                        if(isBool) {
-                            Comm.showWarnDialog(m.mContext,"该箱物料存在"+(size)+"个发货通知单，不允许操作！");
-                            return;
-                        }
+//                        if(isBool) {
+//                            Comm.showWarnDialog(m.mContext,"该箱物料存在"+(size)+"个发货通知单，不允许操作！");
+//                            return;
+//                        }
                         if(m.mbrList.size() > list2.size()) {
                             Comm.showWarnDialog(m.mContext,"装箱物与发货通知单不匹配，请检查！");
                             return;
@@ -395,6 +396,13 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
         mContext = getActivity();
 //        parent = (Stk_TransferDirectMainActivity) mContext;
 
@@ -1031,7 +1039,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
 //            sr2.setSequenceNo(deliOrder.getSnCode());
 //            sr2.setBarcode(deliOrder.getBarcode());
 
-                // 发货单默认的仓库
+                // 发货单调出仓库
                 if (deliOrder.getStock() != null) {
                     sr2.setStock(deliOrder.getStock());
                     sr2.setStockId(deliOrder.getStockId());
@@ -1040,6 +1048,19 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                     sr2.setStockPos(null);
                     sr2.setStockPositionId(0);
                     sr2.setStockPName("");
+                } else if(mtl.getStock() != null) {
+                    // 物料默认的仓库仓位
+                    setStockInfo(sr2, mtl.getStock());
+                    setStockPosInfo(sr2, mtl.getStockPos());
+                } else {
+                    // 默认操作员的仓库仓位
+                    setStockInfo(sr2, stock);
+                    setStockPosInfo(sr2, stockP);
+                }
+
+                // 发货单调入仓库
+                if (deliOrder.getInStock() != null) {
+                    sr2.setStock2(deliOrder.getInStock());
                 } else if(mtl.getStock() != null) {
                     // 物料默认的仓库仓位
                     setStockInfo(sr2, mtl.getStock());
@@ -1129,7 +1150,6 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                 srTok3.setFpaezHigh(deliOrder.getHigh());
                 srTok3.setFpaezBeizhu(deliOrder.getSummary());
                 srTok3.setFentryNote(deliOrder.getEntryRemark());
-                srTok3.setFboxAmount(mapBox.size());
                 srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
                 srTok3.setFlhDbj(deliOrder.getFlhDbj());
                 sr2.setSrTok3(srTok3);
@@ -1295,7 +1315,6 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             srTok3.setFpaezHigh(deliOrder.getHigh());
             srTok3.setFpaezBeizhu(deliOrder.getSummary());
             srTok3.setFentryNote(deliOrder.getEntryRemark());
-            srTok3.setFboxAmount(mapBox.size());
             srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
             srTok3.setFlhDbj(deliOrder.getFlhDbj());
             sr2.setSrTok3(srTok3);
@@ -1448,12 +1467,16 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             }
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
-            record.setSrTok3(sr2.getSrTok3());
+            ScanningRecordTok3 srTok3 = sr2.getSrTok3();
+            srTok3.setFboxAmount(mapBox.size());
+            record.setSrTok3(srTok3);
             record.setLeafNumber(sr2.getLeafNumber());
             record.setLeafNumber2(sr2.getLeafNumber2());
             record.setCoveQty(sr2.getCoveQty());
             record.setStock2(sr2.getStock2());
             record.setStockPos2(sr2.getStockPos2());
+            // 判断连个组织是否一样，是 = InnerOrgTransfer:组织内调拨，否 = OverOrgTransfer:跨组织调拨
+            record.setFtransferBizType(sr2.getReceiveOrgFnumber().equals(sr2.getPurOrgFnumber()) ? "InnerOrgTransfer" : "OverOrgTransfer");
 
             list.add(record);
         }

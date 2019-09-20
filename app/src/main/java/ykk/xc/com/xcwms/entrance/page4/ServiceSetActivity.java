@@ -36,7 +36,7 @@ public class ServiceSetActivity extends BaseActivity {
     @Override
     public void initView() {
         spfConfig = spf(getResStr(R.string.saveConfig));
-        String ip = spfConfig.getString("ip", "192.168.3.198");
+        String ip = spfConfig.getString("ip", "192.168.3.214");
         String port = spfConfig.getString("port", "8080");
         setTexts(etIp, ip);
         setTexts(etPort, port);

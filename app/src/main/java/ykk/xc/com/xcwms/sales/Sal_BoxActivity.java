@@ -477,6 +477,8 @@ public class Sal_BoxActivity extends BaseActivity {
         rbType1.setEnabled(true);
         rbType2.setEnabled(true);
         rbType1.setChecked(true);
+        rbType1.setTextColor(Color.parseColor("#FFFFFF"));
+        rbType2.setTextColor(Color.parseColor("#666666"));
 
         dataType = '1';
         curViewFlag = '1';

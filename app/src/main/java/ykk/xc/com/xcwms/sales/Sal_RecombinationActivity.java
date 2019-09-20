@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -131,7 +132,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
     private AssistInfo assist; // 辅助资料--发货方式
     private int status = 0; // 箱子状态（0：创建，1：开箱，2：封箱）
     private User user;
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private int id = 0; // 设备id
     private ThreadPool threadPool;
     private boolean isConnected, isPair; // 蓝牙是否连接标识
@@ -189,7 +190,7 @@ public class Sal_RecombinationActivity extends BaseActivity {
                         break;
                     case UNSUCC1:
                         String errMsg = JsonUtil.strToString((String) msg.obj);
-                        if(errMsg.length() > 0) {
+                        if(Comm.isNULLS(errMsg).length() > 0) {
                             Comm.showWarnDialog(m.context, errMsg);
                         } else {
                             Comm.showWarnDialog(m.context,"条码不存在，或者扫错了条码！");
@@ -337,6 +338,14 @@ public class Sal_RecombinationActivity extends BaseActivity {
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
+
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         mAdapter = new Sal_RecombinationAdapter(context, checkDatas);

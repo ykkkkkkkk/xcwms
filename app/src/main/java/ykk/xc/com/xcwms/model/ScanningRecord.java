@@ -61,7 +61,8 @@ public class ScanningRecord implements Serializable {
     private double fprice; // 来源订单单价
     private String leafNumber; // 来源叶片
     private String leafNumber2; // 来源叶片1
-    // 临时变量
+    private String ftransferBizType; // 调拨类型( InnerOrgTransfer:组织内调拨，OverOrgTransfer:跨组织调拨 )
+    //    // 临时变量
     private List<String> listBarcode; // 记录每行中扫的条码barcode
     private String strBarcodes; // 用逗号拼接的条码号
     private String kdAccount; // k3 用户的密码
@@ -436,6 +437,12 @@ public class ScanningRecord implements Serializable {
     }
     public void setStockPos2(StockPosition stockPos2) {
         this.stockPos2 = stockPos2;
+    }
+    public String getFtransferBizType() {
+        return ftransferBizType;
+    }
+    public void setFtransferBizType(String ftransferBizType) {
+        this.ftransferBizType = ftransferBizType;
     }
 
     public ScanningRecord() {

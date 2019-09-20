@@ -26,6 +26,7 @@ import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -65,7 +66,7 @@ public class Prod_ProcedureBindingActivity extends BaseActivity {
     private static final int SEL_ORDER = 10, CODE1 = 11;
     private User user;
     private int procedureId; // 工序id
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private DecimalFormat df = new DecimalFormat("#.######");
     private boolean isBack; // 是否返回数据
 
@@ -139,6 +140,14 @@ public class Prod_ProcedureBindingActivity extends BaseActivity {
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {

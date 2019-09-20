@@ -802,6 +802,7 @@ public class Sal_PickingListActivity extends BaseActivity {
             pl.setDeliFremainoutqty(deliOrder.getDeliFremainoutqty());
 //            pl.setDeliveryWay(deliOrder.getDeliveryWay());
             pl.setEntryId(deliOrder.getEntryId());
+            pl.setFprice(deliOrder.getFprice());
 //            pl.setBatchNo(bt.getBatchCode());
 //            pl.setSnNo(bt.getSnCode());
 //            pl.setBarcode(bt.getBarcode());

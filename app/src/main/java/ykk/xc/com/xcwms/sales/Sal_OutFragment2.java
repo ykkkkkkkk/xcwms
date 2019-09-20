@@ -24,10 +24,12 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -71,6 +73,7 @@ import ykk.xc.com.xcwms.model.sal.DeliOrder;
 import ykk.xc.com.xcwms.model.sal.PickingList;
 import ykk.xc.com.xcwms.model.sal.SalOrder;
 import ykk.xc.com.xcwms.sales.adapter.Sal_OutFragment2Adapter;
+import ykk.xc.com.xcwms.util.BigdecimalUtil;
 import ykk.xc.com.xcwms.util.JsonUtil;
 import ykk.xc.com.xcwms.util.LogUtil;
 import ykk.xc.com.xcwms.util.interfaces.IFragmentExec;
@@ -106,6 +109,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     EditText etExpressNo;
     @BindView(R.id.lin_top)
     LinearLayout linTop;
+    @BindView(R.id.tv_boxSize)
+    TextView tvBoxSize;
+    @BindView(R.id.tv_countSum)
+    TextView tvCountSum;
 
     private Sal_OutFragment2 context = this;
     private static final int SEL_ORDER = 10, SEL_DEPT = 11, SEL_ORG = 12, SEL_ORG2 = 13, SEL_EXPRESS = 14, SEL_STOCK2 = 15, SEL_STOCKP2 = 16, SEL_STAFF = 17, PAD_SM = 18;
@@ -123,7 +130,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private String boxBarcode; // 对应的条码号
     private char curViewFlag = '1'; // 1：箱码
     private int curPos; // 当前行
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private User user;
     private char defaultStockVal; // 默认仓库的值
     private Activity mContext;
@@ -135,6 +142,7 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private String k3Number; // 记录传递到k3返回的单号
     private List<Map<String, Object>> listMaps = new ArrayList<>(); // 记录多少个箱子和箱子里的物料
     private boolean isTextChange; // 是否进入TextChange事件
+    private DecimalFormat df = new DecimalFormat("#.####");
 
     // 消息处理
     private Sal_OutFragment2.MyHandler mHandler = new Sal_OutFragment2.MyHandler(this);
@@ -261,6 +269,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                                         // 把这个箱码保存到map中
                                         m.mapBox.put(m.boxBarcode, true);
                                         m.getSourceAfter3(m.mbrList);
+                                        // 显示合计信息
+                                        m.tvBoxSize.setText(String.valueOf(m.mapBox.size()));
+                                        m.tvCountSum.setText(m.countSum());
+
                                         break;
                                 }
 
@@ -319,10 +331,10 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                             }
                             fbillNo = deli.getFbillno();
                         }
-                        if(isBool) {
-                            Comm.showWarnDialog(m.mContext,"该箱物料存在"+(size)+"个发货通知单，不允许操作！");
-                            return;
-                        }
+//                        if(isBool) {
+//                            Comm.showWarnDialog(m.mContext,"该箱物料存在"+(size)+"个发货通知单，不允许操作！");
+//                            return;
+//                        }
                         if(m.mbrList.size() > list2.size()) {
                             Comm.showWarnDialog(m.mContext,"装箱物与发货通知单不匹配，请检查！");
                             return;
@@ -339,6 +351,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                         // 把这个箱码保存到map中
                         m.mapBox.put(m.boxBarcode, true);
                         m.getSourceAfter2();
+                        // 显示合计信息
+                        m.tvBoxSize.setText(String.valueOf(m.mapBox.size()));
+                        m.tvCountSum.setText(m.countSum());
 
                         break;
                     case UNSUCC4: // 查询发货通知单 失败
@@ -394,6 +409,13 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
         mContext = getActivity();
 //        parent = (Sal_OutMainActivity) mContext;
 
@@ -689,6 +711,8 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
         etExpressNo.setText("");
         expressCompany = null;
         linTop.setVisibility(View.VISIBLE);
+        tvBoxSize.setText("0");
+        tvCountSum.setText("0");
     }
 
     private void resetSon() {
@@ -716,6 +740,17 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
     private void resetSon2() {
         etBoxCode.setText("");
         boxBarcode = null;
+    }
+
+    /**
+     * 计算实发总数
+     */
+    private String countSum() {
+        double sum = 0.0;
+        for (int i = 0; i < checkDatas.size(); i++) {
+            sum = BigdecimalUtil.add(sum, checkDatas.get(i).getStockqty());
+        }
+        return df.format(sum);
     }
 
     @Override
@@ -1079,7 +1114,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
                 srTok3.setFpaezHigh(deliOrder.getHigh());
                 srTok3.setFpaezBeizhu(deliOrder.getSummary());
                 srTok3.setFentryNote(deliOrder.getEntryRemark());
-                srTok3.setFboxAmount(mapBox.size());
                 srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
                 srTok3.setFlhDbj(deliOrder.getFlhDbj());
                 sr2.setSrTok3(srTok3);
@@ -1238,7 +1272,6 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             srTok3.setFpaezHigh(deliOrder.getHigh());
             srTok3.setFpaezBeizhu(deliOrder.getSummary());
             srTok3.setFentryNote(deliOrder.getEntryRemark());
-            srTok3.setFboxAmount(mapBox.size());
             srTok3.setFlhDbdj(deliOrder.getFlhDbdj());
             srTok3.setFlhDbj(deliOrder.getFlhDbj());
             sr2.setSrTok3(srTok3);
@@ -1390,7 +1423,9 @@ public class Sal_OutFragment2 extends BaseFragment implements IFragmentExec {
             }
             record.setKdAccount(user.getKdAccount());
             record.setKdAccountPassword(user.getKdAccountPassword());
-            record.setSrTok3(sr2.getSrTok3());
+            ScanningRecordTok3 srTok3 = sr2.getSrTok3();
+            srTok3.setFboxAmount(mapBox.size());
+            record.setSrTok3(srTok3);
             record.setLeafNumber(sr2.getLeafNumber());
             record.setLeafNumber2(sr2.getLeafNumber2());
             record.setCoveQty(sr2.getCoveQty());

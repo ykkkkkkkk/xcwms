@@ -204,7 +204,7 @@ public class MainTabFragment5 extends BaseFragment implements IDownloadContract.
                     public void onClick(DialogInterface dialog, int which) {
                         // 得到ip和端口
                         SharedPreferences spfConfig = spf(getResStr(R.string.saveConfig));
-                        String ip = spfConfig.getString("ip", "192.168.3.198");
+                        String ip = spfConfig.getString("ip", "192.168.3.214");
                         String port = spfConfig.getString("port", "8080");
                         String url = "http://"+ip+":"+port+"/apks/xcwms.apk";
 

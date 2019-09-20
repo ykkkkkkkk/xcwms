@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -84,7 +85,7 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
     private static final int SUCC1 = 200, UNSUCC1 = 500, SUCC2 = 201, UNSUCC2 = 501, SUCC3 = 202, UNSUCC3 = 502, BIND = 1;
     private static final int SEL_ORDER = 10, CODE1 = 11, SCAN = 12;
     private Material mtl;
-    private OkHttpClient okHttpClient = new OkHttpClient();
+    private OkHttpClient okHttpClient = null;
     private String mtlBarcode, staffBarcode; // 对应的条码号
     private DecimalFormat df = new DecimalFormat("#.######");
     private char curViewFlag = '1'; // 1：物料，2：员工
@@ -249,6 +250,14 @@ public class Prod_ProcedureReportActivity extends BaseActivity {
 
     @Override
     public void initView() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient.Builder()
+//                .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间（默认为10秒）
+                    .writeTimeout(300, TimeUnit.SECONDS) // 设置写的超时时间
+                    .readTimeout(300, TimeUnit.SECONDS) //设置读取超时时间
+                    .build();
+        }
+
         mobileMac = Comm.getAddressMac(context);
     }
 
