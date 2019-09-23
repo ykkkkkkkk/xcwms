@@ -83,6 +83,8 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
     EditText etGetFocus;
     @BindView(R.id.btn_save)
     Button btnSave;
+    @BindView(R.id.btn_pass)
+    Button btnPass;
     @BindView(R.id.tv_deptSel)
     TextView tvDeptSel;
     @BindView(R.id.et_boxCode)
@@ -155,17 +157,17 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                 switch (msg.what) {
                     case SUCC1:
                         m.k3Number = JsonUtil.strToString((String) msg.obj);
-                        m.reset('0');
+//                        m.reset('0');
 //
-                        m.checkDatas.clear();
-                        m.mAdapter.notifyDataSetChanged();
-                        m.caseId = 0;
-                        m.mapBox.clear();
-                        m.deliOrderList.clear();
-                        Comm.showWarnDialog(m.mContext,"保存成功✔");
+//                        m.checkDatas.clear();
+//                        m.mAdapter.notifyDataSetChanged();
+//                        m.caseId = 0;
+//                        m.mapBox.clear();
+//                        m.deliOrderList.clear();
 //                        m.parent.setFragment2Print(2, m.listMaps);
-//                        m.btnSave.setVisibility(View.GONE);
-//                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
+                        m.btnSave.setVisibility(View.GONE);
+                        m.btnPass.setVisibility(View.VISIBLE);
+                        Comm.showWarnDialog(m.mContext,"保存成功，请点击“审核按钮”！");
 
                         break;
                     case UNSUCC1:
@@ -175,6 +177,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                     case PASS: // 审核成功 返回
                         m.k3Number = null;
                         m.btnSave.setVisibility(View.VISIBLE);
+                        m.btnPass.setVisibility(View.GONE);
                         m.reset('0');
 
                         m.checkDatas.clear();
@@ -182,9 +185,8 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
                         m.caseId = 0;
                         m.mapBox.clear();
                         m.deliOrderList.clear();
-//                        Comm.showWarnDialog(m.mContext,"审核成功✔");
                         m.toasts("审核成功✔");
-                        m.parent.setFragment2Print(2, m.listMaps);
+//                        m.parent.setFragment2Print(2, m.listMaps);
 
                         break;
                     case UNPASS: // 审核失败 返回
@@ -716,6 +718,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
         listMaps.clear();
         k3Number = null;
         btnSave.setVisibility(View.VISIBLE);
+        btnPass.setVisibility(View.GONE);
         checkDatas.clear();
         mAdapter.notifyDataSetChanged();
         reset('0');
@@ -1120,7 +1123,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
 
                 sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
                 sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
-
+                sr2.setFbillTypeNumber(deliOrder.getZjdbFbillTypeNumber());
                 String deliveryCompanyId = isNULLS(deliOrder.getDeliveryCompanyId());
                 String deliveryCompanyNumber = isNULLS(deliOrder.getDeliveryCompanyNumber());
                 String deliveryCompanyName = isNULLS(deliOrder.getDeliveryCompanyName());
@@ -1286,6 +1289,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
 
             sr2.setFsrcBillTypeId("SAL_DELIVERYNOTICE");
             sr2.setFsTableName("T_SAL_DELIVERYNOTICEENTRY");
+            sr2.setFbillTypeNumber(deliOrder.getZjdbFbillTypeNumber());
             String deliveryCompanyId = isNULLS(deliOrder.getDeliveryCompanyId());
             String deliveryCompanyNumber = isNULLS(deliOrder.getDeliveryCompanyNumber());
             String deliveryCompanyName = isNULLS(deliOrder.getDeliveryCompanyName());
@@ -1462,6 +1466,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
             record.setFsTableName(sr2.getFsTableName());
             record.setFcarriageNo(getValues(etExpressNo).trim());
             record.setSalOrderNo(sr2.getSalOrderNo());
+            record.setFbillTypeNumber(sr2.getFbillTypeNumber());
             if(expressCompany != null) {
                 record.setExpressNumber(expressCompany.getExpressNumber());
             }
@@ -1671,7 +1676,7 @@ public class Stk_TransferDirectFragment2 extends BaseFragment implements IFragme
         getUserInfo();
         FormBody formBody = new FormBody.Builder()
                 .add("fbillNo", k3Number)
-                .add("type", "2")
+                .add("type", "9")
                 .add("kdAccount", user.getKdAccount())
                 .add("kdAccountPassword", user.getKdAccountPassword())
                 .build();

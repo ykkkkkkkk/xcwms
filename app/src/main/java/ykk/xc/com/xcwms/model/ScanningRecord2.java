@@ -73,6 +73,7 @@ public class ScanningRecord2 implements Serializable {
     private int coveQty;
     private Stock stock2; // 调入仓库
     private StockPosition stockPos2; // 调入库位
+    private String fbillTypeNumber; // 单据类型
 
 
     public int getID() {
@@ -463,6 +464,12 @@ public class ScanningRecord2 implements Serializable {
     }
     public void setStockPos2(StockPosition stockPos2) {
         this.stockPos2 = stockPos2;
+    }
+    public String getFbillTypeNumber() {
+        return fbillTypeNumber;
+    }
+    public void setFbillTypeNumber(String fbillTypeNumber) {
+        this.fbillTypeNumber = fbillTypeNumber;
     }
 
     public ScanningRecord2() {

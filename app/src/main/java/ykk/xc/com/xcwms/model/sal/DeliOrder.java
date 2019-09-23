@@ -16,6 +16,8 @@ import ykk.xc.com.xcwms.model.Stock;
 public class DeliOrder implements Serializable{
 	private int fId; // 单据id,
 	private String fbillno; // 单据编号,
+	private String fbillTypeNumber; // 单据类型
+	private String zjdbFbillTypeNumber; // 直接调拨单--单据类型
 	private String deliDate; // 发货日期
 	private int custId; // 客户Id,
 	private String custNumber; // 客户代码,
@@ -686,6 +688,22 @@ public class DeliOrder implements Serializable{
 
 	public void setInStock(Stock inStock) {
 		this.inStock = inStock;
+	}
+
+    public String getFbillTypeNumber() {
+        return fbillTypeNumber;
+    }
+
+    public void setFbillTypeNumber(String fbillTypeNumber) {
+        this.fbillTypeNumber = fbillTypeNumber;
+    }
+
+	public String getZjdbFbillTypeNumber() {
+		return zjdbFbillTypeNumber;
+	}
+
+	public void setZjdbFbillTypeNumber(String zjdbFbillTypeNumber) {
+		this.zjdbFbillTypeNumber = zjdbFbillTypeNumber;
 	}
 
 }
